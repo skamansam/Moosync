@@ -63,6 +63,7 @@ export default {
         this.makePeerConnection();
         try {
           this.sendAnswer(id, description);
+          this.gotStream();
           this.peerConnection.onicecandidate = event => {
             if (event.candidate) {
               this.socket.emit("candidate", id, event.candidate);
