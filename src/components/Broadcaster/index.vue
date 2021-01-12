@@ -12,118 +12,178 @@
 
 <script>
 import { config, connectionOptions } from "@/utils/socketBroadcast";
-
 export default {
   name: "Broadcaster",
   props: {
-    msg: String
+    msg: String,
   },
   data() {
     return {
       socket: undefined,
       peerConnections: {},
-      stream: undefined
+      stream: undefined,
     };
   },
   mounted() {
     this.setupStream();
+    this.playAudio();
   },
-
   methods: {
-    initializeSocket: function() {
+    initializeSocket: function () {
       this.socket = require("socket.io-client").connect(
         "http://localhost:4000",
         connectionOptions
       );
     },
 
-    makePeerConnection: function(id) {
+    makePeerConnection: function (id) {
       const peerConnection = new RTCPeerConnection(config);
       this.peerConnections[id] = peerConnection;
     },
 
-    sendOffer: function(id) {
+    emitOffer: function (id, description) {
+      this.socket.emit("offer", id, description);
+    },
+
+    listenStateFailed: function (id) {
+      this.peerConnections[id].addEventListener(
+        "iceconnectionstatechange",
+        () => {
+          if (
+            this.peerConnections[id].iceConnectionState === "failed" ||
+            this.peerConnections[id].connectionState === "failed"
+          ) {
+            this.peerConnections[id].restartIce();
+          }
+        }
+      );
+    },
+
+    sendOffer: function (id) {
       this.peerConnections[id]
         .createOffer()
-        .then(sdp => this.peerConnections[id].setLocalDescription(sdp))
+        .then((sdp) => this.peerConnections[id].setLocalDescription(sdp))
         .then(() => {
-          this.socket.emit(
-            "offer",
-            id,
-            this.peerConnections[id].localDescription
-          );
+          this.emitOffer(id, this.peerConnections[id].localDescription);
         });
     },
 
-    addIceCandidate: function(id, candidate) {
+    addIceCandidate: function (id, candidate) {
       this.peerConnections[id].addIceCandidate(new RTCIceCandidate(candidate));
     },
 
-    acceptAnswer: function(id, description) {
+    acceptAnswer: function (id, description) {
       this.peerConnections[id].setRemoteDescription(description);
     },
 
-    addTracks: function(id) {
-      if (id === undefined) {
-        for (var conn in this.peerConnections) {
-          this.stream.getTracks().forEach(track => {
-            conn.addTrack(track, this.stream);
-          });
-        }
-      } else {
-        this.stream
-          .getTracks()
-          .forEach(track =>
-            this.peerConnections[id].addTrack(track, this.stream)
-          );
+    addTrackToPeer: function (conn) {
+      if (this.stream !== undefined) {
+        this.stream.getTracks().forEach((track) => {
+          conn.addTrack(track, this.stream);
+          this.track = track;
+        });
       }
     },
 
-    setupSocket: function() {
-      this.socket.on("watcher", id => {
-        this.makePeerConnection(id);
-        this.addTracks(id);
-        this.peerConnections[id].onicecandidate = event => {
-          if (event.candidate) {
-            this.socket.emit("candidate", id, event.candidate);
+    addTracksToAllPeers: function () {
+      for (var id in this.peerConnections) {
+        this.addTrackToPeer(this.peerConnections[id]);
+      }
+    },
+
+    addTracks: function (id) {
+      if (id === undefined) {
+        this.addTracksToAllPeers();
+      } else {
+        this.addTrackToPeer(this.peerConnections[id]);
+      }
+    },
+
+    replaceTrack: function () {
+      for (var id in this.peerConnections) {
+        this.stream.getTracks().forEach((track) => {
+          var senders = this.peerConnections[id].getSenders();
+          for (var index in senders) {
+            senders[index].replaceTrack(track);
           }
-        };
+        });
+      }
+    },
 
-        this.sendOffer(id);
-      });
-
+    gotCandidate: function () {
       this.socket.on("candidate", (id, candidate) => {
         this.addIceCandidate(id, candidate);
       });
+    },
 
-      this.socket.on("disconnectPeer", id => {
+    peerDisconnected: function () {
+      this.socket.on("disconnectPeer", (id) => {
         this.peerConnections[id].close();
         delete this.peerConnections[id];
       });
+    },
 
+    gotAnswer: function () {
       this.socket.on("answer", (id, description) => {
         this.acceptAnswer(id, description);
       });
     },
 
-    gotStream: function(stream) {
-      this.stream = stream;
-      this.addTracks();
+    emitCandidate: function (id, candidate) {
+      this.socket.emit("candidate", id, candidate);
+    },
+
+    listenCandidate: function (id) {
+      this.peerConnections[id].onicecandidate = (event) => {
+        console.log(event);
+        if (event.candidate) {
+          this.emitCandidate(id, event.candidate);
+        }
+      };
+    },
+
+    setupSocket: function () {
+      this.socket.on("watcher", (id) => {
+        this.makePeerConnection(id);
+        this.listenStateFailed(id);
+        this.addTracks(id);
+        this.listenCandidate(id);
+        this.sendOffer(id);
+      });
+
+      this.gotCandidate();
+      this.peerDisconnected();
+
+      this.gotAnswer();
+
       this.socket.emit("broadcaster");
     },
 
-    setupStream: function() {
-      this.initializeSocket();
-      this.getAudioFile();
-      this.setupSocket();
-
-      const audioElement = this.$refs.audio;
-      if (audioElement.src !== undefined) {
-        this.gotStream(audioElement.captureStream());
+    gotStream: function (stream) {
+      if (this.stream === undefined) {
+        this.stream = stream;
+        this.addTracks();
+      } else {
+        this.stream = stream;
+        this.replaceTrack();
       }
     },
 
-    getAudioFile: function() {
+    setupStream: function () {
+      this.initializeSocket();
+      this.setupSocket();
+    },
+
+    playAudio: function () {
+      this.getAudioFile();
+      const audioElement = this.$refs.audio;
+      let stream = audioElement.captureStream();
+      stream.onaddtrack = () => {
+        this.gotStream(stream);
+      };
+    },
+
+    getAudioFile: function () {
       var fs = require("fs");
       var path = require("path");
       var p = path.join("/home/ovenoboyo/test.flac");
@@ -131,8 +191,8 @@ export default {
       const file = fs.readFileSync(p);
       this.fileURL = URL.createObjectURL(new Blob([file]));
       this.$refs.audio.src = this.fileURL;
-    }
-  }
+    },
+  },
 };
 </script>
 

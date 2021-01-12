@@ -5,88 +5,127 @@
   </div>
 </template>
 
-<script>
+<script lang="ts">
 import { config, connectionOptions } from "@/utils/socketBroadcast";
 
 export default {
   name: "Watcher",
   props: {
-    msg: String
+    msg: String,
   },
   mounted() {
     this.setupStream();
   },
   data() {
     return {
-      peerConnection: undefined
+      peerConnection: undefined,
     };
   },
   methods: {
-    initializeSocket: function() {
+    initializeSocket: function () {
       this.socket = require("socket.io-client").connect(
         "http://localhost:4000",
         connectionOptions
       );
     },
 
-    makePeerConnection: function() {
-      if (this.peerConnection == undefined) {
-        this.peerConnection = new RTCPeerConnection(config);
+    makePeerConnection: function () {
+      this.peerConnection = new RTCPeerConnection(config);
+    },
+
+    emitAnswer: function (id, description) {
+      this.socket.emit("answer", id, description);
+    },
+
+    sendAnswer: function (id, description) {
+      this.peerConnection
+        .setRemoteDescription(description)
+        .then(this.peerConnection.createAnswer())
+        .then((sdp) => this.peerConnection.setLocalDescription(sdp))
+        .then(() => this.emitAnswer(id, this.peerConnection.localDescription));
+    },
+
+    addIceCandidate: function (candidate) {
+      this.peerConnection
+        .addIceCandidate(new RTCIceCandidate(candidate))
+        .catch((e) => console.error(e));
+    },
+
+    gotStream: function () {
+      this.peerConnection.ontrack = (event) => {
+        this.$refs.audio.srcObject = event.streams[0];
+      };
+    },
+
+    registerBroadcaster: function () {
+      this.socket.on("broadcaster", () => {
+        if (this.peerConnection !== undefined) {
+          this.peerConnection.close();
+        }
+        this.socket.emit("watcher");
+      });
+    },
+
+    gotCandidate: function () {
+      this.socket.on("candidate", (id, candidate) => {
+        this.addIceCandidate(candidate);
+      });
+    },
+
+    socketConnected: function () {
+      this.socket.on("connect", () => {
+        this.emitWatcher();
+      });
+    },
+
+    emitWatcher: function () {
+      this.socket.emit("watcher");
+    },
+
+    emitCandidate: function (id, candidate) {
+      if (candidate) {
+        this.socket.emit("candidate", id, candidate);
       }
     },
 
-    sendAnswer: function(id, description) {
-      this.peerConnection
-        .setRemoteDescription(description)
-        .then(() => this.peerConnection.createAnswer())
-        .then(sdp => this.peerConnection.setLocalDescription(sdp))
-        .then(() => {
-          this.socket.emit("answer", id, this.peerConnection.localDescription);
-        });
+    listenCandidate: function (id) {
+      this.peerConnection.onicecandidate = (event) => {
+        this.emitCandidate(id, event.candidate);
+      };
     },
 
-    addIceCandidate: function(candidate) {
-      this.peerConnection
-        .addIceCandidate(new RTCIceCandidate(candidate))
-        .catch(e => console.error(e));
+    gotOffer: function (callback) {
+      this.socket.on("offer", (id, description) => {
+        callback(id, description);
+      });
     },
 
-    gotStream: function() {
-      this.peerConnection.ontrack = event => {
-        this.$refs.audio.srcObject = event.streams[0];
+    listenStateFailed: function () {
+      this.peerConnection.onconnectionstatechange = (event) => {
+        if (
+          event.currentTarget.connectionState === "closed" ||
+          event.currentTarget.connectionState === "failed"
+        ) {
+          this.emitWatcher();
+        }
       };
     },
 
     setupStream() {
       this.initializeSocket();
-      this.socket.on("offer", (id, description) => {
+      this.gotOffer((id, description) => {
         this.makePeerConnection();
-        try {
-          this.sendAnswer(id, description);
-          this.gotStream();
-          this.peerConnection.onicecandidate = event => {
-            if (event.candidate) {
-              this.socket.emit("candidate", id, event.candidate);
-            }
-          };
-        } catch (err) {
-          console.log(err);
-        }
+        this.listenStateFailed();
+        this.sendAnswer(id, description);
+        this.gotStream();
+        this.listenCandidate();
       });
 
-      this.socket.on("candidate", (id, candidate) => {
-        this.addIceCandidate(candidate);
-      });
-
-      this.socket.on("connect", () => {
-        this.socket.emit("watcher");
-      });
-
-      this.socket.on("broadcaster", () => {
-        this.socket.emit("watcher");
-      });
-    }
-  }
+      this.gotCandidate();
+      this.registerBroadcaster();
+      this.socketConnected();
+    },
+  },
 };
 </script>
 
