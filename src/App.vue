@@ -1,30 +1,19 @@
 <template>
   <div id="app">
-    <img
-      alt="Vue logo"
-      src="./assets/logo.png"
-    >
-    <router-link to="/broadcast">
-      Broadcaster
-    </router-link>
-    <router-link to="/watch">
-      Watcher
-    </router-link>
-
-    <router-view />
-    <!-- <Broadcaster /> -->
+    <img alt="Vue logo" src="./assets/logo.png" />
+    <router-link to="/watch">Watcher</router-link>
+    <router-link to="/broadcast">Broadcaster</router-link>
+    <router-view></router-view>
   </div>
 </template>
 
-<script>
-// import Broadcaster from "./components/Broadcaster.vue";
+<script lang="ts">
+import { Component, Vue } from "vue-property-decorator";
 
-export default {
-  name: 'Moosync',
-  components: {
-    // Broadcaster,
-  }
-}
+@Component({
+  components: {},
+})
+export default class App extends Vue {}
 </script>
 
 <style>

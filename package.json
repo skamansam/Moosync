@@ -13,28 +13,42 @@
   },
   "main": "background.js",
   "dependencies": {
+    "@types/node": "^14.14.20",
+    "@types/socket.io-client": "^1.4.35",
+    "@types/webpack-env": "^1.16.0",
+    "@types/webrtc": "0.0.26",
     "axios": "^0.21.1",
     "babel-eslint": "^10.1.0",
     "bufferutil": "^4.0.3",
     "core-js": "^3.6.5",
+    "defer-to-connect": "^2.0.0",
     "eslint-plugin-vue": "^7.4.1",
     "socket.io-client": "^3.0.5",
     "utf-8-validate": "^5.0.4",
     "vue": "^2.6.11",
+    "vue-class-component": "^7.2.3",
     "vue-electron": "^1.0.6",
+    "vue-property-decorator": "^9.1.2",
     "vue-router": "^3.4.9",
     "vuex": "^3.0.1",
     "vuex-electron": "^1.0.3"
   },
   "devDependencies": {
+    "@types/electron-devtools-installer": "^2.2.0",
+    "@typescript-eslint/eslint-plugin": "^2.33.0",
+    "@typescript-eslint/parser": "^2.33.0",
     "@vue/cli-plugin-babel": "~4.5.0",
     "@vue/cli-plugin-eslint": "~4.5.0",
+    "@vue/cli-plugin-typescript": "~4.5.0",
     "@vue/cli-service": "~4.5.0",
+    "@vue/eslint-config-typescript": "^5.0.2",
     "babel-eslint": "^10.1.0",
     "electron": "^9.0.0",
     "electron-devtools-installer": "^3.1.0",
     "eslint": "^6.7.2",
     "eslint-plugin-vue": "^6.2.2",
+    "prettier": "2.2.1",
+    "typescript": "^3.9.3",
     "vue-cli-plugin-electron-builder": "~2.0.0-rc.5",
     "vue-template-compiler": "^2.6.11"
   },
@@ -45,10 +59,11 @@
     },
     "extends": [
       "plugin:vue/essential",
-      "eslint:recommended"
+      "eslint:recommended",
+      "@vue/typescript"
     ],
     "parserOptions": {
-      "parser": "babel-eslint"
+      "parser": "@typescript-eslint/parser"
     },
     "rules": {}
   },

@@ -8,7 +8,8 @@
 		"eslint.validate": [
 			"javascript",
 			"vue"
-		]
+		],
+		"prettier.configPath": ".prettierrc.json"
 	},
 	"extensions": {
 		"recommendations": [

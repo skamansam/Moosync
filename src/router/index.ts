@@ -8,12 +8,12 @@ export default new Router({
     {
       path: '/watch',
       name: 'watcher',
-      component: require('@/components/Watcher').default
+      component: require('@/components/Watcher.vue').default
     },
     {
       path: '/broadcast',
       name: 'broadcaster',
-      component: require('@/components/Broadcaster').default
+      component: require('@/components/Broadcaster.vue').default
     }
   ]
 })
