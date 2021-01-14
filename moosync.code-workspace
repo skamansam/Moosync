@@ -9,7 +9,8 @@
 			"javascript",
 			"vue"
 		],
-		"prettier.configPath": ".prettierrc.json"
+		"prettier.configPath": ".prettierrc.json",
+		"editor.tabSize": 2
 	},
 	"extensions": {
 		"recommendations": [

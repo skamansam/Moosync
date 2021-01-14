@@ -1,17 +1,21 @@
 <template>
   <div id="app">
     <img alt="Vue logo" src="./assets/logo.png" />
-    <router-link to="/watch">Watcher</router-link>
+    <MainComponent></MainComponent>
+    <!-- <router-link to="/watch">Watcher</router-link>
     <router-link to="/broadcast">Broadcaster</router-link>
-    <router-view></router-view>
+    <router-view></router-view> -->
   </div>
 </template>
 
 <script lang="ts">
-import { Component, Vue } from "vue-property-decorator";
+import { Component, Vue } from 'vue-property-decorator'
+import MainComponent from '@/components/MainComponent.vue'
 
 @Component({
-  components: {},
+  components: {
+    MainComponent,
+  },
 })
 export default class App extends Vue {}
 </script>

@@ -1,34 +1,38 @@
-import { config, connectionOptions } from '@/utils/socketBroadcast'
-
 export namespace Sockets {
-  class LazySocketConnection {
-    protected socket: any = null
+  const connectionOptions = {
+    'force new connection': true,
+    reconnectionAttempts: 'Infinity', // avoid having user reconnect manually in order to prevent dead clients after a server restart
+    timeout: 10000, // before connect_error and connect_timeout are emitted.
+    transports: ['websocket'],
+  }
+  class BaseSocketConnection {
+    protected socket: any
     private url: string
 
-    protected initialize(): void {
+    constructor(url?: string) {
+      this.url = url == undefined ? 'http://localhost:4000' : url
       this.socket = require('socket.io-client').connect(this.url, connectionOptions)
     }
-
-    protected isInitialized(): Error | null {
-      let err = null
-      if (this.socket === null) {
-        try {
-          this.initialize()
-        } catch (error) {
-          err = error
-        }
-      }
-      return err
-    }
-
     public onConnect(callback: Function): void {
       callback()
+    }
+
+    public onRoomJoined(callback: Function): void {
+      this.socket.on('joinedRoom', (roomID: string) => {
+        callback(roomID)
+      })
     }
 
     public disconnectListener(callback: Function) {
       this.socket.on('disconnectPeer', (id: string) => {
         callback(id)
       })
+    }
+
+    public close() {
+      this.socket.removeAllListeners()
+      this.socket.disconnect()
+      console.log(this.socket)
     }
 
     public listenCandidate(callback: Function): void {
@@ -42,37 +46,35 @@ export namespace Sockets {
     public emitCandidate(id: string, candidate: RTCIceCandidate): void {
       this.socket !== undefined ? this.socket.emit('candidate', id, candidate) : null
     }
-
-    constructor(url?: string) {
-      this.url = url == undefined ? 'http://localhost:4000' : url
-    }
   }
 
-  export class LazyBroadcasterSocket extends LazySocketConnection {
+  export class BroadcasterSocket extends BaseSocketConnection {
     constructor(url?: string) {
       super(url)
+    }
+
+    public createRoom() {
+      this.socket.emit('room')
+    }
+
+    public listenNegotiationRequest(callback: Function): void {
+      this.socket.on('requestedNegotiation', (id: string) => {
+        callback(id)
+      })
     }
 
     public emitOffer(id: string, description: RTCSessionDescription): void {
       this.socket !== undefined ? this.socket.emit('offer', id, description) : null
     }
 
-    public emitBroadcaster(): Error | null {
-      let err = this.isInitialized()
-      if (err === null) {
-        this.socket.emit('broadcaster')
-      }
-      return err
+    public emitBroadcaster(): void {
+      this.socket.emit('broadcaster')
     }
 
-    public listenWatcher(callback: Function): Error | null {
-      let err = this.isInitialized()
-      if (err === null) {
-        this.socket.on('watcher', (id: string) => {
-          callback(id)
-        })
-      }
-      return err
+    public listenWatcher(callback: Function): void {
+      this.socket.on('watcher', (id: string) => {
+        callback(id)
+      })
     }
 
     public listenAnswer(callback: Function): void {
@@ -84,9 +86,22 @@ export namespace Sockets {
     }
   }
 
-  export class LazyWatcherSocket extends LazySocketConnection {
+  export class WatcherSocket extends BaseSocketConnection {
+    constructor(url?: string) {
+      super(url)
+    }
+
+    public joinRoom(id: string): void {
+      console.log(id)
+      this.socket.emit('room', id)
+    }
+
     public emitWatcher(): void {
       this.onConnect(() => this.socket.emit('watcher'))
+    }
+
+    public emitNeedNegotiation(id: string): void {
+      this.socket.emit('needNegotiation', id)
     }
 
     public emitAnswer(id: string, description: RTCSessionDescription): void {
@@ -101,7 +116,6 @@ export namespace Sockets {
     }
 
     public listenOffer(callback: Function): void {
-      this.isInitialized()
       this.socket.on('offer', callback)
     }
   }

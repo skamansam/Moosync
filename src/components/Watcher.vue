@@ -2,48 +2,27 @@
   <div class="hello">
     Watcher
     <audio ref="audio" controls />
+    <input ref="roomid" type="text" class="inputtext" placeholder="..." id="text1" />
+    <button v-on:click="holder.joinRoom(roominput.value)"></button>
   </div>
 </template>
 
 <script lang="ts">
+import { Holders } from '@/utils/syncHandler'
 import { Component, Vue, Ref } from 'vue-property-decorator'
-import { Sockets } from '@/utils/sockets'
-import { RTCPeer } from '@/utils/peers'
 
 @Component
 export default class Watcher extends Vue {
-  private peerConnection: RTCPeer.WatchRTCPeer | null = null
-  private socket: any
-  private socketConnection = new Sockets.LazyWatcherSocket()
-  @Ref('audio') audioElement!: HTMLAudioElement
+  private holder: Holders.WatchHolder = new Holders.WatchHolder()
+  @Ref('audio') audioElement!: ExtendedHtmlAudioElement
+  @Ref('roomid') roominput!: HTMLInputElement
 
-  mounted() {
-    this.setup()
+  beforeDestroy() {
+    this.holder.close()
   }
 
-  public setup(): void {
-    this.socketConnection.listenOffer((id: string, description: RTCSessionDescription) => {
-      this.peerConnection = new RTCPeer.WatchRTCPeer(id)
-      this.peerConnection.sendAnswer(description, (id: string, localdesc: RTCSessionDescription) =>
-        this.socketConnection.emitAnswer(id, localdesc)
-      )
-      this.peerConnection.gotStream((event: RTCTrackEvent) => {
-        this.audioElement.srcObject = event.streams[0]
-      })
-      this.peerConnection.listenCandidate((id: string, candidate: RTCIceCandidate) => {
-        this.socketConnection.emitCandidate(id, candidate)
-      })
-    })
-
-    this.socketConnection.listenCandidate((id: string, candidate: RTCIceCandidate) =>
-      this.peerConnection!.addCandidate(candidate)
-    )
-    this.socketConnection.listenBroadcaster(() => {
-      if (this.peerConnection !== null) {
-        this.peerConnection!.close()
-      }
-    })
-    this.socketConnection.onConnect(() => this.socketConnection.emitWatcher())
+  mounted() {
+    this.holder.setAudioElement = this.audioElement
   }
 }
 </script>

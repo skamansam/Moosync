@@ -1,3 +1,4 @@
 interface ExtendedHtmlAudioElement extends HTMLAudioElement {
-    captureStream(frameRate?: number): MediaStream
+  // https://developer.mozilla.org/en-US/docs/Web/API/HTMLMediaElement/captureStream
+  captureStream(frameRate?: number): MediaStream
 }
