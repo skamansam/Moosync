@@ -1,5 +1,5 @@
-import { Sockets } from '@/utils/sockets'
-import { RTCPeer } from '@/utils/peers'
+import { Sockets } from '@/services/sockets'
+import { RTCPeer } from '@/services/peers'
 
 export namespace Holders {
   export class BroadcastHolder {
@@ -54,7 +54,6 @@ export namespace Holders {
     private listenRoomJoin(): void {
       this.socketConnection.onRoomJoined((roomID: string) => {
         this.roomID = roomID
-        console.log(this.roomID)
         this.socketConnection.emitBroadcaster()
       })
     }
@@ -94,7 +93,6 @@ export namespace Holders {
     }
 
     public close(): void {
-      console.log('closing all')
       for (let index in this.peerConnections) {
         if (this.peerConnections[index] !== null) {
           this.peerConnections[index].close()
@@ -177,7 +175,6 @@ export namespace Holders {
     }
 
     public close() {
-      console.log('closing connections')
       if (this.peerConnection !== null) {
         this.peerConnection.close()
       }

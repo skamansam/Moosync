@@ -32,7 +32,6 @@ export namespace Sockets {
     public close() {
       this.socket.removeAllListeners()
       this.socket.disconnect()
-      console.log(this.socket)
     }
 
     public listenCandidate(callback: Function): void {
@@ -92,7 +91,6 @@ export namespace Sockets {
     }
 
     public joinRoom(id: string): void {
-      console.log(id)
       this.socket.emit('room', id)
     }
 

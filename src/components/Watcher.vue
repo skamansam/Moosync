@@ -8,7 +8,7 @@
 </template>
 
 <script lang="ts">
-import { Holders } from '@/utils/syncHandler'
+import { Holders } from '@/services/syncHandler'
 import { Component, Vue, Ref } from 'vue-property-decorator'
 
 @Component

@@ -18,7 +18,7 @@
 
 <script lang="ts">
 import { Component, Vue, Ref } from 'vue-property-decorator'
-import { Holders } from '@/utils/syncHandler'
+import { Holders } from '@/services/syncHandler'
 
 @Component
 export default class Broadcaster extends Vue {
