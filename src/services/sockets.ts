@@ -10,7 +10,7 @@ export namespace Sockets {
     private url: string
 
     constructor(url?: string) {
-      this.url = url == undefined ? 'http://localhost:4000' : url
+      this.url = url == undefined ? 'http://192.168.0.18:4000' : url
       this.socket = require('socket.io-client').connect(this.url, connectionOptions)
     }
     public onConnect(callback: Function): void {

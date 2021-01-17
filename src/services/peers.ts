@@ -19,7 +19,7 @@ export namespace RTCPeer {
     }
 
     public listenCandidate(callback: Function) {
-      this.connection.onicecandidate = (event) => {
+      this.connection.onicecandidate = event => {
         callback(this.id, event.candidate)
       }
     }
@@ -44,8 +44,16 @@ export namespace RTCPeer {
     }
 
     public listenSignalingState(): void {
-      this.connection.onsignalingstatechange = (e) => {
+      this.connection.onsignalingstatechange = e => {
         this.isNegotiating = this.connection.signalingState != 'stable'
+      }
+    }
+
+    public listenConnectionState(callback: Function): void {
+      this.connection.onconnectionstatechange = e => {
+        if (this.connection.connectionState === 'failed') {
+          callback(e)
+        }
       }
     }
   }
@@ -67,12 +75,12 @@ export namespace RTCPeer {
     public createOfferAndSetDesc(callback: Function, restart: boolean): void {
       this.connection
         .createOffer(restart ? { iceRestart: true } : {})
-        .then((sdp) => this.connection!.setLocalDescription(sdp))
+        .then(sdp => this.connection!.setLocalDescription(sdp))
         .then(() => callback(this.id, this.connection.localDescription))
     }
 
     public replaceTrack(stream: MediaStream) {
-      stream.getTracks().forEach((track) => {
+      stream.getTracks().forEach(track => {
         var senders = this.connection!.getSenders()
         for (var index in senders) {
           senders[index].replaceTrack(track)
@@ -82,7 +90,7 @@ export namespace RTCPeer {
 
     public addTrack(stream: MediaStream) {
       if (this.connection !== null) {
-        stream.getTracks().forEach((track) => {
+        stream.getTracks().forEach(track => {
           this.sender = this.connection!.addTrack(track, stream)
         })
       }
@@ -106,7 +114,7 @@ export namespace RTCPeer {
         this.connection
           .setRemoteDescription(description)
           .then(() => this.connection!.createAnswer())
-          .then((sdp) => this.connection!.setLocalDescription(sdp))
+          .then(sdp => this.connection!.setLocalDescription(sdp))
           .then(() => callback(this.id, this.connection!.localDescription))
       }
     }

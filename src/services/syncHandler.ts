@@ -67,6 +67,7 @@ export namespace Holders {
         this.listenLocalCandidate(peer)
         peer.needsNegotiation(() => this.initiateNegotiation(peer))
         peer.listenSignalingState()
+        peer.listenConnectionState(() => this.initiateNegotiation(peer))
         this.listenNegotiationRequest(peer)
 
         this.peerConnections[id] = peer
@@ -88,7 +89,7 @@ export namespace Holders {
       this.socketConnection.createRoom()
     }
 
-    public setAudioElement(audio: ExtendedHtmlAudioElement): void {
+    set setAudioElement(audio: ExtendedHtmlAudioElement) {
       this.audioElement = audio
     }
 

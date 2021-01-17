@@ -2,9 +2,6 @@
   <div id="app">
     <img alt="Vue logo" src="./assets/logo.png" />
     <MainComponent></MainComponent>
-    <!-- <router-link to="/watch">Watcher</router-link>
-    <router-link to="/broadcast">Broadcaster</router-link>
-    <router-view></router-view> -->
   </div>
 </template>
 
