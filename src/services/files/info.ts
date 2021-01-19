@@ -1,5 +1,5 @@
 import * as mm from 'music-metadata'
-import { ExtendedIPicture } from '@/utils/types/musicmetadata'
+import { ExtendedIPicture } from '@/types/declarations/musicmetadata'
 
 export interface Song {
   title: string | undefined

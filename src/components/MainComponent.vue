@@ -1,23 +1,25 @@
 <template>
   <div>
-    <button v-on:click="toggleBroadcaster()">Broadcaster</button>
-    <button v-on:click="toggleWatcher()">Watcher</button>
-    <AudioStream :isBroadcaster="!watcher" :audioType="audioType">
-      <audio ref="test" />
-    </AudioStream>
+    <!-- <button v-on:click="toggleBroadcaster()">Broadcaster</button>
+    <button v-on:click="toggleWatcher()">Watcher</button> -->
+
+    <Sidebar class="sidebar" />
     <router-view></router-view>
+    <AudioStream class="musicbar" :isBroadcaster="!watcher" :audioType="audioType" />
   </div>
 </template>
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator'
 import AudioStream from '@/components/AudioStream.vue'
+import Sidebar from '@/components/Sidebar.vue'
 import { AudioType } from '@/services/player/enums'
 const stun = require('stun')
 
 @Component({
   components: {
     AudioStream,
+    Sidebar,
   },
 })
 export default class MainComponent extends Vue {
@@ -47,3 +49,8 @@ export default class MainComponent extends Vue {
   }
 }
 </script>
+
+<style lang="sass" scoped>
+.sidebar
+  z-index: -1
+</style>

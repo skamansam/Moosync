@@ -10,7 +10,12 @@
 			"vue"
 		],
 		"prettier.configPath": ".prettierrc.json",
-		"editor.tabSize": 2
+		"editor.tabSize": 2,
+		"cSpell.words": [
+			"ALLSONGS",
+			"musicmetadata",
+			"vuesax"
+		]
 	},
 	"extensions": {
 		"recommendations": [

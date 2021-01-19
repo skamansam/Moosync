@@ -1,6 +1,7 @@
 <template>
-  <div class="hello">
-    <div v-if="audioType == AudioType.STREAMING">
+  <div>
+    <MusicBar />
+    <!-- <div v-if="audioType == AudioType.STREAMING">
       <div v-if="holderWatcher">
         <input ref="roomid" class="inputtext" placeholder="Enter room ID" aria-label="room id" />
         <button v-on:click="holderWatcher.joinRoom(roominput.value)">join room</button>
@@ -14,8 +15,8 @@
     </div>
 
     <div ref="audioHolder">
-      <audio ref="audio" controls />
-    </div>
+      <audio ref="audio" />
+    </div> -->
   </div>
 </template>
 
@@ -23,8 +24,13 @@
 import { Component, Vue, Ref, Prop, Watch } from 'vue-property-decorator'
 import { Holders } from '@/services/syncHandler'
 import { AudioType } from '@/services/player/enums'
+import MusicBar from './Musicbar.vue'
 
-@Component
+@Component({
+  components: {
+    MusicBar,
+  },
+})
 export default class AudioStream extends Vue {
   private AudioType: typeof AudioType = AudioType // To access enum in template
   @Ref('audio') audioElement!: ExtendedHtmlAudioElement
