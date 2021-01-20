@@ -1,7 +1,7 @@
 language: node_js
 
 node_js:
-  - "12.20.1"
+  - '12.20.1'
 
 # Always run two parallel builds: one on mac and one on linux
 # the linux build will use wine to be able to build windows and
@@ -11,14 +11,13 @@ matrix:
     - os: osx
       osx_image: xcode10.2
       language: node_js
-      node_js: "12.20.1"
+      node_js: '12.20.1'
       env:
         - ELECTRON_CACHE=$HOME/.cache/electron
         - ELECTRON_BUILDER_CACHE=$HOME/.cache/electron-builder
 
     - os: linux
       dist: xenial
-      sudo: required
       services: docker
       language: generic
 
@@ -32,16 +31,6 @@ cache:
     - node_modules
     - $HOME/.cache/electron
     - $HOME/.cache/electron-builder
-
-# add git lfs for large file support
-# before_install:
-#   - |
-#     if [ "$TRAVIS_OS_NAME" == "osx" ]; then
-#       mkdir -p /tmp/git-lfs && curl -L https://github.com/github/git-lfs/releases/download/v2.3.1/git-lfs-$([ "$TRAVIS_OS_NAME" == "linux" ] && echo "linux" || echo "darwin")-amd64-2.3.1.tar.gz | tar -xz -C /tmp/git-lfs --strip-components 1
-#       export PATH="/tmp/git-lfs:$PATH"
-#     fi
-# before_script:
-#   - git lfs pull
 
 # on PRs and merges to master and prod run tests and build the app
 script:
@@ -57,10 +46,24 @@ script:
       yarn electron:build
     fi
 before_cache:
+  - sudo chown -R travis:travis $HOME/.cache
+  - sudo chown -R travis:travis $TRAVIS_BUILD_DIR/
   - rm -rf $HOME/.cache/electron-builder/wine
 
+deploy:
+  provider: releases
+  api-key:
+    secure: G12nhy05MQfaod1GGc97we8arrJHz7RUMaafdWMlHQPGJhhyaBv2Uo2fk8hK4J92+mm938KnDrpGdxEp6FrafK4HiNDlPcJ4ipz6ElNWK5+RYujwFxs/hJ8KE09vR2Cr1zRrClQNz6SnnCI5EZlnJUHiZBd4jyBTvB5W/Gc2q/RPprzlVw6tchB9SUwFpGdYb0gIeuQHp/xIwsGYB7iBGa5LUQZEkZfKIswmPiWclnCkIr/LZShtatDLJ26jZoIvoAaEzYU5rIYtww4+WB4694bb+y6mwqj8hAomUEzeeKgXBRpop/MujHN3kQMJABbWDd2v7PXqB2jphp4jcebZZMB750PfVVREHfdxtRHws1JmRIfnGznzLx+I9Fvi9jtUFz0GGsa7BftAdOuVydrV6lhXo+6nP0Jxr4+V1o0Jtx6yB04kpxd6F36kmxgy6bqZfFo9ZCslgrc5VcWyv8ooKZLYtRroMLOL6wL/r2xzAKZDVx6av9aoHZ9HHGspjDt8pxV8spNA7dhjcU43CM9b1ICki6rilIH+vDpvI7VnndguoftbDHyZQLsQKH5SJ2yxzJsVUNAKTpJ4LCcIwbNeqI3J8YZ4yHIGJlDAmp+1Ly1AIEuz6lcAaS2dBJGxs3WAMp6/ebqFgs+obA5CE1MSp+bUclj+IQ9TskXXYzz4pVo=
+  file_glob: true
+  file:
+    - 'dist_electron/moosync*.AppImage'
+    - 'dist_electron/moosync*.deb'
+    - 'dist_electron/moosync*.dmg'
+    - 'dist_electron/moosync*.exe'
+  on:
+    tags: true
 # only run this script on pull requests and merges into
 # the 'master' and 'prod' branches
-branches:
-  only:
-    - main
+# branches:
+#   only:
+#     - main
