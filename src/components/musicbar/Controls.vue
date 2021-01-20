@@ -1,7 +1,7 @@
 <template>
   <b-container fluid class="d-flex flex-column h-100">
     <b-row class="flex-grow-1 align-items-center">
-      <b-col cols="3" class="timestamp">3:32 / 6:10</b-col>
+      <b-col cols="auto" class="timestamp">3:32 / 6:10</b-col>
       <b-col><LastTrack /></b-col>
       <b-col><TenS /></b-col>
       <b-col><Play /></b-col>
@@ -42,8 +42,8 @@ export default class MusicBar extends Vue {}
   font-size: 18px
   line-height: 170.19%
   overflow: hidden
-  padding-left: 0
-  padding-right: 0
+  margin-left: -45px
+  margin-right: 15px
 
 .invisible
   min-width: 0%

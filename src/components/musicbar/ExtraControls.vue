@@ -1,14 +1,14 @@
 <template>
   <b-container fluid class="d-flex flex-column h-100">
     <b-row class="flex-grow-1 align-items-center">
-      <b-col cols="8" class="d-flex">
-        <div class="slider-container">
+      <b-col col="auto" class="d-flex volume-container justify-content-end">
+        <div class="slider-container d-flex">
           <input
             type="range"
             min="1"
             max="100"
             value="50"
-            class="slider w-100 ml-auto"
+            class="slider w-100 align-self-center"
             v-bind:style="{
               background: ComputedGradient,
             }"
@@ -21,7 +21,9 @@
           <VolumeIcon />
         </div>
       </b-col>
-      <b-col cols="1" class="ml-auto expand-icon"> <ExpandIcon /> </b-col>
+      <b-col cols="2">
+        <div class="expand-icon ml-auto"><ExpandIcon /></div
+      ></b-col>
     </b-row>
   </b-container>
 </template>
@@ -66,8 +68,7 @@ export default class MusicBar extends Vue {
 @import '@/sass/variables.sass'
 
 .slider-container
-  width: 85%
-  padding-left: 30px
+  padding-right: 20px
 
 .slider
   -webkit-appearance: none
@@ -77,8 +78,8 @@ export default class MusicBar extends Vue {
 .slider::-webkit-slider-thumb
   -webkit-appearance: none
   appearance: none
-  width: 18.39px
-  height: 18.39px
+  width: 12px
+  height: 12px
   border-radius: 50%
   background: $accent-primary
 
@@ -86,8 +87,11 @@ export default class MusicBar extends Vue {
   background-color: $primary
 
 .volume-icon
-  padding-left: 30px
+  height: 22px
+  width: 22px
+  margin-top: -5px
 
 .expand-icon
-  margin-right: 28px
+  height: 27px
+  width: 18px
 </style>

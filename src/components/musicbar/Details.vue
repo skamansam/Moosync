@@ -6,7 +6,7 @@
       </b-col>
       <b-col cols="10">
         <div class="text song-title text-truncate">Idhar Ayega tera Gaana ka naam</div>
-        <div class="text song-subtitle text-truncate">Khush Adnani - World bike tour 2021</div>
+        <div class="text song-subtitle text-truncate">Khush Adnani - World bike tour 2030</div>
       </b-col>
     </b-row>
   </b-container>

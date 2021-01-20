@@ -1,11 +1,11 @@
 <template>
   <div class="background w-100">
     <div class="timeline w-100"></div>
-    <b-container fluid class="d-flex flex-column h-100">
-      <b-row class="flex-grow-1">
-        <b-col cols="3"><Details /></b-col>
-        <b-col cols="5"><Controls /></b-col>
-        <b-col><ExtraControls /></b-col>
+    <b-container fluid class="d-flex h-100">
+      <b-row class="flex-grow-1 justify-content-lg-between">
+        <b-col col lg="3"><Details /></b-col>
+        <b-col col lg="auto"><Controls /></b-col>
+        <b-col col lg="3"><ExtraControls /></b-col>
       </b-row>
     </b-container>
   </div>
