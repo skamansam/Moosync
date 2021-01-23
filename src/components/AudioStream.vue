@@ -13,18 +13,26 @@
         <button v-on:click="switchAudio()">Switch Audio file</button>
       </div>
     </div>
+    -->
 
     <div ref="audioHolder">
       <audio ref="audio" />
-    </div> -->
+    </div>
   </div>
 </template>
 
 <script lang="ts">
 import { Component, Vue, Ref, Prop, Watch } from 'vue-property-decorator'
 import { Holders } from '@/services/syncHandler'
-import { AudioType } from '@/services/player/enums'
+import { AudioType } from '@/store/player/playerState'
 import MusicBar from './Musicbar.vue'
+import { PlayerState, PlayerModule } from '@/store/player/playerState'
+import { ipcRenderer } from 'electron'
+
+// eslint-disable-next-line no-unused-vars
+import { SongPath } from '@/models/songs'
+
+import fs from 'fs'
 
 @Component({
   components: {
@@ -76,6 +84,7 @@ export default class AudioStream extends Vue {
     if (this.audioType === AudioType.STREAMING) {
       this.setAudioElement()
     }
+    this.registerListeners()
   }
 
   beforeDestroy() {
@@ -97,7 +106,8 @@ export default class AudioStream extends Vue {
   private setAudioElement() {
     if (this.isBroadcaster) {
       this.holderBroadcast!.setAudioElement = this.audioElement
-      this.playAudio(() => this.holderBroadcast!.initialize())
+      // Might need to load track before initializing
+      this.holderBroadcast!.initialize()
     } else {
       this.holderWatcher!.setAudioElement = this.audioElement
     }
@@ -113,39 +123,62 @@ export default class AudioStream extends Vue {
     }
   }
 
-  private playAudio(callback: Function): void {
-    this.getAudioFile()
-    let stream = this.audioElement.captureStream()
-    stream.onaddtrack = () => {
-      callback()
-    }
+  private unloadAudio() {
+    this.audioElement.pause()
+    this.audioElement.srcObject = null
   }
 
-  private switchAudio(): void {
-    var fs = require('fs')
-    var path = require('path')
-    var p = path.join('/home/ovenoboyo/test2.flac')
+  private loadAudio(filePath: string) {
+    this.unloadAudio()
 
-    const file = fs.readFileSync(p)
+    const file = fs.readFileSync(filePath)
     const fileURL = URL.createObjectURL(new Blob([file]))
 
     this.audioElement.src = fileURL
-    let stream = this.audioElement.captureStream()
-    stream.onaddtrack = () => {
-      this.holderBroadcast!.gotStream(stream)
-    }
+    console.log(fileURL)
   }
 
-  private getAudioFile(): void {
-    var fs = require('fs')
-    var path = require('path')
-    var p = path.join('/home/ovenoboyo/test.flac')
+  private registerListeners() {
+    ipcRenderer.on('gotSongPath', (_, data: SongPath) => {
+      this.loadAudio(data.path)
+      PlayerModule.setState(PlayerState.PLAYING)
+    })
 
-    const file = fs.readFileSync(p)
-    const fileURL = URL.createObjectURL(new Blob([file]))
-
-    this.audioElement.src = fileURL
+    PlayerModule.$watch(
+      (playerModule) => playerModule.currentSong,
+      (newSong: string) => {
+        console.log(newSong)
+        this.getAudio(newSong)
+      }
+    )
   }
+
+  private getAudio(id: string) {
+    ipcRenderer.send('getFilePath', id)
+  }
+
+  // private playAudio(callback: Function): void {
+  //   this.getAudioFile()
+  //   let stream = this.audioElement.captureStream()
+  //   stream.onaddtrack = () => {
+  //     callback()
+  //   }
+  // }
+
+  // private switchAudio(): void {
+  //   var fs = require('fs')
+  //   var path = require('path')
+  //   var p = path.join('/home/ovenoboyo/test2.flac')
+
+  //   const file = fs.readFileSync(p)
+  //   const fileURL = URL.createObjectURL(new Blob([file]))
+
+  //   this.audioElement.src = fileURL
+  //   let stream = this.audioElement.captureStream()
+  //   stream.onaddtrack = () => {
+  //     this.holderBroadcast!.gotStream(stream)
+  //   }
+  // }
 }
 </script>
 

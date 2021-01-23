@@ -6,7 +6,7 @@ import router from './router'
 
 import '@/plugins/vueBootstrap'
 import '@/sass/global.sass'
-// import store from './store'
+import store from './store'
 
 if (!process.env.IS_WEB) Vue.use(require('vue-electron'))
 // Vue.http = Vue.prototype.$http = axios
@@ -16,6 +16,6 @@ Vue.config.productionTip = false
 new Vue({
   components: { App },
   router,
-  // store,
+  store,
   template: '<App/>',
 }).$mount('#app')

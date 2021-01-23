@@ -1,8 +1,8 @@
 import fs from 'fs'
 import path from 'path'
 import * as mm from 'music-metadata'
-import { Song, miniSong } from '@/models/songs'
-import { MiniSongDbInstance, SongDBInstance } from '../db/index'
+import { Song, miniSong, SongPath } from '@/models/songs'
+import { MiniSongDbInstance, SongDBInstance, PathsDBInstance } from '../db/index'
 import md5 from 'md5-file'
 import { ExtendedIPicture } from '@/types/declarations/musicmetadata'
 import base64js from 'base64-js'
@@ -63,14 +63,16 @@ export class MusicScanner {
   public async start(): Promise<void> {
     let dbSong = new SongDBInstance()
     let dbMini = new MiniSongDbInstance()
+    let dbPaths = new PathsDBInstance()
     for (let i in this.paths) {
       fs.readdir(this.paths[i], (err: NodeJS.ErrnoException | null, files: string[]) => {
         files.forEach(async (file) => {
           if (audioPatterns.exec(path.extname(file)) != null) {
-            const metadata = await mm.parseFile(path.join(this.paths[i], file))
+            const filePath = path.join(this.paths[i], file)
+            const metadata = await mm.parseFile(filePath)
             const md5Sum = await this.generateChecksum(path.join(this.paths[i], file))
             const parsed = parseMetadata(metadata, md5Sum)
-            await this.storeSong(parsed, dbSong, dbMini)
+            await this.storeSong(parsed, filePath, dbSong, dbMini, dbPaths)
           }
         })
       })
@@ -81,13 +83,20 @@ export class MusicScanner {
     return md5(file)
   }
 
-  private async storeSong(parsedData: [Song, miniSong], dbSong: SongDBInstance, dbMini: MiniSongDbInstance) {
+  private async storeSong(
+    parsedData: [Song, miniSong],
+    path: string,
+    dbSong: SongDBInstance,
+    dbMini: MiniSongDbInstance,
+    dbPaths: PathsDBInstance
+  ) {
     const count = await dbSong.countByHash(parsedData[0].hash)
     if (count == 0) {
       await dbSong.store(parsedData[0]).then(async (data) => {
         let tmp = parsedData[1]
         tmp._id = data._id
         await dbMini.store(tmp)
+        await dbPaths.store({ _id: data._id!, path: path })
       })
     }
     console.log('not added')

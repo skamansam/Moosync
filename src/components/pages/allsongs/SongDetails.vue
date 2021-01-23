@@ -34,11 +34,13 @@ export default class SongDetails extends Vue {
   }
 
   private updateDetails(data: Song) {
-    if (data.cover?.data !== undefined) this.imageElement.src = 'data:image/png;base64, ' + data.cover?.data
+    if (data !== undefined) {
+      if (data.cover?.data !== undefined) this.imageElement.src = 'data:image/png;base64, ' + data.cover?.data
 
-    if (data.title !== undefined) this.currentTitle = data.title
+      if (data.title !== undefined) this.currentTitle = data.title
 
-    if (data.artists !== undefined) this.currentsubTitle = data.artists.join(', ')
+      if (data.artists !== undefined) this.currentsubTitle = data.artists.join(', ')
+    }
   }
 
   created() {

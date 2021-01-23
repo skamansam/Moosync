@@ -40,6 +40,7 @@
     "vue-property-decorator": "^9.1.2",
     "vue-router": "^3.4.9",
     "vuex": "^3.0.1",
+    "vuex-class-modules": "^1.2.0",
     "vuex-electron": "^1.0.3"
   },
   "devDependencies": {

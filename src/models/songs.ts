@@ -32,3 +32,8 @@ export interface CoverImg {
   width: number | undefined
   type: string | undefined
 }
+
+export interface SongPath {
+  _id: string
+  path: string
+}

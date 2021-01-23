@@ -14,7 +14,7 @@
 import { Component, Vue } from 'vue-property-decorator'
 import AudioStream from '@/components/AudioStream.vue'
 import Sidebar from '@/components/Sidebar.vue'
-import { AudioType } from '@/services/player/enums'
+import { AudioType } from '@/store/player/playerState'
 const stun = require('stun')
 
 @Component({

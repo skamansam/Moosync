@@ -28,6 +28,8 @@ import { ipcRenderer } from 'electron'
 // eslint-disable-next-line no-unused-vars
 import { Song } from '@/models/songs'
 
+import { PlayerModule } from '@/store/player/playerState'
+
 interface ResizerElements {
   thElm: HTMLElement | undefined
   thNext: HTMLElement | undefined
@@ -113,7 +115,6 @@ class Resizer {
 
       if (i < 3) {
         let grip = this.getTableGrip((e: MouseEvent) => this.setResizeElements(elements, i, th, e.pageX))
-        console.log(grip)
         th.appendChild(grip)
       }
     })
@@ -143,10 +144,12 @@ export default class SongList extends Vue {
   mounted() {
     this.resizer = new Resizer(document)
     window.addEventListener('resize', this.rerenderTable)
+    // ipcRenderer.send('scanMusic', ['/home/ovenoboyo'])
   }
 
   private onRowSelected(items: any) {
     this.$root.$emit('song-select', items[0]._id)
+    PlayerModule.setSong(items[0]._id)
   }
 
   private sortContent(): void {

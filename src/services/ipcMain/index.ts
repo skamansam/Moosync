@@ -1,8 +1,9 @@
 import { ipcMain } from 'electron'
 import { MusicScanner } from '../files/scanner'
-import { MiniSongDbInstance, SongDBInstance } from '../db/index'
+import { MiniSongDbInstance, PathsDBInstance, SongDBInstance } from '../db/index'
 
 ipcMain.on('scanMusic', async function (event: Electron.IpcMainEvent, args: string[]) {
+  console.log(args)
   const scanner = new MusicScanner(...args)
   scanner.start()
 })
@@ -15,4 +16,9 @@ ipcMain.on('getAllSongs', async function (event: Electron.IpcMainEvent) {
 ipcMain.on('getSingleSong', async function (event: Electron.IpcMainEvent, args) {
   const dbInstance = new SongDBInstance()
   dbInstance.getByID(args).then((data) => event.reply('gotSong', data))
+})
+
+ipcMain.on('getFilePath', async function (event: Electron.IpcMainEvent, args) {
+  const dbInstance = new PathsDBInstance()
+  dbInstance.getByID(args).then((data) => event.reply('gotSongPath', data))
 })
