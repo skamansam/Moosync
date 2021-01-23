@@ -58,7 +58,6 @@ export default class Sidebar extends Vue {
   private active: ActiveTab = ActiveTab.ALLSONGS
 
   private setActive(i: number): void {
-    console.log(i)
     this.active = i
   }
 }

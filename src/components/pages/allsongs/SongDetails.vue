@@ -10,7 +10,6 @@
 
 <script lang="ts">
 import { Component, Ref, Vue } from 'vue-property-decorator'
-import { ipcRenderer } from 'electron'
 
 // eslint-disable-next-line no-unused-vars
 import { Song } from '@/models/songs'
@@ -24,11 +23,7 @@ export default class SongDetails extends Vue {
   private currentsubTitle: string = ''
 
   private registerListeners() {
-    this.$root.$on('song-select', (id: string) => {
-      ipcRenderer.send('getSingleSong', id)
-    })
-
-    ipcRenderer.on('gotSong', (_, data: Song) => {
+    this.$root.$on('song-select', (data: Song) => {
       this.updateDetails(data)
     })
   }

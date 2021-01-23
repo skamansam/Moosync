@@ -1,10 +1,12 @@
 <template>
   <b-container fluid class="d-flex flex-column h-100">
     <b-row class="flex-grow-1 align-items-center">
-      <b-col cols="auto" class="timestamp">3:32 / 6:10</b-col>
+      <b-col cols="auto" class="timestamp"
+        >{{ formatDuration(currentDuration) }} / {{ formatDuration(duration) }}</b-col
+      >
       <b-col><LastTrack /></b-col>
       <b-col><Repeat /></b-col>
-      <b-col><Play /></b-col>
+      <b-col v-on:click="togglePlayerState()"><Play /></b-col>
       <b-col><NextTrack /></b-col>
       <b-col><Shuffle /></b-col>
       <!-- <b-col cols="2" class="d-none d-xl-block"></b-col> -->
@@ -13,12 +15,14 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue } from 'vue-property-decorator'
+import { PlayerModule, PlayerState } from '@/store/player/playerState'
+import { Component, Prop, Vue } from 'vue-property-decorator'
 import LastTrack from './controls/LastTrack.vue'
 import NextTrack from './controls/NextTrack.vue'
 import Play from './controls/Play.vue'
 import Repeat from './controls/Repeat.vue'
 import Shuffle from './controls/Shuffle.vue'
+
 @Component({
   components: {
     LastTrack,
@@ -28,7 +32,53 @@ import Shuffle from './controls/Shuffle.vue'
     Shuffle,
   },
 })
-export default class MusicBar extends Vue {}
+export default class MusicBar extends Vue {
+  @Prop({ default: 0 })
+  private duration!: number
+
+  private currentDuration: number = 0
+
+  private playerState: PlayerState = PlayerState.STOPPED
+
+  mounted() {
+    this.listenTimestampUpdate()
+    this.setupListeners()
+  }
+
+  private listenTimestampUpdate() {
+    this.$root.$on('timestamp-update', (duration: number) => {
+      this.currentDuration = duration
+    })
+  }
+
+  private formatDuration(n: number) {
+    let tmp = new Date(n * 1000).toISOString().substr(11, 8)
+
+    if (tmp[0] == '0' && tmp[1] == '0') {
+      return tmp.substr(3)
+    }
+
+    return tmp
+  }
+
+  private setupListeners() {
+    PlayerModule.$watch(
+      (playerModule) => playerModule.state,
+      (newState: PlayerState) => {
+        this.playerState = newState
+        console.log(newState)
+      }
+    )
+  }
+
+  private togglePlayerState() {
+    if (this.playerState == PlayerState.PAUSED || this.playerState == PlayerState.STOPPED) {
+      PlayerModule.setState(PlayerState.PLAYING)
+    } else {
+      PlayerModule.setState(PlayerState.PAUSED)
+    }
+  }
+}
 </script>
 
 <style lang="sass" scoped>

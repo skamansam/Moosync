@@ -44,7 +44,6 @@ export default class MusicBar extends Vue {
   private volume: number = 69
 
   private setVolume(n: number) {
-    console.log(n)
     this.volume = n
   }
 

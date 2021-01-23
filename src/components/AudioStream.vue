@@ -30,7 +30,7 @@ import { PlayerState, PlayerModule } from '@/store/player/playerState'
 import { ipcRenderer } from 'electron'
 
 // eslint-disable-next-line no-unused-vars
-import { SongPath } from '@/models/songs'
+import { miniSong, Song, SongPath } from '@/models/songs'
 
 import fs from 'fs'
 
@@ -54,6 +54,8 @@ export default class AudioStream extends Vue {
 
   private holderBroadcast: Holders.BroadcastHolder | null = null
   private holderWatcher: Holders.WatchHolder | null = null
+  private playerState: PlayerState = PlayerState.STOPPED
+  private isSongLoaded: boolean = false
 
   @Watch('isBroadcaster') onHolderChanged() {
     this.closeAllHolders()
@@ -85,10 +87,15 @@ export default class AudioStream extends Vue {
       this.setAudioElement()
     }
     this.registerListeners()
+    this.audioElement.ontimeupdate = this.updateCurrentTime
   }
 
   beforeDestroy() {
     this.closeAllHolders()
+  }
+
+  private updateCurrentTime(e: any) {
+    this.$root.$emit('timestamp-update', (e.target as HTMLAudioElement).currentTime)
   }
 
   private closeAllHolders() {
@@ -123,19 +130,21 @@ export default class AudioStream extends Vue {
     }
   }
 
-  private unloadAudio() {
-    this.audioElement.pause()
+  private async unloadAudio() {
+    await this.audioElement.pause()
     this.audioElement.srcObject = null
+    this.isSongLoaded = false
   }
 
   private loadAudio(filePath: string) {
-    this.unloadAudio()
+    this.unloadAudio().then(() => {
+      const file = fs.readFileSync(filePath)
+      const fileURL = URL.createObjectURL(new Blob([file]))
 
-    const file = fs.readFileSync(filePath)
-    const fileURL = URL.createObjectURL(new Blob([file]))
-
-    this.audioElement.src = fileURL
-    console.log(fileURL)
+      this.audioElement.src = fileURL
+      PlayerModule.setState(PlayerState.PAUSED)
+      this.isSongLoaded = true
+    })
   }
 
   private registerListeners() {
@@ -145,12 +154,35 @@ export default class AudioStream extends Vue {
     })
 
     PlayerModule.$watch(
-      (playerModule) => playerModule.currentSong,
-      (newSong: string) => {
-        console.log(newSong)
-        this.getAudio(newSong)
+      (playerModule) => playerModule.currentSongDets,
+      (newSong: miniSong | {}) => {
+        if (newSong) this.getAudio((newSong as Song)._id!)
       }
     )
+
+    PlayerModule.$watch(
+      (playerModule) => playerModule.state,
+      async (newState: PlayerState) => {
+        this.playerState = newState
+        await this.handlePlayerState()
+      }
+    )
+  }
+
+  private async handlePlayerState() {
+    if (this.isSongLoaded) {
+      switch (this.playerState) {
+        case PlayerState.PLAYING:
+          this.audioElement.play()
+          return
+        case PlayerState.PAUSED:
+          await this.audioElement.pause()
+          return
+        case PlayerState.STOPPED:
+          this.unloadAudio()
+          return
+      }
+    }
   }
 
   private getAudio(id: string) {

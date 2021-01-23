@@ -3,8 +3,13 @@
     <div class="timeline w-100"></div>
     <b-container fluid class="d-flex h-100">
       <b-row class="flex-grow-1 justify-content-between">
-        <b-col col lg="3"><Details /></b-col>
-        <b-col col lg="auto"><Controls /></b-col>
+        <b-col col lg="3"
+          ><Details
+            :title="song ? song.title : '-'"
+            :artists="song ? song.artists : []"
+            :cover="song ? song.cover : ''"
+        /></b-col>
+        <b-col col lg="auto"><Controls :duration="song ? song.duration : 0" /></b-col>
         <b-col col lg="3"><ExtraControls /></b-col>
       </b-row>
     </b-container>
@@ -16,6 +21,10 @@ import { Component, Vue } from 'vue-property-decorator'
 import Details from './musicbar/Details.vue'
 import Controls from './musicbar/Controls.vue'
 import ExtraControls from './musicbar/ExtraControls.vue'
+import { PlayerModule } from '@/store/player/playerState'
+
+// eslint-disable-next-line no-unused-vars
+import { Song } from '@/models/songs'
 @Component({
   components: {
     Details,
@@ -23,7 +32,20 @@ import ExtraControls from './musicbar/ExtraControls.vue'
     ExtraControls,
   },
 })
-export default class MusicBar extends Vue {}
+export default class MusicBar extends Vue {
+  private song: Song | {} = {}
+  mounted() {
+    this.registerWatcher()
+  }
+  private registerWatcher() {
+    PlayerModule.$watch(
+      (playerModule) => playerModule.currentSongDets,
+      (newSong: Song | {}) => {
+        this.song = newSong
+      }
+    )
+  }
+}
 </script>
 
 <style lang="sass" scoped>

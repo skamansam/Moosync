@@ -3,7 +3,6 @@ import { MusicScanner } from '../files/scanner'
 import { MiniSongDbInstance, PathsDBInstance, SongDBInstance } from '../db/index'
 
 ipcMain.on('scanMusic', async function (event: Electron.IpcMainEvent, args: string[]) {
-  console.log(args)
   const scanner = new MusicScanner(...args)
   scanner.start()
 })

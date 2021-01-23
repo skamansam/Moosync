@@ -17,7 +17,7 @@
     </template>
 
     <template #cell(artists)="data">
-      {{ data.item.artists.join(', ') }}
+      {{ data.item.artists ? data.item.artists.join(', ') : '-' }}
     </template>
   </b-table>
 </template>
@@ -26,7 +26,7 @@
 import { Component, Vue } from 'vue-property-decorator'
 import { ipcRenderer } from 'electron'
 // eslint-disable-next-line no-unused-vars
-import { Song } from '@/models/songs'
+import { miniSong, Song } from '@/models/songs'
 
 import { PlayerModule } from '@/store/player/playerState'
 
@@ -133,6 +133,7 @@ export default class SongList extends Vue {
     { key: 'album' },
     { key: 'artists' },
   ]
+  private lastSelect: string = ''
 
   private resizer!: Resizer
 
@@ -148,8 +149,10 @@ export default class SongList extends Vue {
   }
 
   private onRowSelected(items: any) {
-    this.$root.$emit('song-select', items[0]._id)
-    PlayerModule.setSong(items[0]._id)
+    if (items[0]._id !== this.lastSelect) {
+      this.getSingleSong(items[0]._id)
+      this.lastSelect = items[0]._id
+    }
   }
 
   private sortContent(): void {
@@ -168,9 +171,18 @@ export default class SongList extends Vue {
     ipcRenderer.send('getAllSongs')
   }
 
+  private getSingleSong(id: string) {
+    ipcRenderer.send('getSingleSong', id)
+  }
+
   private registerListeners() {
-    ipcRenderer.on('gotSongs', (event, arg: Song[]) => {
+    ipcRenderer.on('gotSongs', (_, arg: Song[]) => {
       this.songList = arg
+    })
+
+    ipcRenderer.on('gotSong', (_, arg: Song) => {
+      this.$root.$emit('song-select', arg)
+      PlayerModule.setSong(arg)
     })
   }
 }

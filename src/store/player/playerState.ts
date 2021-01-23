@@ -1,5 +1,6 @@
 import { VuexModule, Module, Mutation, Action } from 'vuex-class-modules'
 import store from '../'
+import { Song } from '@/models/songs'
 
 export enum AudioType {
   STREAMING,
@@ -14,15 +15,15 @@ export enum PlayerState {
 
 @Module
 class Player extends VuexModule {
-  state: PlayerState = PlayerState.STOPPED
-  currentSongID: string = ''
+  state: PlayerState = PlayerState.PAUSED
+  currentSongDets: Song | {} = {}
 
   get currentState() {
     return this.state
   }
 
   get currentSong() {
-    return this.currentSongID
+    return this.currentSongDets
   }
 
   @Mutation
@@ -31,8 +32,8 @@ class Player extends VuexModule {
   }
 
   @Mutation
-  setSong(SongID: string) {
-    this.currentSongID = SongID
+  setSong(Song: Song) {
+    this.currentSongDets = Song
   }
 }
 
