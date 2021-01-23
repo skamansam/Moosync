@@ -1,14 +1,14 @@
 <template>
   <b-container fluid class="d-flex flex-column h-100">
-    <b-row class="flex-grow-1 align-items-center">
-      <b-col col="auto" class="d-flex volume-container justify-content-end">
+    <b-row class="flex-grow-1 align-items-center justify-content-sm-start justify-content-xl-end">
+      <b-col cols="9" class="d-flex volume-container justify-content-end">
         <div class="slider-container d-flex">
           <input
             type="range"
             min="1"
             max="100"
             value="50"
-            class="slider w-100 align-self-center"
+            class="slider w-100 align-self-center test"
             v-bind:style="{
               background: ComputedGradient,
             }"
@@ -94,4 +94,7 @@ export default class MusicBar extends Vue {
 .expand-icon
   height: 27px
   width: 18px
+
+.test
+  min-width: 0
 </style>

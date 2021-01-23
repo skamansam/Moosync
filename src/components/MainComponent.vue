@@ -2,10 +2,11 @@
   <div>
     <!-- <button v-on:click="toggleBroadcaster()">Broadcaster</button>
     <button v-on:click="toggleWatcher()">Watcher</button> -->
-
-    <Sidebar class="sidebar" />
-    <router-view></router-view>
     <AudioStream class="musicbar" :isBroadcaster="!watcher" :audioType="audioType" />
+    <Sidebar class="sidebar" />
+    <div class="d-flex main-content">
+      <router-view></router-view>
+    </div>
   </div>
 </template>
 
@@ -51,6 +52,19 @@ export default class MainComponent extends Vue {
 </script>
 
 <style lang="sass" scoped>
-.sidebar
+.musicbar
+  position: fixed
   z-index: -1
+
+.sidebar
+  position: fixed
+  z-index: -2
+
+.main-content
+  position: fixed
+  left: calc(261px + 30px)
+  right: 30px
+  top: 30px
+  bottom: calc(6rem + 30px)
+  z-index: -3
 </style>

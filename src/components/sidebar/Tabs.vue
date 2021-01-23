@@ -12,7 +12,9 @@
         class="d-flex align-items-center icon-padding"
         v-bind:class="{ 'icon-active': active == i, 'icon-transition': active != i }"
       >
-        <component v-bind:is="item.component"></component>
+        <div class="icon">
+          <component v-bind:is="item.component"></component>
+        </div>
         <div class="text-padding text-format">{{ item.title }}</div>
       </div>
     </div>
@@ -64,6 +66,10 @@ export default class Sidebar extends Vue {
 
 <style lang="sass" scoped>
 @import "@/sass/variables.sass"
+
+.icon
+  width: 38px
+  height: 38px
 
 .icon-padding
   padding: 0.25rem 0rem 0.25rem 1.8rem

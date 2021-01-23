@@ -5,11 +5,11 @@ Vue.use(Router)
 
 export default new Router({
   routes: [
-    // {
-    //   path: '/watch',
-    //   name: 'watcher',
-    //   component: require('@/components/Watcher.vue').default
-    // },
+    {
+      path: '/',
+      name: 'All Songs',
+      component: require('@/components/pages/AllSongs.vue').default,
+    },
     // {
     //   path: '/broadcast',
     //   name: 'broadcaster',

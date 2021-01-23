@@ -2,7 +2,7 @@
   <div class="background w-100">
     <div class="timeline w-100"></div>
     <b-container fluid class="d-flex h-100">
-      <b-row class="flex-grow-1 justify-content-lg-between">
+      <b-row class="flex-grow-1 justify-content-between">
         <b-col col lg="3"><Details /></b-col>
         <b-col col lg="auto"><Controls /></b-col>
         <b-col col lg="3"><ExtraControls /></b-col>

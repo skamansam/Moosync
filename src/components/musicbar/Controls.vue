@@ -3,7 +3,7 @@
     <b-row class="flex-grow-1 align-items-center">
       <b-col cols="auto" class="timestamp">3:32 / 6:10</b-col>
       <b-col><LastTrack /></b-col>
-      <b-col><TenS /></b-col>
+      <b-col><Repeat /></b-col>
       <b-col><Play /></b-col>
       <b-col><NextTrack /></b-col>
       <b-col><Shuffle /></b-col>
@@ -17,14 +17,14 @@ import { Component, Vue } from 'vue-property-decorator'
 import LastTrack from './controls/LastTrack.vue'
 import NextTrack from './controls/NextTrack.vue'
 import Play from './controls/Play.vue'
-import TenS from './controls/10s.vue'
+import Repeat from './controls/Repeat.vue'
 import Shuffle from './controls/Shuffle.vue'
 @Component({
   components: {
     LastTrack,
     NextTrack,
     Play,
-    TenS,
+    Repeat,
     Shuffle,
   },
 })

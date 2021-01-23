@@ -1,5 +1,5 @@
 <template>
-  <svg width="38" height="38" viewBox="0 0 38 38" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <svg viewBox="0 0 38 38" fill="none" xmlns="http://www.w3.org/2000/svg">
     <ellipse cx="19" cy="19.2979" rx="19" ry="18.6475" fill="#A396EF" />
     <mask id="path-2-inside-1" fill="white">
       <path

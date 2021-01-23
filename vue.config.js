@@ -7,4 +7,4 @@ module.exports = {
       mainProcessTypeChecking: false, // Manually enable type checking during webpack bundling for background file.
     },
   },
-};
+}
