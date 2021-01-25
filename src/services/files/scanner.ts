@@ -1,8 +1,8 @@
 import fs from 'fs'
 import path from 'path'
 import * as mm from 'music-metadata'
-import { Song, miniSong, SongPath } from '@/models/songs'
-import { MiniSongDbInstance, SongDBInstance, PathsDBInstance } from '../db/index'
+import { Song, CoverImg } from '@/models/songs'
+import { CoverDBInstance, SongDBInstance } from '../db/index'
 import md5 from 'md5-file'
 import { ExtendedIPicture } from '@/types/declarations/musicmetadata'
 import base64js from 'base64-js'
@@ -15,11 +15,12 @@ function _arrayBufferToBase64(buffer: ArrayBuffer | undefined): string | undefin
   }
 }
 
-export function parseMetadata(data: mm.IAudioMetadata, hash: string): [Song, miniSong] {
-  let coverDetails: ExtendedIPicture[] | undefined = (data.common.picture as unknown) as ExtendedIPicture[]
+export function parseMetadata(data: mm.IAudioMetadata, hash: string, filePath: string): [Song, CoverImg | undefined] {
+  let tmp = (data.common.picture as unknown) as ExtendedIPicture[]
   return [
     {
-      title: data.common.title,
+      title: data.common.title ? data.common.title : path.basename(filePath),
+      path: filePath,
       album: data.common.album,
       artists: data.common.artists,
       date: data.common.date,
@@ -33,23 +34,17 @@ export function parseMetadata(data: mm.IAudioMetadata, hash: string): [Song, min
       duration: data.format.duration,
       sampleRate: data.format.sampleRate,
       hash: hash,
-      cover:
-        data.common.picture !== undefined && data.common.picture.length > 0
-          ? {
-              data: _arrayBufferToBase64(coverDetails[0].data),
-              description: coverDetails[0].description,
-              mime: coverDetails[0].format,
-              height: coverDetails[0].height,
-              width: coverDetails[0].width,
-              type: coverDetails[0].type,
-            }
-          : undefined,
     },
-    {
-      title: data.common.title,
-      album: data.common.album,
-      artists: data.common.artists,
-    },
+    tmp.length > 0
+      ? {
+          data: _arrayBufferToBase64(tmp[0].data),
+          description: tmp[0].description,
+          mime: tmp[0].format,
+          height: tmp[0].height,
+          width: tmp[0].width,
+          type: tmp[0].type,
+        }
+      : undefined,
   ]
 }
 
@@ -62,17 +57,16 @@ export class MusicScanner {
 
   public async start(): Promise<void> {
     let dbSong = new SongDBInstance()
-    let dbMini = new MiniSongDbInstance()
-    let dbPaths = new PathsDBInstance()
+    let dbCover = new CoverDBInstance()
     for (let i in this.paths) {
       fs.readdir(this.paths[i], (err: NodeJS.ErrnoException | null, files: string[]) => {
         files.forEach(async (file) => {
           if (audioPatterns.exec(path.extname(file)) != null) {
             const filePath = path.join(this.paths[i], file)
             const metadata = await mm.parseFile(filePath)
-            const md5Sum = await this.generateChecksum(path.join(this.paths[i], file))
-            const parsed = parseMetadata(metadata, md5Sum)
-            await this.storeSong(parsed, filePath, dbSong, dbMini, dbPaths)
+            const md5Sum = await this.generateChecksum(filePath)
+            const parsed = parseMetadata(metadata, md5Sum, filePath)
+            await this.storeSong(parsed, filePath, dbSong, dbCover)
           }
         })
       })
@@ -84,21 +78,20 @@ export class MusicScanner {
   }
 
   private async storeSong(
-    parsedData: [Song, miniSong],
+    parsedData: [Song, CoverImg | undefined],
     path: string,
     dbSong: SongDBInstance,
-    dbMini: MiniSongDbInstance,
-    dbPaths: PathsDBInstance
+    dbCover: CoverDBInstance
   ) {
     const count = await dbSong.countByHash(parsedData[0].hash)
     if (count == 0) {
       await dbSong.store(parsedData[0]).then(async (data) => {
-        let tmp = parsedData[1]
-        tmp._id = data._id
-        await dbMini.store(tmp)
-        await dbPaths.store({ _id: data._id!, path: path })
+        if (parsedData[1]) {
+          let tmp = parsedData[1]
+          tmp._id = data._id
+          await dbCover.store(tmp)
+        }
       })
     }
-    console.log('not added')
   }
 }

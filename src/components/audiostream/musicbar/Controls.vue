@@ -1,9 +1,7 @@
 <template>
   <b-container fluid class="d-flex flex-column h-100">
     <b-row class="flex-grow-1 align-items-center">
-      <b-col cols="auto" class="timestamp"
-        >{{ formatDuration(currentDuration) }} / {{ formatDuration(duration) }}</b-col
-      >
+      <b-col cols="auto" class="timestamp">{{ formatDuration(timestamp) }} / {{ formatDuration(duration) }}</b-col>
       <b-col><LastTrack /></b-col>
       <b-col><Repeat /></b-col>
       <b-col v-on:click="togglePlayerState()"><Play /></b-col>
@@ -36,19 +34,13 @@ export default class MusicBar extends Vue {
   @Prop({ default: 0 })
   private duration!: number
 
-  private currentDuration: number = 0
+  @Prop({ default: 0 })
+  private timestamp!: number
 
   private playerState: PlayerState = PlayerState.STOPPED
 
   mounted() {
-    this.listenTimestampUpdate()
     this.setupListeners()
-  }
-
-  private listenTimestampUpdate() {
-    this.$root.$on('timestamp-update', (duration: number) => {
-      this.currentDuration = duration
-    })
   }
 
   private formatDuration(n: number) {
@@ -66,7 +58,6 @@ export default class MusicBar extends Vue {
       (playerModule) => playerModule.state,
       (newState: PlayerState) => {
         this.playerState = newState
-        console.log(newState)
       }
     )
   }

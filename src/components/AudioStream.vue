@@ -1,23 +1,9 @@
 <template>
   <div>
-    <MusicBar />
-    <!-- <div v-if="audioType == AudioType.STREAMING">
-      <div v-if="holderWatcher">
-        <input ref="roomid" class="inputtext" placeholder="Enter room ID" aria-label="room id" />
-        <button v-on:click="holderWatcher.joinRoom(roominput.value)">join room</button>
-      </div>
-
-      <div v-if="holderBroadcast">
-        <button v-on:click="holderBroadcast.createRoom()">Create Room</button>
-        <h1>{{ holderBroadcast.roomID }}</h1>
-        <button v-on:click="switchAudio()">Switch Audio file</button>
-      </div>
-    </div>
-    -->
-
     <div ref="audioHolder">
       <audio ref="audio" />
     </div>
+    <MusicBar :currentSong="currentSong" :timestamp="currentTime" />
   </div>
 </template>
 
@@ -25,12 +11,11 @@
 import { Component, Vue, Ref, Prop, Watch } from 'vue-property-decorator'
 import { Holders } from '@/services/syncHandler'
 import { AudioType } from '@/store/player/playerState'
-import MusicBar from './Musicbar.vue'
+import MusicBar from './audiostream/Musicbar.vue'
 import { PlayerState, PlayerModule } from '@/store/player/playerState'
-import { ipcRenderer } from 'electron'
 
 // eslint-disable-next-line no-unused-vars
-import { miniSong, Song, SongPath } from '@/models/songs'
+import { CoverImg, Song } from '@/models/songs'
 
 import fs from 'fs'
 
@@ -42,6 +27,7 @@ import fs from 'fs'
 export default class AudioStream extends Vue {
   private AudioType: typeof AudioType = AudioType // To access enum in template
   @Ref('audio') audioElement!: ExtendedHtmlAudioElement
+  private currentTime: number = 0
 
   @Prop({ default: false })
   isBroadcaster!: boolean
@@ -56,6 +42,8 @@ export default class AudioStream extends Vue {
   private holderWatcher: Holders.WatchHolder | null = null
   private playerState: PlayerState = PlayerState.STOPPED
   private isSongLoaded: boolean = false
+  private currentSong: Song | null = null
+  private currentCover: CoverImg | null = null
 
   @Watch('isBroadcaster') onHolderChanged() {
     this.closeAllHolders()
@@ -87,15 +75,10 @@ export default class AudioStream extends Vue {
       this.setAudioElement()
     }
     this.registerListeners()
-    this.audioElement.ontimeupdate = this.updateCurrentTime
   }
 
   beforeDestroy() {
     this.closeAllHolders()
-  }
-
-  private updateCurrentTime(e: any) {
-    this.$root.$emit('timestamp-update', (e.target as HTMLAudioElement).currentTime)
   }
 
   private closeAllHolders() {
@@ -130,33 +113,12 @@ export default class AudioStream extends Vue {
     }
   }
 
-  private async unloadAudio() {
-    await this.audioElement.pause()
-    this.audioElement.srcObject = null
-    this.isSongLoaded = false
-  }
-
-  private loadAudio(filePath: string) {
-    this.unloadAudio().then(() => {
-      const file = fs.readFileSync(filePath)
-      const fileURL = URL.createObjectURL(new Blob([file]))
-
-      this.audioElement.src = fileURL
-      PlayerModule.setState(PlayerState.PAUSED)
-      this.isSongLoaded = true
-    })
-  }
-
-  private registerListeners() {
-    ipcRenderer.on('gotSongPath', (_, data: SongPath) => {
-      this.loadAudio(data.path)
-      PlayerModule.setState(PlayerState.PLAYING)
-    })
-
+  private registerPlayerListeners() {
     PlayerModule.$watch(
       (playerModule) => playerModule.currentSongDets,
-      (newSong: miniSong | {}) => {
-        if (newSong) this.getAudio((newSong as Song)._id!)
+      (newSong: Song | null) => {
+        this.currentSong = newSong
+        if (newSong) this.loadAudio(newSong.path)
       }
     )
 
@@ -169,24 +131,41 @@ export default class AudioStream extends Vue {
     )
   }
 
+  private registerListeners() {
+    this.audioElement.ontimeupdate = () => (this.currentTime = this.audioElement.currentTime)
+
+    this.registerPlayerListeners()
+  }
+
+  private unloadAudio() {
+    this.audioElement.srcObject = null
+    this.isSongLoaded = false
+  }
+
+  private loadAudio(filePath: string) {
+    const file = fs.readFileSync(filePath)
+    const fileURL = URL.createObjectURL(new Blob([file]))
+
+    this.audioElement.src = fileURL
+    this.isSongLoaded = true
+
+    PlayerModule.setState(PlayerState.PAUSED)
+  }
+
   private async handlePlayerState() {
     if (this.isSongLoaded) {
       switch (this.playerState) {
         case PlayerState.PLAYING:
           this.audioElement.play()
-          return
+          break
         case PlayerState.PAUSED:
-          await this.audioElement.pause()
-          return
+          this.audioElement.pause()
+          break
         case PlayerState.STOPPED:
           this.unloadAudio()
-          return
+          break
       }
     }
-  }
-
-  private getAudio(id: string) {
-    ipcRenderer.send('getFilePath', id)
   }
 
   // private playAudio(callback: Function): void {

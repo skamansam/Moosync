@@ -1,23 +1,22 @@
 import { app } from 'electron'
 import AsyncNedb from 'nedb-async'
 import * as path from 'path'
-import { miniSong, Song, SongPath } from '@/models/songs'
+import { CoverImg, Song } from '@/models/songs'
+import { Databases } from './constants'
 
 let switchConnection = (dbString: string) => {
   switch (dbString) {
-    case 'songs':
+    case Databases.SONG:
       return 'songs.db'
-    case 'minisong':
-      return 'mini.db'
-    case 'paths':
-      return 'paths.db'
+    case Databases.COVER:
+      return 'covers.db'
   }
-  return 'undefined'
+  return 'undefined.db'
 }
 
 export class SongDBInstance {
   private db = new AsyncNedb<Song>({
-    filename: path.join(app.getPath('appData'), app.getName(), 'db', switchConnection('songs')),
+    filename: path.join(app.getPath('appData'), app.getName(), 'db', switchConnection(Databases.SONG)),
     autoload: true,
   })
 
@@ -38,32 +37,17 @@ export class SongDBInstance {
   }
 }
 
-export class MiniSongDbInstance {
-  private db = new AsyncNedb<miniSong>({
-    filename: path.join(app.getPath('appData'), app.getName(), 'db', switchConnection('minisong')),
+export class CoverDBInstance {
+  private db = new AsyncNedb<CoverImg>({
+    filename: path.join(app.getPath('appData'), app.getName(), 'db', switchConnection(Databases.COVER)),
     autoload: true,
   })
 
-  public async getAll(): Promise<miniSong[]> {
-    return this.db.asyncFind({})
-  }
-
-  public async store(newDoc: miniSong): Promise<miniSong> {
-    return this.db.asyncInsert(newDoc)
-  }
-}
-
-export class PathsDBInstance {
-  private db = new AsyncNedb<SongPath>({
-    filename: path.join(app.getPath('appData'), app.getName(), 'db', switchConnection('paths')),
-    autoload: true,
-  })
-
-  public async store(newDoc: SongPath): Promise<SongPath> {
+  public async store(newDoc: CoverImg): Promise<CoverImg> {
     return this.db.asyncInsert(newDoc)
   }
 
-  public async getByID(id: string): Promise<SongPath> {
+  public async getByID(id: string): Promise<CoverImg> {
     return this.db.asyncFindOne({ _id: id })
   }
 }

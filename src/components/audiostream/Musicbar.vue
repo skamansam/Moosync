@@ -5,11 +5,13 @@
       <b-row class="flex-grow-1 justify-content-between">
         <b-col col lg="3"
           ><Details
-            :title="song ? song.title : '-'"
-            :artists="song ? song.artists : []"
-            :cover="song ? song.cover : ''"
+            :title="currentSong ? currentSong.title : '-'"
+            :artists="currentSong ? currentSong.artists : []"
+            :cover="currentCover ? currentCover.data : ''"
         /></b-col>
-        <b-col col lg="auto"><Controls :duration="song ? song.duration : 0" /></b-col>
+        <b-col col lg="auto"
+          ><Controls :duration="currentSong ? currentSong.duration : 0" :timestamp="timestamp"
+        /></b-col>
         <b-col col lg="3"><ExtraControls /></b-col>
       </b-row>
     </b-container>
@@ -17,14 +19,14 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue } from 'vue-property-decorator'
+import { Component, Prop, Vue } from 'vue-property-decorator'
 import Details from './musicbar/Details.vue'
 import Controls from './musicbar/Controls.vue'
 import ExtraControls from './musicbar/ExtraControls.vue'
-import { PlayerModule } from '@/store/player/playerState'
 
 // eslint-disable-next-line no-unused-vars
-import { Song } from '@/models/songs'
+import { CoverImg, Song } from '@/models/songs'
+import { PlayerModule } from '@/store/player/playerState'
 @Component({
   components: {
     Details,
@@ -33,15 +35,23 @@ import { Song } from '@/models/songs'
   },
 })
 export default class MusicBar extends Vue {
-  private song: Song | {} = {}
+  @Prop({ default: null })
+  private currentSong!: Song | null
+
+  @Prop({ default: 0 })
+  private timestamp!: number
+
+  private currentCover: CoverImg | null = null
+
   mounted() {
-    this.registerWatcher()
+    this.registerListeners()
   }
-  private registerWatcher() {
+
+  private registerListeners() {
     PlayerModule.$watch(
-      (playerModule) => playerModule.currentSongDets,
-      (newSong: Song | {}) => {
-        this.song = newSong
+      (playerModule) => playerModule.currentSongCover,
+      async (newState: CoverImg | null) => {
+        this.currentCover = newState
       }
     )
   }

@@ -1,10 +1,14 @@
 <template>
   <div class="w-100 image-container d-flex">
-    <img ref="cover" alt="cover art" />
-    <div class="text-container">
-      <div class="text-over title">{{ currentTitle }}</div>
-      <div class="text-over subtitle">{{ currentsubTitle }}</div>
-    </div>
+    <b-overlay :show="true" no-center opacity="0.6" blur="2px" variant="dark" class="text-container">
+      <img ref="cover" alt="cover art" onerror="this.style.display='none'" />
+      <template #overlay>
+        <div>
+          <div class="text-over title">{{ currentTitle }}</div>
+          <div class="text-over subtitle">{{ currentsubTitle }}</div>
+        </div>
+      </template>
+    </b-overlay>
   </div>
 </template>
 
@@ -12,7 +16,8 @@
 import { Component, Ref, Vue } from 'vue-property-decorator'
 
 // eslint-disable-next-line no-unused-vars
-import { Song } from '@/models/songs'
+import { CoverImg, Song } from '@/models/songs'
+import { EventBus } from '@/services/ipcMain/constants'
 
 @Component({
   components: {},
@@ -23,29 +28,45 @@ export default class SongDetails extends Vue {
   private currentsubTitle: string = ''
 
   private registerListeners() {
-    this.$root.$on('song-select', (data: Song) => {
+    this.$root.$on(EventBus.SONG_SELECTED, (data: Song) => {
       this.updateDetails(data)
+    })
+
+    this.$root.$on(EventBus.COVER_SELECTED, (data: CoverImg) => {
+      this.updateCover(data)
     })
   }
 
-  private updateDetails(data: Song) {
+  private updateCover(cover?: CoverImg) {
+    if (cover !== undefined && cover.data !== undefined) {
+      this.imageElement.style.display = ''
+      this.imageElement.src = 'data:image/png;base64, ' + cover?.data
+    }
+  }
+
+  private updateDetails(data?: Song) {
     if (data !== undefined) {
-      if (data.cover?.data !== undefined) this.imageElement.src = 'data:image/png;base64, ' + data.cover?.data
-
-      if (data.title !== undefined) this.currentTitle = data.title
-
-      if (data.artists !== undefined) this.currentsubTitle = data.artists.join(', ')
+      if (data !== undefined) this.currentTitle = data.title
+      if (data !== undefined && data.artists !== undefined) this.currentsubTitle = data.artists.join(', ')
     }
   }
 
   created() {
     this.registerListeners()
   }
+
+  mounted() {
+    this.imageElement.style.display = 'none'
+  }
 }
 </script>
 
 <style lang="sass">
 @import '@/sass/variables.sass'
+@import "~bootstrap/scss/mixins"
+
+img
+  font-size: 0
 
 .image-container
   position: relative
@@ -54,26 +75,33 @@ export default class SongDetails extends Vue {
 .image-container img
   width: 100%
 
-.text-container
-  position: absolute
-  text-align: left
-  padding-left: 24px
-  padding-top: 31px
-  width: 100%
-  height: 100%
-  background: radial-gradient(70.76% 70.76% at 50% 50%, rgba(255, 255, 255, 0.14) 0%, rgba(91, 91, 91, 0) 100%),
+.text-container > .b-overlay > .bg-dark
+  background-image: linear-gradient(0deg, rgba(0, 0, 0, 0.58), rgba(0, 0, 0, 0.58)), radial-gradient(50% 50% at 50% 50%, rgba(255, 255, 255, 0) 0%, rgba(0, 0, 0, 0.2) 100%) !important
+  background-color: #00000000 !important
 
 .text-over
   font-family: 'Proxima Nova'
+  text-align: left
+  margin-left: 15px
 
 .title
   color: $text-primary
-  font-size: 36px
+  font-size: 2.5vw
   line-height: 32px
+  @include media-breakpoint-up(md-c)
+    margin-top: 12px
+  @include media-breakpoint-up(lg-c)
+    margin-top: 22px
+  @include media-breakpoint-up(xs)
+    margin-top: 8px
+  @include media-breakpoint-up(xl)
+    margin-top: 30px
+    margin-bottom: 13px
+
 
 .subtitle
   color: $text-primary
   font-weight: 250
-  font-size: 18px
+  font-size: 1vw
   line-height: 18px
 </style>

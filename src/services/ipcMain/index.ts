@@ -1,23 +1,19 @@
 import { ipcMain } from 'electron'
 import { MusicScanner } from '../files/scanner'
-import { MiniSongDbInstance, PathsDBInstance, SongDBInstance } from '../db/index'
+import { CoverDBInstance, SongDBInstance } from '../db/index'
+import { IpcEvents } from './constants'
 
-ipcMain.on('scanMusic', async function (event: Electron.IpcMainEvent, args: string[]) {
+ipcMain.on(IpcEvents.SCAN_MUSIC, async function (event: Electron.IpcMainEvent, args: string[]) {
   const scanner = new MusicScanner(...args)
   scanner.start()
 })
 
-ipcMain.on('getAllSongs', async function (event: Electron.IpcMainEvent) {
-  const dbInstance = new MiniSongDbInstance()
-  dbInstance.getAll().then((data) => event.reply('gotSongs', data))
-})
-
-ipcMain.on('getSingleSong', async function (event: Electron.IpcMainEvent, args) {
+ipcMain.on(IpcEvents.GET_ALL_SONGS, async function (event: Electron.IpcMainEvent) {
   const dbInstance = new SongDBInstance()
-  dbInstance.getByID(args).then((data) => event.reply('gotSong', data))
+  dbInstance.getAll().then((data) => event.reply(IpcEvents.GOT_ALL_SONGS, data))
 })
 
-ipcMain.on('getFilePath', async function (event: Electron.IpcMainEvent, args) {
-  const dbInstance = new PathsDBInstance()
-  dbInstance.getByID(args).then((data) => event.reply('gotSongPath', data))
+ipcMain.on(IpcEvents.GET_COVER, async function (event: Electron.IpcMainEvent, arg: string) {
+  const dbInstance = new CoverDBInstance()
+  dbInstance.getByID(arg).then((data) => event.reply(IpcEvents.GOT_COVER, data))
 })

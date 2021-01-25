@@ -3,7 +3,7 @@
   <b-container fluid class="d-flex flex-column h-100">
     <b-row class="flex-grow-1 align-items-center">
       <b-col cols="2" class="d-flex justify-content-center">
-        <img class="coverimg" src="@/assets/logo.png" alt="cover img" />
+        <img ref="cover" :src="'data:image/png;base64, ' + this.cover" class="coverimg" alt="cover img" />
       </b-col>
       <b-col cols="10">
         <div class="text song-title text-truncate">{{ title }}</div>
@@ -17,10 +17,9 @@
 
 <script lang="ts">
 // eslint-disable-next-line no-unused-vars
-import { Song } from '@/models/songs'
 
 import Vue from 'vue'
-import { Component, Prop } from 'vue-property-decorator'
+import { Component, Prop, Ref } from 'vue-property-decorator'
 
 @Component({})
 export default class MusicBar extends Vue {
@@ -32,6 +31,9 @@ export default class MusicBar extends Vue {
 
   @Prop({ default: '' })
   cover!: string
+
+  @Ref('cover')
+  private imageElement!: HTMLImageElement
 }
 </script>
 

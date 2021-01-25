@@ -1,6 +1,7 @@
 export interface Song {
   _id?: string
-  title: string | undefined
+  path: string
+  title: string
   album: string | undefined
   artists: string[] | undefined
   date: string | undefined
@@ -13,27 +14,15 @@ export interface Song {
   container: string | undefined
   duration: number | undefined
   sampleRate: number | undefined
-  cover: CoverImg | undefined
   hash: string
 }
 
-export interface miniSong {
-  _id?: string
-  title: string | undefined
-  album: string | undefined
-  artists: string[] | undefined
-}
-
 export interface CoverImg {
+  _id?: string
   data: string | undefined
   description: string | undefined
   mime: string | undefined
   height: number | undefined
   width: number | undefined
   type: string | undefined
-}
-
-export interface SongPath {
-  _id: string
-  path: string
 }

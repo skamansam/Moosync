@@ -26,9 +26,10 @@
 import { Component, Vue } from 'vue-property-decorator'
 import { ipcRenderer } from 'electron'
 // eslint-disable-next-line no-unused-vars
-import { miniSong, Song } from '@/models/songs'
+import { CoverImg, Song } from '@/models/songs'
 
 import { PlayerModule } from '@/store/player/playerState'
+import { EventBus, IpcEvents } from '@/services/ipcMain/constants'
 
 interface ResizerElements {
   thElm: HTMLElement | undefined
@@ -126,6 +127,9 @@ class Resizer {
 })
 export default class SongList extends Vue {
   private test: boolean = false
+  private playSong: boolean = false
+  private lastSelect: string = ''
+  private resizer!: Resizer
   private songList: any = []
   private fields = [
     { key: 'index', label: 'Sr. No', tdClass: 'index-no-td', thClass: 'index-no-th' },
@@ -133,9 +137,6 @@ export default class SongList extends Vue {
     { key: 'album' },
     { key: 'artists' },
   ]
-  private lastSelect: string = ''
-
-  private resizer!: Resizer
 
   created() {
     this.requestSongs()
@@ -145,18 +146,27 @@ export default class SongList extends Vue {
   mounted() {
     this.resizer = new Resizer(document)
     window.addEventListener('resize', this.rerenderTable)
-    // ipcRenderer.send('scanMusic', ['/home/ovenoboyo'])
   }
 
   private onRowSelected(items: any) {
     if (items[0]._id !== this.lastSelect) {
-      this.getSingleSong(items[0]._id)
       this.lastSelect = items[0]._id
+
+      this.$root.$emit(EventBus.SONG_SELECTED, items[0])
+
+      this.playSong = true
+      PlayerModule.setSong(items[0])
+
+      this.getCover(items[0]._id)
     }
   }
 
   private sortContent(): void {
     // TODO: Sort content without b-table sort since we have table resizers
+  }
+
+  private getCover(id: string) {
+    ipcRenderer.send(IpcEvents.GET_COVER, id)
   }
 
   // For some reason table isn't rerendered on window size change
@@ -168,21 +178,21 @@ export default class SongList extends Vue {
   }
 
   private async requestSongs() {
-    ipcRenderer.send('getAllSongs')
-  }
-
-  private getSingleSong(id: string) {
-    ipcRenderer.send('getSingleSong', id)
+    // ipcRenderer.send(IpcEvents.SCAN_MUSIC, ['/home/ovenoboyo'])
+    ipcRenderer.send(IpcEvents.GET_ALL_SONGS)
   }
 
   private registerListeners() {
-    ipcRenderer.on('gotSongs', (_, arg: Song[]) => {
+    ipcRenderer.on(IpcEvents.GOT_ALL_SONGS, (_, arg: Song[]) => {
       this.songList = arg
     })
 
-    ipcRenderer.on('gotSong', (_, arg: Song) => {
-      this.$root.$emit('song-select', arg)
-      PlayerModule.setSong(arg)
+    ipcRenderer.on(IpcEvents.GOT_COVER, (_, arg: CoverImg) => {
+      this.$root.$emit(EventBus.COVER_SELECTED, arg)
+      if (this.playSong) {
+        PlayerModule.setCover(arg)
+        this.playSong = false
+      }
     })
   }
 }
