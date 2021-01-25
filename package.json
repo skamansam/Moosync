@@ -19,6 +19,7 @@
     "@types/socket.io-client": "^1.4.35",
     "@types/webpack-env": "^1.16.0",
     "@types/webrtc": "0.0.26",
+    "@types/yt-player": "^3.5.0",
     "axios": "^0.21.1",
     "babel-eslint": "^10.1.0",
     "base64-js": "^1.5.1",
@@ -41,7 +42,8 @@
     "vue-router": "^3.4.9",
     "vuex": "^3.0.1",
     "vuex-class-modules": "^1.2.0",
-    "vuex-electron": "^1.0.3"
+    "vuex-electron": "^1.0.3",
+    "yt-player": "^3.5.0"
   },
   "devDependencies": {
     "@types/electron-devtools-installer": "^2.2.0",

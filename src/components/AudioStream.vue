@@ -1,6 +1,7 @@
 <template>
   <div>
     <div ref="audioHolder">
+      <div id="yt-player" class="yt-player"></div>
       <audio ref="audio" />
     </div>
     <MusicBar :currentSong="currentSong" :timestamp="currentTime" />
@@ -13,6 +14,7 @@ import { Holders } from '@/services/syncHandler'
 import { AudioType } from '@/store/player/playerState'
 import MusicBar from './audiostream/Musicbar.vue'
 import { PlayerState, PlayerModule } from '@/store/player/playerState'
+import YTPlayer from 'yt-player'
 
 // eslint-disable-next-line no-unused-vars
 import { CoverImg, Song } from '@/models/songs'
@@ -44,6 +46,7 @@ export default class AudioStream extends Vue {
   private isSongLoaded: boolean = false
   private currentSong: Song | null = null
   private currentCover: CoverImg | null = null
+  private player: YTPlayer | undefined
 
   @Watch('isBroadcaster') onHolderChanged() {
     this.closeAllHolders()
@@ -75,10 +78,15 @@ export default class AudioStream extends Vue {
       this.setAudioElement()
     }
     this.registerListeners()
+    this.setupYTPlayer()
   }
 
   beforeDestroy() {
     this.closeAllHolders()
+  }
+
+  private setupYTPlayer() {
+    this.player = new YTPlayer('#yt-player')
   }
 
   private closeAllHolders() {
@@ -209,4 +217,9 @@ li {
 a {
   color: #42b983;
 }
+</style>
+
+<style lang="sass">
+.yt-player
+  width: 0
 </style>
