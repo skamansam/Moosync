@@ -40,9 +40,8 @@ export default class MusicBar extends Vue {
   @Prop({ default: 0 })
   private timestamp!: number
 
-  private currentCover: CoverImg | null = null
-
-  mounted() {}
+  @Prop({ default: null })
+  private currentCover!: CoverImg | null
 }
 </script>
 

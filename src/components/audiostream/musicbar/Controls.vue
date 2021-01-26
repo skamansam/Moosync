@@ -2,10 +2,10 @@
   <b-container fluid class="d-flex flex-column h-100">
     <b-row class="flex-grow-1 align-items-center">
       <b-col cols="auto" class="timestamp">{{ formatDuration(timestamp) }} / {{ formatDuration(duration) }}</b-col>
-      <b-col><LastTrack /></b-col>
+      <b-col v-on:click="prevTrack()"><LastTrack /></b-col>
       <b-col><Repeat /></b-col>
       <b-col v-on:click="togglePlayerState()"><Play /></b-col>
-      <b-col><NextTrack /></b-col>
+      <b-col v-on:click="nextTrack()"><NextTrack /></b-col>
       <b-col><Shuffle /></b-col>
       <!-- <b-col cols="2" class="d-none d-xl-block"></b-col> -->
     </b-row>
@@ -70,7 +70,10 @@ export default class MusicBar extends Vue {
     }
   }
 
-  private lastTrack() {}
+  private lastTrack() {
+    console.log('here')
+    PlayerModule.prevSong()
+  }
 
   private nextTrack() {
     PlayerModule.nextSong()

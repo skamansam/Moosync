@@ -4,7 +4,7 @@
       <div id="yt-player" class="yt-player"></div>
       <audio ref="audio" />
     </div>
-    <MusicBar :currentSong="currentSong" :timestamp="currentTime" />
+    <MusicBar :currentSong="currentSong" :timestamp="currentTime" :currentCover="currentCover" />
   </div>
 </template>
 
@@ -127,6 +127,13 @@ export default class AudioStream extends Vue {
       (newSong: Song | null) => {
         this.currentSong = newSong
         if (newSong) this.loadAudio(newSong.path)
+      }
+    )
+
+    PlayerModule.$watch(
+      (playerModule) => playerModule.currentSongCover,
+      async (newCover: CoverImg | null) => {
+        this.currentCover = newCover
       }
     )
 

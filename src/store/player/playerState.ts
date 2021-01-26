@@ -32,6 +32,7 @@ class Queue {
     if (!this.data[item._id!]) {
       this.order.push(item._id!)
       this.data[item._id!] = item
+      return
     }
     this.order.push(item._id!)
   }
@@ -39,6 +40,7 @@ class Queue {
   public next() {
     if (this.index < this.order.length - 1) this.index += 1
     else this.index = 0
+    console.log(this.order)
   }
 
   public prev() {
@@ -72,18 +74,17 @@ class Player extends VuexModule {
   }
 
   @Mutation
-  setSong() {
-    this.currentSongDets = this.songQueue.top
-    if (this.currentSongDets) {
-      this.setCover(this.currentSongDets._id!)
-    }
-  }
-
-  @Mutation
   setCover(id: string) {
     this.ipcHolder
       .send<CoverImg>(IpcEvents.GET_COVER, { params: id })
-      .then((data) => (this.currentSongCover = data))
+      .then((data) => {
+        this.currentSongCover = data
+      })
+  }
+
+  @Mutation
+  setSong() {
+    this.currentSongDets = this.songQueue.top
   }
 
   @Mutation
@@ -103,11 +104,17 @@ class Player extends VuexModule {
   nextSong() {
     this.songQueue.next()
     this.setSong()
+    if (this.currentSongDets) {
+      this.setCover(this.currentSongDets._id!)
+    }
   }
   @Action
   prevSong() {
     this.songQueue.prev()
     this.setSong()
+    if (this.currentSongDets) {
+      this.setCover(this.currentSongDets._id!)
+    }
   }
 }
 
