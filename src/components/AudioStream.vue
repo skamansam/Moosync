@@ -139,9 +139,13 @@ export default class AudioStream extends Vue {
     )
   }
 
-  private registerListeners() {
+  private registerAudioListeners() {
     this.audioElement.ontimeupdate = () => (this.currentTime = this.audioElement.currentTime)
+    this.audioElement.onended = () => PlayerModule.nextSong()
+  }
 
+  private registerListeners() {
+    this.registerAudioListeners()
     this.registerPlayerListeners()
   }
 

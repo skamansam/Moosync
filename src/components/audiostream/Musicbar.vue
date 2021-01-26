@@ -26,7 +26,6 @@ import ExtraControls from './musicbar/ExtraControls.vue'
 
 // eslint-disable-next-line no-unused-vars
 import { CoverImg, Song } from '@/models/songs'
-import { PlayerModule } from '@/store/player/playerState'
 @Component({
   components: {
     Details,
@@ -43,18 +42,7 @@ export default class MusicBar extends Vue {
 
   private currentCover: CoverImg | null = null
 
-  mounted() {
-    this.registerListeners()
-  }
-
-  private registerListeners() {
-    PlayerModule.$watch(
-      (playerModule) => playerModule.currentSongCover,
-      async (newState: CoverImg | null) => {
-        this.currentCover = newState
-      }
-    )
-  }
+  mounted() {}
 }
 </script>
 

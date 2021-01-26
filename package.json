@@ -35,6 +35,7 @@
     "socket.io-client": "^3.0.5",
     "stun": "^2.1.0",
     "utf-8-validate": "^5.0.4",
+    "uuid": "^8.3.2",
     "vue": "^2.6.11",
     "vue-class-component": "^7.2.3",
     "vue-electron": "^1.0.6",
@@ -47,6 +48,7 @@
   },
   "devDependencies": {
     "@types/electron-devtools-installer": "^2.2.0",
+    "@types/uuid": "^8.3.0",
     "@typescript-eslint/eslint-plugin": "^2.33.0",
     "@typescript-eslint/parser": "^2.33.0",
     "@vue/cli-plugin-babel": "~4.5.0",

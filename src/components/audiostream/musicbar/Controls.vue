@@ -69,6 +69,12 @@ export default class MusicBar extends Vue {
       PlayerModule.setState(PlayerState.PAUSED)
     }
   }
+
+  private lastTrack() {}
+
+  private nextTrack() {
+    PlayerModule.nextSong()
+  }
 }
 </script>
 

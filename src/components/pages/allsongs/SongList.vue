@@ -10,6 +10,7 @@
     select-mode="single"
     primary-key="title"
     :key="test"
+    @row-dblclicked="onRowDoubleClicked"
     @row-selected="onRowSelected"
   >
     <template #cell(index)="data">
@@ -29,7 +30,8 @@ import { ipcRenderer } from 'electron'
 import { CoverImg, Song } from '@/models/songs'
 
 import { PlayerModule } from '@/store/player/playerState'
-import { EventBus, IpcEvents } from '@/services/ipcMain/constants'
+import { EventBus, IpcEvents } from '@/services/ipc/main/constants'
+import { IpcRendererHolder } from '@/services/ipc/renderer'
 
 interface ResizerElements {
   thElm: HTMLElement | undefined
@@ -127,9 +129,9 @@ class Resizer {
 })
 export default class SongList extends Vue {
   private test: boolean = false
-  private playSong: boolean = false
   private lastSelect: string = ''
   private resizer!: Resizer
+  private IpcHolder = new IpcRendererHolder(ipcRenderer)
   private songList: any = []
   private fields = [
     { key: 'index', label: 'Sr. No', tdClass: 'index-no-td', thClass: 'index-no-th' },
@@ -140,7 +142,6 @@ export default class SongList extends Vue {
 
   created() {
     this.requestSongs()
-    this.registerListeners()
   }
 
   mounted() {
@@ -148,25 +149,23 @@ export default class SongList extends Vue {
     window.addEventListener('resize', this.rerenderTable)
   }
 
-  private onRowSelected(items: any) {
-    if (items[0]._id !== this.lastSelect) {
-      this.lastSelect = items[0]._id
+  private onRowDoubleClicked(item: Song) {
+    PlayerModule.pushInQueue(item)
+  }
 
-      this.$root.$emit(EventBus.SONG_SELECTED, items[0])
+  private onRowSelected(items: Song[]) {
+    if (items[0] && items[0]._id !== this.lastSelect) {
+      this.lastSelect = items[0]._id!
 
-      this.playSong = true
-      PlayerModule.setSong(items[0])
-
-      this.getCover(items[0]._id)
+      this.IpcHolder.send<CoverImg>(IpcEvents.GET_COVER, { params: items[0]._id }).then((data) => {
+        this.$root.$emit(EventBus.SONG_SELECTED, items[0])
+        this.$root.$emit(EventBus.COVER_SELECTED, data)
+      })
     }
   }
 
   private sortContent(): void {
     // TODO: Sort content without b-table sort since we have table resizers
-  }
-
-  private getCover(id: string) {
-    ipcRenderer.send(IpcEvents.GET_COVER, id)
   }
 
   // For some reason table isn't rerendered on window size change
@@ -178,22 +177,9 @@ export default class SongList extends Vue {
   }
 
   private async requestSongs() {
-    // ipcRenderer.send(IpcEvents.SCAN_MUSIC, ['/home/ovenoboyo'])
-    ipcRenderer.send(IpcEvents.GET_ALL_SONGS)
-  }
-
-  private registerListeners() {
-    ipcRenderer.on(IpcEvents.GOT_ALL_SONGS, (_, arg: Song[]) => {
-      this.songList = arg
-    })
-
-    ipcRenderer.on(IpcEvents.GOT_COVER, (_, arg: CoverImg) => {
-      this.$root.$emit(EventBus.COVER_SELECTED, arg)
-      if (this.playSong) {
-        PlayerModule.setCover(arg)
-        this.playSong = false
-      }
-    })
+    this.IpcHolder.send<Song[]>(IpcEvents.GET_ALL_SONGS, { responseChannel: IpcEvents.GOT_ALL_SONGS }).then(
+      (data) => (this.songList = data)
+    )
   }
 }
 </script>

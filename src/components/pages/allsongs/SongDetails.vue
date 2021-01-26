@@ -17,7 +17,7 @@ import { Component, Ref, Vue } from 'vue-property-decorator'
 
 // eslint-disable-next-line no-unused-vars
 import { CoverImg, Song } from '@/models/songs'
-import { EventBus } from '@/services/ipcMain/constants'
+import { EventBus } from '@/services/ipc/main/constants'
 
 @Component({
   components: {},
@@ -38,16 +38,16 @@ export default class SongDetails extends Vue {
   }
 
   private updateCover(cover?: CoverImg) {
-    if (cover !== undefined && cover.data !== undefined) {
+    if (this.imageElement && cover && cover.data) {
       this.imageElement.style.display = ''
       this.imageElement.src = 'data:image/png;base64, ' + cover?.data
     }
   }
 
   private updateDetails(data?: Song) {
-    if (data !== undefined) {
-      if (data !== undefined) this.currentTitle = data.title
-      if (data !== undefined && data.artists !== undefined) this.currentsubTitle = data.artists.join(', ')
+    if (data) {
+      if (data) this.currentTitle = data.title
+      if (data && data.artists) this.currentsubTitle = data.artists.join(', ')
     }
   }
 
