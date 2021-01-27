@@ -9,6 +9,7 @@ export class SyncHolder {
   private socketConnectCallback: Function | undefined
   private stream: MediaStream | null = null
   private BroadcasterID: string = ''
+  private isNegotiating: { [id: string]: boolean } = {}
   private connectionOptions: Partial<ManagerOptions> = {
     forceNew: true,
     reconnection: true,
@@ -76,14 +77,16 @@ export class SyncHolder {
 
   private onAnswer() {
     this.socketConnection.on('answer', (id: string, description: RTCSessionDescription) => {
-      this.peerConnection[id].setRemoteDescription(description)
+      if (this.isNegotiating) this.peerConnection[id].setRemoteDescription(description)
     })
   }
 
   private needsNegotiation(id: string, peer: RTCPeerConnection) {
     peer.onnegotiationneeded = () => {
-      console.log('negotiating')
-      this.makeOffer(id, peer)
+      if (!this.isNegotiating[id]) {
+        this.isNegotiating[id] = true
+        this.makeOffer(id, peer)
+      }
     }
   }
 
@@ -170,6 +173,12 @@ export class SyncHolder {
     this.socketConnection.on('userJoined', (id: string) => {
       this.setupInitiator(id)
     })
+  }
+
+  public listenSignalingState(id: string, peer: RTCPeerConnection): void {
+    peer.onsignalingstatechange = (e) => {
+      this.isNegotiating[id] = (e.target as RTCPeerConnection).signalingState != 'stable'
+    }
   }
 
   private onOffer() {
