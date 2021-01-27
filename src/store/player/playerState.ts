@@ -40,7 +40,6 @@ class Queue {
   public next() {
     if (this.index < this.order.length - 1) this.index += 1
     else this.index = 0
-    console.log(this.order)
   }
 
   public prev() {

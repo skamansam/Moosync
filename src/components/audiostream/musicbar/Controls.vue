@@ -71,7 +71,6 @@ export default class MusicBar extends Vue {
   }
 
   private lastTrack() {
-    console.log('here')
     PlayerModule.prevSong()
   }
 

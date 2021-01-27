@@ -3,7 +3,29 @@
     <template #header>
       <div class="d-flex w-100 mt-3 justify-content-between">
         <Toggle />
-        <Rooms />
+        <Rooms id="rooms" />
+        <b-popover
+          :target="`rooms`"
+          placement="rightbottom"
+          title="Rooms"
+          triggers="focus"
+          :content="`Placement hello`"
+        >
+          <div>
+            <b-tabs content-class="mt-3">
+              <b-tab title="Join" active>
+                <input ref="roomid" class="inputtext" placeholder="Enter room ID" aria-label="room id" />
+                <button v-on:click="joinRoom()">Join room</button>
+                <h3>{{ roomID }}</h3>
+              </b-tab>
+              <b-tab title="Create">
+                <button v-on:click="createRoom()">Create Room</button>
+                <h3>{{ roomID }}</h3>
+              </b-tab>
+            </b-tabs>
+            <div></div>
+          </div>
+        </b-popover>
       </div>
     </template>
     <template #default
@@ -13,10 +35,11 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue } from 'vue-property-decorator'
+import { Component, Ref, Vue } from 'vue-property-decorator'
 import Toggle from './sidebar/Toggle.vue'
 import Rooms from './sidebar/Rooms.vue'
 import Tabs from './sidebar/Tabs.vue'
+import { PeerMode, SyncModule } from '@/store/sync/syncState'
 
 @Component({
   components: {
@@ -25,7 +48,41 @@ import Tabs from './sidebar/Tabs.vue'
     Tabs,
   },
 })
-export default class Sidebar extends Vue {}
+export default class Sidebar extends Vue {
+  @Ref('roomid')
+  private roomInput!: HTMLInputElement
+
+  private roomID: string = ''
+
+  private setWatcher() {
+    SyncModule.setMode(PeerMode.WATCHER)
+  }
+
+  private setBroadcaster() {
+    SyncModule.setMode(PeerMode.BROADCASTER)
+  }
+
+  private joinRoom() {
+    this.$root.$emit('join-room', this.roomInput.value)
+  }
+
+  private createRoom() {
+    this.$root.$emit('create-room')
+  }
+
+  private registerListeners() {
+    SyncModule.$watch(
+      (syncModule) => syncModule.roomID,
+      async (newState: string) => {
+        this.roomID = newState
+      }
+    )
+  }
+
+  mounted() {
+    this.registerListeners()
+  }
+}
 </script>
 
 <style lang="sass">

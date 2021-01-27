@@ -2,15 +2,15 @@
   <div>
     <div ref="audioHolder">
       <div id="yt-player" class="yt-player"></div>
-      <audio ref="audio" />
+      <audio ref="audio" controls style="position: absolute; top: 100px" />
     </div>
     <MusicBar :currentSong="currentSong" :timestamp="currentTime" :currentCover="currentCover" />
   </div>
 </template>
 
 <script lang="ts">
-import { Component, Vue, Ref, Prop, Watch } from 'vue-property-decorator'
-import { Holders } from '@/services/syncHandler'
+import { Component, Vue, Ref, Prop } from 'vue-property-decorator'
+import { SyncHolder } from '@/services/syncHandler'
 import { AudioType } from '@/store/player/playerState'
 import MusicBar from './audiostream/Musicbar.vue'
 import { PlayerState, PlayerModule } from '@/store/player/playerState'
@@ -20,6 +20,7 @@ import YTPlayer from 'yt-player'
 import { CoverImg, Song } from '@/models/songs'
 
 import fs from 'fs'
+import { PeerMode, SyncModule } from '@/store/sync/syncState'
 
 @Component({
   components: {
@@ -31,94 +32,24 @@ export default class AudioStream extends Vue {
   @Ref('audio') audioElement!: ExtendedHtmlAudioElement
   private currentTime: number = 0
 
-  @Prop({ default: false })
-  isBroadcaster!: boolean
-
   @Prop({ default: '' })
   roomID!: string
 
-  @Prop({ default: AudioType.LOCAL })
-  audioType!: AudioType
-
-  private holderBroadcast: Holders.BroadcastHolder | null = null
-  private holderWatcher: Holders.WatchHolder | null = null
+  private peerHolder = new SyncHolder()
   private playerState: PlayerState = PlayerState.STOPPED
   private isSongLoaded: boolean = false
   private currentSong: Song | null = null
   private currentCover: CoverImg | null = null
   private player: YTPlayer | undefined
-
-  @Watch('isBroadcaster') onHolderChanged() {
-    this.closeAllHolders()
-    if (this.audioType == AudioType.STREAMING) {
-      this.setupStreamingType()
-    }
-  }
-
-  @Watch('audioType') onAudioTypeChanged() {
-    switch (this.audioType) {
-      case AudioType.STREAMING:
-        this.setupStreamingType()
-        break
-      case AudioType.LOCAL:
-        this.closeAllHolders()
-        // TODO: Setup requirements of local audio
-        break
-    }
-  }
-
-  created() {
-    if (this.audioType === AudioType.STREAMING) {
-      this.setupStreamingType()
-    }
-  }
+  private peerMode: PeerMode = PeerMode.UNDEFINED
 
   mounted() {
-    if (this.audioType === AudioType.STREAMING) {
-      this.setAudioElement()
-    }
     this.registerListeners()
     this.setupYTPlayer()
   }
 
-  beforeDestroy() {
-    this.closeAllHolders()
-  }
-
   private setupYTPlayer() {
     this.player = new YTPlayer('#yt-player')
-  }
-
-  private closeAllHolders() {
-    if (this.holderBroadcast !== null) {
-      this.holderBroadcast!.close()
-    }
-    if (this.holderWatcher !== null) {
-      this.holderWatcher!.close()
-    }
-
-    this.holderBroadcast = null
-    this.holderWatcher = null
-  }
-
-  private setAudioElement() {
-    if (this.isBroadcaster) {
-      this.holderBroadcast!.setAudioElement = this.audioElement
-      // Might need to load track before initializing
-      this.holderBroadcast!.initialize()
-    } else {
-      this.holderWatcher!.setAudioElement = this.audioElement
-    }
-  }
-
-  private setupStreamingType() {
-    if (this.isBroadcaster) {
-      this.holderBroadcast = new Holders.BroadcastHolder()
-      this.holderWatcher = null
-    } else {
-      this.holderBroadcast = null
-      this.holderWatcher = new Holders.WatchHolder()
-    }
   }
 
   private registerPlayerListeners() {
@@ -144,6 +75,9 @@ export default class AudioStream extends Vue {
         await this.handlePlayerState()
       }
     )
+
+    this.$root.$on('join-room', (data: string) => this.joinRoom(data))
+    this.$root.$on('create-room', () => this.createRoom())
   }
 
   private registerAudioListeners() {
@@ -164,9 +98,15 @@ export default class AudioStream extends Vue {
   private loadAudio(filePath: string) {
     const file = fs.readFileSync(filePath)
     const fileURL = URL.createObjectURL(new Blob([file]))
-
     this.audioElement.src = fileURL
     this.isSongLoaded = true
+
+    if (this.peerMode == PeerMode.BROADCASTER) {
+      // let stream = this.audioElement.captureStream()
+      // stream.onaddtrack = () => {
+      //   this.holderBroadcast!.gotStream(stream)
+      // }
+    }
 
     PlayerModule.setState(PlayerState.PAUSED)
   }
@@ -185,6 +125,34 @@ export default class AudioStream extends Vue {
           break
       }
     }
+  }
+
+  private joinRoom(id: string) {
+    this.peerMode = PeerMode.WATCHER
+    SyncModule.setMode(PeerMode.WATCHER)
+    this.peerHolder.setPeerMode(PeerMode.WATCHER)
+    this.peerHolder.addAudioElement(this.audioElement)
+    this.peerHolder.onJoinRoom((id: string) => {
+      SyncModule.setRoom(id)
+      this.peerHolder.start()
+    })
+    this.peerHolder.joinRoom(id)
+    SyncModule.setRoom(id)
+  }
+
+  private createRoom() {
+    this.peerMode = PeerMode.BROADCASTER
+    SyncModule.setMode(PeerMode.BROADCASTER)
+    this.peerHolder.setPeerMode(PeerMode.BROADCASTER)
+    this.peerHolder.addAudioElement(this.audioElement)
+    this.peerHolder.onJoinRoom((id: string) => {
+      SyncModule.setRoom(id)
+      this.peerHolder.start()
+    })
+    this.peerHolder.createRoom()
+    // this.setupAudioType()
+    // this.holderBroadcast!.onRoomJoin((roomID: string) => SyncModule.setRoom(roomID))
+    // this.holderBroadcast!.createRoom()
   }
 
   // private playAudio(callback: Function): void {
