@@ -2,7 +2,7 @@
   <div>
     <div ref="audioHolder">
       <div id="yt-player" class="yt-player"></div>
-      <audio ref="audio" controls style="position: absolute; top: 100px" />
+      <audio ref="audio" style="position: absolute; top: 100px" />
     </div>
     <MusicBar :currentSong="currentSong" :timestamp="currentTime" :currentCover="currentCover" />
   </div>
@@ -10,7 +10,7 @@
 
 <script lang="ts">
 import { Component, Vue, Ref, Prop } from 'vue-property-decorator'
-import { SyncHolder } from '@/services/syncHandler'
+import { SyncHolder } from '@/services/sync/syncHandler'
 import { AudioType } from '@/store/player/playerState'
 import MusicBar from './audiostream/Musicbar.vue'
 import { PlayerState, PlayerModule } from '@/store/player/playerState'
@@ -41,7 +41,6 @@ export default class AudioStream extends Vue {
   private currentSong: Song | null = null
   private currentCover: CoverImg | null = null
   private player: YTPlayer | undefined
-  private peerMode: PeerMode = PeerMode.UNDEFINED
 
   mounted() {
     this.registerListeners()
@@ -57,7 +56,15 @@ export default class AudioStream extends Vue {
       (playerModule) => playerModule.currentSongDets,
       (newSong: Song | null) => {
         this.currentSong = newSong
-        if (newSong) this.loadAudio(newSong.path)
+        if (newSong) this.loadAudio(newSong)
+      }
+    )
+
+    // TODO: Decide when to play local or remote track
+    SyncModule.$watch(
+      (syncModule) => syncModule.currentSongDets,
+      (newSong: Song | null) => {
+        this.currentSong = newSong
       }
     )
 
@@ -88,6 +95,7 @@ export default class AudioStream extends Vue {
   private registerListeners() {
     this.registerAudioListeners()
     this.registerPlayerListeners()
+    this.syncListeners()
   }
 
   private unloadAudio() {
@@ -95,14 +103,17 @@ export default class AudioStream extends Vue {
     this.isSongLoaded = false
   }
 
-  private loadAudio(filePath: string) {
-    const file = fs.readFileSync(filePath)
+  private loadAudio(song: Song) {
+    const file = fs.readFileSync(song.path)
     const fileURL = URL.createObjectURL(new Blob([file]))
     this.audioElement.src = fileURL
     this.isSongLoaded = true
 
-    if (this.peerMode == PeerMode.BROADCASTER) {
-      // this.peerHolder.gotFile(file)
+    if (this.peerHolder && this.peerHolder.peerMode == PeerMode.BROADCASTER) {
+      let stream = this.audioElement.captureStream()
+      stream.onaddtrack = () => {
+        this.peerHolder.addStream(stream, song)
+      }
     }
 
     PlayerModule.setState(PlayerState.PAUSED)
@@ -124,56 +135,51 @@ export default class AudioStream extends Vue {
     }
   }
 
-  private joinRoom(id: string) {
-    this.peerMode = PeerMode.WATCHER
-    SyncModule.setMode(PeerMode.WATCHER)
-    this.peerHolder.setPeerMode(PeerMode.WATCHER)
-    this.peerHolder.addAudioElement(this.audioElement)
-    this.peerHolder.onJoinRoom((id: string) => {
+  private initializeRTC(mode: PeerMode) {
+    this.peerHolder.peerMode = mode
+    SyncModule.setMode(mode)
+
+    this.peerHolder.onJoinedRoom = (id: string) => {
       SyncModule.setRoom(id)
-      this.peerHolder.start()
-    })
+    }
+  }
+
+  private joinRoom(id: string) {
+    this.initializeRTC(PeerMode.WATCHER)
     this.peerHolder.joinRoom(id)
-    SyncModule.setRoom(id)
   }
 
   private createRoom() {
-    this.peerMode = PeerMode.BROADCASTER
-    SyncModule.setMode(PeerMode.BROADCASTER)
-    this.peerHolder.setPeerMode(PeerMode.BROADCASTER)
-    this.peerHolder.addAudioElement(this.audioElement)
-    this.peerHolder.onJoinRoom((id: string) => {
-      SyncModule.setRoom(id)
-      this.peerHolder.start()
-    })
+    this.initializeRTC(PeerMode.BROADCASTER)
     this.peerHolder.createRoom()
-    // this.setupAudioType()
-    // this.holderBroadcast!.onRoomJoin((roomID: string) => SyncModule.setRoom(roomID))
-    // this.holderBroadcast!.createRoom()
   }
 
-  // private playAudio(callback: Function): void {
-  //   this.getAudioFile()
-  //   let stream = this.audioElement.captureStream()
-  //   stream.onaddtrack = () => {
-  //     callback()
-  //   }
-  // }
+  private async getStream() {
+    return new Promise<MediaStream>((resolve) => {
+      let stream = this.audioElement.captureStream()
+      stream.onaddtrack = () => {
+        resolve(stream)
+      }
+    })
+  }
 
-  // private switchAudio(): void {
-  //   var fs = require('fs')
-  //   var path = require('path')
-  //   var p = path.join('/home/ovenoboyo/test2.flac')
+  private syncListeners() {
+    this.peerHolder.onDataChannelMessage = (event) => {
+      SyncModule.setSong(event.message as Song)
+    }
 
-  //   const file = fs.readFileSync(p)
-  //   const fileURL = URL.createObjectURL(new Blob([file]))
+    this.peerHolder.setLocalTrack = () => {
+      if (this.peerHolder.peerMode == PeerMode.BROADCASTER) {
+        if (this.audioElement.src)
+          this.getStream().then((stream) => this.peerHolder.addStream(stream, this.currentSong!))
+      }
+    }
 
-  //   this.audioElement.src = fileURL
-  //   let stream = this.audioElement.captureStream()
-  //   stream.onaddtrack = () => {
-  //     this.holderBroadcast!.gotStream(stream)
-  //   }
-  // }
+    this.peerHolder.onRemoteTrack = (event) => {
+      this.audioElement.srcObject = event.streams[0]
+      this.audioElement.play().catch((e) => console.log(e))
+    }
+  }
 }
 </script>
 

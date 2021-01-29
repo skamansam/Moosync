@@ -1,3 +1,4 @@
+import { Song } from '@/models/songs'
 import { VuexModule, Module, Mutation, Action } from 'vuex-class-modules'
 import store from '../'
 
@@ -10,6 +11,7 @@ export enum PeerMode {
 @Module
 class Sync extends VuexModule {
   mode: PeerMode = PeerMode.WATCHER
+  currentSongDets: Song | null = null
   roomID: string = ''
 
   @Mutation
@@ -20,6 +22,11 @@ class Sync extends VuexModule {
   @Mutation
   setRoom(id: string) {
     this.roomID = id
+  }
+
+  @Mutation
+  setSong(song: Song) {
+    this.currentSongDets = song
   }
 }
 

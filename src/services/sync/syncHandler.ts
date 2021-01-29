@@ -1,16 +1,18 @@
 import { Socket, io, ManagerOptions } from 'socket.io-client'
 import { PeerMode } from '@/store/sync/syncState'
+import { Song } from '@/models/songs'
+export interface DataChannelMessage {
+  type: string
+  message: object
+}
 
 export class SyncHolder {
   private peerConnection: { [key: string]: { peer: RTCPeerConnection | null; channel: RTCDataChannel | null } } = {}
   private socketConnection: Socket
-  private audioElement: ExtendedHtmlAudioElement | null = null
-  private peerMode: PeerMode = PeerMode.UNDEFINED
-  private socketConnectCallback: Function | undefined
+  private mode: PeerMode = PeerMode.UNDEFINED
   private stream: MediaStream | null = null
   private BroadcasterID: string = ''
   private isNegotiating: { [id: string]: boolean } = {}
-  private dataChannelOpen: boolean = false
   private connectionOptions: Partial<ManagerOptions> = {
     forceNew: true,
     reconnection: true,
@@ -19,25 +21,50 @@ export class SyncHolder {
     transports: ['websocket'],
   }
 
+  private onJoinedRoomCallback: ((id: string) => void) | null = null
+  private onDatachannelOpenCallback: (() => Song | null) | null = null
+  private onDataChannelMessageCallback: ((event: DataChannelMessage) => void) | null = null
+  private setLocalTrackCallback: (() => void) | null = null
+  private onRemoteTrackCallback: ((event: RTCTrackEvent) => void) | null = null
+
   constructor(url?: string) {
     this.socketConnection = io(url ? url : 'http://localhost:4000', this.connectionOptions)
     this.onBroadcasterChange()
+    this.joinedRoom()
   }
 
-  public addAudioElement(element: ExtendedHtmlAudioElement) {
-    this.audioElement = element
+  set onJoinedRoom(callback: (id: string) => void) {
+    this.onJoinedRoomCallback = callback
   }
 
-  public setPeerMode(mode: PeerMode) {
-    this.peerMode = mode
+  set onDatachannelOpen(callback: () => Song | null) {
+    this.onDatachannelOpenCallback = callback
+  }
+
+  set onDataChannelMessage(callback: (event: DataChannelMessage) => void) {
+    this.onDataChannelMessageCallback = callback
+  }
+
+  set setLocalTrack(callback: () => void) {
+    this.setLocalTrackCallback = callback
+  }
+
+  set onRemoteTrack(callback: (event: RTCTrackEvent) => void) {
+    this.onRemoteTrackCallback = callback
+  }
+
+  set peerMode(mode: PeerMode) {
+    this.mode = mode
+  }
+
+  get peerMode() {
+    return this.mode
   }
 
   private makePeer(id: string): RTCPeerConnection {
     // Creates new peer
     let peer = new RTCPeerConnection()
-
-    this.sendLocalCandidate(id, peer)
-
+    this.onLocalCandidate(id, peer)
     return peer
   }
 
@@ -59,33 +86,38 @@ export class SyncHolder {
 
   private handleDataChannel(channel: RTCDataChannel) {
     channel.onopen = (event) => {
-      console.log('open')
+      this.mode == PeerMode.BROADCASTER && this.setLocalTrackCallback ? this.setLocalTrackCallback() : null
     }
 
     channel.onmessage = (event) => {
-      console.log(event.data)
+      let data = JSON.parse(event.data) as DataChannelMessage
+
+      switch (data.type) {
+        case 'trackChange':
+          this.onDataChannelMessageCallback ? this.onDataChannelMessageCallback(data) : null
+          break
+      }
     }
   }
 
   private addRemoteCandidate() {
     this.socketConnection.on('candidate', (id: string, candidate: RTCIceCandidate) => {
       this.peerConnection[id].peer?.addIceCandidate(new RTCIceCandidate(candidate))
-      // }
     })
   }
 
-  private sendLocalCandidate(id: string, peer: RTCPeerConnection) {
+  private onLocalCandidate(id: string, peer: RTCPeerConnection) {
     peer.onicecandidate = (event) => {
       if (event.candidate) {
-        console.log(event.candidate)
         this.socketConnection.emit('candidate', id, event.candidate)
       }
     }
   }
 
-  public onJoinRoom(callback: Function) {
+  private joinedRoom() {
     this.socketConnection.on('joinedRoom', (roomID: string) => {
-      callback(roomID)
+      this.onJoinedRoomCallback ? this.onJoinedRoomCallback(roomID) : null
+      this.start()
     })
   }
 
@@ -114,78 +146,60 @@ export class SyncHolder {
     }
   }
 
-  private addStream(peer: RTCPeerConnection, stream: MediaStream) {
+  private addStreamToPeer(peer: RTCPeerConnection, stream: MediaStream) {
     stream.getTracks().forEach((track) => {
       peer.addTrack(track, stream)
     })
+  }
+
+  private sendTrackMetadata(channel: RTCDataChannel, data: Song | null) {
+    if (data) channel.send(JSON.stringify({ type: 'trackChange', message: data }))
+  }
+
+  // public replaceTrack(track: MediaStreamTrack, song: Song) {
+  //   for (let i in this.peerConnection) {
+  //     let senders = this.peerConnection[i].peer!.getSenders()
+  //     for (let j in senders) {
+  //       senders[j].replaceTrack(track)
+  //     }
+  //     this.sendTrackMetadata(this.peerConnection[i].channel!, song)
+  //   }
+  // }
+
+  // Replace whole stream instead of tracks since playback time gets
+  // messed up on track change and a slight delay is
+  // observed after resuming from broadcaster
+  public addStream(stream: MediaStream, song: Song) {
+    for (let i in this.peerConnection) {
+      const connection = this.peerConnection[i]!
+      let senders = connection.peer!.getSenders()
+      for (let j in senders) {
+        connection.peer!.removeTrack(senders[j])
+      }
+      stream.getTracks().forEach((track) => {
+        connection.peer!.addTrack(track, stream)
+      })
+      this.sendTrackMetadata(connection.channel!, song)
+
+      if (this.stream) {
+        this.stream.getTracks().forEach((track) => {
+          track.stop()
+        })
+      }
+      this.stream = stream
+    }
   }
 
   public createRoom() {
     this.socketConnection.emit('createRoom')
   }
 
-  // Watcher
-
   private onStream(id: string, peer: RTCPeerConnection) {
     peer.ontrack = (event: RTCTrackEvent) => {
-      if (id == this.BroadcasterID) {
-        this.audioElement!.srcObject = event.streams[0]
-        // console.log(event.streams[0].getTracks())
-        this.audioElement!.play()
+      if (this.mode == PeerMode.WATCHER && id == this.BroadcasterID) {
+        this.onRemoteTrackCallback ? this.onRemoteTrackCallback(event) : null
       }
     }
-  }
-
-  private onDataChannel(id: string, peer: RTCPeerConnection) {
-    peer.ondatachannel = (event) => {
-      let channel = event.channel
-      this.handleDataChannel(channel)
-      this.setChannel(id, channel)
-    }
-  }
-
-  public joinRoom(id: string) {
-    this.socketConnection.emit('joinRoom', id)
-  }
-
-  // Common setup
-
-  private handleStream(peer: RTCPeerConnection, id: string) {
-    if (!this.stream) {
-      this.stream = this.audioElement!.captureStream()
-      this.stream!.onaddtrack = () => {
-        this.addStream(peer, this.stream!)
-      }
-    } else {
-      if (this.stream.getTracks().length > 0) {
-        this.addStream(peer, this.stream)
-      } else {
-        this.stream!.onaddtrack = () => {
-          this.addStream(peer, this.stream!)
-        }
-      }
-    }
-    // TODO: Send audio metadata to watcher
-    // this.peerConnection[id].channel?.send('hello')
-  }
-
-  private setupInitiator(id: string) {
-    let peer = this.makePeer(id)
-    this.listenSignalingState(id, peer)
-    this.makeDataChannel(id, peer)
-
-    this.needsNegotiation(id, peer)
-
-    if (this.audioElement!.src || this.audioElement!.srcObject) {
-      this.handleStream(peer, id)
-    } else {
-      this.audioElement!.onloadeddata = () => {
-        this.handleStream(peer, id)
-      }
-    }
-
-    // this.peerConnection[id] = peer
-    this.setPeer(id, peer)
   }
 
   private setupWatcher(id: string, description: RTCSessionDescription) {
@@ -205,7 +219,36 @@ export class SyncHolder {
       .then((sdp) => peer.setLocalDescription(sdp))
       .then(() => this.socketConnection.emit('answer', id, peer.localDescription))
 
-    // this.peerConnection[id] = peer
+    this.setPeer(id, peer)
+  }
+
+  private onDataChannel(id: string, peer: RTCPeerConnection) {
+    peer.ondatachannel = (event) => {
+      let channel = event.channel
+      this.handleDataChannel(channel)
+      this.setChannel(id, channel)
+    }
+  }
+
+  public joinRoom(id: string) {
+    this.socketConnection.emit('joinRoom', id)
+  }
+
+  private loadStream(peer: RTCPeerConnection) {
+    if (this.stream) {
+      this.addStreamToPeer(peer, this.stream)
+    }
+  }
+
+  private setupInitiator(id: string) {
+    let peer = this.makePeer(id)
+    this.listenSignalingState(id, peer)
+    this.makeDataChannel(id, peer)
+
+    this.needsNegotiation(id, peer)
+
+    this.loadStream(peer)
+
     this.setPeer(id, peer)
   }
 
@@ -235,13 +278,8 @@ export class SyncHolder {
 
   public start() {
     this.addRemoteCandidate()
-
-    // Setup watcher
     this.onOffer()
-
-    // Setup initiator
     this.onUserJoined()
-
     this.onAnswer()
   }
 }
