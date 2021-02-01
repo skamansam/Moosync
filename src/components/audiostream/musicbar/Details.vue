@@ -19,7 +19,7 @@
 // eslint-disable-next-line no-unused-vars
 
 import Vue from 'vue'
-import { Component, Prop, Ref } from 'vue-property-decorator'
+import { Component, Prop, Ref, Watch } from 'vue-property-decorator'
 
 @Component({})
 export default class MusicBar extends Vue {
@@ -32,8 +32,17 @@ export default class MusicBar extends Vue {
   @Prop({ default: '' })
   cover!: string
 
+  @Prop({ default: null })
+  private coverBlob!: Blob | null
+
   @Ref('cover')
   private imageElement!: HTMLImageElement
+
+  @Watch('coverBlob') onBlobChanged() {
+    if (this.coverBlob) {
+      this.imageElement.src = URL.createObjectURL(this.coverBlob)
+    }
+  }
 }
 </script>
 

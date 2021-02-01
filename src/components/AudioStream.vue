@@ -4,7 +4,12 @@
       <div id="yt-player" class="yt-player"></div>
       <audio ref="audio" style="position: absolute; top: 100px" />
     </div>
-    <MusicBar :currentSong="currentSong" :timestamp="currentTime" :currentCover="currentCover" />
+    <MusicBar
+      :currentSong="currentSong"
+      :timestamp="currentTime"
+      :currentCover="currentCover"
+      :currentCoverBlob="currentCoverBlob"
+    />
   </div>
 </template>
 
@@ -39,6 +44,7 @@ export default class AudioStream extends Vue {
   private playerState: PlayerState = PlayerState.STOPPED
   private isSongLoaded: boolean = false
   private currentSong: Song | null = null
+  private currentCoverBlob: Blob | null = null
   private currentCover: CoverImg | null = null
   private player: YTPlayer | undefined
 
@@ -72,6 +78,13 @@ export default class AudioStream extends Vue {
       (playerModule) => playerModule.currentSongCover,
       async (newCover: CoverImg | null) => {
         this.currentCover = newCover
+      }
+    )
+
+    SyncModule.$watch(
+      (syncModule) => syncModule.currentCover,
+      async (newCover: Blob | null) => {
+        this.currentCoverBlob = newCover
       }
     )
 
@@ -164,8 +177,13 @@ export default class AudioStream extends Vue {
   }
 
   private syncListeners() {
-    this.peerHolder.onDataChannelMessage = (event) => {
+    this.peerHolder.onRemoteTrackInfo = (event) => {
       SyncModule.setSong(event.message as Song)
+      SyncModule
+    }
+
+    this.peerHolder.onRemoteCover = (event) => {
+      SyncModule.setCover(event)
     }
 
     this.peerHolder.setLocalTrack = () => {
@@ -178,6 +196,11 @@ export default class AudioStream extends Vue {
     this.peerHolder.onRemoteTrack = (event) => {
       this.audioElement.srcObject = event.streams[0]
       this.audioElement.play().catch((e) => console.log(e))
+    }
+
+    this.peerHolder.fetchCover = () => {
+      console.log(this.currentCover)
+      return this.currentCover!
     }
   }
 }

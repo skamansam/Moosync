@@ -1,13 +1,20 @@
 import { Socket, io, ManagerOptions } from 'socket.io-client'
 import { PeerMode } from '@/store/sync/syncState'
-import { Song } from '@/models/songs'
-export interface DataChannelMessage {
+import { CoverImg, Song } from '@/models/songs'
+import { FragmentReceiver, FragmentSender } from './dataFragmenter'
+import { base64 } from 'rfc4648'
+interface DataChannelMessage<T> {
   type: string
-  message: object
+  message: T
 }
-
 export class SyncHolder {
-  private peerConnection: { [key: string]: { peer: RTCPeerConnection | null; channel: RTCDataChannel | null } } = {}
+  private peerConnection: {
+    [key: string]: {
+      peer: RTCPeerConnection | null
+      trackchannel: RTCDataChannel | null
+      coverchannel: RTCDataChannel | null
+    }
+  } = {}
   private socketConnection: Socket
   private mode: PeerMode = PeerMode.UNDEFINED
   private stream: MediaStream | null = null
@@ -23,9 +30,12 @@ export class SyncHolder {
 
   private onJoinedRoomCallback: ((id: string) => void) | null = null
   private onDatachannelOpenCallback: (() => Song | null) | null = null
-  private onDataChannelMessageCallback: ((event: DataChannelMessage) => void) | null = null
+  private onRemoteTrackInfoCallback: ((event: DataChannelMessage<Song>) => void) | null = null
   private setLocalTrackCallback: (() => void) | null = null
   private onRemoteTrackCallback: ((event: RTCTrackEvent) => void) | null = null
+  private onRemoteCoverCallback: ((event: Blob) => void) | null = null
+
+  private fetchCoverCallback: (() => CoverImg) | null = null
 
   constructor(url?: string) {
     this.socketConnection = io(url ? url : 'http://localhost:4000', this.connectionOptions)
@@ -41,8 +51,8 @@ export class SyncHolder {
     this.onDatachannelOpenCallback = callback
   }
 
-  set onDataChannelMessage(callback: (event: DataChannelMessage) => void) {
-    this.onDataChannelMessageCallback = callback
+  set onRemoteTrackInfo(callback: (event: DataChannelMessage<Song>) => void) {
+    this.onRemoteTrackInfoCallback = callback
   }
 
   set setLocalTrack(callback: () => void) {
@@ -51,6 +61,14 @@ export class SyncHolder {
 
   set onRemoteTrack(callback: (event: RTCTrackEvent) => void) {
     this.onRemoteTrackCallback = callback
+  }
+
+  set fetchCover(callback: () => CoverImg) {
+    this.fetchCoverCallback = callback
+  }
+
+  set onRemoteCover(callback: (event: Blob) => void) {
+    this.onRemoteCoverCallback = callback
   }
 
   set peerMode(mode: PeerMode) {
@@ -70,33 +88,62 @@ export class SyncHolder {
 
   private setPeer(id: string, peer: RTCPeerConnection) {
     if (this.peerConnection[id]) this.peerConnection[id].peer = peer
-    else this.peerConnection[id] = { peer: peer, channel: null }
+    else this.peerConnection[id] = { peer: peer, trackchannel: null, coverchannel: null }
   }
 
-  private setChannel(id: string, channel: RTCDataChannel) {
-    if (this.peerConnection[id]) this.peerConnection[id].channel = channel
-    else this.peerConnection[id] = { peer: null, channel: channel }
+  private setTrackChannel(id: string, trackChannel: RTCDataChannel) {
+    if (this.peerConnection[id]) this.peerConnection[id].trackchannel = trackChannel
+    else this.peerConnection[id] = { peer: null, trackchannel: trackChannel, coverchannel: null }
+  }
+
+  private setCoverChannel(id: string, coverChannel: RTCDataChannel) {
+    if (this.peerConnection[id]) this.peerConnection[id].coverchannel = coverChannel
+    else this.peerConnection[id] = { peer: null, trackchannel: null, coverchannel: coverChannel }
   }
 
   private makeDataChannel(id: string, peer: RTCPeerConnection) {
-    let channel = peer.createDataChannel('test-label')
-    this.handleDataChannel(channel)
-    this.setChannel(id, channel)
+    let trackChannel = peer.createDataChannel('track-channel')
+    let coverChannel = peer.createDataChannel('cover-channel')
+
+    this.handleTrackChannel(trackChannel)
+    this.handleCoverChannel(coverChannel)
+    this.setTrackChannel(id, trackChannel)
+    this.setCoverChannel(id, coverChannel)
   }
 
-  private handleDataChannel(channel: RTCDataChannel) {
+  private handleTrackChannel(channel: RTCDataChannel) {
     channel.onopen = (event) => {
       this.mode == PeerMode.BROADCASTER && this.setLocalTrackCallback ? this.setLocalTrackCallback() : null
     }
 
     channel.onmessage = (event) => {
-      let data = JSON.parse(event.data) as DataChannelMessage
+      let data = JSON.parse(event.data)
 
       switch (data.type) {
         case 'trackChange':
-          this.onDataChannelMessageCallback ? this.onDataChannelMessageCallback(data) : null
+          this.onRemoteTrackInfoCallback ? this.onRemoteTrackInfoCallback(data as DataChannelMessage<Song>) : null
           break
       }
+    }
+
+    channel.onclose = (event) => {
+      console.log('traack closed')
+    }
+  }
+
+  private handleCoverChannel(channel: RTCDataChannel) {
+    let fragmentReceiver = new FragmentReceiver(this.onRemoteCoverCallback)
+
+    channel.onopen = (event) => {
+      console.log('open cover channel')
+    }
+
+    channel.onmessage = (event) => {
+      fragmentReceiver.receive(event.data)
+    }
+
+    channel.onclose = (event) => {
+      console.log('cover closed')
     }
   }
 
@@ -152,8 +199,14 @@ export class SyncHolder {
     })
   }
 
-  private sendTrackMetadata(channel: RTCDataChannel, data: Song | null) {
-    if (data) channel.send(JSON.stringify({ type: 'trackChange', message: data }))
+  private sendTrackMetadata(id: string, trackInfo: Song | null) {
+    if (trackInfo)
+      this.peerConnection[id].trackchannel!.send(JSON.stringify({ type: 'trackChange', message: trackInfo }))
+    let cover = this.fetchCoverCallback ? this.fetchCoverCallback() : null
+    if (cover) {
+      let fragmentSender = new FragmentSender(base64.parse(cover.data!), this.peerConnection[id].coverchannel!)
+      fragmentSender.send()
+    }
   }
 
   // public replaceTrack(track: MediaStreamTrack, song: Song) {
@@ -179,7 +232,7 @@ export class SyncHolder {
       stream.getTracks().forEach((track) => {
         connection.peer!.addTrack(track, stream)
       })
-      this.sendTrackMetadata(connection.channel!, song)
+      this.sendTrackMetadata(i, song)
 
       if (this.stream) {
         this.stream.getTracks().forEach((track) => {
@@ -225,8 +278,13 @@ export class SyncHolder {
   private onDataChannel(id: string, peer: RTCPeerConnection) {
     peer.ondatachannel = (event) => {
       let channel = event.channel
-      this.handleDataChannel(channel)
-      this.setChannel(id, channel)
+      if (channel.label === 'track-channel') {
+        this.handleTrackChannel(channel)
+        this.setTrackChannel(id, channel)
+      } else if (channel.label === 'cover-channel') {
+        this.handleCoverChannel(channel)
+        this.setCoverChannel(id, channel)
+      }
     }
   }
 

@@ -8,6 +8,7 @@
             :title="currentSong ? currentSong.title : '-'"
             :artists="currentSong ? currentSong.artists : []"
             :cover="currentCover ? currentCover.data : ''"
+            :coverBlob="currentCoverBlob"
         /></b-col>
         <b-col col lg="auto"
           ><Controls :duration="currentSong ? currentSong.duration : 0" :timestamp="timestamp"
@@ -42,6 +43,9 @@ export default class MusicBar extends Vue {
 
   @Prop({ default: null })
   private currentCover!: CoverImg | null
+
+  @Prop({ default: null })
+  private currentCoverBlob!: Blob | null
 }
 </script>
 

@@ -12,6 +12,7 @@ export enum PeerMode {
 class Sync extends VuexModule {
   mode: PeerMode = PeerMode.WATCHER
   currentSongDets: Song | null = null
+  currentCover: Blob | null = null
   roomID: string = ''
 
   @Mutation
@@ -27,6 +28,11 @@ class Sync extends VuexModule {
   @Mutation
   setSong(song: Song) {
     this.currentSongDets = song
+  }
+
+  @Mutation
+  setCover(cover: Blob) {
+    this.currentCover = cover
   }
 }
 
