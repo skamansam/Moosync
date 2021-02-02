@@ -28,7 +28,6 @@ import { Component, Vue } from 'vue-property-decorator'
 import { ipcRenderer } from 'electron'
 // eslint-disable-next-line no-unused-vars
 import { CoverImg, Song } from '@/models/songs'
-
 import { PlayerModule } from '@/store/player/playerState'
 import { EventBus, IpcEvents } from '@/services/ipc/main/constants'
 import { IpcRendererHolder } from '@/services/ipc/renderer'
@@ -132,7 +131,7 @@ export default class SongList extends Vue {
   private lastSelect: string = ''
   private resizer!: Resizer
   private IpcHolder = new IpcRendererHolder(ipcRenderer)
-  private songList: any = []
+  private songList: Song[] = []
   private fields = [
     { key: 'index', label: 'Sr. No', tdClass: 'index-no-td', thClass: 'index-no-th' },
     { key: 'title' },
@@ -140,13 +139,10 @@ export default class SongList extends Vue {
     { key: 'artists' },
   ]
 
-  created() {
-    this.requestSongs()
-  }
-
   mounted() {
     this.resizer = new Resizer(document)
     window.addEventListener('resize', this.rerenderTable)
+    this.requestSongs()
   }
 
   private onRowDoubleClicked(item: Song) {

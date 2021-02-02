@@ -55,7 +55,7 @@ export default class MusicBar extends Vue {
 
   private setupListeners() {
     PlayerModule.$watch(
-      (playerModule) => playerModule.state,
+      (playerModule) => playerModule.playerState,
       (newState: PlayerState) => {
         this.playerState = newState
       }

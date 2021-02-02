@@ -59,7 +59,7 @@ export default class AudioStream extends Vue {
 
   private registerPlayerListeners() {
     PlayerModule.$watch(
-      (playerModule) => playerModule.currentSongDets,
+      (playerModule) => playerModule.currentSong,
       (newSong: Song | null) => {
         this.currentSong = newSong
         if (newSong) this.loadAudio(newSong)
@@ -75,7 +75,7 @@ export default class AudioStream extends Vue {
     )
 
     PlayerModule.$watch(
-      (playerModule) => playerModule.currentSongCover,
+      (playerModule) => playerModule.currentCover,
       async (newCover: CoverImg | null) => {
         this.currentCover = newCover
       }
@@ -89,7 +89,7 @@ export default class AudioStream extends Vue {
     )
 
     PlayerModule.$watch(
-      (playerModule) => playerModule.state,
+      (playerModule) => playerModule.playerState,
       async (newState: PlayerState) => {
         this.playerState = newState
         await this.handlePlayerState()

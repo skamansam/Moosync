@@ -1,12 +1,13 @@
 <template>
   <div class="background w-100">
-    <div class="timeline w-100"></div>
+    <b-progress class="w-100 timeline" :max="currentSong ? currentSong.duration : 0">
+      <b-progress-bar :value="Math.floor(timestamp)" variant="success"></b-progress-bar>
+    </b-progress>
     <b-container fluid class="d-flex h-100">
       <b-row class="flex-grow-1 justify-content-between">
         <b-col col lg="3"
           ><Details
-            :title="currentSong ? currentSong.title : '-'"
-            :artists="currentSong ? currentSong.artists : []"
+            :title="currentS tSong ? currentSong.artists : []"
             :cover="currentCover ? currentCover.data : ''"
             :coverBlob="currentCoverBlob"
         /></b-col>
@@ -60,6 +61,9 @@ export default class MusicBar extends Vue {
 
 .timeline
   background: $tertiary
-  background: linear-gradient(90deg, $accent-primary 0%, $accent-primary 60%, $tertiary 0%)
   height: 0.5rem
+
+.timeline > .progress-bar
+  background-color: $accent-primary !important
+  transition: width 1s linear
 </style>

@@ -61,11 +61,27 @@ class Queue {
 
 @Module
 class Player extends VuexModule {
-  state: PlayerState = PlayerState.PAUSED
-  currentSongDets: Song | null = null
-  currentSongCover: CoverImg | null = null
-  ipcHolder = new IpcRendererHolder(ipcRenderer)
-  songQueue = new Queue()
+  private state: PlayerState = PlayerState.PAUSED
+  private currentSongDets: Song | null = null
+  private currentSongCover: CoverImg | null = null
+  private ipcHolder = new IpcRendererHolder(ipcRenderer)
+  private songQueue = new Queue()
+
+  get playerState() {
+    return this.state
+  }
+
+  get currentSong() {
+    return this.currentSongDets
+  }
+
+  get currentCover() {
+    return this.currentSongCover
+  }
+
+  get queue() {
+    return this.songQueue
+  }
 
   @Mutation
   setState(state: PlayerState) {
@@ -82,8 +98,8 @@ class Player extends VuexModule {
   }
 
   @Mutation
-  setSong() {
-    this.currentSongDets = this.songQueue.top
+  setSong(song: Song | null) {
+    this.currentSongDets = song
   }
 
   @Mutation
@@ -102,7 +118,7 @@ class Player extends VuexModule {
   @Action
   nextSong() {
     this.songQueue.next()
-    this.setSong()
+    this.setSong(this.songQueue.top)
     if (this.currentSongDets) {
       this.setCover(this.currentSongDets._id!)
     }
@@ -110,7 +126,7 @@ class Player extends VuexModule {
   @Action
   prevSong() {
     this.songQueue.prev()
-    this.setSong()
+    this.setSong(this.songQueue.top)
     if (this.currentSongDets) {
       this.setCover(this.currentSongDets._id!)
     }
