@@ -14,7 +14,7 @@ let switchConnection = (dbString: string) => {
   return 'undefined.db'
 }
 
-export class SongDBInstance {
+class SongDBInstance {
   private db = new AsyncNedb<Song>({
     filename: path.join(app.getPath('appData'), app.getName(), 'db', switchConnection(Databases.SONG)),
     autoload: true,
@@ -37,7 +37,7 @@ export class SongDBInstance {
   }
 }
 
-export class CoverDBInstance {
+class CoverDBInstance {
   private db = new AsyncNedb<CoverImg>({
     filename: path.join(app.getPath('appData'), app.getName(), 'db', switchConnection(Databases.COVER)),
     autoload: true,
@@ -50,4 +50,11 @@ export class CoverDBInstance {
   public async getByID(id: string): Promise<CoverImg> {
     return this.db.asyncFindOne({ _id: id })
   }
+
+  public async countByBase64(base64: string) {
+    return this.db.asyncCount({ data: base64 })
+  }
 }
+
+export const CoverDB = new CoverDBInstance()
+export const SongDB = new SongDBInstance()

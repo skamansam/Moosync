@@ -20,9 +20,4 @@ export interface Song {
 export interface CoverImg {
   _id?: string
   data: string | undefined
-  description: string | undefined
-  mime: string | undefined
-  height: number | undefined
-  width: number | undefined
-  type: string | undefined
 }

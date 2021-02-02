@@ -1,5 +1,14 @@
+var webpack = require('webpack');
+
 module.exports = {
   runtimeCompiler: true,
+  configureWebpack: {
+    plugins: [
+      new webpack.DefinePlugin({
+        'process.browser': 'true'
+      }),
+    ]
+  },
   pluginOptions: {
     electronBuilder: {
       nodeIntegration: true,
