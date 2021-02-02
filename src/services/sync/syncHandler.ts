@@ -23,7 +23,7 @@ export class SyncHolder {
   private connectionOptions: Partial<ManagerOptions> = {
     forceNew: true,
     reconnection: true,
-    reconnectionAttempts: Infinity,
+    reconnectionAttempts: 2,
     timeout: 10000,
     transports: ['websocket'],
   }
@@ -34,11 +34,11 @@ export class SyncHolder {
   private setLocalTrackCallback: (() => void) | null = null
   private onRemoteTrackCallback: ((event: RTCTrackEvent) => void) | null = null
   private onRemoteCoverCallback: ((event: Blob) => void) | null = null
-
   private fetchCoverCallback: (() => CoverImg) | null = null
 
   constructor(url?: string) {
     this.socketConnection = io(url ? url : 'http://localhost:4000', this.connectionOptions)
+    this.handleSocketError()
     this.onBroadcasterChange()
     this.joinedRoom()
   }
@@ -77,6 +77,13 @@ export class SyncHolder {
 
   get peerMode() {
     return this.mode
+  }
+
+  private handleSocketError() {
+    // TODO: Display failure on UI
+    this.socketConnection.on('connect_error', (error: Error) => {
+      console.log(error)
+    })
   }
 
   private makePeer(id: string): RTCPeerConnection {
