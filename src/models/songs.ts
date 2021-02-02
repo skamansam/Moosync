@@ -1,6 +1,7 @@
 export interface Song {
   _id?: string
   path: string
+  coverPath: string | undefined
   title: string
   album: string | undefined
   artists: string[] | undefined
@@ -15,9 +16,4 @@ export interface Song {
   duration: number | undefined
   sampleRate: number | undefined
   hash: string
-}
-
-export interface CoverImg {
-  _id?: string
-  data: string | undefined
 }

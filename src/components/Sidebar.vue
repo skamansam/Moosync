@@ -39,7 +39,7 @@ import { Component, Ref, Vue } from 'vue-property-decorator'
 import Toggle from './sidebar/Toggle.vue'
 import Rooms from './sidebar/Rooms.vue'
 import Tabs from './sidebar/Tabs.vue'
-import { PeerMode, SyncModule } from '@/store/sync/syncState'
+import { PeerMode, SyncModule } from '@/store/syncState'
 
 @Component({
   components: {

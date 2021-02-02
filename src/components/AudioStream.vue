@@ -21,10 +21,10 @@ import { AudioType, PlayerState, PlayerModule } from '@/store/playerState'
 import YTPlayer from 'yt-player'
 
 // eslint-disable-next-line no-unused-vars
-import { CoverImg, Song } from '@/models/songs'
+import { Song } from '@/models/songs'
 
 import fs from 'fs'
-import { PeerMode, SyncModule } from '@/store/sync/syncState'
+import { PeerMode, SyncModule } from '@/store/syncState'
 
 @Component({
   components: {
@@ -43,8 +43,8 @@ export default class AudioStream extends Vue {
   private playerState: PlayerState = PlayerState.STOPPED
   private isSongLoaded: boolean = false
   private currentSong: Song | null = null
+  private currentCover: Buffer | null = null
   private currentCoverBlob: Blob | null = null
-  private currentCover: CoverImg | null = null
   private player: YTPlayer | undefined
 
   mounted() {
@@ -65,18 +65,18 @@ export default class AudioStream extends Vue {
       }
     )
 
+    PlayerModule.$watch(
+      (playerModule) => playerModule.currentCover,
+      (newCover: Buffer | null) => {
+        this.currentCover = newCover
+      }
+    )
+
     // TODO: Decide when to play local or remote track
     SyncModule.$watch(
       (syncModule) => syncModule.currentSongDets,
       (newSong: Song | null) => {
         this.currentSong = newSong
-      }
-    )
-
-    PlayerModule.$watch(
-      (playerModule) => playerModule.currentCover,
-      async (newCover: CoverImg | null) => {
-        this.currentCover = newCover
       }
     )
 
@@ -185,6 +185,10 @@ export default class AudioStream extends Vue {
       SyncModule.setCover(event)
     }
 
+    this.peerHolder.fetchCover = () => {
+      return this.currentCover
+    }
+
     this.peerHolder.setLocalTrack = () => {
       if (this.peerHolder.peerMode == PeerMode.BROADCASTER) {
         if (this.audioElement.src)
@@ -195,11 +199,6 @@ export default class AudioStream extends Vue {
     this.peerHolder.onRemoteTrack = (event) => {
       this.audioElement.srcObject = event.streams[0]
       this.audioElement.play().catch((e) => console.log(e))
-    }
-
-    this.peerHolder.fetchCover = () => {
-      console.log(this.currentCover)
-      return this.currentCover!
     }
   }
 }

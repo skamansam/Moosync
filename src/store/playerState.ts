@@ -1,9 +1,10 @@
 import { VuexModule, Module, Mutation, Action } from 'vuex-class-modules'
 import store from '.'
-import { CoverImg, Song } from '@/models/songs'
+import { Song } from '@/models/songs'
 import { ipcRenderer } from 'electron'
 import { IpcRendererHolder } from '../services/ipc/renderer/index'
 import { IpcEvents } from '@/services/ipc/main/constants'
+import fs from 'fs'
 
 export enum AudioType {
   STREAMING,
@@ -63,7 +64,7 @@ class Queue {
 class Player extends VuexModule {
   private state: PlayerState = PlayerState.PAUSED
   private currentSongDets: Song | null = null
-  private currentSongCover: CoverImg | null = null
+  private currentSongCover: Buffer | null = null
   private ipcHolder = new IpcRendererHolder(ipcRenderer)
   private songQueue = new Queue()
 
@@ -89,12 +90,10 @@ class Player extends VuexModule {
   }
 
   @Mutation
-  setCover(id: string) {
-    this.ipcHolder
-      .send<CoverImg>(IpcEvents.GET_COVER, { params: id })
-      .then((data) => {
-        this.currentSongCover = data
-      })
+  setCover(path: string) {
+    fs.readFile(path, (err, buffer) => {
+      if (!err) this.currentSongCover = buffer
+    })
   }
 
   @Mutation
@@ -119,16 +118,16 @@ class Player extends VuexModule {
   nextSong() {
     this.songQueue.next()
     this.setSong(this.songQueue.top)
-    if (this.currentSongDets) {
-      this.setCover(this.currentSongDets._id!)
+    if (this.songQueue.top && this.songQueue.top.coverPath) {
+      this.setCover(this.songQueue.top.coverPath)
     }
   }
   @Action
   prevSong() {
     this.songQueue.prev()
     this.setSong(this.songQueue.top)
-    if (this.currentSongDets) {
-      this.setCover(this.currentSongDets._id!)
+    if (this.songQueue.top && this.songQueue.top.coverPath) {
+      this.setCover(this.songQueue.top.coverPath)
     }
   }
 }

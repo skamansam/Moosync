@@ -27,10 +27,11 @@
 import { Component, Vue } from 'vue-property-decorator'
 import { ipcRenderer } from 'electron'
 // eslint-disable-next-line no-unused-vars
-import { CoverImg, Song } from '@/models/songs'
+import { Song } from '@/models/songs'
 import { PlayerModule } from '@/store/playerState'
 import { EventBus, IpcEvents } from '@/services/ipc/main/constants'
 import { IpcRendererHolder } from '@/services/ipc/renderer'
+import fs from 'fs'
 
 interface ResizerElements {
   thElm: HTMLElement | undefined
@@ -152,11 +153,8 @@ export default class SongList extends Vue {
   private onRowSelected(items: Song[]) {
     if (items[0] && items[0]._id !== this.lastSelect) {
       this.lastSelect = items[0]._id!
-
-      this.IpcHolder.send<CoverImg>(IpcEvents.GET_COVER, { params: items[0]._id }).then((data) => {
-        this.$root.$emit(EventBus.SONG_SELECTED, items[0])
-        this.$root.$emit(EventBus.COVER_SELECTED, data)
-      })
+      console.log('here')
+      this.fetchCover(items[0])
     }
   }
 
@@ -176,6 +174,17 @@ export default class SongList extends Vue {
     this.IpcHolder.send<Song[]>(IpcEvents.GET_ALL_SONGS, { responseChannel: IpcEvents.GOT_ALL_SONGS }).then(
       (data) => (this.songList = data)
     )
+  }
+
+  private async fetchCover(song: Song) {
+    if (song.coverPath) {
+      fs.readFile(song.coverPath, (err, data) => {
+        if (!err) {
+          this.$root.$emit(EventBus.COVER_SELECTED, data)
+        }
+      })
+    }
+    this.$root.$emit(EventBus.SONG_SELECTED, song)
   }
 }
 </script>

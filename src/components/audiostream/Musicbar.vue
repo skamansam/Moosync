@@ -7,8 +7,9 @@
       <b-row class="flex-grow-1 justify-content-between">
         <b-col col lg="3"
           ><Details
-            :title="currentSong ? currentSong.artists : []"
-            :cover="currentCover ? currentCover.data : ''"
+            :title="currentSong ? currentSong.title : '-'"
+            :artists="currentSong ? currentSong.artists : []"
+            :cover="currentCover"
             :coverBlob="currentCoverBlob"
         /></b-col>
         <b-col col lg="auto"
@@ -27,7 +28,7 @@ import Controls from './musicbar/Controls.vue'
 import ExtraControls from './musicbar/ExtraControls.vue'
 
 // eslint-disable-next-line no-unused-vars
-import { CoverImg, Song } from '@/models/songs'
+import { Song } from '@/models/songs'
 @Component({
   components: {
     Details,
@@ -43,7 +44,7 @@ export default class MusicBar extends Vue {
   private timestamp!: number
 
   @Prop({ default: null })
-  private currentCover!: CoverImg | null
+  private currentCover!: Buffer | null
 
   @Prop({ default: null })
   private currentCoverBlob!: Blob | null
@@ -51,8 +52,6 @@ export default class MusicBar extends Vue {
 </script>
 
 <style lang="sass" scoped>
-@import '@/sass/variables.sass'
-
 .background
   background: $primary
   position: fixed

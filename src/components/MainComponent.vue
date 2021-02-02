@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="appContainer d-flex">
     <!-- <button v-on:click="toggleBroadcaster()">Broadcaster</button>
     <button v-on:click="toggleWatcher()">Watcher</button> -->
     <AudioStream class="musicbar" :isBroadcaster="!watcher" :audioType="audioType" />
@@ -14,7 +14,13 @@
 import { Component, Vue } from 'vue-property-decorator'
 import AudioStream from '@/components/AudioStream.vue'
 import Sidebar from '@/components/Sidebar.vue'
-import { AudioType } from '@/store/player/playerState'
+import { AudioType } from '@/store/playerState'
+import { IpcRendererHolder } from '@/services/ipc/renderer'
+import { ipcRenderer } from 'electron'
+// eslint-disable-next-line no-unused-vars
+import { Song } from '@/models/songs'
+import { IpcEvents } from '@/services/ipc/main/constants'
+
 const stun = require('stun')
 
 @Component({
@@ -26,9 +32,13 @@ const stun = require('stun')
 export default class MainComponent extends Vue {
   private watcher: Boolean = true
   private audioType: number = AudioType.LOCAL
+  private IpcHolder = new IpcRendererHolder(ipcRenderer)
 
   mounted() {
     this.testStun()
+    this.IpcHolder.send<void>(IpcEvents.SCAN_MUSIC, { params: ['/mnt/g/songs/Playlist/Daily Dose'] }).then(() =>
+      console.log('done')
+    )
   }
 
   public toggleWatcher() {
@@ -68,3 +78,5 @@ export default class MainComponent extends Vue {
   bottom: calc(6rem + 30px)
   z-index: -3
 </style>
+
+<style lang="sass"></style>

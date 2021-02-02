@@ -1,7 +1,7 @@
 import { app } from 'electron'
 import AsyncNedb from 'nedb-async'
 import * as path from 'path'
-import { CoverImg, Song } from '@/models/songs'
+import { Song } from '@/models/songs'
 import { Databases } from './constants'
 
 let switchConnection = (dbString: string) => {
@@ -37,24 +37,4 @@ class SongDBInstance {
   }
 }
 
-class CoverDBInstance {
-  private db = new AsyncNedb<CoverImg>({
-    filename: path.join(app.getPath('appData'), app.getName(), 'db', switchConnection(Databases.COVER)),
-    autoload: true,
-  })
-
-  public async store(newDoc: CoverImg): Promise<CoverImg> {
-    return this.db.asyncInsert(newDoc)
-  }
-
-  public async getByID(id: string): Promise<CoverImg> {
-    return this.db.asyncFindOne({ _id: id })
-  }
-
-  public async countByBase64(base64: string) {
-    return this.db.asyncCount({ data: base64 })
-  }
-}
-
-export const CoverDB = new CoverDBInstance()
 export const SongDB = new SongDBInstance()

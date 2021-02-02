@@ -1,6 +1,6 @@
 import { Socket, io, ManagerOptions } from 'socket.io-client'
 import { PeerMode } from '@/store/syncState'
-import { CoverImg, Song } from '@/models/songs'
+import { Song } from '@/models/songs'
 import { FragmentReceiver, FragmentSender } from './dataFragmenter'
 import { base64 } from 'rfc4648'
 interface DataChannelMessage<T> {
@@ -34,7 +34,7 @@ export class SyncHolder {
   private setLocalTrackCallback: (() => void) | null = null
   private onRemoteTrackCallback: ((event: RTCTrackEvent) => void) | null = null
   private onRemoteCoverCallback: ((event: Blob) => void) | null = null
-  private fetchCoverCallback: (() => CoverImg) | null = null
+  private fetchCoverCallback: (() => Buffer | null) | null = null
 
   constructor(url?: string) {
     this.socketConnection = io(url ? url : 'http://localhost:4000', this.connectionOptions)
@@ -63,7 +63,7 @@ export class SyncHolder {
     this.onRemoteTrackCallback = callback
   }
 
-  set fetchCover(callback: () => CoverImg) {
+  set fetchCover(callback: () => Buffer | null) {
     this.fetchCoverCallback = callback
   }
 
@@ -211,7 +211,7 @@ export class SyncHolder {
       this.peerConnection[id].trackchannel!.send(JSON.stringify({ type: 'trackChange', message: trackInfo }))
     let cover = this.fetchCoverCallback ? this.fetchCoverCallback() : null
     if (cover) {
-      let fragmentSender = new FragmentSender(base64.parse(cover.data!), this.peerConnection[id].coverchannel!)
+      let fragmentSender = new FragmentSender(cover, this.peerConnection[id].coverchannel!)
       fragmentSender.send()
     }
   }
