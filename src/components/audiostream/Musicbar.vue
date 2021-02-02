@@ -53,16 +53,16 @@ export default class MusicBar extends Vue {
 
 <style lang="sass" scoped>
 .background
-  background: $primary
+  background: var(--primary)
   position: fixed
   bottom: 0
   height: 6rem
 
 .timeline
-  background: $tertiary
+  background: var(--tertiary)
   height: 0.5rem
 
 .timeline > .progress-bar
-  background-color: $accent-primary !important
+  background-color: var(--accentPrimary) !important
   transition: width 1s linear
 </style>

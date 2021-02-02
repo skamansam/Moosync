@@ -84,7 +84,7 @@ export default class MusicBar extends Vue {
 @import '@/sass/variables.sass'
 
 .timestamp
-  color: $text-secondary
+  color:  var(--textSecondary)
   font-family: 'Proxima Nova'
   font-style: normal
   font-weight: normal

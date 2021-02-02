@@ -84,7 +84,7 @@ export default class Sidebar extends Vue {
   user-select: none
 
 .text-format
-  color: $text-primary
+  color:  var(--textPrimary)
   font-family: 'Proxima Nova'
 
 .button-bar

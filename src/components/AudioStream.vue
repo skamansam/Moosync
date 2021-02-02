@@ -185,10 +185,6 @@ export default class AudioStream extends Vue {
       SyncModule.setCover(event)
     }
 
-    this.peerHolder.fetchCover = () => {
-      return this.currentCover
-    }
-
     this.peerHolder.setLocalTrack = () => {
       if (this.peerHolder.peerMode == PeerMode.BROADCASTER) {
         if (this.audioElement.src)

@@ -1,5 +1,5 @@
 <template>
-  <div class="appContainer d-flex">
+  <div class="appContainer">
     <!-- <button v-on:click="toggleBroadcaster()">Broadcaster</button>
     <button v-on:click="toggleWatcher()">Watcher</button> -->
     <AudioStream class="musicbar" :isBroadcaster="!watcher" :audioType="audioType" />
@@ -62,6 +62,7 @@ export default class MainComponent extends Vue {
 </script>
 
 <style lang="sass" scoped>
+
 .musicbar
   position: fixed
   z-index: -1

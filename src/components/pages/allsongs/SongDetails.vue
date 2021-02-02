@@ -88,7 +88,7 @@ img
   margin-left: 15px
 
 .title
-  color: $text-primary
+  color: var(--textPrimary)
   font-size: 2.5vw
   line-height: 32px
   @include media-breakpoint-up(md-c)
@@ -103,7 +103,7 @@ img
 
 
 .subtitle
-  color: $text-primary
+  color: var(--textPrimary)
   font-weight: 250
   font-size: 1vw
   line-height: 18px

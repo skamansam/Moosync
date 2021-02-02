@@ -193,23 +193,23 @@ export default class SongList extends Vue {
 @import '@/sass/variables.sass'
 
 .custom-table
-  color: $text-primary !important
+  color:  var(--textPrimary) !important
   table-layout: fixed
   margin-right: 10px
   min-width: 10px
   overflow-y: hidden
 
 .custom-table > thead > tr > th
-  background-color: $primary !important
-  color: $text-primary !important
+  background-color: var(--primary) !important
+  color:  var(--textPrimary) !important
   border-top: 0px !important
-  border-bottom: 1px solid $text-secondary !important
+  border-bottom: 1px solid  var(--textSecondary) !important
   text-align: left
   padding: 12px 0 12px 0 !important
 
 .custom-table > tbody > tr > td
   border-top: 0px !important
-  border-bottom: 1px solid $text-secondary !important
+  border-bottom: 1px solid var(--textSecondary) !important
   text-align: left
   padding: 20px 0 20px 0
 
@@ -252,7 +252,7 @@ table.b-table > tfoot > tr > th[aria-sort="descending"]
   overflow-y: auto
 
 .custom-table-container:hover
-  color: $text-primary
+  color: var(--textPrimary)
 
 *::-webkit-scrollbar,
 *::-webkit-scrollbar-thumb

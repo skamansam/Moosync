@@ -32,7 +32,7 @@
 import { Component, Vue } from 'vue-property-decorator'
 import VolumeIcon from './controls/Volume.vue'
 import ExpandIcon from './controls/Expand.vue'
-import exported from '@/sass/variables.sass'
+import { ThemesModule } from '@/store/themeState'
 
 @Component({
   components: {
@@ -47,16 +47,20 @@ export default class MusicBar extends Vue {
     this.volume = n
   }
 
+  get rootColors() {
+    return ThemesModule.rootVars
+  }
+
   get ComputedGradient(): string {
     return (
       'linear-gradient(90deg, ' +
-      exported.accentPrimary +
+      this.rootColors.accentPrimary +
       ' 0%, ' +
-      exported.accentPrimary +
+      this.rootColors.accentPrimary +
       ' ' +
       this.volume +
       '%, ' +
-      exported.quaternary +
+      this.rootColors.quaternary +
       ' 0%)'
     )
   }
@@ -80,10 +84,10 @@ export default class MusicBar extends Vue {
   width: 12px
   height: 12px
   border-radius: 50%
-  background: $accent-primary
+  background:  var(--accentPrimary)
 
 .slider::-ms-fill-upper
-  background-color: $primary
+  background-color:  var(--primary)
 
 .volume-icon
   height: 22px

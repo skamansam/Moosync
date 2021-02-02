@@ -67,9 +67,9 @@ export default class MusicBar extends Vue {
 
 .song-title
   font-size: 19.1549px
-  color: $text-primary
+  color:  var(--textPrimary)
 
 .song-subtitle
   font-size: 12.2592px
-  color: $text-secondary
+  color:  var(--textSecondary)
 </style>
