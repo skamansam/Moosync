@@ -16,8 +16,6 @@
   "dependencies": {
     "@types/nedb": "^1.8.11",
     "@types/node": "^14.14.20",
-    "@types/pica": "^5.1.2",
-    "@types/sharp": "^0.27.1",
     "@types/socket.io-client": "^1.4.35",
     "@types/webpack-env": "^1.16.0",
     "@types/webrtc": "0.0.26",
@@ -35,8 +33,6 @@
     "music-metadata": "^7.6.4",
     "nedb": "^1.8.0",
     "nedb-async": "^0.1.6",
-    "pica": "^6.1.1",
-    "resize-image-buffer": "^1.0.0",
     "rfc4648": "^1.4.0",
     "socket.io-client": "^3.0.5",
     "stun": "^2.1.0",
