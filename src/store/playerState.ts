@@ -1,8 +1,8 @@
 import { VuexModule, Module, Mutation, Action } from 'vuex-class-modules'
-import store from '../'
+import store from '.'
 import { CoverImg, Song } from '@/models/songs'
 import { ipcRenderer } from 'electron'
-import { IpcRendererHolder } from '../../services/ipc/renderer/index'
+import { IpcRendererHolder } from '../services/ipc/renderer/index'
 import { IpcEvents } from '@/services/ipc/main/constants'
 
 export enum AudioType {

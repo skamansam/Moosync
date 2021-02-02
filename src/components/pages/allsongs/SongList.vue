@@ -28,7 +28,7 @@ import { Component, Vue } from 'vue-property-decorator'
 import { ipcRenderer } from 'electron'
 // eslint-disable-next-line no-unused-vars
 import { CoverImg, Song } from '@/models/songs'
-import { PlayerModule } from '@/store/player/playerState'
+import { PlayerModule } from '@/store/playerState'
 import { EventBus, IpcEvents } from '@/services/ipc/main/constants'
 import { IpcRendererHolder } from '@/services/ipc/renderer'
 

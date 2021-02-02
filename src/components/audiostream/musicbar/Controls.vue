@@ -13,7 +13,7 @@
 </template>
 
 <script lang="ts">
-import { PlayerModule, PlayerState } from '@/store/player/playerState'
+import { PlayerModule, PlayerState } from '@/store/playerState'
 import { Component, Prop, Vue } from 'vue-property-decorator'
 import LastTrack from './controls/LastTrack.vue'
 import NextTrack from './controls/NextTrack.vue'

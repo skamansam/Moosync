@@ -7,7 +7,7 @@
       <b-row class="flex-grow-1 justify-content-between">
         <b-col col lg="3"
           ><Details
-            :title="currentS tSong ? currentSong.artists : []"
+            :title="currentSong ? currentSong.artists : []"
             :cover="currentCover ? currentCover.data : ''"
             :coverBlob="currentCoverBlob"
         /></b-col>

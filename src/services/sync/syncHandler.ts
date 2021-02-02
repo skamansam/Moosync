@@ -1,5 +1,5 @@
 import { Socket, io, ManagerOptions } from 'socket.io-client'
-import { PeerMode } from '@/store/sync/syncState'
+import { PeerMode } from '@/store/syncState'
 import { CoverImg, Song } from '@/models/songs'
 import { FragmentReceiver, FragmentSender } from './dataFragmenter'
 import { base64 } from 'rfc4648'

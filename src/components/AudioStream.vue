@@ -16,9 +16,8 @@
 <script lang="ts">
 import { Component, Vue, Ref, Prop } from 'vue-property-decorator'
 import { SyncHolder } from '@/services/sync/syncHandler'
-import { AudioType } from '@/store/player/playerState'
 import MusicBar from './audiostream/Musicbar.vue'
-import { PlayerState, PlayerModule } from '@/store/player/playerState'
+import { AudioType, PlayerState, PlayerModule } from '@/store/playerState'
 import YTPlayer from 'yt-player'
 
 // eslint-disable-next-line no-unused-vars
