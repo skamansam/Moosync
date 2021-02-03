@@ -40,7 +40,6 @@ export default class SongDetails extends Vue {
   private updateCover(cover?: Buffer) {
     if (this.imageElement && cover) {
       this.imageElement.style.display = ''
-      console.log(cover)
       var blob = new Blob([cover], { type: 'image/png' })
       var imageUrl = URL.createObjectURL(blob)
       this.imageElement.src = imageUrl

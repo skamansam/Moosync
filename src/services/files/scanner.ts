@@ -5,41 +5,54 @@ import { Song } from '@/models/songs'
 import { SongDB } from '../db/index'
 import md5 from 'md5-file'
 
-import { ExtendedIPicture } from '@/types/declarations/musicmetadata'
 import Jimp from 'jimp'
 import { v4 } from 'uuid'
 
+interface image {
+  path: string
+  data: Buffer
+}
+
 const audioPatterns = new RegExp('.flac|.mp3|.ogg|.m4a|.webm|.wav|.wv', 'i')
-async function writeBuffer(img: Buffer, path: string) {
-  if (img) {
-    return (await Jimp.read(img)).cover(320, 320).quality(80).writeAsync(path)
+async function writeBuffer(data: image) {
+  return (await Jimp.read(data.data)).cover(320, 320).quality(80).writeAsync(data.path)
+}
+
+function getInfo(data: mm.IAudioMetadata, hash: string, filePath: string, coverPath?: string): Song {
+  let artists: string[] = []
+  if (data.common.artists) {
+    for (let a of data.common.artists) {
+      artists.push(...a.split(', '))
+    }
+  }
+  return {
+    title: data.common.title ? data.common.title : path.basename(filePath),
+    path: filePath,
+    coverPath: coverPath,
+    album: data.common.album,
+    artists: artists,
+    date: data.common.date,
+    year: data.common.year,
+    genre: data.common.genre,
+    lyrics: data.common.lyrics ? data.common.lyrics[0] : undefined,
+    releaseType: data.common.releasetype,
+    bitrate: data.format.bitrate,
+    codec: data.format.codec,
+    container: data.format.container,
+    duration: data.format.duration,
+    sampleRate: data.format.sampleRate,
+    hash: hash,
   }
 }
 
-function parseMetadata(data: mm.IAudioMetadata, hash: string, filePath: string): [Song, Buffer | undefined] {
-  let tmp = (data.common.picture as unknown) as ExtendedIPicture[]
-  let coverPath = tmp ? path.join(path.dirname(filePath), v4() + '.jpg') : undefined
-  return [
-    {
-      title: data.common.title ? data.common.title : path.basename(filePath),
-      path: filePath,
-      coverPath: coverPath,
-      album: data.common.album,
-      artists: data.common.artists,
-      date: data.common.date,
-      year: data.common.year,
-      genre: data.common.genre,
-      lyrics: data.common.lyrics,
-      releaseType: data.common.releasetype,
-      bitrate: data.format.bitrate,
-      codec: data.format.codec,
-      container: data.format.container,
-      duration: data.format.duration,
-      sampleRate: data.format.sampleRate,
-      hash: hash,
-    },
-    tmp ? tmp[0].data : undefined,
-  ]
+function getCover(data: mm.IAudioMetadata, filePath: string): image | undefined {
+  if (data.common.picture) {
+    let coverPath = path.join(path.dirname(filePath), v4() + '.jpg')
+    return {
+      path: coverPath,
+      data: data.common.picture[0].data,
+    }
+  }
 }
 
 export class MusicScanner {
@@ -49,18 +62,29 @@ export class MusicScanner {
     this.paths = paths
   }
 
-  public async start(): Promise<void> {
+  private async processFile(filePath: string) {
+    const metadata = await mm.parseFile(filePath)
+    const md5Sum = await this.generateChecksum(filePath)
+    const cover = getCover(metadata, filePath)
+    const info = getInfo(metadata, md5Sum, filePath, cover ? cover.path : undefined)
+    if (cover) {
+      await writeBuffer(cover)
+    }
+    this.storeSong(info)
+  }
+
+  public async start() {
     for (let i in this.paths) {
       fs.readdir(this.paths[i], async (err: NodeJS.ErrnoException | null, files: string[]) => {
-        files.forEach(async (file) => {
-          if (audioPatterns.exec(path.extname(file)) != null) {
-            const filePath = path.join(this.paths[i], file)
-            const metadata = await mm.parseFile(filePath)
-            const md5Sum = await this.generateChecksum(filePath)
-            const parsed = await parseMetadata(metadata, md5Sum, filePath)
-            await this.storeSong(parsed, filePath)
-          }
-        })
+        if (!err) {
+          files.forEach((file) => {
+            if (audioPatterns.exec(path.extname(file)) !== null) {
+              this.processFile(path.join(this.paths[i], file))
+                .catch((err) => console.log('error: ' + err))
+                .then(() => console.log('scanned: ' + file))
+            }
+          })
+        }
       })
     }
   }
@@ -69,16 +93,10 @@ export class MusicScanner {
     return md5(file)
   }
 
-  private async storeSong(parsedData: [Song, Buffer | undefined], path: string) {
-    const count = await SongDB.countByHash(parsedData[0].hash)
+  private async storeSong(info: Song) {
+    const count = await SongDB.countByHash(info.hash)
     if (count == 0) {
-      await SongDB.store(parsedData[0]).then(async (data) => {
-        if (parsedData[1]) {
-          if (parsedData[1]) {
-            await writeBuffer(parsedData[1], data.coverPath!)
-          }
-        }
-      })
+      await SongDB.store(info)
     }
   }
 }

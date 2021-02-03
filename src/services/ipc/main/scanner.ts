@@ -3,6 +3,7 @@ import { IpcEvents } from './constants'
 import { IpcMainEvent } from 'electron'
 import { IpcRequest } from './index'
 import { MusicScanner } from '../../files/scanner'
+import { EventEmitter } from 'nedb'
 
 export class ScannerChannel implements IpcChannelInterface {
   name = IpcEvents.SCAN_MUSIC

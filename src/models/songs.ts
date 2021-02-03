@@ -8,7 +8,7 @@ export interface Song {
   date: string | undefined
   year: number | undefined
   genre: string[] | undefined
-  lyrics: string[] | undefined
+  lyrics: string | undefined
   releaseType: string[] | undefined
   bitrate: number | undefined
   codec: string | undefined

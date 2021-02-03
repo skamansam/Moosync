@@ -18,7 +18,7 @@
     </template>
 
     <template #cell(artists)="data">
-      {{ data.item.artists ? data.item.artists.join(', ') : '-' }}
+      {{ data.item.artists.length != 0 ? data.item.artists.join(', ') : '-' }}
     </template>
   </b-table>
 </template>
@@ -153,7 +153,6 @@ export default class SongList extends Vue {
   private onRowSelected(items: Song[]) {
     if (items[0] && items[0]._id !== this.lastSelect) {
       this.lastSelect = items[0]._id!
-      console.log('here')
       this.fetchCover(items[0])
     }
   }
@@ -171,9 +170,9 @@ export default class SongList extends Vue {
   }
 
   private async requestSongs() {
-    this.IpcHolder.send<Song[]>(IpcEvents.GET_ALL_SONGS, { responseChannel: IpcEvents.GOT_ALL_SONGS }).then(
-      (data) => (this.songList = data)
-    )
+    this.IpcHolder.send<Song[]>(IpcEvents.GET_ALL_SONGS, { responseChannel: IpcEvents.GOT_ALL_SONGS }).then((data) => {
+      this.songList = data
+    })
   }
 
   private async fetchCover(song: Song) {
@@ -181,6 +180,8 @@ export default class SongList extends Vue {
       fs.readFile(song.coverPath, (err, data) => {
         if (!err) {
           this.$root.$emit(EventBus.COVER_SELECTED, data)
+        } else {
+          console.log(err)
         }
       })
     }
@@ -250,6 +251,7 @@ table.b-table > tfoot > tr > th[aria-sort="descending"]
   color: rgba(0, 0, 0, 0)
   max-height: calc( 100vh - 6.5rem - 30px) !important
   overflow-y: auto
+  overflow-x: hidden
 
 .custom-table-container:hover
   color: var(--textPrimary)

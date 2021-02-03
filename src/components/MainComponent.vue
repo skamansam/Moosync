@@ -19,7 +19,7 @@ import { IpcRendererHolder } from '@/services/ipc/renderer'
 import { ipcRenderer } from 'electron'
 // eslint-disable-next-line no-unused-vars
 import { Song } from '@/models/songs'
-import { IpcEvents } from '@/services/ipc/main/constants'
+// import { IpcEvents } from '@/services/ipc/main/constants'
 
 const stun = require('stun')
 
@@ -36,9 +36,7 @@ export default class MainComponent extends Vue {
 
   mounted() {
     this.testStun()
-    this.IpcHolder.send<void>(IpcEvents.SCAN_MUSIC, { params: ['/mnt/g/songs/Playlist/Daily Dose'] }).then(() =>
-      console.log('done')
-    )
+    // this.IpcHolder.send<void>(IpcEvents.SCAN_MUSIC, { params: ['/mnt/g/songs/Playlist/Daily Dose'] })
   }
 
   public toggleWatcher() {

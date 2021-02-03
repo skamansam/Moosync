@@ -18,6 +18,7 @@
 			"autoload",
 			"minisong",
 			"musicmetadata",
+			"unmarshaled",
 			"vuesax"
 		]
 	},
