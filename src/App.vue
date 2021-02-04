@@ -1,14 +1,14 @@
 <template>
-  <div id="app" :style="themes">
+  <div id="app" :style="rootColors">
     <MainComponent></MainComponent>
   </div>
 </template>
 
 <script lang="ts">
-import { Component, Vue, Watch } from 'vue-property-decorator'
+import { Component, Vue } from 'vue-property-decorator'
 import MainComponent from '@/components/MainComponent.vue'
 // eslint-disable-next-line no-unused-vars
-import { colors, ThemesModule } from './store/themeState'
+import { ThemesModule } from './store/themeState'
 
 @Component({
   components: {
@@ -16,48 +16,32 @@ import { colors, ThemesModule } from './store/themeState'
   },
 })
 export default class App extends Vue {
-  private themes = {
-    '--primary': this.rootColors.primary,
-    '--secondary': this.rootColors.secondary,
-    '--tertiary': this.rootColors.tertiary,
-    '--quaternary': this.rootColors.quaternary,
-    '--textPrimary': this.rootColors.textPrimary,
-    '--textPrimaryTransparent': this.rootColors.textPrimaryTransparent,
-    '--textSecondary': this.rootColors.textSecondary,
-    '--accentPrimary': this.rootColors.accentPrimary,
-  }
   private root = document.documentElement
-  // Themes
   get rootColors() {
     return ThemesModule.rootVars
   }
 
-  private setThemes(colors: colors) {
-    this.themes = {
-      '--primary': colors.primary,
-      '--secondary': colors.secondary,
-      '--tertiary': colors.tertiary,
-      '--quaternary': colors.quaternary,
-      '--textPrimary': colors.textPrimary,
-      '--textPrimaryTransparent': colors.textPrimaryTransparent,
-      '--textSecondary': colors.textSecondary,
-      '--accentPrimary': colors.accentPrimary,
-    }
-  }
-
-  @Watch('themes', { immediate: true, deep: true })
-  onThemeChanged() {
-    this.root.style.setProperty('--primary', this.rootColors.primary)
-    this.root.style.setProperty('--secondary', this.rootColors.secondary)
+  private setDefaultTheme() {
+    ThemesModule.setRootVars({
+      '--primary': '#212121',
+      '--secondary': '#282828',
+      '--tertiary': '#202730',
+      '--quaternary': '#404040',
+      '--textPrimary': '#ffffff',
+      '--textPrimaryTransparent': '#ffffff03',
+      '--textSecondary': '#565656',
+      '--accentPrimary': '#65CB88',
+    })
   }
 
   mounted() {
     ThemesModule.$watch(
       (themesModule) => themesModule.rootVars,
-      async (newColors: colors) => {
-        this.setThemes(newColors)
+      async (newColors: { [key: string]: string }) => {
+        this.root.style.setProperty('--primary', newColors['--primary'])
       }
     )
+    this.setDefaultTheme()
   }
 }
 </script>
