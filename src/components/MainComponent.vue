@@ -2,6 +2,7 @@
   <div class="appContainer">
     <!-- <button v-on:click="toggleBroadcaster()">Broadcaster</button>
     <button v-on:click="toggleWatcher()">Watcher</button> -->
+    <TopBar class="topbar" />
     <AudioStream class="musicbar" :isBroadcaster="!watcher" :audioType="audioType" />
     <Sidebar class="sidebar" />
     <div class="d-flex main-content">
@@ -14,6 +15,7 @@
 import { Component, Vue } from 'vue-property-decorator'
 import AudioStream from '@/components/AudioStream.vue'
 import Sidebar from '@/components/Sidebar.vue'
+import TopBar from '@/components/TopBar.vue'
 import { AudioType } from '@/store/playerState'
 import { IpcRendererHolder } from '@/services/ipc/renderer'
 import { ipcRenderer } from 'electron'
@@ -27,6 +29,7 @@ const stun = require('stun')
   components: {
     AudioStream,
     Sidebar,
+    TopBar,
   },
 })
 export default class MainComponent extends Vue {
@@ -69,13 +72,17 @@ export default class MainComponent extends Vue {
   position: fixed
   z-index: -2
 
+.topbar
+  position: fixed
+  z-index: -3
+
 .main-content
   position: fixed
   left: calc(261px + 30px)
   right: 30px
-  top: 30px
+  top: 70px
   bottom: calc(6rem + 30px)
-  z-index: -3
+  z-index: -4
 </style>
 
 <style lang="sass"></style>

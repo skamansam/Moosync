@@ -87,7 +87,7 @@ export default class Sidebar extends Vue {
 
 <style lang="sass">
 .gradient
-  background: linear-gradient(176.27deg, #282828 1.69%, #212121 72.01%)
+  background: linear-gradient(176.27deg, var(--secondary) 1.69%, var(--primary) 72.01%)
   border-radius: 0px 30px 0px 0px
 </style>
 
