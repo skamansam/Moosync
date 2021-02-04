@@ -22,7 +22,7 @@ function getInfo(data: mm.IAudioMetadata, hash: string, filePath: string, coverP
   let artists: string[] = []
   if (data.common.artists) {
     for (let a of data.common.artists) {
-      artists.push(...a.split(', '))
+      artists.push(...a.split(/[,&]+/))
     }
   }
   return {

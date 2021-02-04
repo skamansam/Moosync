@@ -3,7 +3,6 @@ import store from '.'
 import { Song } from '@/models/songs'
 import { ipcRenderer } from 'electron'
 import { IpcRendererHolder } from '../services/ipc/renderer/index'
-import { IpcEvents } from '@/services/ipc/main/constants'
 import fs from 'fs'
 
 export enum AudioType {
