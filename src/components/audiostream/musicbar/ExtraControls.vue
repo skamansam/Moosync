@@ -52,17 +52,7 @@ export default class MusicBar extends Vue {
   }
 
   get ComputedGradient(): string {
-    return (
-      'linear-gradient(90deg, ' +
-      this.rootColors.accentPrimary +
-      ' 0%, ' +
-      this.rootColors.accentPrimary +
-      ' ' +
-      this.volume +
-      '%, ' +
-      this.rootColors.quaternary +
-      ' 0%)'
-    )
+    return `linear-gradient(90deg, ${this.rootColors['--accentPrimary']} 0%, ${this.rootColors['--accentPrimary']} ${this.volume}%, ${this.rootColors['--quaternary']} 0%)`
   }
 }
 </script>
