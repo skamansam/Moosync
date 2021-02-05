@@ -1,7 +1,7 @@
 <template>
   <div class="background w-100">
     <b-progress class="w-100 timeline" :max="currentSong ? currentSong.duration : 0">
-      <b-progress-bar :value="Math.floor(timestamp)" variant="success"></b-progress-bar>
+      <b-progress-bar :value="timestamp" variant="success"></b-progress-bar>
     </b-progress>
     <b-container fluid class="d-flex h-100">
       <b-row class="flex-grow-1 justify-content-between">
@@ -64,5 +64,5 @@ export default class MusicBar extends Vue {
 
 .timeline > .progress-bar
   background-color: var(--accentPrimary) !important
-  transition: width 1s linear
+  transition: width 0.3s linear
 </style>
