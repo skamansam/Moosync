@@ -114,7 +114,7 @@ export default class AudioStream extends Vue {
   }
 
   private loadAudio(song: Song) {
-    this.audioElement.src = 'image://' + song.path
+    this.audioElement.src = 'media://' + song.path
     this.isSongLoaded = true
 
     if (this.peerHolder && this.peerHolder.peerMode == PeerMode.BROADCASTER) {

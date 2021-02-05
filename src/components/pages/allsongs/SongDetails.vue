@@ -40,7 +40,7 @@ export default class SongDetails extends Vue {
       if (data && data.artists) this.currentsubTitle = data.artists.join(', ')
       if (data?.coverPath) {
         this.imageElement.style.display = ''
-        this.imageElement.src = 'image://' + data.coverPath
+        this.imageElement.src = 'media://' + data.coverPath
       }
     }
   }

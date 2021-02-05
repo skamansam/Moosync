@@ -3,7 +3,7 @@
     <b-card
       :title="title"
       :sub-title="subtitle"
-      :img-src="imgSrc ? 'image://' + imgSrc : ''"
+      :img-src="imgSrc ? 'media://' + imgSrc : ''"
       img-alt="Album Art"
       img-top
       class="mb-2 card-body"
@@ -39,11 +39,15 @@ export default class SongDetails extends Vue {
   padding-right: 0
   max-width: 200px
 
-
 .card-body > p, .card-body > h4
   white-space: nowrap
   overflow: hidden
   text-overflow: ellipsis
+  font-family: Proxima Nova
+  font-style: normal
+  font-weight: bold
+  font-size: 24px
+  line-height: 29px
 
 .card-body > img
   mix-blend-mode: normal
