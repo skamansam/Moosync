@@ -1,6 +1,6 @@
 <template>
   <b-table
-    class="custom-table-container d-flex w-100"
+    class="custom-table-container d-flex w-100 h-100"
     table-class="custom-table"
     :items="songList"
     :fields="fields"
@@ -181,7 +181,11 @@ export default class SongList extends Vue {
 </script>
 
 <style lang="sass">
-@import '@/sass/variables.sass'
+.index-no-td
+  padding: 20px 0 20px 15px !important
+
+.index-no-th > div
+  padding-left: 10px
 
 .custom-table
   color:  var(--textPrimary) !important
@@ -230,11 +234,6 @@ table.b-table > tfoot > tr > th[aria-sort="descending"]
   background-image: none !important
   padding-right: 0px !important
 
-.index-no-td
-  padding: 20px 0 20px 15px !important
-
-.index-no-th > div
-  padding-left: 10px
 
 .custom-table-container
   transition: color .3s ease
@@ -245,21 +244,6 @@ table.b-table > tfoot > tr > th[aria-sort="descending"]
 
 .custom-table-container:hover
   color: var(--textPrimary)
-
-*::-webkit-scrollbar,
-*::-webkit-scrollbar-thumb
-  width: 26px
-  border-radius: 13px
-  background-clip: padding-box
-  border: 10px solid transparent
-
-
-*::-webkit-scrollbar-thumb
-  box-shadow: inset 0 0 0 10px
-
-.custom-table-container::-webkit-scrollbar-track
-  margin-top: calc( 0.75rem * 2 + 18px)
-  background: none
 
 .custom-table-container > table
   width: 100%

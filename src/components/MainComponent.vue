@@ -84,8 +84,12 @@ export default class MainComponent extends Vue {
   right: 30px
   top: 70px
   bottom: calc(6rem + 30px)
+  height: calc(100% - (6rem + 30px) - 70px)
+  overflow-y: scroll
   z-index: -4
+</style>
 
+<style lang="sass">
 .slide-fade-enter-active
   transition: all .3s ease
 
@@ -94,6 +98,20 @@ export default class MainComponent extends Vue {
 .slide-fade-enter, .slide-fade-leave-to
   transform: translateY(100px)
   opacity: 0
+
+*::-webkit-scrollbar,
+*::-webkit-scrollbar-thumb
+  width: 26px
+  border-radius: 13px
+  background-clip: padding-box
+  border: 10px solid transparent
+
+*::-webkit-scrollbar-thumb
+  box-shadow: inset 0 0 0 10px
+
+*::-webkit-scrollbar-track
+  margin-top: calc( 0.75rem * 2 + 18px)
+  background: var(--primary)
 </style>
 
 <style lang="sass"></style>

@@ -1,8 +1,8 @@
 <template>
   <b-container fluid class="song-container">
-    <b-row class="d-flex">
-      <b-col cols="8"><SongList /></b-col>
-      <b-col cols="4"><SongDetails /></b-col>
+    <b-row class="d-flex h-100">
+      <b-col class="h-100" cols="8"><SongList /></b-col>
+      <b-col class="h-100" cols="4"><SongDetails /></b-col>
     </b-row>
   </b-container>
 </template>
@@ -24,4 +24,6 @@ export default class AllSongs extends Vue {}
 <style lang="sass" scoped>
 .song-container
   position: absolute
+  height: 100%
+  overflow-y: hidden
 </style>
