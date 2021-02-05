@@ -1,4 +1,3 @@
-import { IpcRenderer } from 'electron'
 import { IpcChannelInterface, IpcRequest } from '.'
 import { SongDB } from '../../db'
 import { IpcEvents } from './constants'

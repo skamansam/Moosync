@@ -1,8 +1,6 @@
 import { VuexModule, Module, Mutation, Action } from 'vuex-class-modules'
 import store from '.'
 import { Song } from '@/models/songs'
-import { ipcRenderer } from 'electron'
-import { IpcRendererHolder } from '../services/ipc/renderer/index'
 import fs from 'fs'
 
 export enum AudioType {
@@ -64,7 +62,6 @@ class Player extends VuexModule {
   private state: PlayerState = PlayerState.PAUSED
   private currentSongDets: Song | null = null
   private currentSongCover: Buffer | null = null
-  private ipcHolder = new IpcRendererHolder(ipcRenderer)
   private songQueue = new Queue()
 
   get playerState() {

@@ -73,7 +73,8 @@ export class MusicScanner {
     this.storeSong(info)
   }
 
-  public async start() {
+  public start() {
+    console.log('started')
     for (let i in this.paths) {
       fs.readdir(this.paths[i], async (err: NodeJS.ErrnoException | null, files: string[]) => {
         if (!err) {
