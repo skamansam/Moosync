@@ -6,7 +6,9 @@
     <AudioStream class="musicbar" :isBroadcaster="!watcher" :audioType="audioType" />
     <Sidebar class="sidebar" />
     <div class="d-flex main-content">
-      <router-view></router-view>
+      <transition name="fade">
+        <router-view></router-view>
+      </transition>
     </div>
   </div>
 </template>

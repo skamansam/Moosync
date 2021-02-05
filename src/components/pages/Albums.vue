@@ -1,35 +1,59 @@
 <template>
-  <b-container fluid>
+  <b-container fluid class="album-container">
+    <b-row class="title">Albums</b-row>
     <b-row class="d-flex">
-      <!-- <b-col cols="8"><SongList /></b-col>
-      <b-col cols="4"><SongDetails /></b-col> -->
+      <b-col col xl="2" md="3" v-for="album in filteredAlbumList" :key="album.album">
+        <AlbumCard :title="album.album" :imgSrc="album.coverPath" />
+      </b-col>
     </b-row>
   </b-container>
 </template>
 
 <script lang="ts">
+// eslint-disable-next-line no-unused-vars
+import { Album } from '@/models/albums'
+import { IpcEvents } from '@/services/ipc/main/constants'
+import { IpcRendererHolder } from '@/services/ipc/renderer'
+import { ipcRenderer } from 'electron'
 import { Component, Vue } from 'vue-property-decorator'
-import SongDetails from './allsongs/SongDetails.vue'
-import SongList from './allsongs/SongList.vue'
+import AlbumCard from './albums/AlbumCard.vue'
 
 @Component({
   components: {
-    SongList,
-    SongDetails,
+    AlbumCard,
   },
 })
 export default class AllSongs extends Vue {
-  // private getAlbums() {
-  //   let albums: string[] = []
-  //   for (let i of this.AllSongs) {
-  //     if (i.album) !albums.includes(i.album) ? albums.push(i.album) : null
-  //     else albums.push('misc')
-  //   }
-  //   this.setAlbums(albums)
-  // }
+  private IpcHolder = new IpcRendererHolder(ipcRenderer)
+  private albumList: Album[] = []
+  private getAlbums() {
+    this.IpcHolder.send<any>(IpcEvents.GET_ALBUMS, { responseChannel: IpcEvents.GOT_ALL_ALBUMS }).then((data) => {
+      this.albumList = data
+    })
+  }
+
+  get filteredAlbumList() {
+    return this.albumList.filter((x) => {
+      return x.album !== null
+    })
+  }
+
+  mounted() {
+    this.getAlbums()
+  }
 }
 </script>
 
 <style lang="sass" scoped>
-@import '@/sass/variables.sass'
+.album-container
+  overflow-y: scroll
+
+.title
+  font-family: Proxima Nova
+  font-style: normal
+  font-weight: bold
+  font-size: 64px
+  line-height: 100px
+  padding-left: 15px
+  margin-bottom: 50px
 </style>

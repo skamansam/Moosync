@@ -1,5 +1,5 @@
 <template>
-  <b-sidebar width="261px" visible id="sidebar" no-header-close sidebar-class="gradient">
+  <b-sidebar width="261px" visible id="sidebar" no-header-close no-close-on-route-change sidebar-class="gradient">
     <template #header>
       <div class="d-flex w-100 mt-3 justify-content-between">
         <Toggle />

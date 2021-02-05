@@ -1,23 +1,22 @@
 <template>
   <div class="d-flex flex-column">
-    <div
-      v-for="(item, i) in componentNames"
+    <router-link
+      v-for="item in componentNames"
       v-bind:key="item.component"
-      class="d-flex button-bar"
-      v-on:click="setActive(i)"
-      v-bind:class="{ 'button-active': active == i }"
+      :to="{ path: item.link }"
+      custom
+      v-slot="{ navigate, isActive }"
     >
-      <div class="whitebar" v-if="active == i"></div>
-      <div
-        class="d-flex align-items-center icon-padding"
-        v-bind:class="{ 'icon-active': active == i, 'icon-transition': active != i }"
-      >
-        <div class="icon">
-          <component v-bind:is="item.component"></component>
+      <div class="d-flex button-bar" v-on:click="navigate" v-bind:class="{ 'button-active': isActive }">
+        <div class="whitebar" v-if="isActive"></div>
+        <div class="d-flex align-items-center icon-padding icon-transition" v-bind:class="{ 'icon-active': isActive }">
+          <div class="icon">
+            <component v-bind:is="item.component"></component>
+          </div>
+          <div class="text-padding text-format">{{ item.title }}</div>
         </div>
-        <div class="text-padding text-format">{{ item.title }}</div>
       </div>
-    </div>
+    </router-link>
   </div>
 </template>
 
@@ -47,18 +46,20 @@ import Rooms from './Rooms.vue'
 })
 export default class Sidebar extends Vue {
   private componentNames = [
-    { component: 'AllSongs', title: 'All Songs' },
-    { component: 'Playlists', title: 'Playlists' },
-    { component: 'Albums', title: 'Albums' },
-    { component: 'Artists', title: 'Artists' },
-    { component: 'Genre', title: 'Genre' },
-    { component: 'Fav', title: 'Favourites' },
+    { component: 'AllSongs', title: 'All Songs', link: '/songs' },
+    { component: 'Playlists', title: 'Playlists', link: '/playlists' },
+    { component: 'Albums', title: 'Albums', link: '/albums' },
+    { component: 'Artists', title: 'Artists', link: '/artists' },
+    { component: 'Genre', title: 'Genre', link: '/genre' },
+    { component: 'Fav', title: 'Favourites', link: '/favs' },
   ]
 
   private active: ActiveTab = ActiveTab.ALLSONGS
 
-  private setActive(i: number): void {
+  private setActive(i: number, navigate: Function): void {
     this.active = i
+    console.log(navigate)
+    navigate(this)
   }
 }
 </script>
