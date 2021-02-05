@@ -46,6 +46,7 @@ export default class AllSongs extends Vue {
 
 <style lang="sass" scoped>
 .album-container
+  position: absolute
   overflow-y: scroll
 
 .title

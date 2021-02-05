@@ -31,7 +31,6 @@ import { Song } from '@/models/songs'
 import { PlayerModule } from '@/store/playerState'
 import { EventBus, IpcEvents } from '@/services/ipc/main/constants'
 import { IpcRendererHolder } from '@/services/ipc/renderer'
-import fs from 'fs'
 
 interface ResizerElements {
   thElm: HTMLElement | undefined
@@ -176,15 +175,6 @@ export default class SongList extends Vue {
   }
 
   private async fetchCover(song: Song) {
-    if (song.coverPath) {
-      fs.readFile(song.coverPath, (err, data) => {
-        if (!err) {
-          this.$root.$emit(EventBus.COVER_SELECTED, data)
-        } else {
-          console.log(err)
-        }
-      })
-    }
     this.$root.$emit(EventBus.SONG_SELECTED, song)
   }
 }

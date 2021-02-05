@@ -22,8 +22,6 @@ import YTPlayer from 'yt-player'
 
 // eslint-disable-next-line no-unused-vars
 import { Song } from '@/models/songs'
-
-import fs from 'fs'
 import { PeerMode, SyncModule } from '@/store/syncState'
 
 @Component({
@@ -116,9 +114,7 @@ export default class AudioStream extends Vue {
   }
 
   private loadAudio(song: Song) {
-    const file = fs.readFileSync(song.path)
-    const fileURL = URL.createObjectURL(new Blob([file]))
-    this.audioElement.src = fileURL
+    this.audioElement.src = 'image://' + song.path
     this.isSongLoaded = true
 
     if (this.peerHolder && this.peerHolder.peerMode == PeerMode.BROADCASTER) {

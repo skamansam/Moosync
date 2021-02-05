@@ -2,7 +2,7 @@
   <b-container fluid class="d-flex flex-column h-100">
     <b-row class="flex-grow-1 align-items-center">
       <b-col cols="2" class="d-flex justify-content-center">
-        <img ref="cover" class="coverimg" alt="cover img" />
+        <img ref="cover" class="coverimg" alt="cover img" :src="'image://' + cover" />
       </b-col>
       <b-col cols="10">
         <div class="text song-title text-truncate">{{ title }}</div>
@@ -38,14 +38,6 @@ export default class MusicBar extends Vue {
   @Watch('coverBlob') onBlobChanged() {
     if (this.coverBlob) {
       this.imageElement.src = URL.createObjectURL(this.coverBlob)
-    }
-  }
-
-  @Watch('cover') onCoverChanged() {
-    if (this.cover) {
-      var blob = new Blob([this.cover], { type: 'image/png' })
-      var imageUrl = URL.createObjectURL(blob)
-      this.imageElement.src = imageUrl
     }
   }
 }

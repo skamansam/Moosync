@@ -6,7 +6,7 @@
     <AudioStream class="musicbar" :isBroadcaster="!watcher" :audioType="audioType" />
     <Sidebar class="sidebar" />
     <div class="d-flex main-content">
-      <transition name="fade">
+      <transition name="slide-fade">
         <router-view></router-view>
       </transition>
     </div>
@@ -41,7 +41,7 @@ export default class MainComponent extends Vue {
 
   mounted() {
     this.testStun()
-    // this.IpcHolder.send<void>(IpcEvents.SCAN_MUSIC, { params: ['/mnt/g/songs/Playlist/Daily Dose'] })
+    // this.IpcHolder.send<void>(IpcEvents.SCAN_MUSIC, { params: ['G:\\songs\\Playlist\\Daily Dose'] })
   }
 
   public toggleWatcher() {
@@ -79,12 +79,21 @@ export default class MainComponent extends Vue {
   z-index: -3
 
 .main-content
-  position: fixed
+  position: absolute
   left: calc(261px + 30px)
   right: 30px
   top: 70px
   bottom: calc(6rem + 30px)
   z-index: -4
+
+.slide-fade-enter-active
+  transition: all .3s ease
+
+.slide-fade-leave-active
+  transition: all .2s ease
+.slide-fade-enter, .slide-fade-leave-to
+  transform: translateY(100px)
+  opacity: 0
 </style>
 
 <style lang="sass"></style>

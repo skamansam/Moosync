@@ -31,25 +31,17 @@ export default class SongDetails extends Vue {
     this.$root.$on(EventBus.SONG_SELECTED, (data: Song) => {
       this.updateDetails(data)
     })
-
-    this.$root.$on(EventBus.COVER_SELECTED, (data: Buffer) => {
-      this.updateCover(data)
-    })
-  }
-
-  private updateCover(cover?: Buffer) {
-    if (this.imageElement && cover) {
-      this.imageElement.style.display = ''
-      var blob = new Blob([cover], { type: 'image/png' })
-      var imageUrl = URL.createObjectURL(blob)
-      this.imageElement.src = imageUrl
-    }
   }
 
   private updateDetails(data?: Song) {
     if (data) {
+      console.log(data)
       if (data) this.currentTitle = data.title
       if (data && data.artists) this.currentsubTitle = data.artists.join(', ')
+      if (data?.coverPath) {
+        this.imageElement.style.display = ''
+        this.imageElement.src = 'image://' + data.coverPath
+      }
     }
   }
 

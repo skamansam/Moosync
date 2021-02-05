@@ -9,7 +9,7 @@
           ><Details
             :title="currentSong ? currentSong.title : '-'"
             :artists="currentSong ? currentSong.artists : []"
-            :cover="currentCover"
+            :cover="currentSong ? currentSong.coverPath : ''"
             :coverBlob="currentCoverBlob"
         /></b-col>
         <b-col col lg="auto"
@@ -42,9 +42,6 @@ export default class MusicBar extends Vue {
 
   @Prop({ default: 0 })
   private timestamp!: number
-
-  @Prop({ default: null })
-  private currentCover!: Buffer | null
 
   @Prop({ default: null })
   private currentCoverBlob!: Blob | null

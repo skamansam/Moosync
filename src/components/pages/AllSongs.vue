@@ -1,5 +1,5 @@
 <template>
-  <b-container fluid>
+  <b-container fluid class="song-container">
     <b-row class="d-flex">
       <b-col cols="8"><SongList /></b-col>
       <b-col cols="4"><SongDetails /></b-col>
@@ -22,5 +22,6 @@ export default class AllSongs extends Vue {}
 </script>
 
 <style lang="sass" scoped>
-@import '@/sass/variables.sass'
+.song-container
+  position: absolute
 </style>
