@@ -4,6 +4,7 @@ import { marshaledSong, Song } from '@/models/songs'
 import { Databases } from './constants'
 import DB from 'better-sqlite3-helper'
 import { v4 } from 'uuid'
+import { Album } from '@/models/albums'
 
 function unMarshalSong(dbSong: marshaledSong): Song {
   return {
@@ -150,7 +151,7 @@ class SongDBInstance {
     return final
   }
 
-  public async getAll(): Promise<Song[]> {
+  public async getAllSongs(): Promise<Song[]> {
     let marshaled: marshaledSong[] = this.db.query(
       `SELECT P.*, S.*, T.* FROM allsongs P 
         LEFT JOIN genre_bridge Q ON P._id = Q.song
@@ -160,6 +161,12 @@ class SongDBInstance {
         `
     )
     return this.flattenDict(this.mergeSongs(marshaled))
+  }
+
+  public async getAllAlbums(): Promise<Album[]> {
+    let albums = this.db.query(`SELECT coverPath, album from allsongs GROUP BY album`)
+    // console.log(albums)
+    return albums as Album[]
   }
 
   public async countByHash(hash: string): Promise<number> {

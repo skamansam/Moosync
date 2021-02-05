@@ -64,6 +64,16 @@ app.on('ready', async () => {
       console.error('Vue Devtools failed to install:', e.toString())
     }
   }
+  const protocolName = 'image'
+  protocol.registerFileProtocol(protocolName, (request, callback) => {
+    const url = request.url.replace(`${protocolName}://`, '')
+    try {
+      return callback(decodeURIComponent(url))
+    } catch (error) {
+      // Handle the error as needed
+      console.error(error)
+    }
+  })
   createWindow()
 })
 

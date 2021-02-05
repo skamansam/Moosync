@@ -6,14 +6,14 @@ Vue.use(Router)
 export default new Router({
   routes: [
     {
-      path: '/',
+      path: '/songs',
       name: 'All Songs',
       component: require('@/components/pages/AllSongs.vue').default,
     },
-    // {
-    //   path: '/broadcast',
-    //   name: 'broadcaster',
-    //   component: require('@/components/Broadcaster.vue').default
-    // }
+    {
+      path: '/albums',
+      name: 'Albums',
+      component: require('@/components/pages/Albums.vue').default,
+    },
   ],
 })
