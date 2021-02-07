@@ -10,7 +10,9 @@ export class ScannerChannel implements IpcChannelInterface {
   handle(event: IpcMainEvent, request: IpcRequest) {
     if (request.params) {
       const scanner = new MusicScanner(...request.params)
-      scanner.start()
+      scanner.start().then(() => {
+        event.reply(request.responseChannel, { status: 'done' })
+      })
     }
   }
 }
