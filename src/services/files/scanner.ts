@@ -2,10 +2,9 @@ import fs, { promises as fsP } from 'fs'
 import path from 'path'
 import * as mm from 'music-metadata'
 import { Song, stats } from '@/models/songs'
-import { SongDB, SongDBInstance } from '../db/index'
+import { SongDB } from '../db/index'
 import Jimp from 'jimp'
 import { v4 } from 'uuid'
-import { performance } from 'perf_hooks'
 import crypto from 'crypto'
 
 interface image {
