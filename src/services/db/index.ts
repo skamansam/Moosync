@@ -1,6 +1,6 @@
 import { app } from 'electron'
 import * as path from 'path'
-import { marshaledSong, Song } from '@/models/songs'
+import { artists, marshaledSong, Song } from '@/models/songs'
 import { Databases } from './constants'
 import DB, { BetterSqlite3Helper } from 'better-sqlite3-helper'
 import { v4 } from 'uuid'
@@ -78,7 +78,9 @@ export class SongDBInstance {
           `-- Up
         CREATE TABLE artists (
           artist_id VARCHAR(36) PRIMARY KEY,
-          artist_name text
+          artist_mbid TEXT,
+          artist_name TEXT,
+          coverPath TEXT
         );
 
         CREATE TABLE genre (
@@ -177,9 +179,18 @@ export class SongDBInstance {
   }
 
   public async getAllAlbums(): Promise<Album[]> {
-    let albums = this.db.query(`SELECT coverPath, album from allsongs GROUP BY album`)
-    // console.log(albums)
-    return albums as Album[]
+    return this.db.query(`SELECT coverPath, album from allsongs GROUP BY album COLLATE NOCASE`)
+  }
+
+  public async getAllArtists(): Promise<artists[]> {
+    return this.db.query(`SELECT * FROM artists`)
+  }
+
+  public async getDefaultCoverByArtist(id: string): Promise<string | undefined> {
+    return (this.db.queryFirstRow(
+      `SELECT coverPath FROM allsongs WHERE _id = (SELECT song FROM artists_bridge WHERE artist = ?)`,
+      id
+    ) as Song).coverPath
   }
 
   public async countByHash(hash: string): Promise<number> {
@@ -195,8 +206,19 @@ export class SongDBInstance {
   }
 
   public async getInfoByID(id: string): Promise<{ path: string; inode: string; deviceno: string }[]> {
+    return this.db.query(`SELECT path, inode, deviceno FROM allsongs WHERE _id = ?`, id)
+  }
+
+  public async updateArtists(artist: artists) {
     return new Promise((resolve) => {
-      resolve(this.db.query(`SELECT path, inode, deviceno FROM allsongs WHERE _id = ?`, id))
+      resolve(
+        this.db.updateWithBlackList(
+          'artists',
+          artist,
+          ['artist_id = ?', artist.artist_id],
+          ['artist_id', 'artist_name']
+        )
+      )
     })
   }
 
@@ -204,11 +226,11 @@ export class SongDBInstance {
     let artistID: string[] = []
     if (artists) {
       for (let a of artists) {
-        let id = this.db.queryFirstCell(`SELECT artist_id FROM artists WHERE artist_name = ?`, a)
+        let id = this.db.queryFirstCell(`SELECT artist_id FROM artists WHERE artist_name = ? COLLATE NOCASE`, a.trim())
         if (id) artistID.push(id)
         else {
           let id = v4()
-          this.db.insert('artists', { artist_id: id, artist_name: a })
+          this.db.insert('artists', { artist_id: id, artist_name: a.trim() })
           artistID.push(id)
         }
       }
@@ -220,7 +242,7 @@ export class SongDBInstance {
     let genreID: string[] = []
     if (genre) {
       for (let a of genre) {
-        let id = this.db.queryFirstCell(`SELECT genre_id FROM genre WHERE genre_name = ?`, a)
+        let id = this.db.queryFirstCell(`SELECT genre_id FROM genre WHERE genre_name = ? COLLATE NOCASE`, a)
         if (id) genreID.push(id)
         else {
           let id = v4()

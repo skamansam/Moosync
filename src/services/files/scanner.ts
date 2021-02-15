@@ -1,19 +1,14 @@
 import fs, { promises as fsP } from 'fs'
 import path from 'path'
 import * as mm from 'music-metadata'
-import { Song, stats } from '@/models/songs'
+import { image, Song, stats } from '@/models/songs'
 import { SongDB } from '../db/index'
 import Jimp from 'jimp'
 import { v4 } from 'uuid'
 import crypto from 'crypto'
 
-interface image {
-  path: string
-  data: Buffer
-}
-
 const audioPatterns = new RegExp('.flac|.mp3|.ogg|.m4a|.webm|.wav|.wv', 'i')
-async function writeBuffer(data: image) {
+export async function writeBuffer(data: image) {
   return (await Jimp.read(data.data)).cover(320, 320).quality(80).writeAsync(data.path)
 }
 

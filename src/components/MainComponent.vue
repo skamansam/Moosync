@@ -41,7 +41,9 @@ export default class MainComponent extends Vue {
 
   mounted() {
     this.testStun()
-    this.IpcHolder.send<void>(IpcEvents.SCAN_MUSIC, { params: ['/mnt/g/songs/Playlist/Daily Dose'] })
+    this.IpcHolder.send<void>(IpcEvents.SCAN_MUSIC, { params: ['/mnt/g/songs/Playlist/Daily Dose'] }).then((data) => {
+      console.log(data)
+    })
   }
 
   public toggleWatcher() {
