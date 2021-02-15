@@ -6,8 +6,8 @@ import { app } from 'electron'
 import path from 'path'
 import { v4 } from 'uuid'
 import { createHash } from 'crypto'
-import { artists } from '@/models/songs'
 import axiosRetry from 'axios-retry'
+import { artists } from '@/models/artists'
 
 export class CoverScraper {
   private musicbrainz = rateLimit(

@@ -3,10 +3,12 @@ export enum IpcEvents {
   GET_ALL_SONGS = 'getAllSongs',
   GET_COVER = 'getCover',
   GET_ALBUMS = 'getAlbums',
+  GET_ARTISTS = 'getArtists',
 
   GOT_COVER = 'gotCover',
   GOT_ALL_SONGS = 'gotSongs',
   GOT_ALL_ALBUMS = 'gotAlbums',
+  GOT_ARTISTS = 'gotArtists',
 }
 
 export enum EventBus {

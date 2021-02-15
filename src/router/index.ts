@@ -15,5 +15,10 @@ export default new Router({
       name: 'Albums',
       component: require('@/components/pages/Albums.vue').default,
     },
+    {
+      path: '/artists',
+      name: 'Artists',
+      component: require('@/components/pages/Artists.vue').default,
+    },
   ],
 })

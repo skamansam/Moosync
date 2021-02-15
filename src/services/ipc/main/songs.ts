@@ -21,3 +21,14 @@ export class AllAlbumsChannel implements IpcChannelInterface {
       .catch((e) => console.log(e))
   }
 }
+
+export class AllArtistsChannel implements IpcChannelInterface {
+  name = IpcEvents.GET_ARTISTS
+  handle(event: Electron.IpcMainEvent, request: IpcRequest): void {
+    SongDB.getAllArtists()
+      .then((data) => {
+        event.reply(request.responseChannel, data)
+      })
+      .catch((e) => console.log(e))
+  }
+}

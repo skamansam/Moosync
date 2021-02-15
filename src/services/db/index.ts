@@ -1,10 +1,11 @@
 import { app } from 'electron'
 import * as path from 'path'
-import { artists, marshaledSong, Song } from '@/models/songs'
+import { marshaledSong, Song } from '@/models/songs'
 import { Databases } from './constants'
 import DB, { BetterSqlite3Helper } from 'better-sqlite3-helper'
 import { v4 } from 'uuid'
 import { Album } from '@/models/albums'
+import { artists } from '@/models/artists'
 
 function unMarshalSong(dbSong: marshaledSong): Song {
   return {

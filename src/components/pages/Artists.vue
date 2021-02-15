@@ -2,8 +2,8 @@
   <b-container fluid class="album-container">
     <b-row class="title">Albums</b-row>
     <b-row class="d-flex">
-      <b-col col xl="2" md="3" v-for="album in filteredAlbumList" :key="album.album">
-        <AlbumCard :title="album.album" :imgSrc="album.coverPath" />
+      <b-col col xl="2" md="3" v-for="artist in artistList" :key="artist.artist_id">
+        <AlbumCard :title="artist.artist_name" :imgSrc="artist.coverPath" />
       </b-col>
     </b-row>
   </b-container>
@@ -11,7 +11,7 @@
 
 <script lang="ts">
 // eslint-disable-next-line no-unused-vars
-import { Album } from '@/models/albums'
+import { artists } from '@/models/artists'
 import { IpcEvents } from '@/services/ipc/main/constants'
 import { IpcRendererHolder } from '@/services/ipc/renderer'
 import { ipcRenderer } from 'electron'
@@ -23,23 +23,17 @@ import AlbumCard from './albums/AlbumCard.vue'
     AlbumCard,
   },
 })
-export default class Albums extends Vue {
+export default class Artists extends Vue {
   private IpcHolder = new IpcRendererHolder(ipcRenderer)
-  private albumList: Album[] = []
-  private getAlbums() {
-    this.IpcHolder.send<Album[]>(IpcEvents.GET_ALBUMS, { responseChannel: IpcEvents.GOT_ALL_ALBUMS }).then((data) => {
-      this.albumList = data
-    })
-  }
-
-  get filteredAlbumList() {
-    return this.albumList.filter((x) => {
-      return x.album !== null
+  private artistList: artists[] = []
+  private getArtists() {
+    this.IpcHolder.send<artists[]>(IpcEvents.GET_ARTISTS, { responseChannel: IpcEvents.GOT_ARTISTS }).then((data) => {
+      this.artistList = data
     })
   }
 
   mounted() {
-    this.getAlbums()
+    this.getArtists()
   }
 }
 </script>
