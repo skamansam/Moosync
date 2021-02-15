@@ -6,6 +6,7 @@ import DB, { BetterSqlite3Helper } from 'better-sqlite3-helper'
 import { v4 } from 'uuid'
 import { Album } from '@/models/albums'
 import { artists } from '@/models/artists'
+import { Playlist } from '../../models/playlists'
 
 function unMarshalSong(dbSong: marshaledSong): Song {
   return {
@@ -129,6 +130,21 @@ export class SongDBInstance {
         -- Down
         DROP TABLE IF EXISTS 'allsongs';
       `,
+          `-- Up
+        CREATE TABLE playlists (
+          playlist_id integer PRIMARY KEY AUTOINCREMENT,
+          name TEXT NOT NULL,
+          coverPath TEXT
+        );
+
+        CREATE TABLE playlist_bridge (
+          id integer PRIMARY KEY AUTOINCREMENT,
+          song VARCHAR(36),
+          playlist VARCHAR(36),
+          FOREIGN KEY(song) REFERENCES allsongs(_id),
+          FOREIGN KEY(playlist) REFERENCES genre(playlist_id)
+        );
+          `,
         ],
       },
     })
@@ -275,6 +291,32 @@ export class SongDBInstance {
     this.storeArtistBridge(artistID, marshaledSong._id)
     this.storeGenreBridge(genreID, marshaledSong._id)
     return
+  }
+
+  public async getPlaylists(): Promise<Playlist[]> {
+    return this.db.query(`SELECT * FROM playlists`)
+  }
+
+  public async getPlaylistSongs(id: string) {
+    //TODO: Get songs for single playlist
+  }
+
+  public async createPlaylist(name: string): Promise<void> {
+    this.db.insert('playlists', { name: name })
+  }
+
+  public async addInPlaylist(playlist: string, ...songs: string[]) {
+    //Todo: Use transactions
+    for (let s in songs) {
+      this.db.insert('playlist_bridge', { playlist: playlist, song: s })
+    }
+  }
+
+  public async removeFromPlaylist(playlist: string, ...songs: string[]) {
+    //Todo: Use transactions
+    for (let s in songs) {
+      this.db.delete('playlist_bridge', { playlist: playlist, song: s })
+    }
   }
 }
 
