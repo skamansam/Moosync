@@ -312,6 +312,10 @@ export class SongDBInstance {
     }
   }
 
+  public async getGenres() {
+    return this.db.query(`SELECT * FROM genre`)
+  }
+
   public async removeFromPlaylist(playlist: string, ...songs: string[]) {
     //Todo: Use transactions
     for (let s in songs) {
