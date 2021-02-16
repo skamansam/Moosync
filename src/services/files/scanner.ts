@@ -23,9 +23,11 @@ async function getInfo(data: mm.IAudioMetadata, stats: stats, coverPath?: string
   return {
     title: data.common.title ? data.common.title : path.basename(stats.path),
     path: stats.path,
-    coverPath: coverPath,
     size: stats.size,
-    album: data.common.album,
+    album: {
+      album_name: data.common.album,
+      album_coverPath: coverPath,
+    },
     artists: artists,
     date: data.common.date,
     year: data.common.year,

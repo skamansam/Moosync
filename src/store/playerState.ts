@@ -114,16 +114,16 @@ class Player extends VuexModule {
   nextSong() {
     this.songQueue.next()
     this.setSong(this.songQueue.top)
-    if (this.songQueue.top && this.songQueue.top.coverPath) {
-      this.setCover(this.songQueue.top.coverPath)
+    if (this.songQueue.top && this.songQueue.top.album.album_coverPath) {
+      this.setCover(this.songQueue.top.album.album_coverPath)
     }
   }
   @Action
   prevSong() {
     this.songQueue.prev()
     this.setSong(this.songQueue.top)
-    if (this.songQueue.top && this.songQueue.top.coverPath) {
-      this.setCover(this.songQueue.top.coverPath)
+    if (this.songQueue.top && this.songQueue.top.album.album_coverPath) {
+      this.setCover(this.songQueue.top.album.album_coverPath)
     }
   }
 }

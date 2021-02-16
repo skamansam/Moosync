@@ -34,7 +34,7 @@ export default class Albums extends Vue {
 
   get filteredAlbumList() {
     return this.albumList.filter((x) => {
-      return x.album !== null
+      return x.album_name !== null
     })
   }
 

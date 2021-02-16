@@ -12,10 +12,13 @@ function unMarshalSong(dbSong: marshaledSong): Song {
   return {
     _id: dbSong._id,
     path: dbSong.path,
-    coverPath: dbSong.coverPath,
     size: dbSong.size,
     title: dbSong.title,
-    album: dbSong.album,
+    album: {
+      album_id: dbSong.album_id,
+      album_name: dbSong.album_name,
+      album_coverPath: dbSong.album_coverPath,
+    },
     date: dbSong.date,
     year: dbSong.year,
     artists: dbSong.artist_name ? dbSong.artist_name.split(',') : [],
@@ -37,10 +40,8 @@ function marshalSong(song: Song): marshaledSong {
   return {
     _id: v4(),
     path: song.path,
-    coverPath: song.coverPath,
     size: song.size,
     title: song.title,
-    album: song.album,
     date: song.date,
     year: song.year,
     lyrics: song.lyrics,
@@ -82,7 +83,7 @@ export class SongDBInstance {
           artist_id VARCHAR(36) PRIMARY KEY,
           artist_mbid TEXT,
           artist_name TEXT,
-          coverPath TEXT
+          artist_coverPath TEXT
         );
 
         CREATE TABLE genre (
@@ -90,15 +91,20 @@ export class SongDBInstance {
           genre_name text
         );
 
+        CREATE TABLE albums (
+          album_id VARCHAR(36) PRIMARY KEY,
+          album_name TEXT,
+          album_artist TEXT,
+          album_coverPath TEXT
+        );
+
         CREATE TABLE allsongs (
           _id VARCHAR(36) PRIMARY KEY,
           path TEXT,
-          coverPath TEXT,
           size TEXT NOT NULL,
           inode TEXT NOT NULL,
           deviceno TEXT NOT NULL,
           title TEXT,
-          album TEXT,
           date TEXT,
           year TEXT,
           lyrics TEXT,
@@ -127,8 +133,22 @@ export class SongDBInstance {
           FOREIGN KEY(genre) REFERENCES genre(genre_id)
         );
 
+        CREATE TABLE album_bridge (
+          id integer PRIMARY KEY AUTOINCREMENT,
+          song VARCHAR(36),
+          album VARCHAR(36),
+          FOREIGN KEY(song) REFERENCES allsongs(_id),
+          FOREIGN KEY(album) REFERENCES albums(album_id)
+        );
+
         -- Down
         DROP TABLE IF EXISTS 'allsongs';
+        DROP TABLE IF EXISTS 'artists';
+        DROP TABLE IF EXISTS 'genre';
+        DROP TABLE IF EXISTS 'albums';
+        DROP TABLE IF EXISTS 'artists_bridge';
+        DROP TABLE IF EXISTS 'genre_bridge';
+        DROP TABLE IF EXISTS 'album_bridge';
       `,
           `-- Up
         CREATE TABLE playlists (
@@ -144,6 +164,10 @@ export class SongDBInstance {
           FOREIGN KEY(song) REFERENCES allsongs(_id),
           FOREIGN KEY(playlist) REFERENCES genre(playlist_id)
         );
+
+        -- Down
+        DROP TABLE IF EXISTS 'playlists';
+        DROP TABLE IF EXISTS 'playlist_bridge';
           `,
         ],
       },
@@ -185,11 +209,13 @@ export class SongDBInstance {
 
   public async getAllSongs(): Promise<Song[]> {
     let marshaled: marshaledSong[] = this.db.query(
-      `SELECT P.*, S.*, T.* FROM allsongs P 
+      `SELECT P.*, S.*, T.*, V.* FROM allsongs P 
         LEFT JOIN genre_bridge Q ON P._id = Q.song
         LEFT JOIN genre T ON T.genre_id = Q.genre
         LEFT JOIN artists_bridge B ON P._id = B.song 
         LEFT JOIN artists S ON S.artist_id = B.artist
+        LEFT JOIN album_bridge U ON P._id = U.song 
+        LEFT JOIN albums V ON V.album_id = U.album
         `
     )
     return this.flattenDict(this.mergeSongs(marshaled))
@@ -205,9 +231,9 @@ export class SongDBInstance {
 
   public async getDefaultCoverByArtist(id: string): Promise<string | undefined> {
     return (this.db.queryFirstRow(
-      `SELECT coverPath FROM allsongs WHERE _id = (SELECT song FROM artists_bridge WHERE artist = ?)`,
+      `SELECT album_coverPath from albums WHERE album_id = (SELECT album FROM album_bridge WHERE song = (SELECT song FROM artists_bridge WHERE artist = ?))`,
       id
-    ) as Song).coverPath
+    ) as marshaledSong).album_coverPath
   }
 
   public async countByHash(hash: string): Promise<number> {
@@ -239,20 +265,37 @@ export class SongDBInstance {
     })
   }
 
-  private storeArtists(artists?: string[]) {
+  private storeArtists(...artists: string[]): string[] {
     let artistID: string[] = []
-    if (artists) {
-      for (let a of artists) {
-        let id = this.db.queryFirstCell(`SELECT artist_id FROM artists WHERE artist_name = ? COLLATE NOCASE`, a.trim())
-        if (id) artistID.push(id)
-        else {
-          let id = v4()
-          this.db.insert('artists', { artist_id: id, artist_name: a.trim() })
-          artistID.push(id)
-        }
+    for (let a of artists) {
+      let id = this.db.queryFirstCell(`SELECT artist_id FROM artists WHERE artist_name = ? COLLATE NOCASE`, a.trim())
+      if (id) artistID.push(id)
+      else {
+        let id = v4()
+        this.db.insert('artists', { artist_id: id, artist_name: a.trim() })
+        artistID.push(id)
       }
     }
     return artistID
+  }
+
+  private storeAlbum(album: Album): string {
+    let id: string | undefined
+    if (album.album_name) {
+      id = this.db.queryFirstCell(
+        `SELECT album_id FROM albums WHERE album_name = ? COLLATE NOCASE`,
+        album.album_name.trim()
+      )
+      if (!id) {
+        id = v4()
+        this.db.insert('albums', {
+          album_id: id,
+          album_name: album.album_name.trim(),
+          album_coverPath: album.album_coverPath,
+        })
+      }
+    }
+    return id as string
   }
 
   private storeGenre(genre?: string[]) {
@@ -283,13 +326,19 @@ export class SongDBInstance {
     }
   }
 
+  private storeAlbumBridge(albumID: string, songID: string) {
+    if (albumID) this.db.insert('album_bridge', { song: songID, album: albumID })
+  }
+
   public async store(newDoc: Song): Promise<void> {
-    let artistID = this.storeArtists(newDoc.artists)
+    let artistID = newDoc.artists ? this.storeArtists(...newDoc.artists) : []
+    let albumID = newDoc.album ? this.storeAlbum(newDoc.album) : ''
     let genreID = this.storeGenre(newDoc.genre)
     let marshaledSong = marshalSong(newDoc)
     this.db.insert('allsongs', marshaledSong)
     this.storeArtistBridge(artistID, marshaledSong._id)
     this.storeGenreBridge(genreID, marshaledSong._id)
+    this.storeAlbumBridge(albumID, marshaledSong._id)
     return
   }
 

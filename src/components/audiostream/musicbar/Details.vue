@@ -2,7 +2,7 @@
   <b-container fluid class="d-flex flex-column h-100">
     <b-row class="flex-grow-1 align-items-center">
       <b-col cols="2" class="d-flex justify-content-center">
-        <img ref="cover" class="coverimg" alt="cover img" :src="'media://' + cover" />
+        <img ref="cover" class="coverimg" alt="cover img" :src="cover ? 'media://' + cover : ''" />
       </b-col>
       <b-col cols="10">
         <div class="text song-title text-truncate">{{ title }}</div>

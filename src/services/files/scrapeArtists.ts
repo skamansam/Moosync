@@ -148,7 +148,7 @@ export class CoverScraper {
   private async queryArtwork(a: artists) {
     let data = (await this.fetchImagesRemote(a)) || (await SongDB.getDefaultCoverByArtist(a.artist_id))
     if (data) {
-      a.coverPath = data
+      a.artist_coverPath = data
       await SongDB.updateArtists(a)
       return
     }
@@ -158,7 +158,7 @@ export class CoverScraper {
     let artists = await SongDB.getAllArtists()
     let promises: Promise<void>[] = []
     for (let a of artists) {
-      if (!a.coverPath) {
+      if (!a.artist_coverPath) {
         promises.push(this.queryArtwork(a))
       }
     }

@@ -1,10 +1,10 @@
+import { Album } from '@/models/albums'
 export interface Song {
   _id?: string
   path: string
-  coverPath: string | undefined
   size: string
   title: string
-  album: string | undefined
+  album: Album
   artists: string[] | undefined
   date: string | undefined
   year: number | undefined
@@ -24,13 +24,15 @@ export interface Song {
 export interface marshaledSong {
   _id: string
   path: string
-  coverPath: string | undefined
   size: string
   title: string
-  album: string | undefined
+  album_id?: string | undefined
+  album_name?: string | undefined
+  album_coverPath?: string
   lyrics: string | undefined
   artist_name?: string
   artists_id?: string
+  artist_coverPath?: string
   genre_name?: string
   genere_id?: string
   date: string | undefined

@@ -1,4 +1,5 @@
 export interface Album {
-  album: string
-  coverPath: string
+  album_id?: string
+  album_name?: string
+  album_coverPath?: string
 }
