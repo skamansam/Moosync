@@ -2,8 +2,8 @@
   <b-container fluid class="album-container">
     <b-row class="title">Albums</b-row>
     <b-row class="d-flex">
-      <b-col col xl="2" md="3" v-for="album in filteredAlbumList" :key="album.album">
-        <CardView :title="album.album" :imgSrc="album.coverPath" />
+      <b-col col xl="2" md="3" v-for="album in filteredAlbumList" :key="album.album_id">
+        <CardView :title="album.album_name" :imgSrc="album.album_coverPath" />
       </b-col>
     </b-row>
   </b-container>

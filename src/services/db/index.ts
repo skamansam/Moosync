@@ -222,7 +222,7 @@ export class SongDBInstance {
   }
 
   public async getAllAlbums(): Promise<Album[]> {
-    return this.db.query(`SELECT coverPath, album from allsongs GROUP BY album COLLATE NOCASE`)
+    return this.db.query(`SELECT * from albums`)
   }
 
   public async getAllArtists(): Promise<artists[]> {

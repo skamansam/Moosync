@@ -1,9 +1,9 @@
 <template>
   <b-container fluid class="album-container">
-    <b-row class="title">Albums</b-row>
+    <b-row class="title">Artists</b-row>
     <b-row class="d-flex">
       <b-col col xl="2" md="3" v-for="artist in artistList" :key="artist.artist_id">
-        <CardView :title="artist.artist_name" :imgSrc="artist.coverPath" />
+        <CardView :title="artist.artist_name" :imgSrc="artist.artist_coverPath" />
       </b-col>
     </b-row>
   </b-container>
