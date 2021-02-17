@@ -8,17 +8,17 @@ export default new Router({
     {
       path: '/songs',
       name: 'All Songs',
-      component: require('@/components/pages/AllSongs.vue').default,
+      component: require('@/pages/AllSongs.vue').default,
     },
     {
       path: '/albums',
       name: 'Albums',
-      component: require('@/components/pages/Albums.vue').default,
+      component: require('@/pages/Albums.vue').default,
     },
     {
       path: '/artists',
       name: 'Artists',
-      component: require('@/components/pages/Artists.vue').default,
+      component: require('@/pages/Artists.vue').default,
     },
   ],
 })

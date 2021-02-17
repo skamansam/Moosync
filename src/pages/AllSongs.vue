@@ -9,8 +9,8 @@
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator'
-import SongList from './allsongs/SongList.vue'
-import SongDetails from './allsongs/SongDetails.vue'
+import SongList from '@/components/SongList.vue'
+import SongDetails from '@/components/SongDetails.vue'
 
 @Component({
   components: {

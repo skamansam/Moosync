@@ -3,7 +3,7 @@
     <b-row class="title">Albums</b-row>
     <b-row class="d-flex">
       <b-col col xl="2" md="3" v-for="artist in artistList" :key="artist.artist_id">
-        <AlbumCard :title="artist.artist_name" :imgSrc="artist.coverPath" />
+        <CardView :title="artist.artist_name" :imgSrc="artist.coverPath" />
       </b-col>
     </b-row>
   </b-container>
@@ -16,11 +16,11 @@ import { IpcEvents } from '@/services/ipc/main/constants'
 import { IpcRendererHolder } from '@/services/ipc/renderer'
 import { ipcRenderer } from 'electron'
 import { Component, Vue } from 'vue-property-decorator'
-import AlbumCard from './albums/AlbumCard.vue'
+import CardView from '@/components/CardView.vue'
 
 @Component({
   components: {
-    AlbumCard,
+    CardView,
   },
 })
 export default class Artists extends Vue {
