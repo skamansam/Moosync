@@ -1,5 +1,6 @@
 import Vue from 'vue'
 import Router from 'vue-router'
+import { Playlist } from '../models/playlists'
 
 Vue.use(Router)
 
@@ -19,6 +20,11 @@ export default new Router({
       path: '/artists',
       name: 'Artists',
       component: require('@/pages/Artists.vue').default,
+    },
+    {
+      path: '/playlists',
+      name: 'Playlists',
+      component: require('@/pages/Playlists.vue').default,
     },
   ],
 })

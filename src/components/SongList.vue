@@ -1,26 +1,30 @@
 <template>
-  <b-table
-    class="custom-table-container d-flex w-100 h-100"
-    table-class="custom-table"
-    :items="songList"
-    :fields="fields"
-    sticky-header
-    :no-border-collapse="true"
-    selectable
-    select-mode="single"
-    primary-key="title"
-    :key="test"
-    @row-dblclicked="onRowDoubleClicked"
-    @row-selected="onRowSelected"
-  >
-    <template #cell(index)="data">
-      {{ data.index + 1 }}
-    </template>
+  <div>
+    <b-table
+      class="custom-table-container d-flex w-100 h-100"
+      table-class="custom-table"
+      :items="songList"
+      :fields="fields"
+      sticky-header
+      :no-border-collapse="true"
+      selectable
+      select-mode="single"
+      primary-key="title"
+      :key="test"
+      @row-dblclicked="onRowDoubleClicked"
+      @row-selected="onRowSelected"
+      @row-contextmenu="onRowContext"
+    >
+      <template #cell(index)="data">
+        {{ data.index + 1 }}
+      </template>
 
-    <template #cell(artists)="data">
-      {{ data.item.artists.length != 0 ? data.item.artists.join(', ') : '-' }}
-    </template>
-  </b-table>
+      <template #cell(artists)="data">
+        {{ data.item.artists.length != 0 ? data.item.artists.join(', ') : '-' }}
+      </template>
+    </b-table>
+    <NewPlaylistModal :id="'modal'" />
+  </div>
 </template>
 
 <script lang="ts">
@@ -31,6 +35,9 @@ import { Song } from '@/models/songs'
 import { PlayerModule } from '@/store/playerState'
 import { EventBus, IpcEvents } from '@/services/ipc/main/constants'
 import { IpcRendererHolder } from '@/services/ipc/renderer'
+import { remote } from 'electron'
+import { PlaylistModule } from '@/store/playlists'
+import NewPlaylistModal from '@/components/NewPlaylistModal.vue'
 
 interface ResizerElements {
   thElm: HTMLElement | undefined
@@ -124,7 +131,9 @@ class Resizer {
 }
 
 @Component({
-  components: {},
+  components: {
+    NewPlaylistModal,
+  },
 })
 export default class SongList extends Vue {
   private test: boolean = false
@@ -143,6 +152,56 @@ export default class SongList extends Vue {
     this.resizer = new Resizer(document)
     window.addEventListener('resize', this.rerenderTable)
     this.requestSongs()
+  }
+
+  get playlists() {
+    return PlaylistModule.playlists
+  }
+
+  private addSongToPlaylist(playlist_id: string, song: Song) {
+    this.IpcHolder.send<void>(IpcEvents.ADD_TO_PLAYLIST, {
+      responseChannel: IpcEvents.ADDED_TO_PLAYLIST,
+      params: {
+        playlist_id: playlist_id,
+        song_ids: [song],
+      },
+    })
+  }
+
+  private generateContextMenu(item: Song) {
+    const populatePlaylistMenu = () => {
+      let submenu = new remote.Menu()
+      for (let p in this.playlists) {
+        submenu.append(
+          new remote.MenuItem({
+            label: this.playlists[p],
+            click: () => this.addSongToPlaylist(p, item),
+          })
+        )
+      }
+      submenu.append(
+        new remote.MenuItem({
+          label: 'New Playlist',
+          click: () => {
+            this.$bvModal.show('modal')
+          },
+        })
+      )
+      return submenu
+    }
+    let menu = new remote.Menu()
+    menu.append(
+      new remote.MenuItem({
+        label: 'Add to playlist',
+        submenu: populatePlaylistMenu(),
+      })
+    )
+    return menu
+  }
+
+  private onRowContext(item: Song, index: number, event: Event) {
+    event.preventDefault()
+    this.generateContextMenu(item).popup({ window: remote.getCurrentWindow() })
   }
 
   private onRowDoubleClicked(item: Song) {

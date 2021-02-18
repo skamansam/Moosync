@@ -260,13 +260,31 @@ export class SongDBInstance {
   }
 
   public async createPlaylist(name: string): Promise<void> {
-    this.db.insert('playlists', { name: name })
+    this.db.insert('playlists', { playlist_name: name })
   }
 
-  public async addInPlaylist(playlist: string, ...songs: string[]) {
+  public updatePlaylistCoverPath(playlist_id: string, coverPath: string) {
+    this.db.update('playlists', { playlist_coverPath: coverPath }, ['playlist_id = ?', playlist_id])
+  }
+
+  private isPlaylistCoverExists(playlist_id: string) {
+    return (
+      !(this.db.query(`SELECT playlist_coverPath FROM playlists WHERE playlist_id = ?`, playlist_id)[0] as Playlist)
+        .playlist_coverPath == null
+    )
+  }
+
+  public async addToPlaylist(playlist_id: string, ...songs: Song[]) {
+    let coverExists = this.isPlaylistCoverExists(playlist_id)
+
     //Todo: Use transactions
-    for (let s in songs) {
-      this.db.insert('playlist_bridge', { playlist: playlist, song: s })
+    for (let s of songs) {
+      if (!coverExists) {
+        if (s.album && s.album.album_coverPath) {
+          this.updatePlaylistCoverPath(playlist_id, s.album.album_coverPath)
+        }
+      }
+      this.db.insert('playlist_bridge', { playlist: playlist_id, song: s._id })
     }
   }
 

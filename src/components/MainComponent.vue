@@ -24,6 +24,10 @@ import { ipcRenderer } from 'electron'
 // eslint-disable-next-line no-unused-vars
 import { Song } from '@/models/songs'
 import { IpcEvents } from '@/services/ipc/main/constants'
+// eslint-disable-next-line no-unused-vars
+import { Playlist } from '@/models/playlists'
+// eslint-disable-next-line no-unused-vars
+import { playlistInfo, PlaylistModule } from '@/store/playlists'
 
 const stun = require('stun')
 
@@ -44,6 +48,8 @@ export default class MainComponent extends Vue {
     this.IpcHolder.send<void>(IpcEvents.SCAN_MUSIC, { params: ['/mnt/g/songs/Playlist/Daily Dose'] }).then((data) => {
       console.log(data)
     })
+    this.watchPlaylistUpdates()
+    this.populatePlaylists()
   }
 
   public toggleWatcher() {
@@ -61,6 +67,28 @@ export default class MainComponent extends Vue {
         const { address } = res.getXorAddress()
         console.log('ip: ', address)
       }
+    })
+  }
+
+  private watchPlaylistUpdates() {
+    PlaylistModule.$watch(
+      (playlistModule) => playlistModule.updated,
+      (updated: boolean) => {
+        if (updated) {
+          PlaylistModule.setUpdated(false)
+          this.populatePlaylists()
+        }
+      }
+    )
+  }
+
+  private populatePlaylists() {
+    this.IpcHolder.send<Playlist[]>(IpcEvents.GET_PLAYLISTS).then((data) => {
+      let playlists: playlistInfo = {}
+      for (let p of data) {
+        playlists[p.playlist_id] = p.playlist_name
+      }
+      PlaylistModule.setPlaylists(playlists)
     })
   }
 }

@@ -1,9 +1,18 @@
 import { ipcMain, IpcMainEvent } from 'electron'
 import { AllAlbumsChannel, AllArtistsChannel, AllSongsChannel } from './songs'
 import { ScannerChannel } from './scanner'
+import { AddToPlaylistsChannel, AllPlaylistsChannel, CreatePlaylistsChannel } from './playlists'
 
 export function registerIpcChannels() {
-  const ipcChannels = [new AllSongsChannel(), new AllAlbumsChannel(), new AllArtistsChannel(), new ScannerChannel()]
+  const ipcChannels = [
+    new AllSongsChannel(),
+    new AllAlbumsChannel(),
+    new AllArtistsChannel(),
+    new ScannerChannel(),
+    new AllPlaylistsChannel(),
+    new CreatePlaylistsChannel(),
+    new AddToPlaylistsChannel(),
+  ]
   ipcChannels.forEach((channel) => ipcMain.on(channel.name, (event, request) => channel.handle(event, request)))
 }
 

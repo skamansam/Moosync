@@ -104,7 +104,7 @@ export const migrations = [
     song VARCHAR(36),
     playlist VARCHAR(36),
     FOREIGN KEY(song) REFERENCES allsongs(_id),
-    FOREIGN KEY(playlist) REFERENCES genre(playlist_id)
+    FOREIGN KEY(playlist) REFERENCES playlists(playlist_id)
   );
 
   -- Down
