@@ -1,7 +1,7 @@
 <template>
   <div class="w-100 image-container d-flex">
     <b-overlay :show="true" no-center opacity="0.6" blur="2px" variant="dark" class="text-container">
-      <img ref="cover" alt="cover art" onerror="this.style.display='none'" />
+      <img ref="cover" v-if="imgSrc" :src="'media://' + imgSrc" alt="cover art" />
       <template #overlay>
         <div>
           <div class="text-over title">{{ currentTitle }}</div>
@@ -13,45 +13,22 @@
 </template>
 
 <script lang="ts">
-import { Component, Ref, Vue } from 'vue-property-decorator'
-
-// eslint-disable-next-line no-unused-vars
-import { Song } from '@/models/songs'
-import { EventBus } from '@/services/ipc/main/constants'
+import { Component, Prop, Ref, Vue } from 'vue-property-decorator'
 
 @Component({
   components: {},
 })
 export default class SongDetails extends Vue {
   @Ref('cover') imageElement!: HTMLImageElement
-  private currentTitle: string = ''
-  private currentsubTitle: string = ''
 
-  private registerListeners() {
-    this.$root.$on(EventBus.SONG_SELECTED, (data: Song) => {
-      this.updateDetails(data)
-    })
-  }
+  @Prop({ default: '' })
+  private currentTitle!: string
 
-  private updateDetails(data?: Song) {
-    if (data) {
-      console.log(data)
-      if (data) this.currentTitle = data.title
-      if (data && data.artists) this.currentsubTitle = data.artists.join(', ')
-      if (data?.album.album_coverPath) {
-        this.imageElement.style.display = ''
-        this.imageElement.src = 'media://' + data.album.album_coverPath
-      }
-    }
-  }
+  @Prop({ default: '' })
+  private currentsubTitle!: string
 
-  created() {
-    this.registerListeners()
-  }
-
-  mounted() {
-    this.imageElement.style.display = 'none'
-  }
+  @Prop({ default: '' })
+  private imgSrc!: string
 }
 </script>
 

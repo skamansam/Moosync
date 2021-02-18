@@ -9,7 +9,11 @@
           ><Details
             :title="currentSong ? currentSong.title : '-'"
             :artists="currentSong ? currentSong.artists : []"
-            :cover="currentSong ? currentSong.coverPath : ''"
+            :cover="
+              currentSong && currentSong.album && currentSong.album.album_coverPath
+                ? currentSong.album.album_coverPath
+                : ''
+            "
             :coverBlob="currentCoverBlob"
         /></b-col>
         <b-col col lg="auto"

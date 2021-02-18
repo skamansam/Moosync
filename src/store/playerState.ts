@@ -61,7 +61,6 @@ class Queue {
 class Player extends VuexModule {
   private state: PlayerState = PlayerState.PAUSED
   private currentSongDets: Song | null = null
-  private currentSongCover: Buffer | null = null
   private songQueue = new Queue()
 
   get playerState() {
@@ -72,10 +71,6 @@ class Player extends VuexModule {
     return this.currentSongDets
   }
 
-  get currentCover() {
-    return this.currentSongCover
-  }
-
   get queue() {
     return this.songQueue
   }
@@ -83,13 +78,6 @@ class Player extends VuexModule {
   @Mutation
   setState(state: PlayerState) {
     this.state = state
-  }
-
-  @Mutation
-  setCover(path: string) {
-    fs.readFile(path, (err, buffer) => {
-      if (!err) this.currentSongCover = buffer
-    })
   }
 
   @Mutation
@@ -114,17 +102,11 @@ class Player extends VuexModule {
   nextSong() {
     this.songQueue.next()
     this.setSong(this.songQueue.top)
-    if (this.songQueue.top && this.songQueue.top.album.album_coverPath) {
-      this.setCover(this.songQueue.top.album.album_coverPath)
-    }
   }
   @Action
   prevSong() {
     this.songQueue.prev()
     this.setSong(this.songQueue.top)
-    if (this.songQueue.top && this.songQueue.top.album.album_coverPath) {
-      this.setCover(this.songQueue.top.album.album_coverPath)
-    }
   }
 }
 

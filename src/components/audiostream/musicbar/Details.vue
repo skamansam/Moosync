@@ -26,8 +26,8 @@ export default class MusicBar extends Vue {
   @Prop({ default: () => [] })
   artists!: string[]
 
-  @Prop({ default: null })
-  cover!: Buffer | null
+  @Prop({ default: '' })
+  cover!: string
 
   @Prop({ default: null })
   private coverBlob!: Blob | null

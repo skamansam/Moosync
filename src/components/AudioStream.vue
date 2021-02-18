@@ -41,7 +41,7 @@ export default class AudioStream extends Vue {
   private playerState: PlayerState = PlayerState.STOPPED
   private isSongLoaded: boolean = false
   private currentSong: Song | null = null
-  private currentCover: Buffer | null = null
+  private currentCover: string = ''
   private currentCoverBlob: Blob | null = null
   private player: YTPlayer | undefined
 
@@ -60,13 +60,6 @@ export default class AudioStream extends Vue {
       (newSong: Song | null) => {
         this.currentSong = newSong
         if (newSong) this.loadAudio(newSong)
-      }
-    )
-
-    PlayerModule.$watch(
-      (playerModule) => playerModule.currentCover,
-      (newCover: Buffer | null) => {
-        this.currentCover = newCover
       }
     )
 
