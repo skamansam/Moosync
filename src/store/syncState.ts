@@ -1,5 +1,6 @@
+import { Module, Mutation, VuexModule } from 'vuex-class-modules'
+
 import { Song } from '@/models/songs'
-import { VuexModule, Module, Mutation, Action } from 'vuex-class-modules'
 import store from '.'
 
 export enum PeerMode {

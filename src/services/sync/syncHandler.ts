@@ -1,8 +1,9 @@
-import { Socket, io, ManagerOptions } from 'socket.io-client'
+import { FragmentReceiver, FragmentSender } from './dataFragmenter'
+import { ManagerOptions, Socket, io } from 'socket.io-client'
+
 import { PeerMode } from '@/store/syncState'
 import { Song } from '@/models/songs'
-import { FragmentReceiver, FragmentSender } from './dataFragmenter'
-import { base64 } from 'rfc4648'
+
 interface DataChannelMessage<T> {
   type: string
   message: T
@@ -119,7 +120,7 @@ export class SyncHolder {
   }
 
   private handleTrackChannel(channel: RTCDataChannel) {
-    channel.onopen = (event) => {
+    channel.onopen = () => {
       this.mode == PeerMode.BROADCASTER && this.setLocalTrackCallback ? this.setLocalTrackCallback() : null
     }
 
@@ -134,7 +135,7 @@ export class SyncHolder {
     }
 
     channel.onclose = (event) => {
-      console.log('traack closed')
+      console.log('traack closed', event)
     }
   }
 
@@ -142,7 +143,7 @@ export class SyncHolder {
     let fragmentReceiver = new FragmentReceiver(this.onRemoteCoverCallback)
 
     channel.onopen = (event) => {
-      console.log('open cover channel')
+      console.log('open cover channel', event)
     }
 
     channel.onmessage = (event) => {
@@ -150,7 +151,7 @@ export class SyncHolder {
     }
 
     channel.onclose = (event) => {
-      console.log('cover closed')
+      console.log('cover closed', event)
     }
   }
 

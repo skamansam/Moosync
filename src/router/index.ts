@@ -1,6 +1,5 @@
-import Vue from 'vue'
 import Router from 'vue-router'
-import { Playlist } from '../models/playlists'
+import Vue from 'vue'
 
 Vue.use(Router)
 

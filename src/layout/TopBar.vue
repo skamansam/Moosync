@@ -10,9 +10,9 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue } from 'vue-property-decorator'
-import Search from '@/components/topbar/Search.vue'
 import Navigation from '@/components/topbar/Navigation.vue'
+import Search from '@/components/topbar/Search.vue'
+import { Component, Vue } from 'vue-property-decorator'
 
 @Component({
   components: {

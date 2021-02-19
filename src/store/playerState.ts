@@ -1,7 +1,7 @@
-import { VuexModule, Module, Mutation, Action } from 'vuex-class-modules'
-import store from '.'
+import { Action, Module, Mutation, VuexModule } from 'vuex-class-modules'
+
 import { Song } from '@/models/songs'
-import fs from 'fs'
+import store from '.'
 
 export enum AudioType {
   STREAMING,

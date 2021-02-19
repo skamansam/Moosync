@@ -30,7 +30,7 @@
 import { Component, Vue } from 'vue-property-decorator'
 import SongList from '@/components/SongList.vue'
 import SongDetails from '@/components/SongDetails.vue'
-// eslint-disable-next-line no-unused-vars
+
 import { Song } from '@/models/songs'
 import { IpcEvents } from '@/services/ipc/main/constants'
 import { IpcRendererHolder } from '@/services/ipc/renderer'

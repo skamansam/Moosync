@@ -22,7 +22,4 @@
   },
   "typeRoots": ["./node_modules", "./node_modules/@types", "./src/types/declarations"],
   "include": ["src/**/*.ts", "src/**/*.tsx", "src/**/*.vue", "tests/**/*.ts", "tests/**/*.tsx", "src/store/index.ts"]
-  // "exclude": [
-  //   "node_modules"
-  // ]
 }

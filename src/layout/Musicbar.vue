@@ -27,16 +27,16 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue } from 'vue-property-decorator'
-import Details from '@/components/musicbar/Details.vue'
-import Controls from '@/components/musicbar/Controls.vue'
-import ExtraControls from '@/components/musicbar/ExtraControls.vue'
 import AudioStream from '@/components/AudioStream.vue'
+import Controls from '@/components/musicbar/Controls.vue'
+import Details from '@/components/musicbar/Details.vue'
+import ExtraControls from '@/components/musicbar/ExtraControls.vue'
 
-// eslint-disable-next-line no-unused-vars
 import { Song } from '@/models/songs'
 import { PlayerModule, PlayerState } from '@/store/playerState'
 import { SyncModule } from '@/store/syncState'
+import { Component, Vue } from 'vue-property-decorator'
+
 @Component({
   components: {
     Details,

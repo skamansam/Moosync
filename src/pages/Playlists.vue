@@ -10,7 +10,6 @@
 </template>
 
 <script lang="ts">
-// eslint-disable-next-line no-unused-vars
 import { Playlist } from '@/models/playlists'
 import { IpcEvents } from '@/services/ipc/main/constants'
 import { IpcRendererHolder } from '@/services/ipc/renderer'

@@ -28,7 +28,7 @@
 
 <script lang="ts">
 import NewPlaylistModal from '@/components/generic/NewPlaylistModal.vue'
-// eslint-disable-next-line no-unused-vars
+
 import { Song } from '@/models/songs'
 import { Resizer } from '@/services/ui/resizer'
 import { Component, Prop, Vue } from 'vue-property-decorator'

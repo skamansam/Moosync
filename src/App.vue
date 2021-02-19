@@ -7,7 +7,7 @@
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator'
 import MainComponent from '@/components/MainComponent.vue'
-// eslint-disable-next-line no-unused-vars
+
 import { ThemesModule } from './store/themeState'
 
 @Component({

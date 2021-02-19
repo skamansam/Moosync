@@ -10,13 +10,12 @@
 </template>
 
 <script lang="ts">
-// eslint-disable-next-line no-unused-vars
+import CardView from '@/components/generic/CardView.vue'
 import { Album } from '@/models/albums'
 import { IpcEvents } from '@/services/ipc/main/constants'
 import { IpcRendererHolder } from '@/services/ipc/renderer'
 import { ipcRenderer } from 'electron'
 import { Component, Vue } from 'vue-property-decorator'
-import CardView from '@/components/generic/CardView.vue'
 
 @Component({
   components: {

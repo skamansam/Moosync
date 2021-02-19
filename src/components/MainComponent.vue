@@ -12,17 +12,17 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue } from 'vue-property-decorator'
+import MusicBar from '@/layout/Musicbar.vue'
 import Sidebar from '@/layout/Sidebar.vue'
 import TopBar from '@/layout/TopBar.vue'
-import { IpcRendererHolder } from '@/services/ipc/renderer'
-import { ipcRenderer } from 'electron'
-import MusicBar from '@/layout/Musicbar.vue'
-import { IpcEvents } from '@/services/ipc/main/constants'
-// eslint-disable-next-line no-unused-vars
+
 import { Playlist } from '@/models/playlists'
-// eslint-disable-next-line no-unused-vars
+import { IpcEvents } from '@/services/ipc/main/constants'
+import { IpcRendererHolder } from '@/services/ipc/renderer'
+
 import { playlistInfo, PlaylistModule } from '@/store/playlists'
+import { ipcRenderer } from 'electron'
+import { Component, Vue } from 'vue-property-decorator'
 
 const stun = require('stun')
 

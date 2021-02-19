@@ -35,11 +35,11 @@
 </template>
 
 <script lang="ts">
-import { Component, Ref, Vue } from 'vue-property-decorator'
-import Toggle from '@/components/icons/Toggle.vue'
 import Rooms from '@/components/icons/Rooms.vue'
+import Toggle from '@/components/icons/Toggle.vue'
 import Tabs from '@/components/sidebar/Tabs.vue'
 import { PeerMode, SyncModule } from '@/store/syncState'
+import { Component, Ref, Vue } from 'vue-property-decorator'
 
 @Component({
   components: {

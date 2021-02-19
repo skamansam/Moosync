@@ -8,14 +8,12 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue, Ref, Prop, Watch } from 'vue-property-decorator'
-import { SyncHolder } from '@/services/sync/syncHandler'
-import { PlayerState, PlayerModule } from '@/store/playerState'
-import YTPlayer from 'yt-player'
-
-// eslint-disable-next-line no-unused-vars
 import { Song } from '@/models/songs'
+import { SyncHolder } from '@/services/sync/syncHandler'
+import { PlayerModule, PlayerState } from '@/store/playerState'
 import { PeerMode, SyncModule } from '@/store/syncState'
+import { Component, Prop, Ref, Vue, Watch } from 'vue-property-decorator'
+import YTPlayer from 'yt-player'
 
 @Component({})
 export default class AudioStream extends Vue {

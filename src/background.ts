@@ -1,8 +1,9 @@
 'use strict'
 
-import { app, protocol, BrowserWindow, NativeTheme, nativeTheme } from 'electron'
-import { createProtocol } from 'vue-cli-plugin-electron-builder/lib'
+import { BrowserWindow, app, nativeTheme, protocol } from 'electron'
 import installExtension, { VUEJS_DEVTOOLS } from 'electron-devtools-installer'
+
+import { createProtocol } from 'vue-cli-plugin-electron-builder/lib'
 import { registerIpcChannels } from '@/services/ipc/main' // Import for side effects
 
 const isDevelopment = process.env.NODE_ENV !== 'production'
