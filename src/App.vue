@@ -9,11 +9,10 @@ import { ThemesModule } from '@/store/themeState'
 
 import { Playlist } from '@/models/playlists'
 import { IpcEvents } from '@/services/ipc/main/constants'
-import { IpcRendererHolder } from '@/services/ipc/renderer'
 
 import { playlistInfo, PlaylistModule } from '@/store/playlists'
-import { ipcRenderer } from 'electron'
 import { Component, Vue } from 'vue-property-decorator'
+import { ipcRendererHolder } from './services/ipc/renderer'
 
 const stun = require('stun')
 
@@ -44,12 +43,10 @@ export default class App extends Vue {
     this.populatePlaylists()
 
     // this.testStun()
-    // this.IpcHolder.send<void>(IpcEvents.SCAN_MUSIC, { params: ['/mnt/g/songs/Playlist/Daily Dose'] }).then((data) => {
+    // ipcRendererHolder.send<void>(IpcEvents.SCAN_MUSIC, { params: ['/mnt/g/songs/Playlist/Daily Dose'] }).then((data) => {
     //   console.log(data)
     // })
   }
-
-  private IpcHolder = new IpcRendererHolder(ipcRenderer)
 
   public testStun(): void {
     stun.request('stun.l.google.com:19302', (err: any, res: any) => {
@@ -84,7 +81,7 @@ export default class App extends Vue {
   }
 
   private populatePlaylists() {
-    this.IpcHolder.send<Playlist[]>(IpcEvents.GET_PLAYLISTS).then((data) => {
+    ipcRendererHolder.send<Playlist[]>(IpcEvents.GET_PLAYLISTS).then((data) => {
       let playlists: playlistInfo = {}
       for (let p of data) {
         playlists[p.playlist_id] = p.playlist_name

@@ -13,8 +13,7 @@
 import CardView from '@/components/generic/CardView.vue'
 import { Album } from '@/models/albums'
 import { IpcEvents } from '@/services/ipc/main/constants'
-import { IpcRendererHolder } from '@/services/ipc/renderer'
-import { ipcRenderer } from 'electron'
+import { ipcRendererHolder } from '@/services/ipc/renderer'
 import { Component, Vue } from 'vue-property-decorator'
 
 @Component({
@@ -23,12 +22,13 @@ import { Component, Vue } from 'vue-property-decorator'
   },
 })
 export default class Albums extends Vue {
-  private IpcHolder = new IpcRendererHolder(ipcRenderer)
   private albumList: Album[] = []
   private getAlbums() {
-    this.IpcHolder.send<Album[]>(IpcEvents.GET_ALBUMS, { responseChannel: IpcEvents.GOT_ALL_ALBUMS }).then((data) => {
-      this.albumList = data
-    })
+    ipcRendererHolder
+      .send<Album[]>(IpcEvents.GET_ALBUMS, { responseChannel: IpcEvents.GOT_ALL_ALBUMS })
+      .then((data) => {
+        this.albumList = data
+      })
   }
 
   get filteredAlbumList() {

@@ -12,10 +12,9 @@
 <script lang="ts">
 import { Playlist } from '@/models/playlists'
 import { IpcEvents } from '@/services/ipc/main/constants'
-import { IpcRendererHolder } from '@/services/ipc/renderer'
-import { ipcRenderer } from 'electron'
 import { Component, Vue } from 'vue-property-decorator'
 import CardView from '@/components/generic/CardView.vue'
+import { ipcRendererHolder } from '@/services/ipc/renderer'
 
 @Component({
   components: {
@@ -23,14 +22,13 @@ import CardView from '@/components/generic/CardView.vue'
   },
 })
 export default class Albums extends Vue {
-  private IpcHolder = new IpcRendererHolder(ipcRenderer)
   private playlists: Playlist[] = []
   private getPlaylists() {
-    this.IpcHolder.send<Playlist[]>(IpcEvents.GET_PLAYLISTS, { responseChannel: IpcEvents.GOT_PLAYLISTS }).then(
-      (data) => {
+    ipcRendererHolder
+      .send<Playlist[]>(IpcEvents.GET_PLAYLISTS, { responseChannel: IpcEvents.GOT_PLAYLISTS })
+      .then((data) => {
         this.playlists = data
-      }
-    )
+      })
   }
 
   mounted() {

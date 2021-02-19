@@ -12,10 +12,9 @@
 <script lang="ts">
 import { artists } from '@/models/artists'
 import { IpcEvents } from '@/services/ipc/main/constants'
-import { IpcRendererHolder } from '@/services/ipc/renderer'
-import { ipcRenderer } from 'electron'
 import { Component, Vue } from 'vue-property-decorator'
 import CardView from '@/components/generic/CardView.vue'
+import { ipcRendererHolder } from '@/services/ipc/renderer'
 
 @Component({
   components: {
@@ -23,12 +22,13 @@ import CardView from '@/components/generic/CardView.vue'
   },
 })
 export default class Artists extends Vue {
-  private IpcHolder = new IpcRendererHolder(ipcRenderer)
   private artistList: artists[] = []
   private getArtists() {
-    this.IpcHolder.send<artists[]>(IpcEvents.GET_ARTISTS, { responseChannel: IpcEvents.GOT_ARTISTS }).then((data) => {
-      this.artistList = data
-    })
+    ipcRendererHolder
+      .send<artists[]>(IpcEvents.GET_ARTISTS, { responseChannel: IpcEvents.GOT_ARTISTS })
+      .then((data) => {
+        this.artistList = data
+      })
   }
 
   mounted() {

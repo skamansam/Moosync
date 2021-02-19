@@ -33,12 +33,11 @@ import SongDetails from '@/components/generic/SongDetails.vue'
 
 import { Song } from '@/models/songs'
 import { IpcEvents } from '@/services/ipc/main/constants'
-import { IpcRendererHolder } from '@/services/ipc/renderer'
-import { ipcRenderer, remote } from 'electron'
 import { PlayerModule } from '@/store/playerState'
 import { PlaylistModule } from '@/store/playlists'
-import { getPlaylistsMenu } from '@/services/ui/contextMenu'
+// import { getPlaylistsMenu } from '@/services/ui/contextMenu'
 import NewPlaylistModal from '@/components/generic/NewPlaylistModal.vue'
+import { ipcRendererHolder } from '@/services/ipc/renderer'
 
 @Component({
   components: {
@@ -48,7 +47,6 @@ import NewPlaylistModal from '@/components/generic/NewPlaylistModal.vue'
   },
 })
 export default class AllSongs extends Vue {
-  private IpcHolder = new IpcRendererHolder(ipcRenderer)
   private songList: Song[] = []
   private currentSong: Song | null = null
 
@@ -61,13 +59,15 @@ export default class AllSongs extends Vue {
   }
 
   private async requestSongs() {
-    this.IpcHolder.send<Song[]>(IpcEvents.GET_ALL_SONGS, { responseChannel: IpcEvents.GOT_ALL_SONGS }).then((data) => {
-      this.songList = data
-    })
+    ipcRendererHolder
+      .send<Song[]>(IpcEvents.GET_ALL_SONGS, { responseChannel: IpcEvents.GOT_ALL_SONGS })
+      .then((data) => {
+        this.songList = data
+      })
   }
 
   private addSongToPlaylist(playlist_id: string, song: Song) {
-    this.IpcHolder.send<void>(IpcEvents.ADD_TO_PLAYLIST, {
+    ipcRendererHolder.send<void>(IpcEvents.ADD_TO_PLAYLIST, {
       responseChannel: IpcEvents.ADDED_TO_PLAYLIST,
       params: {
         playlist_id: playlist_id,
@@ -81,18 +81,19 @@ export default class AllSongs extends Vue {
   }
 
   private getSongContextMenu(item: Song) {
-    let menu = new remote.Menu()
-    menu.append(
-      new remote.MenuItem({
-        label: 'Add to playlist',
-        submenu: getPlaylistsMenu(
-          this.playlists,
-          (p: string) => this.addSongToPlaylist(p, item),
-          () => this.$bvModal.show('NewPlaylistModal')
-        ),
-      })
-    )
-    menu.popup()
+    console.log(item)
+    // let menu = new Menu()
+    // menu.append(
+    //   new MenuItem({
+    //     label: 'Add to playlist',
+    //     submenu: getPlaylistsMenu(
+    //       this.playlists,
+    //       (p: string) => this.addSongToPlaylist(p, item),
+    //       () => this.$bvModal.show('NewPlaylistModal')
+    //     ),
+    //   })
+    // )
+    // menu.popup()
   }
 
   private pushInQueue(item: Song) {

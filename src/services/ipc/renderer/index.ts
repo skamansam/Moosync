@@ -1,8 +1,8 @@
-import { IpcRequest } from '../main'
 import { IpcRenderer } from 'electron'
+import { IpcRequest } from '../main'
 import { v4 } from 'uuid'
 
-export class IpcRendererHolder {
+class IpcRendererHolder {
   ipcRenderer: IpcRenderer
 
   constructor(renderer: IpcRenderer) {
@@ -20,3 +20,5 @@ export class IpcRendererHolder {
     })
   }
 }
+
+export const ipcRendererHolder = new IpcRendererHolder(window.ipcRenderer)

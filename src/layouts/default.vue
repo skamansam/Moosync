@@ -12,9 +12,9 @@
 </template>
 
 <script lang="ts">
-import MusicBar from '@/layout/Musicbar.vue'
-import Sidebar from '@/layout/Sidebar.vue'
-import TopBar from '@/layout/TopBar.vue'
+import MusicBar from '@/components/Musicbar.vue'
+import Sidebar from '@/components/Sidebar.vue'
+import TopBar from '@/components/TopBar.vue'
 import { Component } from 'vue-property-decorator'
 import Vue from 'vue'
 

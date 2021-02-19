@@ -10,23 +10,22 @@
 
 <script lang="ts">
 import { IpcEvents } from '@/services/ipc/main/constants'
-import { IpcRendererHolder } from '@/services/ipc/renderer'
+import { ipcRendererHolder } from '@/services/ipc/renderer'
 import { PlaylistModule } from '@/store/playlists'
-import { ipcRenderer } from 'electron'
 import { Component, Prop, Vue } from 'vue-property-decorator'
 
 @Component({})
 export default class NewPlaylistModal extends Vue {
-  private IpcHolder = new IpcRendererHolder(ipcRenderer)
-
   @Prop({ default: 'NewPlaylistModal' })
   private id!: string
 
   private createPlaylist() {
-    this.IpcHolder.send<void>(IpcEvents.CREATE_PLAYLIST, { params: { name: 'henlo' } }).then(() => {
-      this.$bvModal.hide(this.id)
-      PlaylistModule.setUpdated(true)
-    })
+    ipcRendererHolder
+      .send<void>(IpcEvents.CREATE_PLAYLIST, { params: { name: 'henlo' } })
+      .then(() => {
+        this.$bvModal.hide(this.id)
+        PlaylistModule.setUpdated(true)
+      })
   }
 }
 </script>

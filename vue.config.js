@@ -14,9 +14,10 @@ module.exports = {
   },
   pluginOptions: {
     electronBuilder: {
-      nodeIntegration: true,
+      nodeIntegration: false,
       disableMainProcessTypescript: false,
       mainProcessTypeChecking: true,
+      preload: 'src/preload.ts',
       externals: [
         'better-sqlite3'
       ]
