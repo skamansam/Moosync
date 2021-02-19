@@ -58,7 +58,6 @@ export default class Sidebar extends Vue {
 
   private setActive(i: number, navigate: Function): void {
     this.active = i
-    console.log(navigate)
     navigate(this)
   }
 }

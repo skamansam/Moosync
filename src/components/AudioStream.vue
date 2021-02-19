@@ -96,7 +96,6 @@ export default class AudioStream extends Vue {
   }
 
   private async handlePlayerState(newState: PlayerState) {
-    console.log('handling player state')
     if (this.isSongLoaded) {
       switch (newState) {
         case PlayerState.PLAYING:
