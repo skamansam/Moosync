@@ -15,11 +15,11 @@
 <script lang="ts">
 import { PlayerModule, PlayerState } from '@/store/playerState'
 import { Component, Prop, Vue } from 'vue-property-decorator'
-import LastTrack from './controls/LastTrack.vue'
-import NextTrack from './controls/NextTrack.vue'
-import Play from './controls/Play.vue'
-import Repeat from './controls/Repeat.vue'
-import Shuffle from './controls/Shuffle.vue'
+import LastTrack from '@/components/icons/LastTrack.vue'
+import NextTrack from '@/components/icons/NextTrack.vue'
+import Play from '@/components/icons/Play.vue'
+import Repeat from '@/components/icons/Repeat.vue'
+import Shuffle from '@/components/icons/Shuffle.vue'
 
 @Component({
   components: {

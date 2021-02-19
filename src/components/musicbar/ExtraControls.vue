@@ -30,8 +30,8 @@
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator'
-import VolumeIcon from './controls/Volume.vue'
-import ExpandIcon from './controls/Expand.vue'
+import VolumeIcon from '@/components/icons/Volume.vue'
+import ExpandIcon from '@/components/icons/Expand.vue'
 import { ThemesModule } from '@/store/themeState'
 
 @Component({

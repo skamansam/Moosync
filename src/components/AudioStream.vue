@@ -4,46 +4,47 @@
       <div id="yt-player" class="yt-player"></div>
       <audio ref="audio" style="position: absolute; top: 100px" />
     </div>
-    <MusicBar
-      :currentSong="currentSong"
-      :timestamp="currentTime"
-      :currentCover="currentCover"
-      :currentCoverBlob="currentCoverBlob"
-    />
   </div>
 </template>
 
 <script lang="ts">
-import { Component, Vue, Ref, Prop } from 'vue-property-decorator'
+import { Component, Vue, Ref, Prop, Watch } from 'vue-property-decorator'
 import { SyncHolder } from '@/services/sync/syncHandler'
-import MusicBar from './audiostream/Musicbar.vue'
-import { AudioType, PlayerState, PlayerModule } from '@/store/playerState'
+import { PlayerState, PlayerModule } from '@/store/playerState'
 import YTPlayer from 'yt-player'
 
 // eslint-disable-next-line no-unused-vars
 import { Song } from '@/models/songs'
 import { PeerMode, SyncModule } from '@/store/syncState'
 
-@Component({
-  components: {
-    MusicBar,
-  },
-})
+@Component({})
 export default class AudioStream extends Vue {
-  private AudioType: typeof AudioType = AudioType // To access enum in template
-  @Ref('audio') audioElement!: ExtendedHtmlAudioElement
   private currentTime: number = 0
+
+  @Ref('audio') audioElement!: ExtendedHtmlAudioElement
 
   @Prop({ default: '' })
   roomID!: string
 
+  @Prop({ default: PlayerState.STOPPED })
+  playerState!: PlayerState
+
+  @Prop({ default: null })
+  currentSong!: Song | null
+
+  @Watch('playerState')
+  onPlayerStateChanged(newState: PlayerState) {
+    this.handlePlayerState(newState).catch((e) => console.log(e))
+  }
+
+  @Watch('currentSong')
+  onSongChanged(newSong: Song | null) {
+    if (newSong) this.loadAudio(newSong)
+  }
+
   private peerHolder = new SyncHolder()
-  private playerState: PlayerState = PlayerState.STOPPED
   private isSongLoaded: boolean = false
-  private currentSong: Song | null = null
-  private currentCover: string = ''
-  private currentCoverBlob: Blob | null = null
-  private player: YTPlayer | undefined
+  private YTplayer: YTPlayer | undefined
 
   mounted() {
     this.registerListeners()
@@ -51,41 +52,10 @@ export default class AudioStream extends Vue {
   }
 
   private setupYTPlayer() {
-    this.player = new YTPlayer('#yt-player')
+    this.YTplayer = new YTPlayer('#yt-player')
   }
 
-  private registerPlayerListeners() {
-    PlayerModule.$watch(
-      (playerModule) => playerModule.currentSong,
-      (newSong: Song | null) => {
-        this.currentSong = newSong
-        if (newSong) this.loadAudio(newSong)
-      }
-    )
-
-    // TODO: Decide when to play local or remote track
-    SyncModule.$watch(
-      (syncModule) => syncModule.currentSongDets,
-      (newSong: Song | null) => {
-        this.currentSong = newSong
-      }
-    )
-
-    SyncModule.$watch(
-      (syncModule) => syncModule.currentCover,
-      async (newCover: Blob | null) => {
-        this.currentCoverBlob = newCover
-      }
-    )
-
-    PlayerModule.$watch(
-      (playerModule) => playerModule.playerState,
-      async (newState: PlayerState) => {
-        this.playerState = newState
-        await this.handlePlayerState()
-      }
-    )
-
+  private registerRoomListeners() {
     this.$root.$on('join-room', (data: string) => this.joinRoom(data))
     this.$root.$on('create-room', () => this.createRoom())
   }
@@ -97,8 +67,9 @@ export default class AudioStream extends Vue {
 
   private registerListeners() {
     this.registerAudioListeners()
-    this.registerPlayerListeners()
+    this.registerRoomListeners()
     this.syncListeners()
+    this.handleAudioTimeUpdate()
   }
 
   private unloadAudio() {
@@ -120,18 +91,22 @@ export default class AudioStream extends Vue {
     PlayerModule.setState(PlayerState.PAUSED)
   }
 
-  private async handlePlayerState() {
+  private handleAudioTimeUpdate() {
+    this.audioElement.ontimeupdate = (e: Event) => {
+      this.$emit('onTimeUpdate', (e.currentTarget as HTMLAudioElement).currentTime)
+    }
+  }
+
+  private async handlePlayerState(newState: PlayerState) {
+    console.log('handling player state')
     if (this.isSongLoaded) {
-      switch (this.playerState) {
+      switch (newState) {
         case PlayerState.PLAYING:
-          this.audioElement.play()
-          break
+          return this.audioElement.play()
         case PlayerState.PAUSED:
-          this.audioElement.pause()
-          break
+          return this.audioElement.pause()
         case PlayerState.STOPPED:
-          this.unloadAudio()
-          break
+          return this.unloadAudio()
       }
     }
   }
@@ -167,7 +142,6 @@ export default class AudioStream extends Vue {
   private syncListeners() {
     this.peerHolder.onRemoteTrackInfo = (event) => {
       SyncModule.setSong(event.message as Song)
-      SyncModule
     }
 
     this.peerHolder.onRemoteCover = (event) => {

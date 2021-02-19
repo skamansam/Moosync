@@ -23,14 +23,14 @@
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator'
 import { ActiveTab } from '@/services/ui/enums'
-import Playlists from './Playlists.vue'
-import AllSongs from './AllSongs.vue'
-import Artists from './Artists.vue'
-import Fav from './Fav.vue'
-import Genre from './Genre.vue'
-import Albums from './Albums.vue'
-import Toggle from './Toggle.vue'
-import Rooms from './Rooms.vue'
+import Playlists from '@/components/icons/Playlists.vue'
+import AllSongs from '@/components/icons/AllSongs.vue'
+import Artists from '@/components/icons/Artists.vue'
+import Fav from '@/components/icons/Fav.vue'
+import Genre from '@/components/icons/Genre.vue'
+import Albums from '@/components/icons/Albums.vue'
+import Toggle from '@/components/icons/Toggle.vue'
+import Rooms from '@/components/icons/Rooms.vue'
 
 @Component({
   components: {

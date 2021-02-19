@@ -16,7 +16,7 @@ import { IpcEvents } from '@/services/ipc/main/constants'
 import { IpcRendererHolder } from '@/services/ipc/renderer'
 import { ipcRenderer } from 'electron'
 import { Component, Vue } from 'vue-property-decorator'
-import CardView from '@/components/CardView.vue'
+import CardView from '@/components/generic/CardView.vue'
 
 @Component({
   components: {

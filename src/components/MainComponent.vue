@@ -1,9 +1,7 @@
 <template>
   <div class="appContainer">
-    <!-- <button v-on:click="toggleBroadcaster()">Broadcaster</button>
-    <button v-on:click="toggleWatcher()">Watcher</button> -->
     <TopBar class="topbar" />
-    <AudioStream class="musicbar" :isBroadcaster="!watcher" :audioType="audioType" />
+    <MusicBar class="musicbar" />
     <Sidebar class="sidebar" />
     <div class="d-flex main-content">
       <transition name="slide-fade">
@@ -15,14 +13,11 @@
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator'
-import AudioStream from '@/components/AudioStream.vue'
-import Sidebar from '@/components/Sidebar.vue'
-import TopBar from '@/components/TopBar.vue'
-import { AudioType } from '@/store/playerState'
+import Sidebar from '@/layout/Sidebar.vue'
+import TopBar from '@/layout/TopBar.vue'
 import { IpcRendererHolder } from '@/services/ipc/renderer'
 import { ipcRenderer } from 'electron'
-// eslint-disable-next-line no-unused-vars
-import { Song } from '@/models/songs'
+import MusicBar from '@/layout/Musicbar.vue'
 import { IpcEvents } from '@/services/ipc/main/constants'
 // eslint-disable-next-line no-unused-vars
 import { Playlist } from '@/models/playlists'
@@ -33,14 +28,12 @@ const stun = require('stun')
 
 @Component({
   components: {
-    AudioStream,
     Sidebar,
     TopBar,
+    MusicBar,
   },
 })
 export default class MainComponent extends Vue {
-  private watcher: Boolean = true
-  private audioType: number = AudioType.LOCAL
   private IpcHolder = new IpcRendererHolder(ipcRenderer)
 
   mounted() {
@@ -50,13 +43,6 @@ export default class MainComponent extends Vue {
     })
     this.watchPlaylistUpdates()
     this.populatePlaylists()
-  }
-
-  public toggleWatcher() {
-    this.watcher = true
-  }
-  public toggleBroadcaster() {
-    this.watcher = false
   }
 
   public testStun(): void {

@@ -38,7 +38,7 @@ import { ipcRenderer, remote } from 'electron'
 import { PlayerModule } from '@/store/playerState'
 import { PlaylistModule } from '@/store/playlists'
 import { getPlaylistsMenu } from '@/services/ui/contextMenu'
-import NewPlaylistModal from '@/components/NewPlaylistModal.vue'
+import NewPlaylistModal from '@/components/generic/NewPlaylistModal.vue'
 
 @Component({
   components: {

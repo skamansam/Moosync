@@ -1,4 +1,4 @@
-import { VuexModule, Module, Mutation, Action } from 'vuex-class-modules'
+import { VuexModule, Module, Mutation } from 'vuex-class-modules'
 import store from '.'
 
 @Module
