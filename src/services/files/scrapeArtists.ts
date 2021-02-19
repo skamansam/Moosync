@@ -1,13 +1,13 @@
-import axios from 'axios'
 import { SongDB } from '../db'
-import rateLimit from 'axios-rate-limit'
-import { writeBuffer } from './scanner'
 import { app } from 'electron'
-import path from 'path'
-import { v4 } from 'uuid'
-import { createHash } from 'crypto'
-import axiosRetry from 'axios-retry'
 import { artists } from '@/models/artists'
+import axios from 'axios'
+import axiosRetry from 'axios-retry'
+import { createHash } from 'crypto'
+import path from 'path'
+import rateLimit from 'axios-rate-limit'
+import { v4 } from 'uuid'
+import { writeBuffer } from './scanner'
 
 export class CoverScraper {
   private musicbrainz = rateLimit(

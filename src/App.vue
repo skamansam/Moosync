@@ -1,5 +1,6 @@
 <template>
   <div id="app" :style="rootColors">
+    <!-- <button v-on:click="scan()">Scan</button> -->
     <router-view></router-view>
   </div>
 </template>
@@ -43,9 +44,14 @@ export default class App extends Vue {
     this.populatePlaylists()
 
     // this.testStun()
-    // ipcRendererHolder.send<void>(IpcEvents.SCAN_MUSIC, { params: ['/mnt/g/songs/Playlist/Daily Dose'] }).then((data) => {
-    //   console.log(data)
-    // })
+  }
+
+  private scan() {
+    ipcRendererHolder
+      .send<void>(IpcEvents.SCAN_MUSIC, { params: ['/mnt/g/Songs/Playlist/Daily Dose'] })
+      .then((data) => {
+        console.log(data)
+      })
   }
 
   public testStun(): void {

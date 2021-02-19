@@ -1,4 +1,4 @@
-var webpack = require('webpack');
+const webpack = require('webpack');
 
 module.exports = {
   runtimeCompiler: true,
@@ -8,9 +8,7 @@ module.exports = {
         'process.browser': 'true'
       }),
     ],
-    externals: {
-      'better-sqlite3': 'commonjs better-sqlite3'
-    }
+    externals: ['better-sqlite3']
   },
   pluginOptions: {
     electronBuilder: {

@@ -1,11 +1,15 @@
-import fs, { promises as fsP } from 'fs'
-import path from 'path'
 import * as mm from 'music-metadata'
-import { image, Song, stats } from '@/models/songs'
-import { SongDB } from '../db/index'
+
+import { Song, image, stats } from '@/models/songs'
+import fs, { promises as fsP } from 'fs'
+
 import Jimp from 'jimp'
-import { v4 } from 'uuid'
+import PromiseThrottle from 'promise-throttle'
+import { SongDB } from '../db/index'
 import crypto from 'crypto'
+import os from 'os'
+import path from 'path'
+import { v4 } from 'uuid'
 
 const audioPatterns = new RegExp('.flac|.mp3|.ogg|.m4a|.webm|.wav|.wv', 'i')
 export async function writeBuffer(data: image) {
@@ -63,17 +67,12 @@ export class MusicScanner {
   }
 
   private async scanFile(filePath: string): Promise<void> {
-    return new Promise((resolve) => {
-      fsP.stat(filePath).then((stats) => {
-        resolve(
-          this.storeSong({
-            path: filePath,
-            inode: stats.ino.toString(),
-            deviceno: stats.dev.toString(),
-            size: stats.size.toString(),
-          })
-        )
-      })
+    let stats = await fsP.stat(filePath)
+    return this.storeSong({
+      path: filePath,
+      inode: stats.ino.toString(),
+      deviceno: stats.dev.toString(),
+      size: stats.size.toString(),
     })
   }
 
@@ -85,12 +84,16 @@ export class MusicScanner {
   }
 
   public async start() {
-    let promises: Promise<void>[] = []
+    var promisesThrottled = new PromiseThrottle({
+      requestsPerSecond: os.cpus().length / 2,
+      promiseImplementation: Promise,
+    })
+    var promises: Promise<void>[] = []
     for (let i in this.paths) {
       let files = fs.readdirSync(this.paths[i])
       files.forEach((file) => {
         if (audioPatterns.exec(path.extname(file)) !== null) {
-          promises.push(this.scanFile(path.join(this.paths[i], file)))
+          promises.push(promisesThrottled.add(this.scanFile.bind(this, path.join(this.paths[i], file))))
         }
       })
     }
