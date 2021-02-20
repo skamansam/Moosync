@@ -136,6 +136,26 @@ export class SongDBInstance {
     return this.db.query(`SELECT * from albums`)
   }
 
+  public async getAlbumByID(id: string): Promise<Album | undefined> {
+    return this.db.queryFirstRow(`SELECT * FROM albums WHERE album_id = ?`, id)
+  }
+
+  public async getAlbumSongs(id: string): Promise<Song[]> {
+    let marshaled: marshaledSong[] = this.db.query(
+      `SELECT * FROM album_bridge P
+      LEFT JOIN allsongs S ON P.song = S._id 
+      LEFT JOIN artists_bridge B ON P.song = B.song 
+      LEFT JOIN artists S ON S.artist_id = B.artist
+      LEFT JOIN album_bridge U ON P.song = U.song 
+      LEFT JOIN albums V ON V.album_id = U.album
+      LEFT JOIN genre_bridge Q ON P.song = Q.song
+      LEFT JOIN genre T ON T.genre_id = Q.genre
+      WHERE P.album = ?`,
+      id
+    )
+    return this.flattenDict(this.mergeSongs(marshaled))
+  }
+
   public async getAllArtists(): Promise<artists[]> {
     return this.db.query(`SELECT * FROM artists`)
   }

@@ -19,6 +19,10 @@
         {{ data.index + 1 }}
       </template>
 
+      <template #cell(album)="data">
+        {{ data.item.album.album_name ? data.item.album.album_name : '-' }}
+      </template>
+
       <template #cell(artists)="data">
         {{ data.item.artists.length != 0 ? data.item.artists.join(', ') : '-' }}
       </template>

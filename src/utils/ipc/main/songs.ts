@@ -1,6 +1,7 @@
 import { IpcChannelInterface, IpcRequest } from '.'
-import { SongDB } from '../../db'
+
 import { IpcEvents } from './constants'
+import { SongDB } from '../../db'
 
 export class AllSongsChannel implements IpcChannelInterface {
   name = IpcEvents.GET_ALL_SONGS
@@ -11,19 +12,8 @@ export class AllSongsChannel implements IpcChannelInterface {
   }
 }
 
-export class AllAlbumsChannel implements IpcChannelInterface {
-  name = IpcEvents.GET_ALBUMS
-  handle(event: Electron.IpcMainEvent, request: IpcRequest): void {
-    SongDB.getAllAlbums()
-      .then((data) => {
-        event.reply(request.responseChannel, data)
-      })
-      .catch((e) => console.log(e))
-  }
-}
-
 export class AllArtistsChannel implements IpcChannelInterface {
-  name = IpcEvents.GET_ARTISTS
+  name = IpcEvents.GET_ALL_ARTISTS
   handle(event: Electron.IpcMainEvent, request: IpcRequest): void {
     SongDB.getAllArtists()
       .then((data) => {

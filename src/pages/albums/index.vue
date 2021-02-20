@@ -25,7 +25,7 @@ export default class Albums extends Vue {
   private albumList: Album[] = []
   private getAlbums() {
     ipcRendererHolder
-      .send<Album[]>(IpcEvents.GET_ALBUMS, { responseChannel: IpcEvents.GOT_ALL_ALBUMS })
+      .send<Album[]>(IpcEvents.GET_ALL_ALBUMS, { responseChannel: IpcEvents.GOT_ALL_ALBUMS })
       .then((data) => {
         this.albumList = data
       })

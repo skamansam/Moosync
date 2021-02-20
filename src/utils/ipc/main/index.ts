@@ -1,12 +1,15 @@
-import { ipcMain, IpcMainEvent } from 'electron'
-import { AllAlbumsChannel, AllArtistsChannel, AllSongsChannel } from './songs'
-import { ScannerChannel } from './scanner'
 import { AddToPlaylistsChannel, AllPlaylistsChannel, CreatePlaylistsChannel } from './playlists'
+import { AllAlbumsChannel, SingleAlbumChannel } from './albums'
+import { AllArtistsChannel, AllSongsChannel } from './songs'
+import { IpcMainEvent, ipcMain } from 'electron'
+
+import { ScannerChannel } from './scanner'
 
 export function registerIpcChannels() {
   const ipcChannels = [
     new AllSongsChannel(),
     new AllAlbumsChannel(),
+    new SingleAlbumChannel(),
     new AllArtistsChannel(),
     new ScannerChannel(),
     new AllPlaylistsChannel(),

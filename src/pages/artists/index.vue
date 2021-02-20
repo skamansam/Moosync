@@ -25,7 +25,7 @@ export default class Artists extends Vue {
   private artistList: artists[] = []
   private getArtists() {
     ipcRendererHolder
-      .send<artists[]>(IpcEvents.GET_ARTISTS, { responseChannel: IpcEvents.GOT_ARTISTS })
+      .send<artists[]>(IpcEvents.GET_ALL_ARTISTS, { responseChannel: IpcEvents.GOT_ARTISTS })
       .then((data) => {
         this.artistList = data
       })

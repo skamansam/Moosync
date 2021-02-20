@@ -2,17 +2,19 @@ export enum IpcEvents {
   SCAN_MUSIC = 'scanMusic',
   GET_ALL_SONGS = 'getAllSongs',
   GET_COVER = 'getCover',
-  GET_ALBUMS = 'getAlbums',
-  GET_ARTISTS = 'getArtists',
+  GET_ALL_ALBUMS = 'getAlbums',
+  GET_ALL_ARTISTS = 'getArtists',
   GET_PLAYLISTS = 'getPlaylists',
   CREATE_PLAYLIST = 'createPlaylist',
   ADD_TO_PLAYLIST = 'AddToPlaylist',
+  GET_ALBUM = 'getAlbum',
 
   GOT_COVER = 'gotCover',
   GOT_ALL_SONGS = 'gotSongs',
   GOT_ALL_ALBUMS = 'gotAlbums',
   GOT_ARTISTS = 'gotArtists',
   GOT_PLAYLISTS = 'gotPlaylists',
+  GOT_ALBUM = 'gotAlbum',
   ADDED_TO_PLAYLIST = 'addedToPlaylist',
 }
 
