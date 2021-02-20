@@ -5,7 +5,7 @@ import installExtension, { VUEJS_DEVTOOLS } from 'electron-devtools-installer'
 
 import { createProtocol } from 'vue-cli-plugin-electron-builder/lib'
 import path from 'path'
-import { registerIpcChannels } from '@/services/ipc/main' // Import for side effects
+import { registerIpcChannels } from '@/utils/ipc/main' // Import for side effects
 
 const isDevelopment = process.env.NODE_ENV !== 'production'
 

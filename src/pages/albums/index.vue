@@ -12,8 +12,8 @@
 <script lang="ts">
 import CardView from '@/components/generic/CardView.vue'
 import { Album } from '@/models/albums'
-import { IpcEvents } from '@/services/ipc/main/constants'
-import { ipcRendererHolder } from '@/services/ipc/renderer'
+import { IpcEvents } from '@/utils/ipc/main/constants'
+import { ipcRendererHolder } from '@/utils/ipc/renderer'
 import { Component, Vue } from 'vue-property-decorator'
 
 @Component({

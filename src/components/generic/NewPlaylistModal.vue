@@ -9,8 +9,8 @@
 </template>
 
 <script lang="ts">
-import { IpcEvents } from '@/services/ipc/main/constants'
-import { ipcRendererHolder } from '@/services/ipc/renderer'
+import { IpcEvents } from '@/utils/ipc/main/constants'
+import { ipcRendererHolder } from '@/utils/ipc/renderer'
 import { PlaylistModule } from '@/store/playlists'
 import { Component, Prop, Vue } from 'vue-property-decorator'
 

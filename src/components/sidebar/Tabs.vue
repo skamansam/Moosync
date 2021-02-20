@@ -22,7 +22,7 @@
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator'
-import { ActiveTab } from '@/services/ui/enums'
+import { ActiveTab } from '@/utils/ui/enums'
 import Playlists from '@/components/icons/Playlists.vue'
 import AllSongs from '@/components/icons/AllSongs.vue'
 import Artists from '@/components/icons/Artists.vue'

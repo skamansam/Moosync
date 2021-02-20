@@ -32,12 +32,12 @@ import SongList from '@/components/generic/SongList.vue'
 import SongDetails from '@/components/generic/SongDetails.vue'
 
 import { Song } from '@/models/songs'
-import { IpcEvents } from '@/services/ipc/main/constants'
+import { IpcEvents } from '@/utils/ipc/main/constants'
 import { PlayerModule } from '@/store/playerState'
 import { PlaylistModule } from '@/store/playlists'
-// import { getPlaylistsMenu } from '@/services/ui/contextMenu'
+// import { getPlaylistsMenu } from '@/utils/ui/contextMenu'
 import NewPlaylistModal from '@/components/generic/NewPlaylistModal.vue'
-import { ipcRendererHolder } from '@/services/ipc/renderer'
+import { ipcRendererHolder } from '@/utils/ipc/renderer'
 
 @Component({
   components: {

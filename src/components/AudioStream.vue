@@ -9,7 +9,7 @@
 
 <script lang="ts">
 import { Song } from '@/models/songs'
-import { SyncHolder } from '@/services/sync/syncHandler'
+import { SyncHolder } from '@/utils/sync/syncHandler'
 import { PlayerModule, PlayerState } from '@/store/playerState'
 import { PeerMode, SyncModule } from '@/store/syncState'
 import { Component, Prop, Ref, Vue, Watch } from 'vue-property-decorator'

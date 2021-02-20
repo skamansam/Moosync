@@ -1,7 +1,7 @@
 import { IpcChannelInterface, IpcRequest } from '.'
 
 import { IpcEvents } from './constants'
-import { SongDB } from '@/services/db'
+import { SongDB } from '@/utils/db'
 
 export class AllPlaylistsChannel implements IpcChannelInterface {
   name = IpcEvents.GET_PLAYLISTS

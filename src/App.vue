@@ -9,11 +9,11 @@
 import { ThemesModule } from '@/store/themeState'
 
 import { Playlist } from '@/models/playlists'
-import { IpcEvents } from '@/services/ipc/main/constants'
+import { IpcEvents } from '@/utils/ipc/main/constants'
 
 import { playlistInfo, PlaylistModule } from '@/store/playlists'
 import { Component, Vue } from 'vue-property-decorator'
-import { ipcRendererHolder } from './services/ipc/renderer'
+import { ipcRendererHolder } from './utils/ipc/renderer'
 
 const stun = require('stun')
 

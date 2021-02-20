@@ -28,7 +28,7 @@
 
 <script lang="ts">
 import { Song } from '@/models/songs'
-import { Resizer } from '@/services/ui/resizer'
+import { Resizer } from '@/utils/ui/resizer'
 import { Component, Prop, Vue } from 'vue-property-decorator'
 
 @Component({})
