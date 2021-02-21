@@ -12,7 +12,7 @@
 <script lang="ts">
 import CardView from '@/components/generic/CardView.vue'
 import { Album } from '@/models/albums'
-import { IpcEvents } from '@/utils/ipc/main/constants'
+import { AlbumEvents, IpcEvents } from '@/utils/ipc/main/constants'
 import { ipcRendererHolder } from '@/utils/ipc/renderer'
 import { Component, Vue } from 'vue-property-decorator'
 
@@ -25,7 +25,7 @@ export default class Albums extends Vue {
   private albumList: Album[] = []
   private getAlbums() {
     ipcRendererHolder
-      .send<Album[]>(IpcEvents.GET_ALL_ALBUMS, { responseChannel: IpcEvents.GOT_ALL_ALBUMS })
+      .send<Album[]>(IpcEvents.ALBUM, { type: AlbumEvents.GET_ALL_ALBUMS })
       .then((data) => {
         this.albumList = data
       })

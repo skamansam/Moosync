@@ -1,25 +1,24 @@
-import { AddToPlaylistsChannel, AllPlaylistsChannel, CreatePlaylistsChannel } from './playlists'
-import { AllAlbumsChannel, SingleAlbumChannel } from './albums'
-import { AllArtistsChannel, AllSongsChannel } from './songs'
 import { IpcMainEvent, ipcMain } from 'electron'
 
+import { AlbumsChannel } from './albums'
+import { ArtistsChannel } from './artists'
+import { PlaylistsChannel } from './playlists'
 import { ScannerChannel } from './scanner'
+import { SongsChannel } from './songs'
 
 export function registerIpcChannels() {
   const ipcChannels = [
-    new AllSongsChannel(),
-    new AllAlbumsChannel(),
-    new SingleAlbumChannel(),
-    new AllArtistsChannel(),
+    new SongsChannel(),
+    new AlbumsChannel(),
     new ScannerChannel(),
-    new AllPlaylistsChannel(),
-    new CreatePlaylistsChannel(),
-    new AddToPlaylistsChannel(),
+    new PlaylistsChannel(),
+    new ArtistsChannel(),
   ]
   ipcChannels.forEach((channel) => ipcMain.on(channel.name, (event, request) => channel.handle(event, request)))
 }
 
 export interface IpcRequest {
+  type: string
   responseChannel?: string
   params?: any
 }

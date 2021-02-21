@@ -9,7 +9,7 @@ class IpcRendererHolder {
     this.ipcRenderer = renderer
   }
 
-  public send<T>(channel: string, request: IpcRequest = {}): Promise<T> {
+  public send<T>(channel: string, request: IpcRequest): Promise<T> {
     if (!request.responseChannel) {
       request.responseChannel = v4()
     }

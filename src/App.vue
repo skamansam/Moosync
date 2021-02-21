@@ -9,7 +9,7 @@
 import { ThemesModule } from '@/store/themeState'
 
 import { Playlist } from '@/models/playlists'
-import { IpcEvents } from '@/utils/ipc/main/constants'
+import { IpcEvents, PlaylistEvents, ScannerEvents } from '@/utils/ipc/main/constants'
 
 import { playlistInfo, PlaylistModule } from '@/store/playlists'
 import { Component, Vue } from 'vue-property-decorator'
@@ -48,7 +48,7 @@ export default class App extends Vue {
 
   private scan() {
     ipcRendererHolder
-      .send<void>(IpcEvents.SCAN_MUSIC, { params: ['/mnt/g/Songs/Playlist/Daily Dose'] })
+      .send<void>(IpcEvents.SCANNER, { params: ['/mnt/g/Songs/Playlist/Daily Dose'], type: ScannerEvents.SCAN_MUSIC })
       .then((data) => {
         console.log(data)
       })
@@ -87,13 +87,15 @@ export default class App extends Vue {
   }
 
   private populatePlaylists() {
-    ipcRendererHolder.send<Playlist[]>(IpcEvents.GET_PLAYLISTS).then((data) => {
-      let playlists: playlistInfo = {}
-      for (let p of data) {
-        playlists[p.playlist_id] = p.playlist_name
-      }
-      PlaylistModule.setPlaylists(playlists)
-    })
+    ipcRendererHolder
+      .send<Playlist[]>(IpcEvents.PLAYLIST, { type: PlaylistEvents.GET_PLAYLISTS })
+      .then((data) => {
+        let playlists: playlistInfo = {}
+        for (let p of data) {
+          playlists[p.playlist_id] = p.playlist_name
+        }
+        PlaylistModule.setPlaylists(playlists)
+      })
   }
 }
 </script>

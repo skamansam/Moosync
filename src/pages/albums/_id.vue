@@ -15,7 +15,7 @@ import { Component } from 'vue-property-decorator'
 import SongView from '@/components/SongView.vue'
 import { Album } from '@/models/albums'
 import { ipcRendererHolder } from '@/utils/ipc/renderer'
-import { IpcEvents } from '@/utils/ipc/main/constants'
+import { AlbumEvents, IpcEvents } from '@/utils/ipc/main/constants'
 import { Song } from '@/models/songs'
 
 @Component({
@@ -34,8 +34,8 @@ export default class SingleAlbumView extends Vue {
   private fetchAlbum() {
     console.log(this.$route.params.id)
     ipcRendererHolder
-      .send<Song[]>(IpcEvents.GET_ALBUM, {
-        responseChannel: IpcEvents.GOT_ALBUM,
+      .send<Song[]>(IpcEvents.ALBUM, {
+        type: AlbumEvents.GET_ALBUM,
         params: { id: this.$route.params.id },
       })
       .then((data) => {

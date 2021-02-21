@@ -11,7 +11,7 @@
 
 <script lang="ts">
 import { artists } from '@/models/artists'
-import { IpcEvents } from '@/utils/ipc/main/constants'
+import { ArtistEvents, IpcEvents } from '@/utils/ipc/main/constants'
 import { Component, Vue } from 'vue-property-decorator'
 import CardView from '@/components/generic/CardView.vue'
 import { ipcRendererHolder } from '@/utils/ipc/renderer'
@@ -25,7 +25,7 @@ export default class Artists extends Vue {
   private artistList: artists[] = []
   private getArtists() {
     ipcRendererHolder
-      .send<artists[]>(IpcEvents.GET_ALL_ARTISTS, { responseChannel: IpcEvents.GOT_ARTISTS })
+      .send<artists[]>(IpcEvents.ARTIST, { type: ArtistEvents.GET_ALL_ARTISTS })
       .then((data) => {
         this.artistList = data
       })

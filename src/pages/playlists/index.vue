@@ -11,7 +11,7 @@
 
 <script lang="ts">
 import { Playlist } from '@/models/playlists'
-import { IpcEvents } from '@/utils/ipc/main/constants'
+import { IpcEvents, PlaylistEvents } from '@/utils/ipc/main/constants'
 import { Component, Vue } from 'vue-property-decorator'
 import CardView from '@/components/generic/CardView.vue'
 import { ipcRendererHolder } from '@/utils/ipc/renderer'
@@ -25,7 +25,7 @@ export default class Albums extends Vue {
   private playlists: Playlist[] = []
   private getPlaylists() {
     ipcRendererHolder
-      .send<Playlist[]>(IpcEvents.GET_PLAYLISTS, { responseChannel: IpcEvents.GOT_PLAYLISTS })
+      .send<Playlist[]>(IpcEvents.PLAYLIST, { type: PlaylistEvents.GET_PLAYLISTS })
       .then((data) => {
         this.playlists = data
       })
