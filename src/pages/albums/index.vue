@@ -3,7 +3,7 @@
     <b-row class="title">Albums</b-row>
     <b-row class="d-flex">
       <b-col col xl="2" md="3" v-for="album in filteredAlbumList" :key="album.album_id">
-        <CardView :title="album.album_name" :imgSrc="album.album_coverPath" />
+        <CardView :title="album.album_name" :imgSrc="album.album_coverPath" @click.native="itemSelected(album)" />
       </b-col>
     </b-row>
   </b-container>
@@ -34,6 +34,17 @@ export default class Albums extends Vue {
   get filteredAlbumList() {
     return this.albumList.filter((x) => {
       return x.album_name !== null
+    })
+  }
+
+  private itemSelected(album: Album) {
+    this.$router.push({
+      name: 'albums-id',
+      params: {
+        album_id: album.album_id!,
+        album_name: album.album_name!,
+        album_coverPath: album.album_coverPath ? album.album_coverPath : '',
+      },
     })
   }
 

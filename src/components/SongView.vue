@@ -1,7 +1,7 @@
 <template>
   <b-container fluid class="song-container">
-    <b-row class="d-flex h-100">
-      <b-col class="h-100" cols="8"
+    <b-row class="d-flex">
+      <b-col cols="8" class="d-flex"
         ><SongList
           :songList="songList"
           :extrafields="[{ key: 'title' }, { key: 'album' }, { key: 'artists' }]"
@@ -9,8 +9,8 @@
           @onRowContext="getSongContextMenu"
           @onRowSelected="updateCoverDetails"
       /></b-col>
-      <b-col class="h-100" cols="4"
-        ><SongDetails
+      <b-col cols="4">
+        <SongDetails
           :currentTitle="currentSong ? currentSong.title : ''"
           :currentsubTitle="
             currentSong && currentSong.album && currentSong.album.album_name ? currentSong.album.album_name : ''
@@ -20,7 +20,8 @@
               ? currentSong.album.album_coverPath
               : ''
           "
-      /></b-col>
+        />
+      </b-col>
     </b-row>
   </b-container>
 </template>
@@ -62,6 +63,5 @@ export default class AllSongs extends Vue {
 <style lang="sass" scoped>
 .song-container
   position: absolute
-  height: 100%
   overflow-y: hidden
 </style>

@@ -9,7 +9,7 @@
 </template>
 
 <script lang="ts">
-import { IpcEvents } from '@/utils/ipc/main/constants'
+import { IpcEvents, PlaylistEvents } from '@/utils/ipc/main/constants'
 import { ipcRendererHolder } from '@/utils/ipc/renderer'
 import { PlaylistModule } from '@/store/playlists'
 import { Component, Prop, Vue } from 'vue-property-decorator'
@@ -21,7 +21,7 @@ export default class NewPlaylistModal extends Vue {
 
   private createPlaylist() {
     ipcRendererHolder
-      .send<void>(IpcEvents.CREATE_PLAYLIST, { params: { name: 'henlo' } })
+      .send<void>(IpcEvents.PLAYLIST, { type: PlaylistEvents.CREATE_PLAYLIST, params: { name: 'henlo' } })
       .then(() => {
         this.$bvModal.hide(this.id)
         PlaylistModule.setUpdated(true)

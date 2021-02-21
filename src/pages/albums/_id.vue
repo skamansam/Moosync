@@ -1,7 +1,12 @@
+<route>
+{
+  "props": true
+}
+</route>
 <template>
   <b-container fluid>
     <b-row>
-      <div></div>
+      <div>{{ album_name }}</div>
     </b-row>
     <b-row>
       <SongView :songList="songList" />
@@ -11,7 +16,7 @@
 
 <script lang="ts">
 import Vue from 'vue'
-import { Component } from 'vue-property-decorator'
+import { Component, Prop } from 'vue-property-decorator'
 import SongView from '@/components/SongView.vue'
 import { Album } from '@/models/albums'
 import { ipcRendererHolder } from '@/utils/ipc/renderer'
@@ -27,16 +32,25 @@ export default class SingleAlbumView extends Vue {
   private album: Album | null = null
   private songList: Song[] = []
 
+  @Prop({ default: '' })
+  private album_id!: string
+
+  @Prop({ default: '' })
+  private album_name!: string
+
+  @Prop({ default: '' })
+  private album_coverPath!: string
+
   mounted() {
+    console.log(this.album_name)
     this.fetchAlbum()
   }
 
   private fetchAlbum() {
-    console.log(this.$route.params.id)
     ipcRendererHolder
       .send<Song[]>(IpcEvents.ALBUM, {
         type: AlbumEvents.GET_ALBUM,
-        params: { id: this.$route.params.id },
+        params: { id: this.album_id },
       })
       .then((data) => {
         this.songList = data

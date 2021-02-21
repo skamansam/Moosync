@@ -1,7 +1,7 @@
 <template>
-  <div>
+  <div class="d-flex">
     <b-table
-      class="custom-table-container d-flex w-100 h-100"
+      class="custom-table-container d-flex w-100"
       table-class="custom-table"
       :items="songList"
       :fields="fields"
@@ -147,9 +147,10 @@ table.b-table > tfoot > tr > th[aria-sort="descending"]
 .custom-table-container
   transition: color .3s ease
   color: rgba(0, 0, 0, 0)
-  max-height: calc( 100vh - 6.5rem - 30px - 30px) !important
+  max-height: calc( 100vh - 6rem - 70px - 30px) !important
   overflow-y: auto
   overflow-x: hidden
+  margin-bottom: 0 !important
 
 .custom-table-container:hover
   color: var(--textPrimary)
