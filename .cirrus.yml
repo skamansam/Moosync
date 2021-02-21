@@ -1,0 +1,17 @@
+mac_linux_task:
+  matrix:
+    - container:
+        image: node:latest
+
+    - macos_instance:
+        image: big-sur-base
+      dep_script: brew install node && npm install --global yarn
+
+  node_modules_cache:
+    folder: node_modules
+    fingerprint_script: cat yarn.lock
+    populate_script: yarn install
+  build_script: yarn postinstall && yarn electron:build
+
+  environment:
+    GH_TOKEN: ENCRYPTED[1ac94c5ed2bfdc350487c348f6084d4fe2bfb7686174040835b82526ae5def5c88cf844c31005eae618cdcffe4dc409f]

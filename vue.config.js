@@ -18,7 +18,7 @@ module.exports = {
       preload: 'src/preload.ts',
       externals: [
         'better-sqlite3'
-      ]
+      ],
     },
     autoRouting: {
       chunkNamePrefix: 'page-'
