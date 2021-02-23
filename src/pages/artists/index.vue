@@ -3,7 +3,7 @@
     <b-row class="title">Artists</b-row>
     <b-row class="d-flex">
       <b-col col xl="2" md="3" v-for="artist in artistList" :key="artist.artist_id">
-        <CardView :title="artist.artist_name" :imgSrc="artist.artist_coverPath" />
+        <CardView :title="artist.artist_name" :imgSrc="artist.artist_coverPath" @click.native="itemSelected(artist)" />
       </b-col>
     </b-row>
   </b-container>
@@ -29,6 +29,17 @@ export default class Artists extends Vue {
       .then((data) => {
         this.artistList = data
       })
+  }
+
+  private itemSelected(artist: artists) {
+    this.$router.push({
+      name: 'artists-id',
+      params: {
+        artist_id: artist.artist_id!,
+        artist_name: artist.artist_name!,
+        artist_coverPath: artist.artist_coverPath ? artist.artist_coverPath : '',
+      },
+    })
   }
 
   mounted() {

@@ -6,7 +6,7 @@
 <template>
   <b-container fluid>
     <b-row>
-      <div>{{ album_name }}</div>
+      <div>{{ artist_name }}</div>
     </b-row>
     <b-row>
       <SongView :songList="songList" />
@@ -18,10 +18,10 @@
 import Vue from 'vue'
 import { Component, Prop } from 'vue-property-decorator'
 import SongView from '@/components/SongView.vue'
-import { Album } from '@/models/albums'
 import { ipcRendererHolder } from '@/utils/ipc/renderer'
-import { AlbumEvents, IpcEvents } from '@/utils/ipc/main/constants'
+import { ArtistEvents, IpcEvents } from '@/utils/ipc/main/constants'
 import { Song } from '@/models/songs'
+import Artists from './index.vue'
 
 @Component({
   components: {
@@ -29,27 +29,27 @@ import { Song } from '@/models/songs'
   },
 })
 export default class SingleAlbumView extends Vue {
-  private album: Album | null = null
+  private artist: Artists | null = null
   private songList: Song[] = []
 
   @Prop({ default: '' })
-  private album_id!: string
+  private artist_id!: string
 
   @Prop({ default: '' })
-  private album_name!: string
+  private artist_name!: string
 
   @Prop({ default: '' })
-  private album_coverPath!: string
+  private artist_coverPath!: string
 
   mounted() {
-    this.fetchAlbum()
+    this.fetchArtist()
   }
 
-  private fetchAlbum() {
+  private fetchArtist() {
     ipcRendererHolder
-      .send<Song[]>(IpcEvents.ALBUM, {
-        type: AlbumEvents.GET_ALBUM,
-        params: { id: this.album_id },
+      .send<Song[]>(IpcEvents.ARTIST, {
+        type: ArtistEvents.GET_ARTIST,
+        params: { id: this.artist_id },
       })
       .then((data) => {
         this.songList = data

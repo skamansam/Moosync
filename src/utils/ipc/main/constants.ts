@@ -23,6 +23,7 @@ export enum PlaylistEvents {
 
 export enum ArtistEvents {
   GET_ALL_ARTISTS = 'getArtists',
+  GET_ARTIST = 'getArtist',
 }
 
 export enum SongEvents {

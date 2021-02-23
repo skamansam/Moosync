@@ -146,8 +146,7 @@ export class SongDBInstance {
       LEFT JOIN allsongs S ON P.song = S._id 
       LEFT JOIN artists_bridge B ON P.song = B.song 
       LEFT JOIN artists S ON S.artist_id = B.artist
-      LEFT JOIN album_bridge U ON P.song = U.song 
-      LEFT JOIN albums V ON V.album_id = U.album
+      LEFT JOIN albums V ON V.album_id = P.album
       LEFT JOIN genre_bridge Q ON P.song = Q.song
       LEFT JOIN genre T ON T.genre_id = Q.genre
       WHERE P.album = ?`,
@@ -158,6 +157,22 @@ export class SongDBInstance {
 
   public async getAllArtists(): Promise<artists[]> {
     return this.db.query(`SELECT * FROM artists`)
+  }
+
+  public async getArtistSongs(id: string): Promise<Song[]> {
+    let marshaled: marshaledSong[] = this.db.query(
+      `SELECT * FROM artists_bridge P
+      LEFT JOIN allsongs S ON P.song = S._id 
+      LEFT JOIN artists S ON S.artist_id = P.artist
+      LEFT JOIN album_bridge U ON P.song = U.song 
+      LEFT JOIN albums V ON V.album_id = U.album
+      LEFT JOIN genre_bridge Q ON P.song = Q.song
+      LEFT JOIN genre T ON T.genre_id = Q.genre
+      WHERE P.artist = ?`,
+      id
+    )
+    console.log(marshaled)
+    return this.flattenDict(this.mergeSongs(marshaled))
   }
 
   public async getDefaultCoverByArtist(id: string): Promise<string | undefined> {

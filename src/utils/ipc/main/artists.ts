@@ -10,6 +10,9 @@ export class ArtistsChannel implements IpcChannelInterface {
       case ArtistEvents.GET_ALL_ARTISTS:
         this.getAllArtists(event, request)
         break
+      case ArtistEvents.GET_ARTIST:
+        this.getArtist(event, request)
+        break
     }
   }
 
@@ -19,5 +22,15 @@ export class ArtistsChannel implements IpcChannelInterface {
         event.reply(request.responseChannel, data)
       })
       .catch((e) => console.log(e))
+  }
+
+  private getArtist(event: Electron.IpcMainEvent, request: IpcRequest) {
+    if (request.params.id) {
+      SongDB.getArtistSongs(request.params.id)
+        .then((data) => {
+          event.reply(request.responseChannel, data)
+        })
+        .catch((e) => console.log(e))
+    }
   }
 }
