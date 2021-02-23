@@ -9,26 +9,29 @@
       <div>{{ album_name }}</div>
     </b-row>
     <b-row>
-      <SongView :songList="songList" />
+      <SongView :songList="songList" @onRowContext="getSongContextMenu" />
     </b-row>
   </b-container>
 </template>
 
 <script lang="ts">
-import Vue from 'vue'
 import { Component, Prop } from 'vue-property-decorator'
 import SongView from '@/components/SongView.vue'
 import { Album } from '@/models/albums'
 import { ipcRendererHolder } from '@/utils/ipc/renderer'
 import { AlbumEvents, IpcEvents } from '@/utils/ipc/main/constants'
 import { Song } from '@/models/songs'
+import { PlaylistModule } from '@/store/playlists'
+
+import { mixins } from 'vue-class-component'
+import PlaylistContextMenuMixin from '@/utils/mixins/PlaylistContextMenuMixin'
 
 @Component({
   components: {
     SongView,
   },
 })
-export default class SingleAlbumView extends Vue {
+export default class SingleAlbumView extends mixins(PlaylistContextMenuMixin) {
   private album: Album | null = null
   private songList: Song[] = []
 
@@ -40,6 +43,10 @@ export default class SingleAlbumView extends Vue {
 
   @Prop({ default: '' })
   private album_coverPath!: string
+
+  get playlists() {
+    return PlaylistModule.playlists
+  }
 
   mounted() {
     this.fetchAlbum()

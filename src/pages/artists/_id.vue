@@ -9,13 +9,12 @@
       <div>{{ artist_name }}</div>
     </b-row>
     <b-row>
-      <SongView :songList="songList" />
+      <SongView :songList="songList" @onRowContext="getSongContextMenu" />
     </b-row>
   </b-container>
 </template>
 
 <script lang="ts">
-import Vue from 'vue'
 import { Component, Prop } from 'vue-property-decorator'
 import SongView from '@/components/SongView.vue'
 import { ipcRendererHolder } from '@/utils/ipc/renderer'
@@ -23,12 +22,15 @@ import { ArtistEvents, IpcEvents } from '@/utils/ipc/main/constants'
 import { Song } from '@/models/songs'
 import Artists from './index.vue'
 
+import { mixins } from 'vue-class-component'
+import PlaylistContextMenuMixin from '@/utils/mixins/PlaylistContextMenuMixin'
+
 @Component({
   components: {
     SongView,
   },
 })
-export default class SingleAlbumView extends Vue {
+export default class SingleAlbumView extends mixins(PlaylistContextMenuMixin) {
   private artist: Artists | null = null
   private songList: Song[] = []
 

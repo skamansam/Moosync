@@ -1,4 +1,5 @@
-import { VuexModule, Module, Mutation } from 'vuex-class-modules'
+import { Module, Mutation, VuexModule } from 'vuex-class-modules'
+
 import store from '.'
 
 export type playlistInfo = { [key: string]: string }

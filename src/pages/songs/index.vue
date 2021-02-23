@@ -6,7 +6,7 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue } from 'vue-property-decorator'
+import { Component } from 'vue-property-decorator'
 import SongView from '@/components/SongView.vue'
 
 import { Song } from '@/models/songs'
@@ -15,13 +15,16 @@ import { PlaylistModule } from '@/store/playlists'
 import NewPlaylistModal from '@/components/generic/NewPlaylistModal.vue'
 import { ipcRendererHolder } from '@/utils/ipc/renderer'
 
+import { mixins } from 'vue-class-component'
+import PlaylistContextMenuMixin from '@/utils/mixins/PlaylistContextMenuMixin'
+
 @Component({
   components: {
     SongView,
     NewPlaylistModal,
   },
 })
-export default class AllSongs extends Vue {
+export default class AllSongs extends mixins(PlaylistContextMenuMixin) {
   private songList: Song[] = []
   private currentSong: Song | null = null
 
@@ -49,10 +52,6 @@ export default class AllSongs extends Vue {
         song_ids: [song],
       },
     })
-  }
-
-  private getSongContextMenu(item: Song) {
-    console.log(item)
   }
 }
 </script>

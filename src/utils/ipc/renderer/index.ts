@@ -1,4 +1,5 @@
 import { IpcRenderer } from 'electron'
+import { IpcRendererEvent } from 'electron/renderer'
 import { IpcRequest } from '../main'
 import { v4 } from 'uuid'
 
@@ -18,6 +19,10 @@ class IpcRendererHolder {
     return new Promise((resolve) => {
       this.ipcRenderer.once(request.responseChannel!, (event, response) => resolve(response))
     })
+  }
+
+  public listen<T>(channel: string, callback: (event: IpcRendererEvent, ...args: T[]) => void) {
+    this.ipcRenderer.on(channel, (event, ...args: any[]) => callback(event, ...args))
   }
 }
 
