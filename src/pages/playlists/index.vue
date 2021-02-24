@@ -3,7 +3,11 @@
     <b-row class="title">Playlists</b-row>
     <b-row class="d-flex">
       <b-col col xl="2" md="3" v-for="playlist in playlists" :key="playlist.playlist_id">
-        <CardView :title="playlist.playlist_name" :imgSrc="playlist.playlist_coverPath" />
+        <CardView
+          :title="playlist.playlist_name"
+          :imgSrc="playlist.playlist_coverPath"
+          @click.native="itemSelected(playlist)"
+        />
       </b-col>
     </b-row>
   </b-container>
@@ -25,7 +29,7 @@ export default class Albums extends Vue {
   private playlists: Playlist[] = []
   private getPlaylists() {
     ipcRendererHolder
-      .send<Playlist[]>(IpcEvents.PLAYLIST, { type: PlaylistEvents.GET_PLAYLISTS })
+      .send<Playlist[]>(IpcEvents.PLAYLIST, { type: PlaylistEvents.GET_ALL_PLAYLISTS })
       .then((data) => {
         this.playlists = data
       })
@@ -33,6 +37,16 @@ export default class Albums extends Vue {
 
   mounted() {
     this.getPlaylists()
+  }
+
+  private itemSelected(playlist: Playlist) {
+    this.$router.push({
+      name: 'playlists-id',
+      params: {
+        playlist_id: playlist.playlist_id!,
+        playlist_name: playlist.playlist_name!,
+      },
+    })
   }
 }
 </script>

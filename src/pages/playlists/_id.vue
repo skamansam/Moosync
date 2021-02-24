@@ -6,7 +6,7 @@
 <template>
   <b-container fluid>
     <b-row>
-      <div>{{ artist_name }}</div>
+      <div>{{ playlist_name }}</div>
     </b-row>
     <b-row>
       <SongView :songList="songList" @onRowContext="getSongContextMenu" />
@@ -18,9 +18,9 @@
 import { Component, Prop } from 'vue-property-decorator'
 import SongView from '@/components/SongView.vue'
 import { ipcRendererHolder } from '@/utils/ipc/renderer'
-import { ArtistEvents, IpcEvents } from '@/utils/ipc/main/constants'
+import { IpcEvents, PlaylistEvents } from '@/utils/ipc/main/constants'
 import { Song } from '@/models/songs'
-import Artists from './index.vue'
+import playlists from './index.vue'
 
 import { mixins } from 'vue-class-component'
 import PlaylistContextMenuMixin from '@/utils/mixins/PlaylistContextMenuMixin'
@@ -30,28 +30,28 @@ import PlaylistContextMenuMixin from '@/utils/mixins/PlaylistContextMenuMixin'
     SongView,
   },
 })
-export default class SingleArtistView extends mixins(PlaylistContextMenuMixin) {
-  private artist: Artists | null = null
+export default class SinglePlaylistView extends mixins(PlaylistContextMenuMixin) {
+  private playlist: playlists | null = null
   private songList: Song[] = []
 
   @Prop({ default: '' })
-  private artist_id!: string
+  private playlist_id!: string
 
   @Prop({ default: '' })
-  private artist_name!: string
+  private playlist_name!: string
 
   @Prop({ default: '' })
-  private artist_coverPath!: string
+  private playlist_coverPath!: string
 
   mounted() {
-    this.fetchArtist()
+    this.fetchPlaylist()
   }
 
-  private fetchArtist() {
+  private fetchPlaylist() {
     ipcRendererHolder
-      .send<Song[]>(IpcEvents.ARTIST, {
-        type: ArtistEvents.GET_ARTIST,
-        params: { id: this.artist_id },
+      .send<Song[]>(IpcEvents.PLAYLIST, {
+        type: PlaylistEvents.GET_PLAYLIST,
+        params: { id: this.playlist_id },
       })
       .then((data) => {
         this.songList = data

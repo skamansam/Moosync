@@ -4,12 +4,18 @@ export enum IpcEvents {
   ALBUM = 'album',
   ARTIST = 'artist',
   PLAYLIST = 'playlist',
+  GENRE = 'genre',
   CONTEXT_MENU = 'contextMenu',
 }
 
 export enum AlbumEvents {
   GET_ALL_ALBUMS = 'getAlbums',
   GET_ALBUM = 'getAlbum',
+}
+
+export enum GenreEvents {
+  GET_ALL_GENRE = 'getAllGenre',
+  GET_GENRE = 'getGenre',
 }
 
 export enum ScannerEvents {
@@ -19,7 +25,8 @@ export enum ScannerEvents {
 export enum PlaylistEvents {
   CREATE_PLAYLIST = 'createPlaylist',
   ADD_TO_PLAYLIST = 'AddToPlaylist',
-  GET_PLAYLISTS = 'getPlaylists',
+  GET_ALL_PLAYLISTS = 'getPlaylists',
+  GET_PLAYLIST = 'getPlaylist',
   ADDED_PLAYLIST = 'addedPlaylist',
 }
 

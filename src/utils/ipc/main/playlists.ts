@@ -13,9 +13,22 @@ export class PlaylistsChannel implements IpcChannelInterface {
       case PlaylistEvents.CREATE_PLAYLIST:
         this.createPlaylist(event, request)
         break
-      case PlaylistEvents.GET_PLAYLISTS:
+      case PlaylistEvents.GET_ALL_PLAYLISTS:
         this.getAllPlaylists(event, request)
         break
+      case PlaylistEvents.GET_PLAYLIST:
+        this.getPlaylist(event, request)
+        break
+    }
+  }
+
+  private getPlaylist(event: Electron.IpcMainEvent, request: IpcRequest) {
+    if (request.params.id) {
+      SongDB.getPlaylistSongs(request.params.id)
+        .then((data) => {
+          event.reply(request.responseChannel, data)
+        })
+        .catch((e) => console.log(e))
     }
   }
 

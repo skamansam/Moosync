@@ -94,7 +94,7 @@ export const migrations = [
   `
   -- Up
   CREATE TABLE playlists (
-    playlist_id integer PRIMARY KEY AUTOINCREMENT,
+    playlist_id VARCHAR(36) PRIMARY KEY,
     playlist_name TEXT NOT NULL,
     playlist_coverPath TEXT
   );

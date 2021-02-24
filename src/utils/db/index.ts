@@ -5,6 +5,7 @@ import { Song, marshaledSong } from '@/models/songs'
 
 import { Album } from '@/models/albums'
 import { Databases } from './constants'
+import { Genre } from '@/models/genre'
 import { Playlist } from '../../models/playlists'
 import { app } from 'electron'
 import { artists } from '@/models/artists'
@@ -136,6 +137,10 @@ export class SongDBInstance {
     return this.db.query(`SELECT * from albums`)
   }
 
+  public async getAllGenres(): Promise<Genre[]> {
+    return this.db.query(`SELECT * from genre`)
+  }
+
   public async getAlbumByID(id: string): Promise<Album | undefined> {
     return this.db.queryFirstRow(`SELECT * FROM albums WHERE album_id = ?`, id)
   }
@@ -171,7 +176,38 @@ export class SongDBInstance {
       WHERE P.artist = ?`,
       id
     )
-    console.log(marshaled)
+    return this.flattenDict(this.mergeSongs(marshaled))
+  }
+
+  public async getPlaylistSongs(id: string) {
+    let marshaled: marshaledSong[] = this.db.query(
+      `SELECT * FROM playlist_bridge P
+      LEFT JOIN allsongs S ON P.song = S._id 
+      LEFT JOIN artists_bridge B ON P.song = B.song 
+      LEFT JOIN artists S ON S.artist_id = B.artist
+      LEFT JOIN album_bridge U ON P.song = U.song 
+      LEFT JOIN albums V ON V.album_id = U.album
+      LEFT JOIN genre_bridge Q ON P.song = Q.song
+      LEFT JOIN genre T ON T.genre_id = Q.genre
+      WHERE P.playlist = ?`,
+      id
+    )
+    console.log(marshaled, id)
+    return this.flattenDict(this.mergeSongs(marshaled))
+  }
+
+  public async getGenreSongs(id: string) {
+    let marshaled: marshaledSong[] = this.db.query(
+      `SELECT * FROM genre_bridge P
+      LEFT JOIN allsongs S ON P.song = S._id 
+      LEFT JOIN artists_bridge B ON P.song = B.song 
+      LEFT JOIN artists S ON S.artist_id = B.artist
+      LEFT JOIN album_bridge U ON P.song = U.song 
+      LEFT JOIN albums V ON V.album_id = U.album
+      LEFT JOIN genre T ON T.genre_id = P.genre
+      WHERE P.genre = ?`,
+      id
+    )
     return this.flattenDict(this.mergeSongs(marshaled))
   }
 
@@ -292,13 +328,8 @@ export class SongDBInstance {
     return this.db.query(`SELECT * FROM playlists`)
   }
 
-  public async getPlaylistSongs(id: string) {
-    console.log(id)
-    //TODO: Get songs for single playlist
-  }
-
   public async createPlaylist(name: string): Promise<void> {
-    this.db.insert('playlists', { playlist_name: name })
+    this.db.insert('playlists', { playlist_id: v4(), playlist_name: name })
   }
 
   public updatePlaylistCoverPath(playlist_id: string, coverPath: string) {

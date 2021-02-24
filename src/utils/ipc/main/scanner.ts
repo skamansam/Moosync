@@ -1,13 +1,13 @@
+import { IpcEvents, ScannerEvents } from './constants'
+
 import { CoverScraper } from '../../files/scrapeArtists'
 import { IpcChannelInterface } from '.'
 import { IpcMainEvent } from 'electron'
 import { IpcRequest } from './index'
 import { MusicScanner } from '../../files/scanner'
-import { ScannerEvents } from './constants'
 
 export class ScannerChannel implements IpcChannelInterface {
-  name = ScannerEvents.SCAN_MUSIC
-
+  name = IpcEvents.SCANNER
   handle(event: IpcMainEvent, request: IpcRequest) {
     switch (request.type) {
       case ScannerEvents.SCAN_MUSIC:
@@ -19,6 +19,7 @@ export class ScannerChannel implements IpcChannelInterface {
   private ScanSongs(event: IpcMainEvent, request: IpcRequest) {
     if (request.params) {
       const scanner = new MusicScanner(...request.params)
+      console.log('Started')
       scanner.start().then(() => {
         event.reply(request.responseChannel, { status: 'done' })
         this.ScrapeCovers()
