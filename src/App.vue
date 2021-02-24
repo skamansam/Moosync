@@ -88,7 +88,7 @@ export default class App extends Vue {
 
   private populatePlaylists() {
     ipcRendererHolder
-      .send<Playlist[]>(IpcEvents.PLAYLIST, { type: PlaylistEvents.GET_PLAYLISTS })
+      .send<Playlist[]>(IpcEvents.PLAYLIST, { type: PlaylistEvents.GET_ALL_PLAYLISTS })
       .then((data) => {
         let playlists: playlistInfo = {}
         for (let p of data) {
