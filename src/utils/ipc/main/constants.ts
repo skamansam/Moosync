@@ -6,6 +6,12 @@ export enum IpcEvents {
   PLAYLIST = 'playlist',
   GENRE = 'genre',
   CONTEXT_MENU = 'contextMenu',
+  BROWSER_WINDOWS = 'browserWindows',
+}
+
+export enum WindowEvents {
+  OPEN_PREFERENCE_WINDOW = 'openPreferencesWindow',
+  CLOSE_PREFERENCE_WINDOW = 'closePreferencesWindow',
 }
 
 export enum AlbumEvents {

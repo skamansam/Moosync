@@ -1,7 +1,7 @@
 import { FragmentReceiver, FragmentSender } from './dataFragmenter'
 import { ManagerOptions, Socket, io } from 'socket.io-client'
 
-import { PeerMode } from '@/store/syncState'
+import { PeerMode } from '@/mainWindow/store/syncState'
 import { Song } from '@/models/songs'
 
 interface DataChannelMessage<T> {

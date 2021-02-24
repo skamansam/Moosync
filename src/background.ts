@@ -8,9 +8,41 @@ import path from 'path'
 import { registerIpcChannels } from '@/utils/ipc/main' // Import for side effects
 
 const isDevelopment = process.env.NODE_ENV !== 'production'
+export var preferenceWindow: BrowserWindow
 
 // Scheme must be registered before the app is ready
 protocol.registerSchemesAsPrivileged([{ scheme: 'app', privileges: { secure: true, standard: true } }])
+
+async function createPreferenceWindow() {
+  const win = new BrowserWindow({
+    width: 1016,
+    height: 653,
+    minHeight: 653,
+    minWidth: 1016,
+    backgroundColor: '#212121',
+    show: false,
+    webPreferences: {
+      // Use pluginOptions.nodeIntegration, leave this alone
+      // See nklayman.github.io/vue-cli-plugin-electron-builder/guide/security.html#node-integration for more info
+      nodeIntegration: (process.env.ELECTRON_NODE_INTEGRATION as unknown) as boolean,
+      nodeIntegrationInWorker: true,
+      preload: path.join(__dirname, 'preload.js'),
+    },
+  })
+
+  if (process.env.WEBPACK_DEV_SERVER_URL) {
+    // Load the url of the dev server if in development mode
+    await win.loadURL((process.env.WEBPACK_DEV_SERVER_URL + 'preferenceWindow') as string)
+    if (!process.env.IS_TEST) win.webContents.openDevTools()
+  } else {
+    createProtocol('app')
+    // Load the index.html when not in development
+    win.loadURL('app://./preferenceWindow.html')
+  }
+  win.removeMenu()
+
+  return win
+}
 
 async function createWindow() {
   // Create the browser window.
@@ -20,6 +52,8 @@ async function createWindow() {
     minHeight: 653,
     minWidth: 1016,
     backgroundColor: '#212121',
+    titleBarStyle: 'hidden',
+    frame: false,
     webPreferences: {
       // Use pluginOptions.nodeIntegration, leave this alone
       // See nklayman.github.io/vue-cli-plugin-electron-builder/guide/security.html#node-integration for more info
@@ -34,12 +68,10 @@ async function createWindow() {
     await win.loadURL(process.env.WEBPACK_DEV_SERVER_URL as string)
     if (!process.env.IS_TEST) win.webContents.openDevTools()
   } else {
-    createProtocol('app')
     // Load the index.html when not in development
     win.loadURL('app://./index.html')
   }
-
-  nativeTheme.themeSource = 'dark'
+  win.removeMenu()
 }
 
 // Quit when all windows are closed.
@@ -79,7 +111,9 @@ app.on('ready', async () => {
       console.error(error)
     }
   })
+  nativeTheme.themeSource = 'dark'
   createWindow()
+  preferenceWindow = await createPreferenceWindow()
 })
 
 // Exit cleanly on request from parent process in development mode.

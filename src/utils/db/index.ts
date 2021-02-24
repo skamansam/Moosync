@@ -192,7 +192,6 @@ export class SongDBInstance {
       WHERE P.playlist = ?`,
       id
     )
-    console.log(marshaled, id)
     return this.flattenDict(this.mergeSongs(marshaled))
   }
 

@@ -2,6 +2,7 @@ import { IpcMainEvent, ipcMain } from 'electron'
 
 import { AlbumsChannel } from './albums'
 import { ArtistsChannel } from './artists'
+import { BrowserWindowChannel } from './window'
 import { ContextMenuChannel } from './contextMenu'
 import { GenreChannel } from './genre'
 import { PlaylistsChannel } from './playlists'
@@ -17,6 +18,7 @@ export function registerIpcChannels() {
     new ArtistsChannel(),
     new GenreChannel(),
     new ContextMenuChannel(),
+    new BrowserWindowChannel(),
   ]
   ipcChannels.forEach((channel) => ipcMain.on(channel.name, (event, request) => channel.handle(event, request)))
 }

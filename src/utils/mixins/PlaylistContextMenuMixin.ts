@@ -1,7 +1,7 @@
 import { Component, Vue } from 'vue-property-decorator'
 import { ContextMenuEvents, IpcEvents } from '../ipc/main/constants'
 
-import { PlaylistModule } from '@/store/playlists'
+import { PlaylistModule } from '@/mainWindow/store/playlists'
 import { Song } from '@/models/songs'
 import { ipcRendererHolder } from '../ipc/renderer'
 

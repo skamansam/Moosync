@@ -3,7 +3,7 @@ import { IpcChannelInterface, IpcRequest } from '.'
 import { Menu, MenuItem } from 'electron'
 
 import { SongDB } from '@/utils/db'
-import { playlistInfo } from '@/store/playlists'
+import { playlistInfo } from '@/mainWindow/store/playlists'
 
 function getPlaylistsMenu(playlists: playlistInfo, onClick: (playlist_id: string) => void, onNewPlaylist: () => void) {
   let menu = new Menu()
