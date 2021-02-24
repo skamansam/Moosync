@@ -1,7 +1,6 @@
 import { IpcChannelInterface, IpcRequest } from '.'
 import { IpcEvents, WindowEvents } from './constants'
-
-import { preferenceWindow } from '@/background'
+import { mainWindow, preferenceWindow } from '@/background'
 
 export class BrowserWindowChannel implements IpcChannelInterface {
   name = IpcEvents.BROWSER_WINDOWS
@@ -12,6 +11,9 @@ export class BrowserWindowChannel implements IpcChannelInterface {
         break
       case WindowEvents.CLOSE_PREFERENCE_WINDOW:
         this.closePreferenceWindow(event, request)
+        break
+      case WindowEvents.TOGGLE_DEV_TOOLS:
+        this.toggleDevTools(event, request)
         break
     }
   }
@@ -26,6 +28,14 @@ export class BrowserWindowChannel implements IpcChannelInterface {
   private closePreferenceWindow(event: Electron.IpcMainEvent, request: IpcRequest) {
     if (preferenceWindow && preferenceWindow.isVisible) {
       preferenceWindow.hide()
+    }
+    event.reply(request.responseChannel, null)
+  }
+
+  private toggleDevTools(event: Electron.IpcMainEvent, request: IpcRequest) {
+    if (mainWindow) {
+      if (mainWindow.webContents.isDevToolsOpened()) mainWindow.webContents.closeDevTools()
+      else mainWindow.webContents.openDevTools()
     }
     event.reply(request.responseChannel, null)
   }

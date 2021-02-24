@@ -9,6 +9,7 @@ import { registerIpcChannels } from '@/utils/ipc/main' // Import for side effect
 
 const isDevelopment = process.env.NODE_ENV !== 'production'
 export var preferenceWindow: BrowserWindow
+export var mainWindow: BrowserWindow
 
 // Scheme must be registered before the app is ready
 protocol.registerSchemesAsPrivileged([{ scheme: 'app', privileges: { secure: true, standard: true } }])
@@ -53,7 +54,7 @@ async function createWindow() {
     minWidth: 1016,
     backgroundColor: '#212121',
     titleBarStyle: 'hidden',
-    frame: false,
+    frame: process.env.WEBPACK_DEV_SERVER_URL ? true : false,
     webPreferences: {
       // Use pluginOptions.nodeIntegration, leave this alone
       // See nklayman.github.io/vue-cli-plugin-electron-builder/guide/security.html#node-integration for more info
@@ -72,6 +73,7 @@ async function createWindow() {
     win.loadURL('app://./index.html')
   }
   win.removeMenu()
+  return win
 }
 
 // Quit when all windows are closed.
@@ -112,7 +114,7 @@ app.on('ready', async () => {
     }
   })
   nativeTheme.themeSource = 'dark'
-  createWindow()
+  mainWindow = await createWindow()
   preferenceWindow = await createPreferenceWindow()
 })
 

@@ -14,13 +14,13 @@
         </div>
       </div>
 
-      <div class="titlebar-menu">
+      <!-- <div class="titlebar-menu">
         <div class="titlebar-menu-item" v-for="(item, index) in menu" :key="index">
           <button @click="item.click()">
             {{ item.label }}
           </button>
         </div>
-      </div>
+      </div> -->
 
       <div class="titlebar-buttons">
         <button aria-label="minimize" title="Minimize" tabindex="-1" @click="onMinimize()">
@@ -56,7 +56,7 @@
 import { ThemesModule } from '@/mainWindow/store/themeState'
 
 import { Playlist } from '@/models/playlists'
-import { IpcEvents, PlaylistEvents, ScannerEvents } from '@/utils/ipc/main/constants'
+import { IpcEvents, PlaylistEvents, ScannerEvents, WindowEvents } from '@/utils/ipc/main/constants'
 
 import { playlistInfo, PlaylistModule } from '@/mainWindow/store/playlists'
 import { Component, Vue } from 'vue-property-decorator'
@@ -89,8 +89,18 @@ export default class App extends Vue {
     this.setDefaultTheme()
     this.watchPlaylistUpdates()
     this.populatePlaylists()
-
+    this.registerDevTools()
     // this.testStun()
+  }
+
+  private registerDevTools() {
+    document.addEventListener('keydown', function (e) {
+      if (e.code === 'F12') {
+        ipcRendererHolder.send<void>(IpcEvents.BROWSER_WINDOWS, { type: WindowEvents.TOGGLE_DEV_TOOLS })
+      } else if (e.code === 'F5') {
+        location.reload()
+      }
+    })
   }
 
   private scan() {
@@ -147,7 +157,7 @@ export default class App extends Vue {
 }
 </script>
 
-<style>
+<style lang="scss">
 #app {
   font-family: Avenir, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
@@ -158,10 +168,6 @@ export default class App extends Vue {
   width: 100%;
   height: 100%;
   /* margin-top: 60px; */
-}
-
-.router {
-  margin-top: 32px;
 }
 
 body {
@@ -180,9 +186,12 @@ body {
   left: 0;
   right: 0;
   z-index: 99999;
-  height: 32px;
+  width: 100%;
+  height: 18px;
+  margin-top: 4px;
   -webkit-app-region: drag;
-  &.titlebar-style-dark {
+
+  .titlebar-style-dark {
     color: #fff;
     background: #2d3135;
   }
@@ -203,11 +212,11 @@ body {
       left: auto;
       right: 0;
       width: 3px;
-      height: $titlebar-height;
+      height: 18px;
     }
     &.left {
       width: 3px;
-      height: $titlebar-height;
+      height: 18px;
     }
   }
   .titlebar-header {
@@ -223,9 +232,9 @@ body {
     flex-grow: 0;
     flex-shrink: 0;
     font-size: 14px;
-    line-height: $titlebar-height;
+    line-height: 18px;
     padding: 0 12px;
-    height: $titlebar-height;
+    height: 18px;
     > svg,
     > img {
       display: block;
@@ -318,6 +327,7 @@ body {
     -webkit-box-pack: justify;
     justify-content: space-between;
     align-items: center;
+
     .macButton {
       -webkit-app-region: no-drag;
       -webkit-box-sizing: border-box;

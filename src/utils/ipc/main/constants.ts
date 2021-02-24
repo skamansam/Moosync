@@ -12,6 +12,7 @@ export enum IpcEvents {
 export enum WindowEvents {
   OPEN_PREFERENCE_WINDOW = 'openPreferencesWindow',
   CLOSE_PREFERENCE_WINDOW = 'closePreferencesWindow',
+  TOGGLE_DEV_TOOLS = 'toggleDevTools',
 }
 
 export enum AlbumEvents {
