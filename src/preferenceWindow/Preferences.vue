@@ -1,6 +1,6 @@
 <template>
   <div id="app" :style="rootColors">
-    <!-- <button v-on:click="scan()">Scan</button> -->
+    <Titlebar />
     <router-view></router-view>
   </div>
 </template>
@@ -9,7 +9,13 @@
 import { Component } from 'vue-property-decorator'
 import Vue from 'vue'
 import { ThemesModule } from '@/preferenceWindow/store/themeState'
-@Component({})
+import Titlebar from '@/commonComponents/Titlebar.vue'
+
+@Component({
+  components: {
+    Titlebar,
+  },
+})
 export default class App extends Vue {
   private root = document.documentElement
   get rootColors() {
@@ -38,6 +44,7 @@ export default class App extends Vue {
     ThemesModule.$watch(
       (themesModule) => themesModule.rootVars,
       async (newColors: { [key: string]: string }) => {
+        console.log('setting')
         this.root.style.setProperty('--primary', newColors['--primary'])
       }
     )

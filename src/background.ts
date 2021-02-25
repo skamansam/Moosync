@@ -8,13 +8,12 @@ import path from 'path'
 import { registerIpcChannels } from '@/utils/ipc/main' // Import for side effects
 
 const isDevelopment = process.env.NODE_ENV !== 'production'
-export var preferenceWindow: BrowserWindow
 export var mainWindow: BrowserWindow
 
 // Scheme must be registered before the app is ready
 protocol.registerSchemesAsPrivileged([{ scheme: 'app', privileges: { secure: true, standard: true } }])
 
-async function createPreferenceWindow() {
+export async function createPreferenceWindow() {
   const win = new BrowserWindow({
     width: 1016,
     height: 653,
@@ -41,7 +40,6 @@ async function createPreferenceWindow() {
     win.loadURL('app://./preferenceWindow.html')
   }
   win.removeMenu()
-
   return win
 }
 
@@ -115,7 +113,6 @@ app.on('ready', async () => {
   })
   nativeTheme.themeSource = 'dark'
   mainWindow = await createWindow()
-  preferenceWindow = await createPreferenceWindow()
 })
 
 // Exit cleanly on request from parent process in development mode.

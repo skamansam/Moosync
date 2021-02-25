@@ -80,10 +80,7 @@ export default class Sidebar extends Vue {
   }
 
   private openSettings() {
-    console.log('here')
-    ipcRendererHolder
-      .send<void>(IpcEvents.BROWSER_WINDOWS, { type: WindowEvents.OPEN_PREFERENCE_WINDOW })
-      .then((data) => console.log(data))
+    ipcRendererHolder.send<void>(IpcEvents.BROWSER_WINDOWS, { type: WindowEvents.OPEN_PREFERENCE_WINDOW })
   }
 
   private registerListeners() {
