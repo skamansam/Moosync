@@ -42,14 +42,11 @@ import { ThemesModule } from '@/mainWindow/store/themeState'
   },
 })
 export default class MusicBar extends Vue {
-  private volume: number = 69
+  // TODO: Load last used volume
+  private volume: number = 50
 
-  private setVolume(n: number) {
-    this.volume = n
-  }
-
-  private emitVolume(event: InputEvent) {
-    this.$emit('onVolumeChange', (event.target as HTMLInputElement).value)
+  private emitVolume() {
+    this.$emit('onVolumeChange', this.volume)
   }
   get rootColors() {
     return ThemesModule.rootVars
