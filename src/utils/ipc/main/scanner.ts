@@ -1,4 +1,5 @@
 import { IpcEvents, ScannerEvents } from './constants'
+import { getActiveMusicPaths, loadPreferences } from '@/utils/db/preferences'
 
 import { CoverScraper } from '../../files/scrapeArtists'
 import { IpcChannelInterface } from '.'
@@ -17,14 +18,19 @@ export class ScannerChannel implements IpcChannelInterface {
   }
 
   private ScanSongs(event: IpcMainEvent, request: IpcRequest) {
-    if (request.params) {
-      const scanner = new MusicScanner(...request.params)
-      console.log('Started')
-      scanner.start().then(() => {
-        event.reply(request.responseChannel, { status: 'done' })
-        this.ScrapeCovers()
+    loadPreferences()
+      .then((preferences) => {
+        const scanner = new MusicScanner(...getActiveMusicPaths(preferences.musicPaths))
+        console.log(preferences)
+        scanner
+          .start()
+          .then(() => {
+            event.reply(request.responseChannel, { status: 'done' })
+            this.ScrapeCovers()
+          })
+          .catch((err) => console.log(err))
       })
-    }
+      .catch((err) => console.log(err))
   }
 
   private ScrapeCovers() {

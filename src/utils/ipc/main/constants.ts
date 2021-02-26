@@ -7,12 +7,19 @@ export enum IpcEvents {
   GENRE = 'genre',
   CONTEXT_MENU = 'contextMenu',
   BROWSER_WINDOWS = 'browserWindows',
+  PREFERENCES = 'preferences',
+}
+
+export enum PreferenceEvents {
+  SAVE_PREFERENCES = 'savePreferences',
+  LOAD_PREFERENCES = 'loadPreferences',
 }
 
 export enum WindowEvents {
   OPEN_PREFERENCE_WINDOW = 'openPreferencesWindow',
   CLOSE_PREFERENCE_WINDOW = 'closePreferencesWindow',
   TOGGLE_DEV_TOOLS = 'toggleDevTools',
+  OPEN_FILE_BROWSER = 'openFileBrowser',
 }
 
 export enum AlbumEvents {

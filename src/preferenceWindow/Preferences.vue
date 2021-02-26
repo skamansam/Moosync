@@ -1,7 +1,13 @@
 <template>
   <div id="app" :style="rootColors">
     <Titlebar />
-    <router-view></router-view>
+    <div class="content">
+      <router-view></router-view>
+    </div>
+    <div class="footer-buttons">
+      <b-button v-on:click="closeWindow"> Close </b-button>
+      <b-button v-on:click="writePreferences"> Apply </b-button>
+    </div>
   </div>
 </template>
 
@@ -10,6 +16,10 @@ import { Component } from 'vue-property-decorator'
 import Vue from 'vue'
 import { ThemesModule } from '@/preferenceWindow/store/themeState'
 import Titlebar from '@/commonComponents/Titlebar.vue'
+import { Preferences } from '@/utils/db/constants'
+import { ipcRendererHolder } from '@/utils/ipc/renderer'
+import { IpcEvents, PreferenceEvents, WindowEvents } from '@/utils/ipc/main/constants'
+import { PreferencesModule } from './store/preferences'
 
 @Component({
   components: {
@@ -35,16 +45,38 @@ export default class App extends Vue {
     })
   }
 
+  created() {
+    this.loadPreferences()
+  }
+
   mounted() {
-    this.setDefaultTheme()
     this.registerThemeListeners()
+    this.setDefaultTheme()
+  }
+
+  private loadPreferences() {
+    ipcRendererHolder
+      .send<Preferences>(IpcEvents.PREFERENCES, { type: PreferenceEvents.LOAD_PREFERENCES })
+      .then((data) => {
+        PreferencesModule.setPreferences(data)
+      })
+  }
+
+  private closeWindow() {
+    ipcRendererHolder.send<void>(IpcEvents.BROWSER_WINDOWS, { type: WindowEvents.CLOSE_PREFERENCE_WINDOW })
+  }
+
+  private async writePreferences() {
+    return ipcRendererHolder.send<void>(IpcEvents.PREFERENCES, {
+      type: PreferenceEvents.SAVE_PREFERENCES,
+      params: { preferences: PreferencesModule.preferences },
+    })
   }
 
   private registerThemeListeners() {
     ThemesModule.$watch(
       (themesModule) => themesModule.rootVars,
       async (newColors: { [key: string]: string }) => {
-        console.log('setting')
         this.root.style.setProperty('--primary', newColors['--primary'])
       }
     )
@@ -68,5 +100,16 @@ export default class App extends Vue {
 body {
   background-color: var(--primary) !important;
   color: var(--textPrimary) !important;
+}
+
+.content {
+  margin: 0 2rem 0 2rem;
+  max-height: calc(100% - 32px);
+}
+
+.footer-buttons {
+  position: absolute;
+  bottom: 0;
+  right: 0;
 }
 </style>

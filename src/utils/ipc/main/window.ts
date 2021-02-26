@@ -1,8 +1,7 @@
+import { BrowserWindow, dialog } from 'electron'
 import { IpcChannelInterface, IpcRequest } from '.'
 import { IpcEvents, WindowEvents } from './constants'
 import { createPreferenceWindow, mainWindow } from '@/background'
-
-import { BrowserWindow } from 'electron'
 
 export class BrowserWindowChannel implements IpcChannelInterface {
   name = IpcEvents.BROWSER_WINDOWS
@@ -18,6 +17,8 @@ export class BrowserWindowChannel implements IpcChannelInterface {
       case WindowEvents.TOGGLE_DEV_TOOLS:
         this.toggleDevTools(event, request)
         break
+      case WindowEvents.OPEN_FILE_BROWSER:
+        this.getFolder(event, request)
     }
   }
 
@@ -43,5 +44,17 @@ export class BrowserWindowChannel implements IpcChannelInterface {
       else mainWindow.webContents.openDevTools()
     }
     event.reply(request.responseChannel, null)
+  }
+
+  private getFolder(event: Electron.IpcMainEvent, request: IpcRequest) {
+    if (this.preferenceWindow) {
+      dialog
+        .showOpenDialog(this.preferenceWindow, {
+          properties: ['openDirectory'],
+        })
+        .then((folders) => {
+          event.reply(request.responseChannel, folders)
+        })
+    }
   }
 }

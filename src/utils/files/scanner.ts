@@ -90,12 +90,16 @@ export class MusicScanner {
     })
     var promises: Promise<void>[] = []
     for (let i in this.paths) {
-      let files = fs.readdirSync(this.paths[i])
-      files.forEach((file) => {
-        if (audioPatterns.exec(path.extname(file)) !== null) {
-          promises.push(promisesThrottled.add(this.scanFile.bind(this, path.join(this.paths[i], file))))
-        }
-      })
+      if (fs.existsSync(this.paths[i])) {
+        let files = fs.readdirSync(this.paths[i])
+        files.forEach((file) => {
+          if (audioPatterns.exec(path.extname(file)) !== null) {
+            promises.push(promisesThrottled.add(this.scanFile.bind(this, path.join(this.paths[i], file))))
+          }
+        })
+      } else {
+        console.log('invalid directory: ' + this.paths[i])
+      }
     }
     return Promise.all(promises)
   }

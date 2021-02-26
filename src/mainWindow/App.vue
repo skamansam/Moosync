@@ -1,6 +1,6 @@
 <template>
   <div id="app" :style="rootColors">
-    <!-- <button v-on:click="scan()">Scan</button> -->
+    <button v-on:click="scan()">Scan</button>
     <Titlebar />
     <div>
       <router-view></router-view>
@@ -67,7 +67,7 @@ export default class App extends Vue {
 
   private scan() {
     ipcRendererHolder
-      .send<void>(IpcEvents.SCANNER, { params: ['/mnt/g/Songs/Playlist/Daily Dose'], type: ScannerEvents.SCAN_MUSIC })
+      .send<void>(IpcEvents.SCANNER, { type: ScannerEvents.SCAN_MUSIC })
       .then((data) => {
         console.log(data)
       })

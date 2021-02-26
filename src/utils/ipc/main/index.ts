@@ -6,6 +6,7 @@ import { BrowserWindowChannel } from './window'
 import { ContextMenuChannel } from './contextMenu'
 import { GenreChannel } from './genre'
 import { PlaylistsChannel } from './playlists'
+import { PreferenceChannel } from './preferences'
 import { ScannerChannel } from './scanner'
 import { SongsChannel } from './songs'
 
@@ -19,6 +20,7 @@ export function registerIpcChannels() {
     new GenreChannel(),
     new ContextMenuChannel(),
     new BrowserWindowChannel(),
+    new PreferenceChannel(),
   ]
   ipcChannels.forEach((channel) => ipcMain.on(channel.name, (event, request) => channel.handle(event, request)))
 }
