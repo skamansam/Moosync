@@ -7,6 +7,7 @@ import Jimp from 'jimp'
 import PromiseThrottle from 'promise-throttle'
 import { SongDB } from '../db/index'
 import crypto from 'crypto'
+import { musicPaths } from '../db/constants'
 import os from 'os'
 import path from 'path'
 import { v4 } from 'uuid'
@@ -60,9 +61,9 @@ function getCover(data: mm.IAudioMetadata, filePath: string): image | undefined 
 }
 
 export class MusicScanner {
-  private paths: string[]
+  private paths: musicPaths
 
-  constructor(...paths: string[]) {
+  constructor(...paths: musicPaths) {
     this.paths = paths
   }
 
@@ -90,11 +91,11 @@ export class MusicScanner {
     })
     var promises: Promise<void>[] = []
     for (let i in this.paths) {
-      if (fs.existsSync(this.paths[i])) {
-        let files = fs.readdirSync(this.paths[i])
+      if (fs.existsSync(this.paths[i].path)) {
+        let files = fs.readdirSync(this.paths[i].path)
         files.forEach((file) => {
           if (audioPatterns.exec(path.extname(file)) !== null) {
-            promises.push(promisesThrottled.add(this.scanFile.bind(this, path.join(this.paths[i], file))))
+            promises.push(promisesThrottled.add(this.scanFile.bind(this, path.join(this.paths[i].path, file))))
           }
         })
       } else {

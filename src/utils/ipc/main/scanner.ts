@@ -1,11 +1,11 @@
 import { IpcEvents, ScannerEvents } from './constants'
-import { getActiveMusicPaths, loadPreferences } from '@/utils/db/preferences'
 
 import { CoverScraper } from '../../files/scrapeArtists'
 import { IpcChannelInterface } from '.'
 import { IpcMainEvent } from 'electron'
 import { IpcRequest } from './index'
 import { MusicScanner } from '../../files/scanner'
+import { loadPreferences } from '@/utils/db/preferences'
 
 export class ScannerChannel implements IpcChannelInterface {
   name = IpcEvents.SCANNER
@@ -20,7 +20,7 @@ export class ScannerChannel implements IpcChannelInterface {
   private ScanSongs(event: IpcMainEvent, request: IpcRequest) {
     loadPreferences()
       .then((preferences) => {
-        const scanner = new MusicScanner(...getActiveMusicPaths(preferences.musicPaths))
+        const scanner = new MusicScanner(...preferences.musicPaths)
         console.log(preferences)
         scanner
           .start()
