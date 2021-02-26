@@ -24,6 +24,9 @@ export default class AudioStream extends Vue {
   @Prop({ default: '' })
   roomID!: string
 
+  @Prop({ default: 50 })
+  volume!: number
+
   @Prop({ default: PlayerState.STOPPED })
   playerState!: PlayerState
 
@@ -38,6 +41,10 @@ export default class AudioStream extends Vue {
   @Watch('currentSong')
   onSongChanged(newSong: Song | null) {
     if (newSong) this.loadAudio(newSong)
+  }
+
+  @Watch('volume') onMatchChanged(newValue: number) {
+    this.audioElement.volume = newValue / 100
   }
 
   private peerHolder = new SyncHolder()

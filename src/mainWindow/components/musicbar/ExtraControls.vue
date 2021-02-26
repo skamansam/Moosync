@@ -5,7 +5,7 @@
         <div class="slider-container d-flex">
           <input
             type="range"
-            min="1"
+            min="0"
             max="100"
             value="50"
             class="slider w-100 align-self-center test"
@@ -15,6 +15,7 @@
             id="myRange"
             aria-label="volume"
             v-model="volume"
+            v-on:input="emitVolume"
           />
         </div>
         <div class="volume-icon">
@@ -47,6 +48,9 @@ export default class MusicBar extends Vue {
     this.volume = n
   }
 
+  private emitVolume(event: InputEvent) {
+    this.$emit('onVolumeChange', (event.target as HTMLInputElement).value)
+  }
   get rootColors() {
     return ThemesModule.rootVars
   }

@@ -19,10 +19,15 @@
         <b-col col lg="auto"
           ><Controls :duration="currentSong ? currentSong.duration : 0" :timestamp="timestamp"
         /></b-col>
-        <b-col col lg="3"><ExtraControls /></b-col>
+        <b-col col lg="3"><ExtraControls @onVolumeChange="volumeUpdated" /></b-col>
       </b-row>
     </b-container>
-    <AudioStream :playerState="playerState" :currentSong="currentSong" @onTimeUpdate="updateTimestamp" />
+    <AudioStream
+      :playerState="playerState"
+      :currentSong="currentSong"
+      @onTimeUpdate="updateTimestamp"
+      :volume="volume"
+    />
   </div>
 </template>
 
@@ -48,6 +53,7 @@ import { Component, Vue } from 'vue-property-decorator'
 export default class MusicBar extends Vue {
   private currentSong: Song | null = null
   private timestamp: number = 0
+  private volume: number = 50
   private currentCoverBlob: Blob | null = null
 
   private playerState: PlayerState = PlayerState.STOPPED
@@ -92,6 +98,10 @@ export default class MusicBar extends Vue {
 
   private updateTimestamp(timestamp: number) {
     this.timestamp = timestamp
+  }
+
+  private volumeUpdated(value: number) {
+    this.volume = value
   }
 }
 </script>

@@ -9,8 +9,6 @@ const RouterLayout = createRouterLayout((layout) => {
   return import('@/mainWindow/layouts/' + layout + '.vue')
 })
 
-console.log(routes)
-
 export default new Router({
   mode: process.env.IS_ELECTRON ? 'hash' : 'history',
   base: process.env.BASE_URL,
