@@ -181,7 +181,7 @@ export class SongDBInstance {
     let marshaled: marshaledSong[] = this.db.query(
       `SELECT * FROM artists_bridge A
       LEFT JOIN allsongs B ON A.song = B._id 
-      LEFT JOIN artists C ON B.artist = C.artist_id 
+      LEFT JOIN artists C ON A.artist = C.artist_id 
       LEFT JOIN album_bridge D ON A.song = D.song 
       LEFT JOIN albums E ON D.album = E.album_id 
       LEFT JOIN genre_bridge F ON A.song = F.song 
