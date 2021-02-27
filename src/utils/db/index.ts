@@ -127,95 +127,97 @@ export class SongDBInstance {
     })
   }
 
-  private addExcludeWhereClause(column: string, exclude?: string[]) {
-    return exclude ? `WHERE ${column} NOT REGEXP '${exclude.join('|')}'` : ''
+  private addExcludeWhereClause(where: boolean, column: string, exclude?: string[]): string {
+    return exclude && exclude.length > 0
+      ? `${where ? 'WHERE' : 'AND '} ${column} NOT REGEXP '${exclude.join('|')}'`
+      : ''
   }
 
   public async getAllSongs(exclude?: string[]): Promise<Song[]> {
     let marshaled: marshaledSong[] = this.db.query(
-      `SELECT P.*, S.*, T.*, V.* FROM allsongs P
-        LEFT JOIN genre_bridge Q ON P._id = Q.song
-        LEFT JOIN genre T ON T.genre_id = Q.genre
-        LEFT JOIN artists_bridge B ON P._id = B.song
-        LEFT JOIN artists S ON S.artist_id = B.artist
-        LEFT JOIN album_bridge U ON P._id = U.song
-        LEFT JOIN albums V ON V.album_id = U.album ${this.addExcludeWhereClause('P.path', exclude)}`
+      `SELECT * FROM allsongs A
+        LEFT JOIN genre_bridge B ON A._id = B.song
+        LEFT JOIN genre C ON B.genre = C.genre_id
+        LEFT JOIN artists_bridge C ON A._id = C.song
+        LEFT JOIN artists D ON C.artist = D.artist_id
+        LEFT JOIN album_bridge E ON A._id = E.song
+        LEFT JOIN albums F ON E.album = F.album_id ${this.addExcludeWhereClause(true, 'A.path', exclude)}`
     )
     return this.flattenDict(this.mergeSongs(marshaled))
   }
 
   public async getAllAlbums(): Promise<Album[]> {
+    // TODO: exclude albums with disabled paths
     return this.db.query(`SELECT * from albums`)
   }
 
   public async getAllGenres(): Promise<Genre[]> {
+    // TODO: exclude genres with disabled paths
     return this.db.query(`SELECT * from genre`)
   }
 
-  public async getAlbumByID(id: string): Promise<Album | undefined> {
-    return this.db.queryFirstRow(`SELECT * FROM albums WHERE album_id = ?`, id)
-  }
-
-  public async getAlbumSongs(id: string): Promise<Song[]> {
+  public async getAlbumSongs(id: string, exclude?: string[]): Promise<Song[]> {
     let marshaled: marshaledSong[] = this.db.query(
-      `SELECT * FROM album_bridge P
-      LEFT JOIN allsongs S ON P.song = S._id 
-      LEFT JOIN artists_bridge B ON P.song = B.song 
-      LEFT JOIN artists S ON S.artist_id = B.artist
-      LEFT JOIN albums V ON V.album_id = P.album
-      LEFT JOIN genre_bridge Q ON P.song = Q.song
-      LEFT JOIN genre T ON T.genre_id = Q.genre
-      WHERE P.album = ?`,
+      `SELECT * FROM album_bridge A
+      LEFT JOIN allsongs B ON A.song = B._id
+      LEFT JOIN artists_bridge C ON A.song = C.song
+      LEFT JOIN artists D ON C.artist = D.artist_id
+      LEFT JOIN albums E ON A.album = E.album_id
+      LEFT JOIN genre_bridge F ON A.song = F.song
+      LEFT JOIN genre G ON F.genre = G.genre_id
+      WHERE A.album = ? ${this.addExcludeWhereClause(false, 'B.path', exclude)}`,
       id
     )
     return this.flattenDict(this.mergeSongs(marshaled))
+    return []
   }
 
   public async getAllArtists(): Promise<artists[]> {
+    // TODO: exclude artists with disabled paths
     return this.db.query(`SELECT * FROM artists`)
   }
 
-  public async getArtistSongs(id: string): Promise<Song[]> {
+  public async getArtistSongs(id: string, exclude?: string[]): Promise<Song[]> {
     let marshaled: marshaledSong[] = this.db.query(
-      `SELECT * FROM artists_bridge P
-      LEFT JOIN allsongs S ON P.song = S._id 
-      LEFT JOIN artists S ON S.artist_id = P.artist
-      LEFT JOIN album_bridge U ON P.song = U.song 
-      LEFT JOIN albums V ON V.album_id = U.album
-      LEFT JOIN genre_bridge Q ON P.song = Q.song
-      LEFT JOIN genre T ON T.genre_id = Q.genre
-      WHERE P.artist = ?`,
+      `SELECT * FROM artists_bridge A
+      LEFT JOIN allsongs B ON A.song = B._id 
+      LEFT JOIN artists C ON B.artist = C.artist_id 
+      LEFT JOIN album_bridge D ON A.song = D.song 
+      LEFT JOIN albums E ON D.album = E.album_id 
+      LEFT JOIN genre_bridge F ON A.song = F.song 
+      LEFT JOIN genre G ON F.genre = G.genre_id
+      WHERE A.artist = ? ${this.addExcludeWhereClause(false, 'B.path', exclude)}`,
       id
     )
     return this.flattenDict(this.mergeSongs(marshaled))
   }
 
-  public async getPlaylistSongs(id: string) {
+  public async getPlaylistSongs(id: string, exclude?: string[]) {
     let marshaled: marshaledSong[] = this.db.query(
-      `SELECT * FROM playlist_bridge P
-      LEFT JOIN allsongs S ON P.song = S._id 
-      LEFT JOIN artists_bridge B ON P.song = B.song 
-      LEFT JOIN artists S ON S.artist_id = B.artist
-      LEFT JOIN album_bridge U ON P.song = U.song 
-      LEFT JOIN albums V ON V.album_id = U.album
-      LEFT JOIN genre_bridge Q ON P.song = Q.song
-      LEFT JOIN genre T ON T.genre_id = Q.genre
-      WHERE P.playlist = ?`,
+      `SELECT * FROM playlist_bridge A
+      LEFT JOIN allsongs B ON A.song = B._id 
+      LEFT JOIN artists_bridge C ON A.song = C.song 
+      LEFT JOIN artists D ON C.artist = D.artist_id
+      LEFT JOIN album_bridge E ON A.song = E.song 
+      LEFT JOIN albums F ON E.album = F.album_id
+      LEFT JOIN genre_bridge G ON A.song = G.song
+      LEFT JOIN genre H ON G.genre = H.genre_id
+      WHERE A.playlist = ? ${this.addExcludeWhereClause(false, 'B.path', exclude)}`,
       id
     )
     return this.flattenDict(this.mergeSongs(marshaled))
   }
 
-  public async getGenreSongs(id: string) {
+  public async getGenreSongs(id: string, exclude?: string[]) {
     let marshaled: marshaledSong[] = this.db.query(
-      `SELECT * FROM genre_bridge P
-      LEFT JOIN allsongs S ON P.song = S._id 
-      LEFT JOIN artists_bridge B ON P.song = B.song 
-      LEFT JOIN artists S ON S.artist_id = B.artist
-      LEFT JOIN album_bridge U ON P.song = U.song 
-      LEFT JOIN albums V ON V.album_id = U.album
-      LEFT JOIN genre T ON T.genre_id = P.genre
-      WHERE P.genre = ?`,
+      `SELECT * FROM genre_bridge A
+      LEFT JOIN allsongs B ON A.song = B._id 
+      LEFT JOIN artists_bridge C ON A.song = C.song 
+      LEFT JOIN artists D ON C.artist = D.artist_id
+      LEFT JOIN album_bridge E ON A.song = E.song 
+      LEFT JOIN albums F ON E.album = F.album_id
+      LEFT JOIN genre G ON A.genre = G.genre_id
+      WHERE A.genre = ? ${this.addExcludeWhereClause(false, 'B.path', exclude)}`,
       id
     )
     return this.flattenDict(this.mergeSongs(marshaled))
