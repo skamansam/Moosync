@@ -83,6 +83,9 @@ export default class AudioStream extends Vue {
   }
 
   private loadAudio(song: Song) {
+    let firstSong: boolean
+    firstSong = this.audioElement.src ? true : false
+
     this.audioElement.src = 'media://' + song.path
     this.isSongLoaded = true
 
@@ -93,7 +96,12 @@ export default class AudioStream extends Vue {
       }
     }
 
-    PlayerModule.setState(PlayerState.PAUSED)
+    if (firstSong) {
+      this.handlePlayerState(PlayerModule.playerState)
+    } else {
+      PlayerModule.setState(PlayerState.PLAYING)
+      this.handlePlayerState(PlayerState.PLAYING)
+    }
   }
 
   private handleAudioTimeUpdate() {
