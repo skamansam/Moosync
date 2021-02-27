@@ -84,6 +84,7 @@ export class SongDBInstance {
         migrations: migrations,
       },
     })
+    this.registerRegexp()
   }
 
   private pushIfUnique(tag: 'artists' | 'genre', list: string[] | undefined, song: Song) {
@@ -119,8 +120,18 @@ export class SongDBInstance {
     return final
   }
 
+  private registerRegexp() {
+    this.db.function('regexp', (pattern: string, str: string) => {
+      let regexp = new RegExp(pattern ? pattern : /\*/, 'i')
+      return str.match(regexp) ? 1 : 0
+    })
+  }
+
+  private addExcludeWhereClause(column: string, exclude?: string[]) {
+    return exclude ? `WHERE ${column} NOT REGEXP '${exclude.join('|')}'` : ''
+  }
+
   public async getAllSongs(exclude?: string[]): Promise<Song[]> {
-    // TODO: Somehow exclude paterns of paths provided from results
     let marshaled: marshaledSong[] = this.db.query(
       `SELECT P.*, S.*, T.*, V.* FROM allsongs P
         LEFT JOIN genre_bridge Q ON P._id = Q.song
@@ -128,9 +139,8 @@ export class SongDBInstance {
         LEFT JOIN artists_bridge B ON P._id = B.song
         LEFT JOIN artists S ON S.artist_id = B.artist
         LEFT JOIN album_bridge U ON P._id = U.song
-        LEFT JOIN albums V ON V.album_id = U.album `
+        LEFT JOIN albums V ON V.album_id = U.album ${this.addExcludeWhereClause('P.path', exclude)}`
     )
-    console.log(exclude)
     return this.flattenDict(this.mergeSongs(marshaled))
   }
 
