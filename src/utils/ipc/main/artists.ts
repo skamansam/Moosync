@@ -18,7 +18,7 @@ export class ArtistsChannel implements IpcChannelInterface {
   }
 
   private getAllArtists(event: Electron.IpcMainEvent, request: IpcRequest) {
-    SongDB.getAllArtists()
+    SongDB.getAllArtists(getDisabledPaths(preferences.musicPaths))
       .then((data) => {
         event.reply(request.responseChannel, data)
       })

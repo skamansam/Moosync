@@ -18,7 +18,7 @@ export class GenreChannel implements IpcChannelInterface {
   }
 
   private getAllGenres(event: Electron.IpcMainEvent, request: IpcRequest) {
-    SongDB.getAllGenres()
+    SongDB.getAllGenres(getDisabledPaths(preferences.musicPaths))
       .then((data) => {
         event.reply(request.responseChannel, data)
       })

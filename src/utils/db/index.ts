@@ -122,8 +122,11 @@ export class SongDBInstance {
 
   private registerRegexp() {
     this.db.function('regexp', (pattern: string, str: string) => {
-      let regexp = new RegExp(pattern ? pattern : /\*/, 'i')
-      return str.match(regexp) ? 1 : 0
+      if (pattern) {
+        let regexp = new RegExp(pattern, 'i')
+        return str.match(regexp) ? 1 : 0
+      }
+      return 1
     })
   }
 
@@ -141,19 +144,30 @@ export class SongDBInstance {
         LEFT JOIN artists_bridge C ON A._id = C.song
         LEFT JOIN artists D ON C.artist = D.artist_id
         LEFT JOIN album_bridge E ON A._id = E.song
-        LEFT JOIN albums F ON E.album = F.album_id ${this.addExcludeWhereClause(true, 'A.path', exclude)}`
+        LEFT JOIN albums F ON E.album = F.album_id
+        ${this.addExcludeWhereClause(true, 'A.path', exclude)}`
     )
     return this.flattenDict(this.mergeSongs(marshaled))
   }
 
-  public async getAllAlbums(): Promise<Album[]> {
-    // TODO: exclude albums with disabled paths
-    return this.db.query(`SELECT * from albums`)
+  public async getAllAlbums(exclude?: string[]): Promise<Album[]> {
+    return this.db.query(
+      `SELECT * from albums A
+        LEFT JOIN album_bridge B ON A.album_id = B.album
+        LEFT JOIN allsongs C ON B.song = C._id
+        ${this.addExcludeWhereClause(true, 'C.path', exclude)}
+        GROUP BY A.album_id`
+    )
   }
 
-  public async getAllGenres(): Promise<Genre[]> {
-    // TODO: exclude genres with disabled paths
-    return this.db.query(`SELECT * from genre`)
+  public async getAllGenres(exclude?: string[]): Promise<Genre[]> {
+    return this.db.query(
+      `SELECT * from genre A
+        LEFT JOIN genre_bridge B ON A.genre_id = B.genre
+        LEFT JOIN allsongs C ON B.song = C._id
+        ${this.addExcludeWhereClause(true, 'C.path', exclude)}
+        GROUP BY A.genre_id`
+    )
   }
 
   public async getAlbumSongs(id: string, exclude?: string[]): Promise<Song[]> {
@@ -172,9 +186,14 @@ export class SongDBInstance {
     return []
   }
 
-  public async getAllArtists(): Promise<artists[]> {
-    // TODO: exclude artists with disabled paths
-    return this.db.query(`SELECT * FROM artists`)
+  public async getAllArtists(exclude?: string[]): Promise<artists[]> {
+    return this.db.query(
+      `SELECT * FROM artists A
+        LEFT JOIN artists_bridge B ON A.artist_id = B.artist
+        LEFT JOIN allsongs C ON B.song = C._id
+        ${this.addExcludeWhereClause(true, 'C.path', exclude)}
+        GROUP BY A.artist_id`
+    )
   }
 
   public async getArtistSongs(id: string, exclude?: string[]): Promise<Song[]> {

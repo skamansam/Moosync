@@ -18,7 +18,7 @@ export class AlbumsChannel implements IpcChannelInterface {
   }
 
   private getAllAlbums(event: Electron.IpcMainEvent, request: IpcRequest) {
-    SongDB.getAllAlbums()
+    SongDB.getAllAlbums(getDisabledPaths(preferences.musicPaths))
       .then((data) => {
         event.reply(request.responseChannel, data)
       })
