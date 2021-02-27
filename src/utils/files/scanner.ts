@@ -10,6 +10,7 @@ import crypto from 'crypto'
 import { musicPaths } from '../db/constants'
 import os from 'os'
 import path from 'path'
+import { preferences } from '@/utils/db/preferences'
 import { v4 } from 'uuid'
 
 const audioPatterns = new RegExp('.flac|.mp3|.ogg|.m4a|.webm|.wav|.wv', 'i')
@@ -84,12 +85,26 @@ export class MusicScanner {
     return { song: info, cover: cover }
   }
 
+  private async destructiveScan() {
+    let allSongs = await SongDB.getAllSongs()
+    const regex = new RegExp(preferences.musicPaths.join('|'))
+    for (let s of allSongs) {
+      try {
+        s.path.match(regex) ? await SongDB.removeSong(s._id!) : null
+        await fs.promises.access(s.path, fs.constants.F_OK)
+      } catch (e) {
+        await SongDB.removeSong(s._id!)
+      }
+    }
+  }
+
   public async start() {
     var promisesThrottled = new PromiseThrottle({
       requestsPerSecond: os.cpus().length / 2,
       promiseImplementation: Promise,
     })
     var promises: Promise<void>[] = []
+    await this.destructiveScan()
     for (let i in this.paths) {
       if (fs.existsSync(this.paths[i].path)) {
         let files = fs.readdirSync(this.paths[i].path)

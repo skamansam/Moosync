@@ -153,8 +153,8 @@ export class SongDBInstance {
   public async getAllAlbums(exclude?: string[]): Promise<Album[]> {
     return this.db.query(
       `SELECT * from albums A
-        LEFT JOIN album_bridge B ON A.album_id = B.album
-        LEFT JOIN allsongs C ON B.song = C._id
+        INNER JOIN album_bridge B ON A.album_id = B.album
+        INNER JOIN allsongs C ON B.song = C._id
         ${this.addExcludeWhereClause(true, 'C.path', exclude)}
         GROUP BY A.album_id`
     )
@@ -163,8 +163,8 @@ export class SongDBInstance {
   public async getAllGenres(exclude?: string[]): Promise<Genre[]> {
     return this.db.query(
       `SELECT * from genre A
-        LEFT JOIN genre_bridge B ON A.genre_id = B.genre
-        LEFT JOIN allsongs C ON B.song = C._id
+        INNER JOIN genre_bridge B ON A.genre_id = B.genre
+        INNER JOIN allsongs C ON B.song = C._id
         ${this.addExcludeWhereClause(true, 'C.path', exclude)}
         GROUP BY A.genre_id`
     )
@@ -189,8 +189,8 @@ export class SongDBInstance {
   public async getAllArtists(exclude?: string[]): Promise<artists[]> {
     return this.db.query(
       `SELECT * FROM artists A
-        LEFT JOIN artists_bridge B ON A.artist_id = B.artist
-        LEFT JOIN allsongs C ON B.song = C._id
+        INNER JOIN artists_bridge B ON A.artist_id = B.artist
+        INNER JOIN allsongs C ON B.song = C._id
         ${this.addExcludeWhereClause(true, 'C.path', exclude)}
         GROUP BY A.artist_id`
     )
@@ -390,6 +390,16 @@ export class SongDBInstance {
 
   public async getGenres() {
     return this.db.query(`SELECT * FROM genre`)
+  }
+
+  public async removeSong(song_id: string) {
+    this.db.transaction((song_id: string) => {
+      this.db.delete('artists_bridge', { song: song_id })
+      this.db.delete('album_bridge', { song: song_id })
+      this.db.delete('genre_bridge', { song: song_id })
+      this.db.delete('playlist_bridge', { song: song_id })
+      this.db.delete('allsongs', { _id: song_id })
+    })(song_id)
   }
 
   public async removeFromPlaylist(playlist: string, ...songs: string[]) {
