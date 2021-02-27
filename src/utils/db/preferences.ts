@@ -1,4 +1,4 @@
-import { Preferences, defaultPreferences } from './constants'
+import { Preferences, defaultPreferences, musicPaths } from './constants'
 
 import { app } from 'electron'
 import fs from 'fs'
@@ -15,4 +15,12 @@ export async function loadPreferences() {
     return JSON.parse(data) as Preferences
   }
   return defaultPreferences as Preferences
+}
+
+export function getDisabledPaths(paths: musicPaths): string[] {
+  let disablePaths = []
+  for (let p of paths) {
+    if (!p.enabled) disablePaths.push(p.path)
+  }
+  return disablePaths
 }

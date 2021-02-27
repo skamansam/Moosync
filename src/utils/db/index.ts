@@ -119,17 +119,18 @@ export class SongDBInstance {
     return final
   }
 
-  public async getAllSongs(): Promise<Song[]> {
+  public async getAllSongs(exclude?: string[]): Promise<Song[]> {
+    // TODO: Somehow exclude paterns of paths provided from results
     let marshaled: marshaledSong[] = this.db.query(
-      `SELECT P.*, S.*, T.*, V.* FROM allsongs P 
+      `SELECT P.*, S.*, T.*, V.* FROM allsongs P
         LEFT JOIN genre_bridge Q ON P._id = Q.song
         LEFT JOIN genre T ON T.genre_id = Q.genre
-        LEFT JOIN artists_bridge B ON P._id = B.song 
+        LEFT JOIN artists_bridge B ON P._id = B.song
         LEFT JOIN artists S ON S.artist_id = B.artist
-        LEFT JOIN album_bridge U ON P._id = U.song 
-        LEFT JOIN albums V ON V.album_id = U.album
-        `
+        LEFT JOIN album_bridge U ON P._id = U.song
+        LEFT JOIN albums V ON V.album_id = U.album `
     )
+    console.log(exclude)
     return this.flattenDict(this.mergeSongs(marshaled))
   }
 
