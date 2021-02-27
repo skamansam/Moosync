@@ -55,7 +55,7 @@ export default class DefaultLayout extends Vue {
   position: absolute
   left: calc(261px + 30px)
   right: 30px
-  top: 70px
+  top: calc(70px + 18px + 4px)
   bottom: calc(6rem + 30px)
   height: calc(100% - (6rem + 30px) - 70px)
   overflow-y: scroll

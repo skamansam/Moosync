@@ -1,6 +1,6 @@
 <template>
   <div id="app" :style="rootColors">
-    <button v-on:click="scan()">Scan</button>
+    <!-- <button v-on:click="scan()">Scan</button> -->
     <Titlebar />
     <div>
       <router-view></router-view>
