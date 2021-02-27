@@ -13,6 +13,7 @@ export enum IpcEvents {
 export enum PreferenceEvents {
   SAVE_PREFERENCES = 'savePreferences',
   LOAD_PREFERENCES = 'loadPreferences',
+  PREFERENCE_REFRESH = 'preferenceRefresh',
 }
 
 export enum WindowEvents {

@@ -1,5 +1,6 @@
 import { ArtistEvents, IpcEvents } from './constants'
 import { IpcChannelInterface, IpcRequest } from '.'
+import { getDisabledPaths, preferences } from '@/utils/db/preferences'
 
 import { SongDB } from '@/utils/db'
 
@@ -26,7 +27,7 @@ export class ArtistsChannel implements IpcChannelInterface {
 
   private getArtist(event: Electron.IpcMainEvent, request: IpcRequest) {
     if (request.params.id) {
-      SongDB.getArtistSongs(request.params.id)
+      SongDB.getArtistSongs(request.params.id, getDisabledPaths(preferences.musicPaths))
         .then((data) => {
           event.reply(request.responseChannel, data)
         })

@@ -1,5 +1,6 @@
 import { GenreEvents, IpcEvents } from './constants'
 import { IpcChannelInterface, IpcRequest } from '.'
+import { getDisabledPaths, preferences } from '@/utils/db/preferences'
 
 import { SongDB } from '@/utils/db'
 
@@ -26,7 +27,7 @@ export class GenreChannel implements IpcChannelInterface {
 
   private getGenre(event: Electron.IpcMainEvent, request: IpcRequest) {
     if (request.params.id) {
-      SongDB.getGenreSongs(request.params.id)
+      SongDB.getGenreSongs(request.params.id, getDisabledPaths(preferences.musicPaths))
         .then((data) => {
           event.reply(request.responseChannel, data)
         })

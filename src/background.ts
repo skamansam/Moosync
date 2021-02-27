@@ -4,6 +4,7 @@ import { BrowserWindow, app, nativeTheme, protocol } from 'electron'
 import installExtension, { VUEJS_DEVTOOLS } from 'electron-devtools-installer'
 
 import { createProtocol } from 'vue-cli-plugin-electron-builder/lib'
+import { loadPreferences } from '@/utils/db/preferences'
 import path from 'path'
 import { registerIpcChannels } from '@/utils/ipc/main' // Import for side effects
 
@@ -112,6 +113,7 @@ app.on('ready', async () => {
     }
   })
   nativeTheme.themeSource = 'dark'
+  await loadPreferences()
   mainWindow = await createWindow()
 })
 

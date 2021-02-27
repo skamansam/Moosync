@@ -2,6 +2,8 @@ import { IpcChannelInterface, IpcRequest } from '.'
 import { IpcEvents, PreferenceEvents } from './constants'
 import { loadPreferences, savePreferences } from '../../db/preferences'
 
+import { mainWindow } from '@/background'
+
 export class PreferenceChannel implements IpcChannelInterface {
   name = IpcEvents.PREFERENCES
   handle(event: Electron.IpcMainEvent, request: IpcRequest): void {
@@ -16,7 +18,9 @@ export class PreferenceChannel implements IpcChannelInterface {
   }
 
   private loadPreferences(event: Electron.IpcMainEvent, request: IpcRequest) {
-    loadPreferences().then((data) => event.reply(request.responseChannel, data))
+    loadPreferences()
+      .then((data) => event.reply(request.responseChannel, data))
+      .catch((e) => console.log(e))
   }
 
   private savePreferences(event: Electron.IpcMainEvent, request: IpcRequest) {
@@ -24,4 +28,8 @@ export class PreferenceChannel implements IpcChannelInterface {
       savePreferences(request.params.preferences).then((data) => event.reply(request.responseChannel, data))
     }
   }
+}
+
+export function preferencesChanged() {
+  mainWindow.webContents.send(PreferenceEvents.PREFERENCE_REFRESH)
 }

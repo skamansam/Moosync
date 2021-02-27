@@ -5,7 +5,7 @@
     <Sidebar class="sidebar" />
     <div class="d-flex main-content">
       <transition name="slide-fade">
-        <router-view></router-view>
+        <router-view :key="refreshRouter"></router-view>
       </transition>
     </div>
   </div>
@@ -17,6 +17,8 @@ import Sidebar from '@/mainWindow/components/Sidebar.vue'
 import TopBar from '@/mainWindow/components/TopBar.vue'
 import { Component } from 'vue-property-decorator'
 import Vue from 'vue'
+import { ipcRendererHolder } from '@/utils/ipc/renderer'
+import { PreferenceEvents } from '@/utils/ipc/main/constants'
 
 @Component({
   components: {
@@ -25,7 +27,14 @@ import Vue from 'vue'
     MusicBar,
   },
 })
-export default class DefaultLayout extends Vue {}
+export default class DefaultLayout extends Vue {
+  private refreshRouter: boolean = false
+  mounted() {
+    ipcRendererHolder.listen(PreferenceEvents.PREFERENCE_REFRESH, () => {
+      this.refreshRouter = !this.refreshRouter
+    })
+  }
+}
 </script>
 
 <style lang="sass" scoped>
