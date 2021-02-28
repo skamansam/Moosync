@@ -10,7 +10,7 @@
             value="50"
             class="slider w-100 align-self-center test"
             v-bind:style="{
-              background: ComputedGradient,
+              backgroundPosition: ComputedGradient,
             }"
             id="myRange"
             aria-label="volume"

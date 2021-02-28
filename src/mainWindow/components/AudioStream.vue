@@ -27,6 +27,9 @@ export default class AudioStream extends Vue {
   @Prop({ default: 50 })
   volume!: number
 
+  @Prop({ default: 50 })
+  forceSeek!: number
+
   @Prop({ default: PlayerState.STOPPED })
   playerState!: PlayerState
 
@@ -45,6 +48,10 @@ export default class AudioStream extends Vue {
 
   @Watch('volume') onMatchChanged(newValue: number) {
     this.audioElement.volume = newValue / 100
+  }
+
+  @Watch('forceSeek') onSeek(newValue: number) {
+    this.audioElement.currentTime = newValue
   }
 
   private peerHolder = new SyncHolder()

@@ -1,8 +1,16 @@
 <template>
   <div class="background w-100">
-    <b-progress class="w-100 timeline" :max="currentSong ? currentSong.duration : 0">
-      <b-progress-bar :value="timestamp" variant="success"></b-progress-bar>
-    </b-progress>
+    <VueSlider
+      :min="0"
+      :max="currentSong ? Math.round(currentSong.duration) : 0"
+      class="timeline"
+      :interval="1"
+      :dotSize="10"
+      :value="timestamp"
+      :duration="0.1"
+      :tooltip="'none'"
+      @change="updateTimestmp"
+    />
     <b-container fluid class="d-flex h-100">
       <b-row class="flex-grow-1 justify-content-between">
         <b-col col lg="3"
@@ -26,6 +34,7 @@
       :playerState="playerState"
       :currentSong="currentSong"
       @onTimeUpdate="updateTimestamp"
+      :forceSeek="forceSeek"
       :volume="volume"
     />
   </div>
@@ -41,6 +50,7 @@ import { Song } from '@/models/songs'
 import { PlayerModule, PlayerState } from '@/mainWindow/store/playerState'
 import { SyncModule } from '@/mainWindow/store/syncState'
 import { Component, Vue } from 'vue-property-decorator'
+import { ThemesModule } from '../store/themeState'
 
 @Component({
   components: {
@@ -53,14 +63,29 @@ import { Component, Vue } from 'vue-property-decorator'
 export default class MusicBar extends Vue {
   private currentSong: Song | null = null
   private timestamp: number = 0
+  private forceSeek: number = 0
   private volume: number = 50
   private currentCoverBlob: Blob | null = null
 
   private playerState: PlayerState = PlayerState.STOPPED
 
+  private updateTimestmp(value: number) {
+    this.forceSeek = value
+  }
+
   mounted() {
     this.registerSongInfoListeners()
     this.registerSyncInfoListeners()
+  }
+
+  get rootColors() {
+    return ThemesModule.rootVars
+  }
+
+  get ComputedGradient(): string {
+    return `linear-gradient(90deg, ${this.rootColors['--accentPrimary']} 0%, ${this.rootColors['--accentPrimary']} ${
+      this.currentSong && this.currentSong.duration ? (this.timestamp / this.currentSong.duration) * 100 : 0
+    }%, ${this.rootColors['--quaternary']} 0%)`
   }
 
   private registerSongInfoListeners() {
@@ -106,18 +131,27 @@ export default class MusicBar extends Vue {
 }
 </script>
 
-<style lang="sass" scoped>
+<style lang="sass">
 .background
   background: var(--primary)
   position: fixed
   bottom: 0
-  height: 6rem
+  height: 6.5rem
+
+.timeline-container
+  position: absolute
+  bottom: 6rem
+  height: 1rem
+  width: 100%
+  background-color: #ffffff
 
 .timeline
-  background: var(--tertiary)
-  height: 0.5rem
+  height: 0.5rem !important
+  width: 100%
 
-.timeline > .progress-bar
-  background-color: var(--accentPrimary) !important
-  transition: width 0.3s linear
+.vue-slider-process
+  background-color: var(--accentPrimary)
+
+.vue-slider-rail
+  background-color: var(--tertiary)
 </style>
