@@ -2,10 +2,10 @@
   <b-container fluid class="d-flex flex-column h-100">
     <b-row class="flex-grow-1 align-items-center">
       <b-col cols="auto" class="timestamp">{{ formatDuration(timestamp) }} / {{ formatDuration(duration) }}</b-col>
-      <b-col v-on:click="prevTrack()"><LastTrack /></b-col>
+      <b-col v-on:click="prevSong()"><LastTrack /></b-col>
       <b-col><Repeat /></b-col>
       <b-col v-on:click="togglePlayerState()"><Play /></b-col>
-      <b-col v-on:click="nextTrack()"><NextTrack /></b-col>
+      <b-col v-on:click="nextSong()"><NextTrack /></b-col>
       <b-col><Shuffle /></b-col>
       <!-- <b-col cols="2" class="d-none d-xl-block"></b-col> -->
     </b-row>
@@ -14,12 +14,14 @@
 
 <script lang="ts">
 import { PlayerModule, PlayerState } from '@/mainWindow/store/playerState'
-import { Component, Prop, Vue } from 'vue-property-decorator'
+import { Component, Prop } from 'vue-property-decorator'
 import LastTrack from '@/mainWindow/components/icons/LastTrack.vue'
 import NextTrack from '@/mainWindow/components/icons/NextTrack.vue'
 import Play from '@/mainWindow/components/icons/Play.vue'
 import Repeat from '@/mainWindow/components/icons/Repeat.vue'
 import Shuffle from '@/mainWindow/components/icons/Shuffle.vue'
+import { mixins } from 'vue-class-component'
+import PlayerControls from '@/utils/mixins/PlayerControls'
 
 @Component({
   components: {
@@ -30,14 +32,12 @@ import Shuffle from '@/mainWindow/components/icons/Shuffle.vue'
     Shuffle,
   },
 })
-export default class MusicBar extends Vue {
+export default class MusicBar extends mixins(PlayerControls) {
   @Prop({ default: 0 })
   private duration!: number
 
   @Prop({ default: 0 })
   private timestamp!: number
-
-  private playerState: PlayerState = PlayerState.STOPPED
 
   mounted() {
     this.setupListeners()
@@ -57,25 +57,10 @@ export default class MusicBar extends Vue {
     PlayerModule.$watch(
       (playerModule) => playerModule.playerState,
       (newState: PlayerState) => {
-        this.playerState = newState
+        // TODO: Change icons
+        console.log(newState)
       }
     )
-  }
-
-  private togglePlayerState() {
-    if (this.playerState == PlayerState.PAUSED || this.playerState == PlayerState.STOPPED) {
-      PlayerModule.setState(PlayerState.PLAYING)
-    } else {
-      PlayerModule.setState(PlayerState.PAUSED)
-    }
-  }
-
-  private lastTrack() {
-    PlayerModule.prevSong()
-  }
-
-  private nextTrack() {
-    PlayerModule.nextSong()
   }
 }
 </script>

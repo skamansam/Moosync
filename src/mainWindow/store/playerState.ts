@@ -26,13 +26,20 @@ class Queue {
     return null
   }
 
-  public push(item: Song): void {
+  private addSong(item: Song) {
     if (!this.data[item._id!]) {
-      this.order.push(item._id!)
       this.data[item._id!] = item
-      return
     }
+  }
+
+  public push(item: Song): void {
+    this.addSong(item)
     this.order.push(item._id!)
+  }
+
+  public pushAtIndex(item: Song): void {
+    this.addSong(item)
+    this.order.splice(this.index + 1, 0, item._id!)
   }
 
   public next() {
@@ -48,10 +55,7 @@ class Queue {
   public pop(): Song | null {
     if (this.index > 0) {
       let id = this.order.pop()
-      let elem = this.data[id!]
-      delete this.data[id!]
-      this.prev()
-      return elem
+      return this.data[id!]
     }
     return null
   }
@@ -90,12 +94,22 @@ class Player extends VuexModule {
     this.songQueue.push(Song)
   }
 
+  @Mutation
+  loadInQueueTop(Song: Song) {
+    this.songQueue.pushAtIndex(Song)
+  }
+
   @Action
   pushInQueue(Song: Song) {
     this.loadInQueue(Song)
     if (this.currentSongDets == null) {
       this.nextSong()
     }
+  }
+
+  @Action
+  pushInQueueTop(Song: Song) {
+    this.loadInQueueTop(Song)
   }
 
   @Action

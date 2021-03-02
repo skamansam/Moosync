@@ -3,10 +3,11 @@ import * as path from 'path'
 import DB, { BetterSqlite3Helper } from 'better-sqlite3-helper'
 import { Song, marshaledSong } from '@/models/songs'
 
-import { Album } from '@/models/albums'
+import { Album } from '../../models/albums'
 import { Databases } from './constants'
 import { Genre } from '@/models/genre'
 import { Playlist } from '../../models/playlists'
+import { SearchResult } from '../../models/searchResult'
 import { app } from 'electron'
 import { artists } from '@/models/artists'
 import { migrations } from './migrations'
@@ -408,6 +409,25 @@ export class SongDBInstance {
         this.db.delete('playlist_bridge', { playlist: playlist, song: s })
       }
     })(songs)
+  }
+
+  public async searchSongs(term: string, exclude?: string[]): Promise<SearchResult> {
+    let songs: marshaledSong[] = []
+    songs = this.db.query(
+      `SELECT * FROM allsongs A        
+        LEFT JOIN genre_bridge B ON A._id = B.song
+        LEFT JOIN genre C ON B.genre = C.genre_id
+        LEFT JOIN artists_bridge C ON A._id = C.song
+        LEFT JOIN artists D ON C.artist = D.artist_id
+        LEFT JOIN album_bridge E ON A._id = E.song
+        LEFT JOIN albums F ON E.album = F.album_id  WHERE A.path LIKE ? ${this.addExcludeWhereClause(
+          false,
+          'A.path',
+          exclude
+        )}`,
+      `%${term}%`
+    )
+    return { songs: this.flattenDict(this.mergeSongs(songs)) }
   }
 }
 

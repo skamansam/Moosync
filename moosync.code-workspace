@@ -24,7 +24,17 @@
 			"musicmetadata",
 			"unmarshaled",
 			"vuesax"
-		]
+		],
+		"sqltools.connections": [
+			{
+				"previewLimit": 50,
+				"driver": "SQLite",
+				"name": "Moosync",
+				"group": "Sqlite",
+				"database": "/home/ovenoboyo/.config/moosync/databases/songs.db"
+			}
+		],
+		"sqltools.useNodeRuntime": true
 	},
 	"extensions": {
 		"recommendations": [

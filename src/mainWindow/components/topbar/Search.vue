@@ -1,52 +1,141 @@
 <template>
-  <div class="h-100 d-flex align-items-center">
-    <svg
-      class="search-icon my-auto"
-      width="18"
-      height="18"
-      viewBox="0 0 19 19"
-      fill="none"
-      xmlns="http://www.w3.org/2000/svg"
-    >
-      <path
-        fill-rule="evenodd"
-        clip-rule="evenodd"
-        d="M12.3431 12.2426C14.6863 9.8995 14.6863 6.1005 12.3431 3.75736C10 1.41421 6.20101 1.41421 3.85786 3.75736C1.51472 6.1005 1.51472 9.8995 3.85786 12.2426C6.20101 14.5858 10 14.5858 12.3431 12.2426ZM13.7574 2.34315C16.6425 5.22833 16.8633 9.76899 14.4195 12.9075C14.4348 12.921 14.4498 12.9351 14.4645 12.9497L18.7071 17.1924C19.0976 17.5829 19.0976 18.2161 18.7071 18.6066C18.3166 18.9971 17.6834 18.9971 17.2929 18.6066L13.0503 14.364C13.0356 14.3493 13.0215 14.3343 13.008 14.319C9.8695 16.7628 5.32883 16.542 2.44365 13.6569C-0.680542 10.5327 -0.680542 5.46734 2.44365 2.34315C5.56785 -0.781049 10.6332 -0.781049 13.7574 2.34315Z"
-        fill="white"
+  <div class="h-100 d-flex align-items-center search-container">
+    <div class="w-100 searchbar-container" :class="showSearchResults ? 'half-border' : 'full-border'">
+      <Search class="search-icon" />
+      <b-form-input
+        class="searchbar"
+        placeholder="Search..."
+        type="text"
+        debounce="300"
+        @update="onTextChange"
+        @blur="handleInputFocus"
+        @focus="handleInputFocus"
       />
-    </svg>
-
-    <b-form-input class="searchbar" placeholder="Search..." type="text" debounce="500" />
+    </div>
+    <div class="search-results d-flex" :class="showSearchResults ? 'search-visible' : 'search-invisible'">
+      <div v-if="results && results.songs.length !== 0" class="w-100">
+        <div v-for="(song, index) in results.songs" :key="song._id">
+          <SingleSearchResult :song="song" :divider="index != results.songs.length - 1" />
+        </div>
+      </div>
+      <div class="w-100 text-center" v-if="results && results.songs.length == 0">No Results found</div>
+    </div>
   </div>
 </template>
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator'
+import Search from '@/mainWindow/components/icons/Search.vue'
+import { SearchResult } from '@/models/searchResult'
+import { ipcRendererHolder } from '@/utils/ipc/renderer'
+import { IpcEvents, SearchEvents } from '@/utils/ipc/main/constants'
+import SingleSearchResult from '@/mainWindow/components/topbar/SingleSearchResult.vue'
 
-@Component({})
-export default class Sidebar extends Vue {}
+@Component({
+  components: {
+    Search,
+    SingleSearchResult,
+  },
+})
+export default class Sidebar extends Vue {
+  private showSearchResults: boolean = false
+  private results: SearchResult | null = null
+
+  private handleInputFocus(event: FocusEvent) {
+    switch (event.type) {
+      case 'blur':
+        this.showSearchResults = false
+        break
+      case 'focus':
+        this.showSearchResults = this.results ? true : false
+        break
+    }
+  }
+  private onTextChange(value: string) {
+    if (value) {
+      this.showSearchResults = true
+      ipcRendererHolder
+        .send<SearchResult>(IpcEvents.SEARCH, {
+          type: SearchEvents.SEARCH_SONGS,
+          params: { searchTerm: value },
+        })
+        .then((result) => {
+          this.results = result
+        })
+    } else {
+      this.showSearchResults = false
+      this.results = null
+    }
+  }
+}
 </script>
 
 <style lang="sass" scoped>
 .searchbar
-  border-radius: 58px
   color: var(--textPrimary) !important
-  background: var(--secondary)
-  box-shadow: none
+  background: rgba(0, 0, 0, 0)
   border: none
-  transition: background 0.3s cubic-bezier(0.39, 0.58, 0.57, 1)
-  text-align: center
-
-.searchbar::-webkit-input-placeholder
-  color: var(--textSecondary)
-
-.searchbar:focus
-  background: #000000
-  outline: 0
+  height: 24px
+  margin-top: -12px
+  width: calc(100% - 24px - 18px - 15px)
+  position: absolute
+  transition: background 0.3s cubic-bezier(0.39, 0.58, 0.57, 1), border-radius 1000ms
+  text-align: left
+  top: 50%
   box-shadow: none
+  margin-left: calc(24px + 18px)
+  &::-webkit-input-placeholder
+    color: var(--textSecondary)
+  &:focus
+      background: rgba(0, 0, 0, 0) !important
+      outline: 0
+
+.full-border
+  border-radius: 58px
+
+.half-border
+  border-radius: 18px 18px 0 0
+  box-shadow: 0px -2px 17px 0px rgb(0 0 0 / 27%) !important
 
 .search-icon
   position: absolute
   height: 24px
+  top: 50%
+  left: 0
+  margin-top: -12px
   margin-left: 15px
+
+.search-results
+  position: absolute
+  top: 50px
+  padding: 0.375rem 0.75rem
+  width: 100%
+  background: var(--secondary)
+  border-radius: 0 0 18px 18px
+  box-shadow: 0 4px 6px rgb(32 33 36 / 28%)
+  max-height: 60vh
+  overflow: scroll
+  overflow-x: hidden
+  &::-webkit-scrollbar-track
+    margin-top: 0
+    margin-bottom: 18px
+    background: var(--secondary)
+
+.search-invisible
+  visibility: hidden
+  opacity: 0
+  transition: visibility 0s linear 300ms, opacity 300ms
+
+.search-visible
+  visibility: visible
+  opacity: 1
+  transition: visibility 0s linear 0s, opacity 300ms
+
+.searchbar-container
+  height:50px
+  background: var(--secondary)
+  position: relative
+
+.search-container
+  position: relative
 </style>

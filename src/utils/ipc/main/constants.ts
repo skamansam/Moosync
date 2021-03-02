@@ -8,6 +8,11 @@ export enum IpcEvents {
   CONTEXT_MENU = 'contextMenu',
   BROWSER_WINDOWS = 'browserWindows',
   PREFERENCES = 'preferences',
+  SEARCH = 'search',
+}
+
+export enum SearchEvents {
+  SEARCH_SONGS = 'searchAll',
 }
 
 export enum PreferenceEvents {

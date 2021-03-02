@@ -2,7 +2,7 @@
   <div class="topbar-container d-flex w-100 align-items-center">
     <b-container fluid class="d-flex">
       <b-row class="flex-grow-1 justify-content-start">
-        <b-col cols="10"> <Search /> </b-col>
+        <b-col cols="9"> <Search /> </b-col>
         <b-col cols="auto" class="my-auto"> <Navigation /> </b-col>
       </b-row>
     </b-container>

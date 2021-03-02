@@ -27,7 +27,7 @@ async function getInfo(data: mm.IAudioMetadata, stats: stats, coverPath?: string
   }
 
   return {
-    title: data.common.title ? data.common.title : path.basename(stats.path),
+    title: data.common.title ? data.common.title : path.basename(stats.path).split('.').slice(0, -1).join('.'),
     path: stats.path,
     size: stats.size,
     album: {

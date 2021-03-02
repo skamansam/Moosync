@@ -41,8 +41,9 @@ export default class App extends Vue {
       '--quaternary': '#404040',
       '--textPrimary': '#ffffff',
       '--textPrimaryTransparent': '#ffffff03',
-      '--textSecondary': '#565656',
+      '--textSecondary': 'rgba(227, 227, 227, 0.43)',
       '--accentPrimary': '#65CB88',
+      '--divider': 'rgba(79, 79, 79, 0.67)',
     })
   }
 
