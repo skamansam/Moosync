@@ -1,7 +1,7 @@
 import { Module, Mutation, VuexModule } from 'vuex-class-modules'
 
 import { Song } from '@/models/songs'
-import store from '.'
+import store from '@/commonStore'
 
 export enum PeerMode {
   WATCHER,

@@ -5,7 +5,7 @@ import '@/sass/global.sass'
 import App from '@/mainWindow/App.vue'
 import Vue from 'vue'
 import router from '@/mainWindow/plugins/router'
-import store from '@/mainWindow/store'
+import store from '@/commonStore'
 
 Vue.config.productionTip = false
 

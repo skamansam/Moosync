@@ -13,46 +13,22 @@
 
 <script lang="ts">
 import { Component } from 'vue-property-decorator'
-import Vue from 'vue'
-import { ThemesModule } from '@/preferenceWindow/store/themeState'
 import Titlebar from '@/commonComponents/Titlebar.vue'
 import { Preferences } from '@/utils/db/constants'
 import { ipcRendererHolder } from '@/utils/ipc/renderer'
 import { IpcEvents, PreferenceEvents, WindowEvents } from '@/utils/ipc/main/constants'
 import { PreferencesModule } from './store/preferences'
+import { mixins } from 'vue-class-component'
+import ThemeHandler from '@/utils/mixins/ThemeHandler'
 
 @Component({
   components: {
     Titlebar,
   },
 })
-export default class App extends Vue {
-  private root = document.documentElement
-  get rootColors() {
-    return ThemesModule.rootVars
-  }
-
-  private setDefaultTheme() {
-    ThemesModule.setRootVars({
-      '--primary': '#212121',
-      '--secondary': '#282828',
-      '--tertiary': '#202730',
-      '--quaternary': '#404040',
-      '--textPrimary': '#ffffff',
-      '--textPrimaryTransparent': '#ffffff03',
-      '--textSecondary': '#565656',
-      '--accentPrimary': '#65CB88',
-      '--divider': 'rgba(79, 79, 79, 0.67)',
-    })
-  }
-
+export default class App extends mixins(ThemeHandler) {
   created() {
     this.loadPreferences()
-  }
-
-  mounted() {
-    this.registerThemeListeners()
-    this.setDefaultTheme()
   }
 
   private loadPreferences() {
@@ -72,15 +48,6 @@ export default class App extends Vue {
       type: PreferenceEvents.SAVE_PREFERENCES,
       params: { preferences: PreferencesModule.preferences },
     })
-  }
-
-  private registerThemeListeners() {
-    ThemesModule.$watch(
-      (themesModule) => themesModule.rootVars,
-      async (newColors: { [key: string]: string }) => {
-        this.root.style.setProperty('--primary', newColors['--primary'])
-      }
-    )
   }
 }
 </script>

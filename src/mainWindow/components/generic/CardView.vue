@@ -13,12 +13,14 @@
 </template>
 
 <script lang="ts">
-import { Component, Prop, Vue } from 'vue-property-decorator'
+import Colors from '@/utils/mixins/Colors'
+import { mixins } from 'vue-class-component'
+import { Component, Prop } from 'vue-property-decorator'
 
 @Component({
   components: {},
 })
-export default class SongDetails extends Vue {
+export default class SongDetails extends mixins(Colors) {
   @Prop({ default: '' })
   private title!: string
 

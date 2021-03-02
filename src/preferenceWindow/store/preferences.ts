@@ -1,7 +1,7 @@
 import { Module, Mutation, VuexModule } from 'vuex-class-modules'
 import { Preferences, defaultPreferences } from '@/utils/db/constants'
 
-import store from '.'
+import store from '@/commonStore'
 
 export enum PeerMode {
   WATCHER,

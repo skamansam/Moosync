@@ -32,11 +32,13 @@
 
 <script lang="ts">
 import { Song } from '@/models/songs'
+import Colors from '@/utils/mixins/Colors'
 import { Resizer } from '@/utils/ui/resizer'
-import { Component, Prop, Vue } from 'vue-property-decorator'
+import { mixins } from 'vue-class-component'
+import { Component, Prop } from 'vue-property-decorator'
 
 @Component({})
-export default class SongList extends Vue {
+export default class SongList extends mixins(Colors) {
   private test: boolean = false
   private lastSelect: string = ''
   private resizer!: Resizer

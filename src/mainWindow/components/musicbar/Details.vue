@@ -15,11 +15,12 @@
 </template>
 
 <script lang="ts">
-import Vue from 'vue'
+import Colors from '@/utils/mixins/Colors'
+import { mixins } from 'vue-class-component'
 import { Component, Prop, Ref, Watch } from 'vue-property-decorator'
 
 @Component({})
-export default class MusicBar extends Vue {
+export default class MusicBar extends mixins(Colors) {
   @Prop({ default: '-' })
   title!: string
 

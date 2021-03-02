@@ -24,12 +24,14 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue } from 'vue-property-decorator'
+import { Component } from 'vue-property-decorator'
 import Search from '@/mainWindow/components/icons/Search.vue'
 import { SearchResult } from '@/models/searchResult'
 import { ipcRendererHolder } from '@/utils/ipc/renderer'
 import { IpcEvents, SearchEvents } from '@/utils/ipc/main/constants'
 import SingleSearchResult from '@/mainWindow/components/topbar/SingleSearchResult.vue'
+import Colors from '@/utils/mixins/Colors'
+import { mixins } from 'vue-class-component'
 
 @Component({
   components: {
@@ -37,7 +39,7 @@ import SingleSearchResult from '@/mainWindow/components/topbar/SingleSearchResul
     SingleSearchResult,
   },
 })
-export default class Sidebar extends Vue {
+export default class Sidebar extends mixins(Colors) {
   private showSearchResults: boolean = false
   private results: SearchResult | null = null
 

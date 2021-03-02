@@ -13,12 +13,14 @@
 </template>
 
 <script lang="ts">
-import { Component, Prop, Ref, Vue } from 'vue-property-decorator'
+import Colors from '@/utils/mixins/Colors'
+import { mixins } from 'vue-class-component'
+import { Component, Prop, Ref } from 'vue-property-decorator'
 
 @Component({
   components: {},
 })
-export default class SongDetails extends Vue {
+export default class SongDetails extends mixins(Colors) {
   @Ref('cover') imageElement!: HTMLImageElement
 
   @Prop({ default: '' })

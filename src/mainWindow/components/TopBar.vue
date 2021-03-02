@@ -12,7 +12,9 @@
 <script lang="ts">
 import Navigation from '@/mainWindow/components/topbar/Navigation.vue'
 import Search from '@/mainWindow/components/topbar/Search.vue'
-import { Component, Vue } from 'vue-property-decorator'
+import Colors from '@/utils/mixins/Colors'
+import { mixins } from 'vue-class-component'
+import { Component } from 'vue-property-decorator'
 
 @Component({
   components: {
@@ -20,7 +22,7 @@ import { Component, Vue } from 'vue-property-decorator'
     Navigation,
   },
 })
-export default class TopBar extends Vue {}
+export default class TopBar extends mixins(Colors) {}
 </script>
 
 <style lang="sass" scoped>

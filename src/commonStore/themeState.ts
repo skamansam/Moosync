@@ -1,5 +1,7 @@
 import { Module, Mutation, VuexModule } from 'vuex-class-modules'
 
+import store from '.'
+
 @Module
 export default class Themes extends VuexModule {
   private colors: { [key: string]: string } = {}
@@ -13,3 +15,5 @@ export default class Themes extends VuexModule {
     this.colors = colors
   }
 }
+
+export const ThemesModule = new Themes({ store, name: 'themes' })

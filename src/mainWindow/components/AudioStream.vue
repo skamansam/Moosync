@@ -12,11 +12,13 @@ import { Song } from '@/models/songs'
 import { SyncHolder } from '@/utils/sync/syncHandler'
 import { PlayerModule, PlayerState } from '@/mainWindow/store/playerState'
 import { PeerMode, SyncModule } from '@/mainWindow/store/syncState'
-import { Component, Prop, Ref, Vue, Watch } from 'vue-property-decorator'
+import { Component, Prop, Ref, Watch } from 'vue-property-decorator'
 import YTPlayer from 'yt-player'
+import Colors from '@/utils/mixins/Colors'
+import { mixins } from 'vue-class-component'
 
 @Component({})
-export default class AudioStream extends Vue {
+export default class AudioStream extends mixins(Colors) {
   private currentTime: number = 0
 
   @Ref('audio') audioElement!: ExtendedHtmlAudioElement

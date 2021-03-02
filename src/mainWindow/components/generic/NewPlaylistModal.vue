@@ -12,10 +12,12 @@
 import { IpcEvents, PlaylistEvents } from '@/utils/ipc/main/constants'
 import { ipcRendererHolder } from '@/utils/ipc/renderer'
 import { PlaylistModule } from '@/mainWindow/store/playlists'
-import { Component, Prop, Vue } from 'vue-property-decorator'
+import { Component, Prop } from 'vue-property-decorator'
+import Colors from '@/utils/mixins/Colors'
+import { mixins } from 'vue-class-component'
 
 @Component({})
-export default class NewPlaylistModal extends Vue {
+export default class NewPlaylistModal extends mixins(Colors) {
   @Prop({ default: 'NewPlaylistModal' })
   private id!: string
 

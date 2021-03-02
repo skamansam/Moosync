@@ -28,11 +28,12 @@
 
 <script lang="ts">
 import { Component, Prop } from 'vue-property-decorator'
-import Vue from 'vue'
 import SongList from '@/mainWindow/components/generic/SongList.vue'
 import SongDetails from '@/mainWindow/components/generic/SongDetails.vue'
 import { Song } from '@/models/songs'
 import { PlayerModule } from '@/mainWindow/store/playerState'
+import Colors from '@/utils/mixins/Colors'
+import { mixins } from 'vue-class-component'
 
 @Component({
   components: {
@@ -40,7 +41,7 @@ import { PlayerModule } from '@/mainWindow/store/playerState'
     SongDetails,
   },
 })
-export default class AllSongs extends Vue {
+export default class AllSongs extends mixins(Colors) {
   @Prop({ default: [] })
   private songList!: Song[]
 

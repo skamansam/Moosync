@@ -10,15 +10,16 @@
 
 <script lang="ts">
 // import {Themes} from '@/commonStore/themeState'
-import { ThemesModule } from '@/mainWindow/store/themeState'
 
 import { Playlist } from '@/models/playlists'
 import { IpcEvents, PlaylistEvents, ScannerEvents, WindowEvents } from '@/utils/ipc/main/constants'
 
 import { playlistInfo, PlaylistModule } from '@/mainWindow/store/playlists'
-import { Component, Vue } from 'vue-property-decorator'
+import { Component } from 'vue-property-decorator'
 import { ipcRendererHolder } from '@/utils/ipc/renderer'
 import Titlebar from '@/commonComponents/Titlebar.vue'
+import { mixins } from 'vue-class-component'
+import ThemeHandler from '@/utils/mixins/ThemeHandler'
 
 const stun = require('stun')
 
@@ -27,29 +28,8 @@ const stun = require('stun')
     Titlebar,
   },
 })
-export default class App extends Vue {
-  private root = document.documentElement
-  get rootColors() {
-    return ThemesModule.rootVars
-  }
-
-  private setDefaultTheme() {
-    ThemesModule.setRootVars({
-      '--primary': '#212121',
-      '--secondary': '#282828',
-      '--tertiary': '#202730',
-      '--quaternary': '#404040',
-      '--textPrimary': '#ffffff',
-      '--textPrimaryTransparent': '#ffffff03',
-      '--textSecondary': 'rgba(227, 227, 227, 0.43)',
-      '--accentPrimary': '#65CB88',
-      '--divider': 'rgba(79, 79, 79, 0.67)',
-    })
-  }
-
+export default class App extends mixins(ThemeHandler) {
   mounted() {
-    this.registerThemeListeners()
-    this.setDefaultTheme()
     this.watchPlaylistUpdates()
     this.populatePlaylists()
     this.registerDevTools()
@@ -83,15 +63,6 @@ export default class App extends Vue {
         console.log('ip: ', address)
       }
     })
-  }
-
-  private registerThemeListeners() {
-    ThemesModule.$watch(
-      (themesModule) => themesModule.rootVars,
-      async (newColors: { [key: string]: string }) => {
-        this.root.style.setProperty('--primary', newColors['--primary'])
-      }
-    )
   }
 
   private watchPlaylistUpdates() {

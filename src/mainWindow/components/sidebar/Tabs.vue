@@ -21,7 +21,7 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue } from 'vue-property-decorator'
+import { Component } from 'vue-property-decorator'
 import { ActiveTab } from '@/utils/ui/enums'
 import Playlists from '@/mainWindow/components/icons/Playlists.vue'
 import AllSongs from '@/mainWindow/components/icons/AllSongs.vue'
@@ -31,6 +31,8 @@ import Genre from '@/mainWindow/components/icons/Genre.vue'
 import Albums from '@/mainWindow/components/icons/Albums.vue'
 import Toggle from '@/mainWindow/components/icons/Toggle.vue'
 import Rooms from '@/mainWindow/components/icons/Rooms.vue'
+import Colors from '@/utils/mixins/Colors'
+import { mixins } from 'vue-class-component'
 
 @Component({
   components: {
@@ -44,7 +46,7 @@ import Rooms from '@/mainWindow/components/icons/Rooms.vue'
     Rooms,
   },
 })
-export default class Sidebar extends Vue {
+export default class Sidebar extends mixins(Colors) {
   private componentNames = [
     { component: 'AllSongs', title: 'All Songs', link: '/songs' },
     { component: 'Playlists', title: 'Playlists', link: '/playlists' },

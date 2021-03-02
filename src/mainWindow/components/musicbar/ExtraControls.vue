@@ -10,7 +10,7 @@
             value="50"
             class="slider w-100 align-self-center test"
             v-bind:style="{
-              backgroundPosition: ComputedGradient,
+              background: ComputedGradient,
             }"
             id="myRange"
             aria-label="volume"
@@ -30,10 +30,11 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue } from 'vue-property-decorator'
+import { Component } from 'vue-property-decorator'
 import VolumeIcon from '@/mainWindow/components/icons/Volume.vue'
 import ExpandIcon from '@/mainWindow/components/icons/Expand.vue'
-import { ThemesModule } from '@/mainWindow/store/themeState'
+import Colors from '@/utils/mixins/Colors'
+import { mixins } from 'vue-class-component'
 
 @Component({
   components: {
@@ -41,15 +42,12 @@ import { ThemesModule } from '@/mainWindow/store/themeState'
     ExpandIcon,
   },
 })
-export default class MusicBar extends Vue {
+export default class MusicBar extends mixins(Colors) {
   // TODO: Load last used volume
   private volume: number = 50
 
   private emitVolume() {
     this.$emit('onVolumeChange', this.volume)
-  }
-  get rootColors() {
-    return ThemesModule.rootVars
   }
 
   get ComputedGradient(): string {

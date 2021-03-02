@@ -46,11 +46,12 @@ import Controls from '@/mainWindow/components/musicbar/Controls.vue'
 import Details from '@/mainWindow/components/musicbar/Details.vue'
 import ExtraControls from '@/mainWindow/components/musicbar/ExtraControls.vue'
 
+import { Component } from 'vue-property-decorator'
 import { Song } from '@/models/songs'
 import { PlayerModule, PlayerState } from '@/mainWindow/store/playerState'
 import { SyncModule } from '@/mainWindow/store/syncState'
-import { Component, Vue } from 'vue-property-decorator'
-import { ThemesModule } from '../store/themeState'
+import Colors from '@/utils/mixins/Colors'
+import { mixins } from 'vue-class-component'
 
 @Component({
   components: {
@@ -60,7 +61,7 @@ import { ThemesModule } from '../store/themeState'
     AudioStream,
   },
 })
-export default class MusicBar extends Vue {
+export default class MusicBar extends mixins(Colors) {
   private currentSong: Song | null = null
   private timestamp: number = 0
   private forceSeek: number = 0
@@ -76,16 +77,6 @@ export default class MusicBar extends Vue {
   mounted() {
     this.registerSongInfoListeners()
     this.registerSyncInfoListeners()
-  }
-
-  get rootColors() {
-    return ThemesModule.rootVars
-  }
-
-  get ComputedGradient(): string {
-    return `linear-gradient(90deg, ${this.rootColors['--accentPrimary']} 0%, ${this.rootColors['--accentPrimary']} ${
-      this.currentSong && this.currentSong.duration ? (this.timestamp / this.currentSong.duration) * 100 : 0
-    }%, ${this.rootColors['--quaternary']} 0%)`
   }
 
   private registerSongInfoListeners() {
