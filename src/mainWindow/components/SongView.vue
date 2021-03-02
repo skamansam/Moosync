@@ -42,7 +42,7 @@ import { mixins } from 'vue-class-component'
   },
 })
 export default class AllSongs extends mixins(Colors) {
-  @Prop({ default: [] })
+  @Prop({ default: () => [] })
   private songList!: Song[]
 
   private currentSong: Song | null = null

@@ -1,12 +1,12 @@
-import { IpcRenderer } from 'electron'
 import { IpcRendererEvent } from 'electron/renderer'
 import { IpcRequest } from '../main'
+import { ipcRendererRestricted } from '@/types/declarations/window'
 import { v4 } from 'uuid'
 
 class IpcRendererHolder {
-  ipcRenderer: IpcRenderer
+  ipcRenderer: ipcRendererRestricted
 
-  constructor(renderer: IpcRenderer) {
+  constructor(renderer: ipcRendererRestricted) {
     this.ipcRenderer = renderer
   }
 
@@ -17,7 +17,7 @@ class IpcRendererHolder {
     this.ipcRenderer.send(channel, request)
 
     return new Promise((resolve) => {
-      this.ipcRenderer.once(request.responseChannel!, (event, response) => resolve(response))
+      this.ipcRenderer.once(request.responseChannel!, (response) => resolve(response))
     })
   }
 
