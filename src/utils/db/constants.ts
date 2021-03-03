@@ -3,11 +3,6 @@ export interface Preferences {
   musicPaths: musicPaths
 }
 
-export enum Databases {
-  SONG = 'song',
-  ALBUMS = 'albums',
-}
-
 export const defaultPreferences: Preferences = {
   musicPaths: [],
 }
