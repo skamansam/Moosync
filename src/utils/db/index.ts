@@ -420,11 +420,13 @@ export class SongDBInstance {
         LEFT JOIN artists_bridge C ON A._id = C.song
         LEFT JOIN artists D ON C.artist = D.artist_id
         LEFT JOIN album_bridge E ON A._id = E.song
-        LEFT JOIN albums F ON E.album = F.album_id  WHERE A.path LIKE ? ${this.addExcludeWhereClause(
+        LEFT JOIN albums F ON E.album = F.album_id  WHERE A.path LIKE ? OR F.album_name LIKE ? OR D.artist_name LIKE ? ${this.addExcludeWhereClause(
           false,
           'A.path',
           exclude
         )}`,
+      `%${term}%`,
+      `%${term}%`,
       `%${term}%`
     )
     return { songs: this.flattenDict(this.mergeSongs(songs)) }
