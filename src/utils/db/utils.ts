@@ -71,37 +71,12 @@ export class DBUtils {
     }
   }
 
-  protected pushIfUnique(tag: 'artists' | 'genre', list: string[] | undefined, song: Song) {
-    if (song[tag]) {
-      for (let s of list!) {
-        if (!song[tag]!.includes(s)) song[tag]!.push(s)
-      }
-    } else {
-      song[tag] = list
-    }
-  }
-
-  protected mergeSongs(marshaled: marshaledSong[]) {
-    let unmarshaled: { [key: string]: Song } = {}
+  protected batchUnmarshal(marshaled: marshaledSong[]) {
+    let unmarshaled: Song[] = []
     for (let m of marshaled) {
-      let song = this.unMarshalSong(m)
-      if (unmarshaled[song._id!]) {
-        // Merge all duplicate values
-        this.pushIfUnique('artists', song.artists, unmarshaled[song._id!])
-        this.pushIfUnique('genre', song.genre, unmarshaled[song._id!])
-      } else {
-        unmarshaled[song._id!] = song
-      }
+      unmarshaled.push(this.unMarshalSong(m))
     }
     return unmarshaled
-  }
-
-  protected flattenDict(dict: { [key: string]: Song }) {
-    let final = []
-    for (let n in dict) {
-      final.push(dict[n])
-    }
-    return final
   }
 
   protected registerRegexp() {
@@ -158,5 +133,9 @@ export class DBUtils {
       this.leftJoinCommon('artists', 'artist', 'artists_bridge') +
       this.leftJoinCommon('genre', 'genre', 'genre_bridge')
     )
+  }
+
+  protected addGroupConcatClause() {
+    return 'group_concat(artist_name) as artist_name, group_concat(genre_name) as genre_name'
   }
 }

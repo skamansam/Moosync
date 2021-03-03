@@ -8,18 +8,18 @@ import { SearchResult } from '../../models/searchResult'
 import { artists } from '@/models/artists'
 import { v4 } from 'uuid'
 
-export class SongDBInstance extends DBUtils {
+class SongDBInstance extends DBUtils {
   /* ============================= 
                 ALLSONGS
      ============================= */
 
   public async getAllSongs(exclude?: string[]): Promise<Song[]> {
     let marshaled: marshaledSong[] = this.db.query(
-      `SELECT * FROM allsongs
+      `SELECT *, ${this.addGroupConcatClause()} FROM allsongs
       ${this.addLeftJoinClause(undefined, 'allsongs')}
-      ${this.addExcludeWhereClause(true, exclude)}`
+      ${this.addExcludeWhereClause(true, exclude)} GROUP BY allsongs._id`
     )
-    return this.flattenDict(this.mergeSongs(marshaled))
+    return this.batchUnmarshal(marshaled)
   }
 
   public async store(newDoc: Song): Promise<void> {
@@ -47,17 +47,17 @@ export class SongDBInstance extends DBUtils {
   public async searchSongs(term: string, exclude?: string[]): Promise<SearchResult> {
     let songs: marshaledSong[] = []
     songs = this.db.query(
-      `SELECT * FROM allsongs
+      `SELECT * FROM allsongs, ${this.addGroupConcatClause()} 
       ${this.addLeftJoinClause(undefined, 'allsongs')}
         WHERE allsongs.path LIKE ? 
         OR albums.album_name LIKE ?
         OR artists.artist_name LIKE ?
-        ${this.addExcludeWhereClause(false, exclude)}`,
+        ${this.addExcludeWhereClause(false, exclude)} GROUP BY allsongs._id`,
       `%${term}%`,
       `%${term}%`,
       `%${term}%`
     )
-    return { songs: this.flattenDict(this.mergeSongs(songs)) }
+    return { songs: this.batchUnmarshal(songs) }
   }
 
   public async countByHash(hash: string): Promise<number> {
@@ -92,13 +92,13 @@ export class SongDBInstance extends DBUtils {
 
   public async getAlbumSongs(id: string, exclude?: string[]): Promise<Song[]> {
     let marshaled: marshaledSong[] = this.db.query(
-      `SELECT * FROM album_bridge
+      `SELECT *, ${this.addGroupConcatClause()} FROM album_bridge
       ${this.addLeftJoinClause('album_bridge', 'album')} 
       WHERE album_bridge.album = ? 
-      ${this.addExcludeWhereClause(false, exclude)}`,
+      ${this.addExcludeWhereClause(false, exclude)} GROUP BY allsongs._id`,
       id
     )
-    return this.flattenDict(this.mergeSongs(marshaled))
+    return this.batchUnmarshal(marshaled)
   }
 
   private storeAlbum(album: Album): string {
@@ -140,13 +140,13 @@ export class SongDBInstance extends DBUtils {
 
   public async getGenreSongs(id: string, exclude?: string[]) {
     let marshaled: marshaledSong[] = this.db.query(
-      `SELECT * FROM genre_bridge 
+      `SELECT *, ${this.addGroupConcatClause()} FROM genre_bridge 
       ${this.addLeftJoinClause('genre_bridge', 'genre')}
       WHERE genre_bridge.genre = ? 
-      ${this.addExcludeWhereClause(false, exclude)}`,
+      ${this.addExcludeWhereClause(false, exclude)} GROUP BY allsongs._id`,
       id
     )
-    return this.flattenDict(this.mergeSongs(marshaled))
+    return this.batchUnmarshal(marshaled)
   }
 
   private storeGenre(genre?: string[]) {
@@ -191,13 +191,13 @@ export class SongDBInstance extends DBUtils {
 
   public async getArtistSongs(id: string, exclude?: string[]): Promise<Song[]> {
     let marshaled: marshaledSong[] = this.db.query(
-      `SELECT * FROM artists_bridge 
+      `SELECT *, ${this.addGroupConcatClause()} FROM artists_bridge 
       ${this.addLeftJoinClause('artists_bridge', 'artists')}  
       WHERE artists_bridge.artist = ? 
-      ${this.addExcludeWhereClause(false, exclude)}`,
+      ${this.addExcludeWhereClause(false, exclude)} GROUP BY allsongs._id`,
       id
     )
-    return this.flattenDict(this.mergeSongs(marshaled))
+    return this.batchUnmarshal(marshaled)
   }
 
   public async updateArtists(artist: artists) {
@@ -246,13 +246,13 @@ export class SongDBInstance extends DBUtils {
 
   public async getPlaylistSongs(id: string, exclude?: string[]) {
     let marshaled: marshaledSong[] = this.db.query(
-      `SELECT * FROM playlist_bridge 
+      `SELECT *, ${this.addGroupConcatClause()} FROM playlist_bridge 
       ${this.addLeftJoinClause('playlist_bridge')} 
       WHERE playlist_bridge.playlist = ? 
-      ${this.addExcludeWhereClause(false, exclude)}`,
+      ${this.addExcludeWhereClause(false, exclude)} GROUP BY allsongs._id`,
       id
     )
-    return this.flattenDict(this.mergeSongs(marshaled))
+    return this.batchUnmarshal(marshaled)
   }
 
   public async getPlaylists(): Promise<Playlist[]> {
