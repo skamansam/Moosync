@@ -47,7 +47,7 @@ class SongDBInstance extends DBUtils {
   public async searchSongs(term: string, exclude?: string[]): Promise<SearchResult> {
     let songs: marshaledSong[] = []
     songs = this.db.query(
-      `SELECT * FROM allsongs, ${this.addGroupConcatClause()} 
+      `SELECT *, ${this.addGroupConcatClause()} FROM allsongs 
       ${this.addLeftJoinClause(undefined, 'allsongs')}
         WHERE allsongs.path LIKE ? 
         OR albums.album_name LIKE ?
