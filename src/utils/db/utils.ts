@@ -32,6 +32,8 @@ export class DBUtils {
         album_id: dbSong.album_id,
         album_name: dbSong.album_name,
         album_coverPath: dbSong.album_coverPath,
+        album_song_count: dbSong.album_song_count,
+        year: dbSong.year,
       },
       date: dbSong.date,
       year: dbSong.year,

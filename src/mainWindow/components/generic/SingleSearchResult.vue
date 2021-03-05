@@ -1,20 +1,15 @@
 <template>
-  <div>
+  <div :class="first ? 'first' : ''">
     <div class="d-flex result-container">
-      <div class="img-container" @click="playTop(song)">
+      <div class="img-container" @click="emitImgClick">
         <div class="play-button m-auto d-flex align-items-center justify-content-center">
           <div class="play-icon"><Play2 /></div>
         </div>
-        <img
-          ref="cover"
-          class="coverimg"
-          alt="cover img"
-          :src="song.album.album_coverPath ? 'media://' + song.album.album_coverPath : ''"
-        />
+        <img ref="cover" class="coverimg" alt="cover img" :src="coverImg ? 'media://' + coverImg : ''" />
       </div>
       <div class="text-container text-truncate my-auto">
-        <div class="song-title text-truncate">{{ song.title }}</div>
-        <div class="song-subtitle text-truncate">{{ song.artists.join(', ') }}</div>
+        <b-link class="song-title text-truncate" @click="emitTitleClick">{{ title }}</b-link>
+        <div class="song-subtitle text-truncate">{{ subtitle }}</div>
       </div>
     </div>
     <div v-if="divider" class="divider" />
@@ -27,7 +22,6 @@ import { Component, Prop } from 'vue-property-decorator'
 import Play2 from '@/mainWindow/components/icons/Play2.vue'
 import { mixins } from 'vue-class-component'
 import PlayerControls from '@/utils/mixins/PlayerControls'
-import { Song } from '@/models/songs'
 
 @Component({
   components: {
@@ -35,11 +29,31 @@ import { Song } from '@/models/songs'
   },
 })
 export default class SingleSearchResult extends mixins(PlayerControls) {
-  @Prop({ default: null })
-  song!: Song | null
+  @Prop({ default: '' })
+  coverImg!: string
+
+  @Prop({ default: '' })
+  title!: string
+
+  @Prop({ default: '' })
+  subtitle!: string
 
   @Prop({ default: false })
   divider!: boolean
+
+  @Prop({ default: false })
+  first!: boolean
+
+  @Prop({ default: null })
+  id!: any
+
+  private emitImgClick() {
+    this.$emit('imgClick', this.id)
+  }
+
+  private emitTitleClick() {
+    this.$emit('titleClick', this.id)
+  }
 }
 </script>
 
@@ -90,4 +104,7 @@ export default class SingleSearchResult extends mixins(PlayerControls) {
 
 .placeholder
   height: 13px
+
+.first
+  margin-top: 13px
 </style>

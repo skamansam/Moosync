@@ -3,7 +3,7 @@
     <b-row class="title">Artists</b-row>
     <b-row class="d-flex">
       <b-col col xl="2" md="3" v-for="artist in artistList" :key="artist.artist_id">
-        <CardView :title="artist.artist_name" :imgSrc="artist.artist_coverPath" @click.native="itemSelected(artist)" />
+        <CardView :title="artist.artist_name" :imgSrc="artist.artist_coverPath" @click.native="gotoArtist(artist)" />
       </b-col>
     </b-row>
   </b-container>
@@ -12,16 +12,18 @@
 <script lang="ts">
 import { artists } from '@/models/artists'
 import { ArtistEvents, IpcEvents } from '@/utils/ipc/main/constants'
-import { Component, Vue } from 'vue-property-decorator'
+import { Component } from 'vue-property-decorator'
 import CardView from '@/mainWindow/components/generic/CardView.vue'
 import { ipcRendererHolder } from '@/utils/ipc/renderer'
+import { mixins } from 'vue-class-component'
+import RouterPushes from '@/utils/mixins/RouterPushes'
 
 @Component({
   components: {
     CardView,
   },
 })
-export default class Artists extends Vue {
+export default class Artists extends mixins(RouterPushes) {
   private artistList: artists[] = []
   private getArtists() {
     ipcRendererHolder
@@ -29,17 +31,6 @@ export default class Artists extends Vue {
       .then((data) => {
         this.artistList = data
       })
-  }
-
-  private itemSelected(artist: artists) {
-    this.$router.push({
-      name: 'artists-id',
-      params: {
-        artist_id: artist.artist_id!,
-        artist_name: artist.artist_name!,
-        artist_coverPath: artist.artist_coverPath ? artist.artist_coverPath : '',
-      },
-    })
   }
 
   mounted() {

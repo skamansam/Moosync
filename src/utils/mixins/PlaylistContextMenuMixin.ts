@@ -23,7 +23,6 @@ export default class PlaylistContextMenuMixin extends Vue {
         params: { playlists: this.playlists, song: item },
       })
       .then((status: PlaylistCallbacks) => {
-        console.log(status)
         PlaylistModule.setUpdated(true)
         switch (status.type) {
           case 'newPlaylist':

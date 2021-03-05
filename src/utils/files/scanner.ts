@@ -27,12 +27,14 @@ async function getInfo(data: mm.IAudioMetadata, stats: stats, coverPath?: string
   }
 
   return {
-    title: data.common.title ? data.common.title : path.basename(stats.path).split('.').slice(0, -1).join('.'),
+    title: data.common.title ? data.common.title : path.basename(stats.path).split('.').slice(0, -1).join('.').trim(),
     path: stats.path,
     size: stats.size,
     album: {
       album_name: data.common.album,
       album_coverPath: coverPath,
+      album_song_count: 0,
+      year: data.common.year,
     },
     artists: artists,
     date: data.common.date,
@@ -98,6 +100,13 @@ export class MusicScanner {
     }
   }
 
+  private async updateCounts() {
+    await SongDB.updateSongCountAlbum()
+    await SongDB.updateSongCountArtists()
+    await SongDB.updateSongCountGenre()
+    await SongDB.updateSongCountPlaylists()
+  }
+
   public async start() {
     var promisesThrottled = new PromiseThrottle({
       requestsPerSecond: os.cpus().length / 2,
@@ -117,7 +126,8 @@ export class MusicScanner {
         console.log('invalid directory: ' + this.paths[i])
       }
     }
-    return Promise.all(promises)
+    await Promise.all(promises)
+    await this.updateCounts()
   }
   private async generateChecksum(file: string): Promise<string> {
     return new Promise((resolve) => {

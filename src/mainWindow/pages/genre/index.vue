@@ -3,7 +3,7 @@
     <b-row class="title">genres</b-row>
     <b-row class="d-flex">
       <b-col col xl="2" md="3" v-for="genre in genres" :key="genre.genre_id">
-        <CardView :title="genre.genre_name" :imgSrc="genre.genre_coverPath" @click.native="itemSelected(genre)" />
+        <CardView :title="genre.genre_name" :imgSrc="genre.genre_coverPath" @click.native="gotoGenre(genre)" />
       </b-col>
     </b-row>
   </b-container>
@@ -12,16 +12,18 @@
 <script lang="ts">
 import { Genre } from '@/models/genre'
 import { GenreEvents, IpcEvents } from '@/utils/ipc/main/constants'
-import { Component, Vue } from 'vue-property-decorator'
+import { Component } from 'vue-property-decorator'
 import CardView from '@/mainWindow/components/generic/CardView.vue'
 import { ipcRendererHolder } from '@/utils/ipc/renderer'
+import { mixins } from 'vue-class-component'
+import RouterPushes from '@/utils/mixins/RouterPushes'
 
 @Component({
   components: {
     CardView,
   },
 })
-export default class Genres extends Vue {
+export default class Genres extends mixins(RouterPushes) {
   private genres: Genre[] = []
   private getgenres() {
     ipcRendererHolder
@@ -33,16 +35,6 @@ export default class Genres extends Vue {
 
   mounted() {
     this.getgenres()
-  }
-
-  private itemSelected(genre: Genre) {
-    this.$router.push({
-      name: 'genre-id',
-      params: {
-        genre_id: genre.genre_id!,
-        genre_name: genre.genre_name!,
-      },
-    })
   }
 }
 </script>

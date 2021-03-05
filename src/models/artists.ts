@@ -3,4 +3,5 @@ export interface artists {
   artist_name: string
   artist_mbid: string | undefined
   artist_coverPath: string | undefined
+  artist_song_count: number
 }

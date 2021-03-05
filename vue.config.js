@@ -1,4 +1,6 @@
 const webpack = require('webpack');
+const VuetifyLoaderPlugin = require('vuetify-loader/lib/plugin')
+
 
 module.exports = {
   runtimeCompiler: true,
@@ -19,6 +21,7 @@ module.exports = {
       new webpack.DefinePlugin({
         'process.browser': 'true'
       }),
+      new VuetifyLoaderPlugin()
     ],
     externals: ['better-sqlite3']
   },

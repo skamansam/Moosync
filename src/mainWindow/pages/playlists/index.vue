@@ -6,7 +6,7 @@
         <CardView
           :title="playlist.playlist_name"
           :imgSrc="playlist.playlist_coverPath"
-          @click.native="itemSelected(playlist)"
+          @click.native="gotoPlaylist(playlist)"
         />
       </b-col>
     </b-row>
@@ -16,16 +16,18 @@
 <script lang="ts">
 import { Playlist } from '@/models/playlists'
 import { IpcEvents, PlaylistEvents } from '@/utils/ipc/main/constants'
-import { Component, Vue } from 'vue-property-decorator'
+import { Component } from 'vue-property-decorator'
 import CardView from '@/mainWindow/components/generic/CardView.vue'
 import { ipcRendererHolder } from '@/utils/ipc/renderer'
+import { mixins } from 'vue-class-component'
+import RouterPushes from '@/utils/mixins/RouterPushes'
 
 @Component({
   components: {
     CardView,
   },
 })
-export default class Albums extends Vue {
+export default class Albums extends mixins(RouterPushes) {
   private playlists: Playlist[] = []
   private getPlaylists() {
     ipcRendererHolder
@@ -37,16 +39,6 @@ export default class Albums extends Vue {
 
   mounted() {
     this.getPlaylists()
-  }
-
-  private itemSelected(playlist: Playlist) {
-    this.$router.push({
-      name: 'playlists-id',
-      params: {
-        playlist_id: playlist.playlist_id!,
-        playlist_name: playlist.playlist_name!,
-      },
-    })
   }
 }
 </script>

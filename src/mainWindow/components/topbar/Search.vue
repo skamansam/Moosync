@@ -6,17 +6,35 @@
         class="searchbar"
         placeholder="Search..."
         type="text"
+        v-model="inputText"
         debounce="300"
+        ref="inputfield"
         @update="onTextChange"
         @blur="handleInputFocus"
         @focus="handleInputFocus"
+        @keyup.enter="openSearchPage"
       />
     </div>
     <div class="search-results d-flex" :class="showSearchResults ? 'search-visible' : 'search-invisible'">
       <div v-if="results && results.songs.length !== 0" class="w-100">
-        <div v-for="(song, index) in results.songs" :key="song._id">
-          <SingleSearchResult :song="song" :divider="index != results.songs.length - 1" />
-        </div>
+        <RecycleScroller
+          class="scroller"
+          :items="results.songs"
+          :item-size="83"
+          key-field="_id"
+          v-slot="{ item, index }"
+          :direction="'vertical'"
+        >
+          <SingleSearchResult
+            class="single-result"
+            :title="item.title"
+            :subtitle="item.artists ? item.artists.join(', ') : ''"
+            :coverImg="item.album ? item.album.album_coverPath : ''"
+            :divider="index != results.songs.length - 1"
+            :id="index"
+            @imgClick="handleClick"
+          />
+        </RecycleScroller>
       </div>
       <div class="w-100 text-center" v-if="results && results.songs.length == 0">No Results found</div>
     </div>
@@ -29,9 +47,10 @@ import Search from '@/mainWindow/components/icons/Search.vue'
 import { SearchResult } from '@/models/searchResult'
 import { ipcRendererHolder } from '@/utils/ipc/renderer'
 import { IpcEvents, SearchEvents } from '@/utils/ipc/main/constants'
-import SingleSearchResult from '@/mainWindow/components/topbar/SingleSearchResult.vue'
+import SingleSearchResult from '@/mainWindow/components/generic/SingleSearchResult.vue'
 import Colors from '@/utils/mixins/Colors'
 import { mixins } from 'vue-class-component'
+import PlayerControls from '@/utils/mixins/PlayerControls'
 
 @Component({
   components: {
@@ -39,9 +58,10 @@ import { mixins } from 'vue-class-component'
     SingleSearchResult,
   },
 })
-export default class Sidebar extends mixins(Colors) {
+export default class Sidebar extends mixins(Colors, PlayerControls) {
   private showSearchResults: boolean = false
   private results: SearchResult | null = null
+  private inputText: string = ''
 
   private handleInputFocus(event: FocusEvent) {
     switch (event.type) {
@@ -53,12 +73,28 @@ export default class Sidebar extends mixins(Colors) {
         break
     }
   }
+
+  private handleClick(index: any) {
+    this.playTop(this.results!.songs![index])
+  }
+
+  private openSearchPage() {
+    this.$router
+      .push({
+        name: 'search',
+        query: {
+          search_term: this.inputText,
+        },
+      })
+      .catch(() => {})
+    this.showSearchResults = false
+  }
   private onTextChange(value: string) {
     if (value) {
       this.showSearchResults = true
       ipcRendererHolder
         .send<SearchResult>(IpcEvents.SEARCH, {
-          type: SearchEvents.SEARCH_SONGS,
+          type: SearchEvents.SEARCH_SONGS_COMPACT,
           params: { searchTerm: value },
         })
         .then((result) => {
@@ -73,6 +109,13 @@ export default class Sidebar extends mixins(Colors) {
 </script>
 
 <style lang="sass" scoped>
+.scroller
+  height: 100%
+  &::-webkit-scrollbar-track
+    margin-top: 0
+    margin-bottom: 18px
+    background: var(--secondary)
+
 .searchbar
   color: var(--textPrimary) !important
   background: rgba(0, 0, 0, 0)
@@ -116,12 +159,7 @@ export default class Sidebar extends mixins(Colors) {
   border-radius: 0 0 18px 18px
   box-shadow: 0 4px 6px rgb(32 33 36 / 28%)
   max-height: 60vh
-  overflow: scroll
-  overflow-x: hidden
-  &::-webkit-scrollbar-track
-    margin-top: 0
-    margin-bottom: 18px
-    background: var(--secondary)
+  overflow: hidden
 
 .search-invisible
   visibility: hidden

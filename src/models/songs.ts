@@ -26,9 +26,10 @@ export interface marshaledSong {
   path: string
   size: string
   title: string
-  album_id?: string | undefined
-  album_name?: string | undefined
+  album_id?: string
+  album_name?: string
   album_coverPath?: string
+  album_song_count?: number
   lyrics: string | undefined
   artist_name?: string
   artists_id?: string

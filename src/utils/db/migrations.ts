@@ -111,4 +111,16 @@ export const migrations = [
   DROP TABLE IF EXISTS 'playlist_bridge';
   DROP TABLE IF EXISTS 'playlists';
     `,
+
+  // 04-03-2021
+  `
+  -- Up
+  ALTER TABLE albums ADD album_song_count NUMBER NOT NULL DEFAULT 0;
+  ALTER TABLE albums ADD year TEXT;
+  ALTER TABLE artists ADD artist_song_count NUMBER NOT NULL DEFAULT 0;
+  ALTER TABLE playlists ADD playlist_song_count NUMBER NOT NULL DEFAULT 0;
+  ALTER TABLE genre ADD genre_song_count NUMBER NOT NULL DEFAULT 0;
+
+  -- Down
+  `,
 ]

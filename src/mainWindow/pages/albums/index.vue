@@ -3,7 +3,7 @@
     <b-row class="title">Albums</b-row>
     <b-row class="d-flex">
       <b-col col xl="2" md="3" v-for="album in filteredAlbumList" :key="album.album_id">
-        <CardView :title="album.album_name" :imgSrc="album.album_coverPath" @click.native="itemSelected(album)" />
+        <CardView :title="album.album_name" :imgSrc="album.album_coverPath" @click.native="gotoAlbum(album)" />
       </b-col>
     </b-row>
   </b-container>
@@ -14,14 +14,16 @@ import CardView from '@/mainWindow/components/generic/CardView.vue'
 import { Album } from '@/models/albums'
 import { AlbumEvents, IpcEvents } from '@/utils/ipc/main/constants'
 import { ipcRendererHolder } from '@/utils/ipc/renderer'
-import { Component, Vue } from 'vue-property-decorator'
+import { mixins } from 'vue-class-component'
+import { Component } from 'vue-property-decorator'
+import RouterPushes from '@/utils/mixins/RouterPushes'
 
 @Component({
   components: {
     CardView,
   },
 })
-export default class Albums extends Vue {
+export default class Albums extends mixins(RouterPushes) {
   private albumList: Album[] = []
   private getAlbums() {
     ipcRendererHolder
@@ -34,17 +36,6 @@ export default class Albums extends Vue {
   get filteredAlbumList() {
     return this.albumList.filter((x) => {
       return x.album_name !== null
-    })
-  }
-
-  private itemSelected(album: Album) {
-    this.$router.push({
-      name: 'albums-id',
-      params: {
-        album_id: album.album_id!,
-        album_name: album.album_name!,
-        album_coverPath: album.album_coverPath ? album.album_coverPath : '',
-      },
     })
   }
 
