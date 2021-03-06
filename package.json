@@ -57,6 +57,7 @@
     "vuex": "^3.0.1",
     "vuex-class-modules": "^1.2.0",
     "vuex-electron": "^1.0.3",
+    "youtube-music-api": "^1.0.6",
     "yt-player": "^3.5.0"
   },
   "devDependencies": {

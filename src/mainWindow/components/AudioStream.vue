@@ -10,7 +10,7 @@
 <script lang="ts">
 import { Song } from '@/models/songs'
 import { SyncHolder } from '@/utils/sync/syncHandler'
-import { PlayerModule, PlayerState } from '@/mainWindow/store/playerState'
+import { PlayerModule, PlayerState, PlayerType } from '@/mainWindow/store/playerState'
 import { PeerMode, SyncModule } from '@/mainWindow/store/syncState'
 import { Component, Prop, Ref, Watch } from 'vue-property-decorator'
 import YTPlayer from 'yt-player'
@@ -19,8 +19,6 @@ import { mixins } from 'vue-class-component'
 
 @Component({})
 export default class AudioStream extends mixins(Colors) {
-  private currentTime: number = 0
-
   @Ref('audio') audioElement!: ExtendedHtmlAudioElement
 
   @Prop({ default: '' })
@@ -35,34 +33,51 @@ export default class AudioStream extends mixins(Colors) {
   @Prop({ default: PlayerState.STOPPED })
   playerState!: PlayerState
 
+  @Prop({ default: PlayerType.LOCAL })
+  playerType!: PlayerType
+
   @Prop({ default: null })
   currentSong!: Song | null
 
   @Watch('playerState')
   onPlayerStateChanged(newState: PlayerState) {
-    this.handlePlayerState(newState).catch((e) => console.log(e))
+    if (this.playerType == PlayerType.LOCAL) this.handleLocalPlayerState(newState).catch((e) => console.log(e))
+    else if (this.playerType == PlayerType.YOUTUBE) this.handleYoutubePlayerState(newState)
+  }
+
+  @Watch('playerType')
+  onPlayerTypeChanged(newType: PlayerType) {
+    this.playerType = newType
+    if (this.playerType == PlayerType.YOUTUBE) this.handleLocalPlayerState(PlayerState.STOPPED)
+    else this.handleYoutubePlayerState(PlayerState.STOPPED)
   }
 
   @Watch('currentSong')
   onSongChanged(newSong: Song | null) {
-    if (newSong) this.loadAudio(newSong)
+    if (newSong) {
+      if (this.playerType == PlayerType.LOCAL) this.loadAudio(newSong)
+      else if (this.playerType == PlayerType.YOUTUBE) this.loadAudioYoutube(newSong)
+    }
   }
 
   @Watch('volume') onMatchChanged(newValue: number) {
-    this.audioElement.volume = newValue / 100
+    if (this.playerType == PlayerType.LOCAL) this.audioElement.volume = newValue / 100
+    else if (this.playerType == PlayerType.YOUTUBE) this.YTplayer!.setVolume(newValue / 100)
   }
 
   @Watch('forceSeek') onSeek(newValue: number) {
-    this.audioElement.currentTime = newValue
+    if (this.playerType == PlayerType.LOCAL) this.audioElement.currentTime = newValue
+    else if (this.playerType == PlayerType.YOUTUBE) this.YTplayer!.seek(newValue)
   }
 
   private peerHolder = new SyncHolder()
-  private isSongLoaded: boolean = false
+  private isLocalSongLoaded: boolean = false
+  private isYoutubeSongLoaded: boolean = false
   private YTplayer: YTPlayer | undefined
 
   mounted() {
-    this.registerListeners()
     this.setupYTPlayer()
+    this.registerListeners()
   }
 
   private setupYTPlayer() {
@@ -75,8 +90,8 @@ export default class AudioStream extends mixins(Colors) {
   }
 
   private registerAudioListeners() {
-    this.audioElement.ontimeupdate = () => (this.currentTime = this.audioElement.currentTime)
     this.audioElement.onended = () => PlayerModule.nextSong()
+    this.YTplayer!.on('ended', () => PlayerModule.nextSong())
   }
 
   private registerListeners() {
@@ -88,7 +103,15 @@ export default class AudioStream extends mixins(Colors) {
 
   private unloadAudio() {
     this.audioElement.srcObject = null
-    this.isSongLoaded = false
+    this.isLocalSongLoaded = false
+  }
+
+  private loadAudioYoutube(item: Song) {
+    this.YTplayer!.load(item.url!)
+    this.isYoutubeSongLoaded = true
+
+    PlayerModule.setState(PlayerState.PLAYING)
+    this.handleYoutubePlayerState(PlayerState.PLAYING)
   }
 
   private loadAudio(song: Song) {
@@ -96,7 +119,7 @@ export default class AudioStream extends mixins(Colors) {
     firstSong = this.audioElement.src ? true : false
 
     this.audioElement.src = 'media://' + song.path
-    this.isSongLoaded = true
+    this.isLocalSongLoaded = true
 
     if (this.peerHolder && this.peerHolder.peerMode == PeerMode.BROADCASTER) {
       let stream = this.audioElement.captureStream()
@@ -106,10 +129,10 @@ export default class AudioStream extends mixins(Colors) {
     }
 
     if (firstSong) {
-      this.handlePlayerState(PlayerModule.playerState)
+      this.handleLocalPlayerState(PlayerModule.playerState)
     } else {
       PlayerModule.setState(PlayerState.PLAYING)
-      this.handlePlayerState(PlayerState.PLAYING)
+      this.handleLocalPlayerState(PlayerState.PLAYING)
     }
   }
 
@@ -117,10 +140,15 @@ export default class AudioStream extends mixins(Colors) {
     this.audioElement.ontimeupdate = (e: Event) => {
       this.$emit('onTimeUpdate', (e.currentTarget as HTMLAudioElement).currentTime)
     }
+
+    this.YTplayer!.on('timeupdate', (time: number) => {
+      console.log('here')
+      if (this.playerType == PlayerType.YOUTUBE) this.$emit('onTimeUpdate', time)
+    })
   }
 
-  private async handlePlayerState(newState: PlayerState) {
-    if (this.isSongLoaded) {
+  private async handleLocalPlayerState(newState: PlayerState) {
+    if (this.isLocalSongLoaded) {
       switch (newState) {
         case PlayerState.PLAYING:
           return this.audioElement.play()
@@ -128,6 +156,19 @@ export default class AudioStream extends mixins(Colors) {
           return this.audioElement.pause()
         case PlayerState.STOPPED:
           return this.unloadAudio()
+      }
+    }
+  }
+
+  private handleYoutubePlayerState(newState: PlayerState) {
+    if (this.isYoutubeSongLoaded) {
+      switch (newState) {
+        case PlayerState.PLAYING:
+          return this.YTplayer!.play()
+        case PlayerState.PAUSED:
+          return this.YTplayer!.pause()
+        case PlayerState.STOPPED:
+          return this.YTplayer!.stop()
       }
     }
   }

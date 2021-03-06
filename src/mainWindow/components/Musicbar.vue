@@ -32,6 +32,7 @@
     </b-container>
     <AudioStream
       :playerState="playerState"
+      :playerType="playerType"
       :currentSong="currentSong"
       @onTimeUpdate="updateTimestamp"
       :forceSeek="forceSeek"
@@ -48,7 +49,7 @@ import ExtraControls from '@/mainWindow/components/musicbar/ExtraControls.vue'
 
 import { Component } from 'vue-property-decorator'
 import { Song } from '@/models/songs'
-import { PlayerModule, PlayerState } from '@/mainWindow/store/playerState'
+import { PlayerModule, PlayerState, PlayerType } from '@/mainWindow/store/playerState'
 import { SyncModule } from '@/mainWindow/store/syncState'
 import Colors from '@/utils/mixins/Colors'
 import { mixins } from 'vue-class-component'
@@ -67,11 +68,14 @@ export default class MusicBar extends mixins(Colors) {
   private forceSeek: number = 0
   private volume: number = 50
   private currentCoverBlob: Blob | null = null
-
   private playerState: PlayerState = PlayerState.STOPPED
 
   private updateTimestmp(value: number) {
     this.forceSeek = value
+  }
+
+  get playerType(): PlayerType {
+    return PlayerModule.playerType
   }
 
   mounted() {

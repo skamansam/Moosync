@@ -2,7 +2,7 @@
   <b-container fluid class="d-flex flex-column h-100">
     <b-row class="flex-grow-1 align-items-center">
       <b-col cols="2" class="d-flex justify-content-center">
-        <img ref="cover" class="coverimg" alt="cover img" :src="cover ? 'media://' + cover : ''" />
+        <img ref="cover" class="coverimg" alt="cover img" :src="getCoverImg()" />
       </b-col>
       <b-col cols="10">
         <div class="text song-title text-truncate">{{ title }}</div>
@@ -40,6 +40,16 @@ export default class MusicBar extends mixins(Colors) {
     if (this.coverBlob) {
       this.imageElement.src = URL.createObjectURL(this.coverBlob)
     }
+  }
+
+  private getCoverImg() {
+    if (this.cover) {
+      if (this.cover.startsWith('http')) {
+        return this.cover
+      }
+      return `media://${this.cover}`
+    }
+    return ''
   }
 }
 </script>

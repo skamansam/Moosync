@@ -54,6 +54,7 @@ import { Song } from '@/models/songs'
 import PlayerControls from '@/utils/mixins/PlayerControls'
 import { mixins } from 'vue-class-component'
 import RouterPushes from '@/utils/mixins/RouterPushes'
+import { YoutubeItem } from '@/models/youtube'
 
 @Component({
   components: {
@@ -98,6 +99,8 @@ export default class SearchPage extends mixins(PlayerControls, RouterPushes) {
           return this.result.genres || []
         case 'Playlists':
           return this.result.playlists || []
+        case 'Youtube':
+          return this.result.youtube || []
       }
     }
     return []
@@ -116,6 +119,8 @@ export default class SearchPage extends mixins(PlayerControls, RouterPushes) {
           return (item as Genre).genre_name
         case 'Playlists':
           return (item as Playlist).playlist_name
+        case 'Youtube':
+          return (item as YoutubeItem).yt_title
       }
     }
     return ''
@@ -134,6 +139,8 @@ export default class SearchPage extends mixins(PlayerControls, RouterPushes) {
           return `${(item as Genre).genre_song_count} Songs`
         case 'Playlists':
           return `${(item as Playlist).playlist_songs} Songs`
+        case 'Youtube':
+          return `${(item as YoutubeItem).yt_album} - ${(item as YoutubeItem).yt_artist}`
       }
     }
     return ''
@@ -143,7 +150,7 @@ export default class SearchPage extends mixins(PlayerControls, RouterPushes) {
     if (item) {
       switch (tab) {
         case 'Songs':
-          return (item as Song).album ? (item as Song).album.album_coverPath : ''
+          return (item as Song).album ? (item as Song).album!.album_coverPath : ''
         case 'Albums':
           return (item as Album).album_coverPath
         case 'Artists':
@@ -152,6 +159,8 @@ export default class SearchPage extends mixins(PlayerControls, RouterPushes) {
           return ''
         case 'Playlists':
           return (item as Playlist).playlist_coverPath
+        case 'Youtube':
+          return (item as YoutubeItem).yt_coverImage
       }
     }
     return ''
@@ -194,6 +203,8 @@ export default class SearchPage extends mixins(PlayerControls, RouterPushes) {
       case 'Playlists':
         this.playPlaylist(item as Playlist)
         return
+      case 'Youtube':
+        this.playYoutube(item as YoutubeItem)
     }
   }
 
@@ -236,6 +247,21 @@ export default class SearchPage extends mixins(PlayerControls, RouterPushes) {
           this.queueSong(value)
         })
       )
+  }
+
+  private playYoutube(item: YoutubeItem) {
+    this.playTop({
+      _id: item._id,
+      title: item.yt_title,
+      album: {
+        album_name: item.yt_album,
+        album_coverPath: item.yt_coverImage,
+      },
+      artists: [item.yt_artist],
+      duration: item.duration,
+      type: 'YOUTUBE',
+      url: item._id,
+    })
   }
 
   created() {

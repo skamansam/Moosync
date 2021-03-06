@@ -123,4 +123,13 @@ export const migrations = [
 
   -- Down
   `,
+
+  // 05-03-2021
+  `
+  -- Up
+  ALTER TABLE allsongs ADD type TEXT NOT NULL DEFAULT LOCAL;
+  ALTER TABLE allsongs ADD url TEXT;
+
+  -- Down
+  `,
 ]

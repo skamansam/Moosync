@@ -45,11 +45,12 @@ async function getInfo(data: mm.IAudioMetadata, stats: stats, coverPath?: string
     bitrate: data.format.bitrate,
     codec: data.format.codec,
     container: data.format.container,
-    duration: data.format.duration,
+    duration: data.format.duration || 0,
     sampleRate: data.format.sampleRate,
     hash: undefined,
     inode: stats.inode,
     deviceno: stats.deviceno,
+    type: 'LOCAL',
   }
 }
 
@@ -91,11 +92,13 @@ export class MusicScanner {
     let allSongs = await SongDB.getAllSongs()
     const regex = new RegExp(preferences.musicPaths.join('|'))
     for (let s of allSongs) {
-      try {
-        s.path.match(regex) ? await SongDB.removeSong(s._id!) : null
-        await fs.promises.access(s.path, fs.constants.F_OK)
-      } catch (e) {
-        await SongDB.removeSong(s._id!)
+      if (s.type == 'LOCAL' && s.path) {
+        try {
+          s.path.match(regex) ? await SongDB.removeSong(s._id!) : null
+          await fs.promises.access(s.path!, fs.constants.F_OK)
+        } catch (e) {
+          await SongDB.removeSong(s._id!)
+        }
       }
     }
   }

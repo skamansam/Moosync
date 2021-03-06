@@ -1,51 +1,55 @@
 import { Album } from '@/models/albums'
 export interface Song {
   _id?: string
-  path: string
-  size: string
+  path?: string
+  size?: string
   title: string
-  album: Album
-  artists: string[] | undefined
-  date: string | undefined
-  year: number | undefined
-  genre: string[] | undefined
-  lyrics: string | undefined
-  releaseType: string[] | undefined
-  bitrate: number | undefined
-  codec: string | undefined
-  container: string | undefined
-  duration: number | undefined
-  sampleRate: number | undefined
-  hash: string | undefined
-  inode: string
-  deviceno: string
+  album?: Album
+  artists?: string[]
+  date?: string
+  year?: number
+  genre?: string[]
+  lyrics?: string
+  releaseType?: string[]
+  bitrate?: number
+  codec?: string
+  container?: string
+  duration: number
+  sampleRate?: number
+  hash?: string
+  inode?: string
+  deviceno?: string
+  url?: string
+  type: 'LOCAL' | 'YOUTUBE'
 }
 
 export interface marshaledSong {
   _id: string
-  path: string
-  size: string
+  path?: string
+  size?: string
   title: string
   album_id?: string
   album_name?: string
   album_coverPath?: string
   album_song_count?: number
-  lyrics: string | undefined
+  lyrics?: string
   artist_name?: string
   artists_id?: string
   artist_coverPath?: string
   genre_name?: string
   genere_id?: string
-  date: string | undefined
-  year: number | undefined
-  bitrate: number | undefined
-  codec: string | undefined
-  container: string | undefined
-  duration: number | undefined
-  sampleRate: number | undefined
-  hash: string | undefined
-  inode: string
-  deviceno: string
+  date?: string
+  year?: number
+  bitrate?: number
+  codec?: string
+  container?: string
+  duration: number
+  sampleRate?: number
+  hash?: string
+  inode?: string
+  deviceno?: string
+  url?: string
+  type: 'LOCAL' | 'YOUTUBE'
 }
 
 export interface stats {

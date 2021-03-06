@@ -5,7 +5,7 @@
         <div class="play-button m-auto d-flex align-items-center justify-content-center">
           <div class="play-icon"><Play2 /></div>
         </div>
-        <img ref="cover" class="coverimg" alt="cover img" :src="coverImg ? 'media://' + coverImg : ''" />
+        <img ref="cover" class="coverimg" alt="cover img" :src="getCoverImg()" />
       </div>
       <div class="text-container text-truncate my-auto">
         <b-link class="song-title text-truncate" @click="emitTitleClick">{{ title }}</b-link>
@@ -46,6 +46,16 @@ export default class SingleSearchResult extends mixins(PlayerControls) {
 
   @Prop({ default: null })
   id!: any
+
+  private getCoverImg() {
+    if (this.coverImg) {
+      if (this.coverImg.startsWith('http')) {
+        return this.coverImg
+      }
+      return `media://${this.coverImg}`
+    }
+    return ''
+  }
 
   private emitImgClick() {
     this.$emit('imgClick', this.id)

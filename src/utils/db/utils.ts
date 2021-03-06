@@ -49,6 +49,8 @@ export class DBUtils {
       hash: dbSong.hash,
       inode: '',
       deviceno: '',
+      type: dbSong.type,
+      url: dbSong.url,
     }
   }
 
@@ -70,6 +72,8 @@ export class DBUtils {
       hash: song.hash,
       inode: song.inode,
       deviceno: song.deviceno,
+      type: song.type,
+      url: song.url,
     }
   }
 

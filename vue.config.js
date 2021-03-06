@@ -23,7 +23,8 @@ module.exports = {
       }),
       new VuetifyLoaderPlugin()
     ],
-    externals: ['better-sqlite3']
+    externals: ['better-sqlite3', 'youtube-music-api'],
+    devtool: 'source-map'
   },
   pluginOptions: {
     electronBuilder: {

@@ -14,6 +14,11 @@ export enum PlayerState {
   STOPPED,
 }
 
+export enum PlayerType {
+  LOCAL,
+  YOUTUBE,
+}
+
 class Queue {
   data: { [id: string]: Song } = {}
   order: string[] = []
@@ -64,6 +69,7 @@ class Queue {
 @Module
 class Player extends VuexModule {
   private state: PlayerState = PlayerState.PAUSED
+  private type: PlayerType = PlayerType.LOCAL
   private currentSongDets: Song | null = null
   private songQueue = new Queue()
 
@@ -79,14 +85,18 @@ class Player extends VuexModule {
     return this.songQueue
   }
 
+  get playerType() {
+    return this.type
+  }
+
   @Mutation
   setState(state: PlayerState) {
     this.state = state
   }
 
   @Mutation
-  setSong(song: Song | null) {
-    this.currentSongDets = song
+  setPlayerType(type: PlayerType) {
+    this.type = type
   }
 
   @Mutation
@@ -95,8 +105,23 @@ class Player extends VuexModule {
   }
 
   @Mutation
+  setSong(song: Song | null) {
+    this.currentSongDets = song
+  }
+
+  @Mutation
   loadInQueueTop(Song: Song) {
     this.songQueue.pushAtIndex(Song)
+  }
+
+  @Action
+  loadSong(song: Song | null) {
+    if (song && song.type == 'YOUTUBE') {
+      this.setPlayerType(PlayerType.YOUTUBE)
+    } else {
+      this.setPlayerType(PlayerType.LOCAL)
+    }
+    this.setSong(song)
   }
 
   @Action
@@ -115,12 +140,12 @@ class Player extends VuexModule {
   @Action
   nextSong() {
     this.songQueue.next()
-    this.setSong(this.songQueue.top)
+    this.loadSong(this.songQueue.top)
   }
   @Action
   prevSong() {
     this.songQueue.prev()
-    this.setSong(this.songQueue.top)
+    this.loadSong(this.songQueue.top)
   }
 }
 
