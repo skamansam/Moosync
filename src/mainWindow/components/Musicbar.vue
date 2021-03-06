@@ -12,8 +12,8 @@
       @change="updateTimestmp"
     />
     <b-container fluid class="d-flex h-100">
-      <b-row class="flex-grow-1 justify-content-between">
-        <b-col col lg="3"
+      <b-row class="justify-content-between d-flex no-gutters">
+        <b-col col lg="3" class="no-gutters"
           ><Details
             :title="currentSong ? currentSong.title : '-'"
             :artists="currentSong ? currentSong.artists : []"
@@ -24,10 +24,10 @@
             "
             :coverBlob="currentCoverBlob"
         /></b-col>
-        <b-col col lg="auto"
+        <b-col col lg="auto" class="no-gutters"
           ><Controls :duration="currentSong ? currentSong.duration : 0" :timestamp="timestamp"
         /></b-col>
-        <b-col col lg="3"><ExtraControls @onVolumeChange="volumeUpdated" /></b-col>
+        <b-col col lg="3" class="no-gutters"><ExtraControls @onVolumeChange="volumeUpdated" /></b-col>
       </b-row>
     </b-container>
     <AudioStream

@@ -39,6 +39,8 @@ export default class AudioStream extends mixins(Colors) {
   @Prop({ default: null })
   currentSong!: Song | null
 
+  private isFirst: boolean = true
+
   @Watch('playerState')
   onPlayerStateChanged(newState: PlayerState) {
     if (this.playerType == PlayerType.LOCAL) this.handleLocalPlayerState(newState).catch((e) => console.log(e))
@@ -62,7 +64,7 @@ export default class AudioStream extends mixins(Colors) {
 
   @Watch('volume') onMatchChanged(newValue: number) {
     if (this.playerType == PlayerType.LOCAL) this.audioElement.volume = newValue / 100
-    else if (this.playerType == PlayerType.YOUTUBE) this.YTplayer!.setVolume(newValue / 100)
+    else if (this.playerType == PlayerType.YOUTUBE) this.YTplayer!.setVolume(newValue)
   }
 
   @Watch('forceSeek') onSeek(newValue: number) {
@@ -109,15 +111,18 @@ export default class AudioStream extends mixins(Colors) {
   private loadAudioYoutube(item: Song) {
     this.YTplayer!.load(item.url!)
     this.isYoutubeSongLoaded = true
+    this.YTplayer!.setVolume(this.volume)
 
-    PlayerModule.setState(PlayerState.PLAYING)
-    this.handleYoutubePlayerState(PlayerState.PLAYING)
+    if (this.isFirst) {
+      PlayerModule.setState(PlayerState.PLAYING)
+      this.handleYoutubePlayerState(PlayerState.PLAYING)
+      this.isFirst = false
+    } else {
+      this.handleYoutubePlayerState(PlayerModule.playerState)
+    }
   }
 
   private loadAudio(song: Song) {
-    let firstSong: boolean
-    firstSong = this.audioElement.src ? true : false
-
     this.audioElement.src = 'media://' + song.path
     this.isLocalSongLoaded = true
 
@@ -128,11 +133,12 @@ export default class AudioStream extends mixins(Colors) {
       }
     }
 
-    if (firstSong) {
-      this.handleLocalPlayerState(PlayerModule.playerState)
-    } else {
+    if (this.isFirst) {
       PlayerModule.setState(PlayerState.PLAYING)
       this.handleLocalPlayerState(PlayerState.PLAYING)
+      this.isFirst = false
+    } else {
+      this.handleLocalPlayerState(PlayerModule.playerState)
     }
   }
 
@@ -155,6 +161,7 @@ export default class AudioStream extends mixins(Colors) {
         case PlayerState.PAUSED:
           return this.audioElement.pause()
         case PlayerState.STOPPED:
+          this.isLocalSongLoaded = false
           return this.unloadAudio()
       }
     }
@@ -168,6 +175,7 @@ export default class AudioStream extends mixins(Colors) {
         case PlayerState.PAUSED:
           return this.YTplayer!.pause()
         case PlayerState.STOPPED:
+          this.isYoutubeSongLoaded = false
           return this.YTplayer!.stop()
       }
     }

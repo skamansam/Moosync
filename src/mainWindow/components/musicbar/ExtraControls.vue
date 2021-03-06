@@ -1,6 +1,6 @@
 <template>
   <b-container fluid class="d-flex flex-column h-100">
-    <b-row class="flex-grow-1 align-items-center justify-content-sm-start justify-content-xl-end">
+    <b-row class="flex-grow-1 no-gutters align-items-center justify-content-sm-start justify-content-xl-end">
       <b-col cols="9" class="d-flex volume-container justify-content-end">
         <div class="slider-container d-flex">
           <input
