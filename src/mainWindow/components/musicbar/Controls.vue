@@ -1,15 +1,13 @@
 <template>
-  <b-container fluid class="d-flex flex-column h-100">
-    <b-row class="flex-grow-1 align-items-center">
-      <b-col cols="auto" class="timestamp">{{ formatDuration(timestamp) }} / {{ formatDuration(duration) }}</b-col>
-      <b-col v-on:click="prevSong()"><LastTrack /></b-col>
-      <b-col><Repeat /></b-col>
-      <b-col v-on:click="togglePlayerState()"><Play /></b-col>
-      <b-col v-on:click="nextSong()"><NextTrack /></b-col>
-      <b-col><Shuffle /></b-col>
-      <!-- <b-col cols="2" class="d-none d-xl-block"></b-col> -->
-    </b-row>
-  </b-container>
+  <b-row align-v="center" class="justify-content-center">
+    <b-col cols="auto" class="timestamp">{{ formatDuration(timestamp) }} / {{ formatDuration(duration) }}</b-col>
+    <b-col cols="auto" v-on:click="prevSong()"><LastTrack /></b-col>
+    <b-col cols="auto"><Repeat /></b-col>
+    <b-col cols="auto" v-on:click="togglePlayerState()"><Play /></b-col>
+    <b-col cols="auto" v-on:click="nextSong()"><NextTrack /></b-col>
+    <b-col cols="auto"><Shuffle /></b-col>
+    <!-- <b-col cols="2" class="d-none d-xl-block"></b-col> -->
+  </b-row>
 </template>
 
 <script lang="ts">
@@ -76,8 +74,6 @@ export default class MusicBar extends mixins(PlayerControls) {
   font-size: 18px
   line-height: 170.19%
   overflow: hidden
-  margin-left: -45px
-  margin-right: 15px
 
 .invisible
   min-width: 0%

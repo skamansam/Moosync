@@ -28,6 +28,9 @@ module.exports = {
   },
   pluginOptions: {
     electronBuilder: {
+      builderOptions: {
+        publish: ['github']
+      },
       nodeIntegration: false,
       disableMainProcessTypescript: false,
       mainProcessTypeChecking: true,

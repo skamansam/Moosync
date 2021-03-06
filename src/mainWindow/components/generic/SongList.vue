@@ -1,7 +1,7 @@
 <template>
-  <div class="d-flex">
+  <div class="d-flex h-100">
     <b-table
-      class="custom-table-container d-flex w-100"
+      class="custom-table-container d-flex h-100"
       table-class="custom-table"
       :items="songList"
       :fields="fields"

@@ -1,16 +1,9 @@
 <template>
-  <b-container fluid class="song-container">
-    <b-row class="d-flex">
-      <b-col cols="8" class="d-flex"
-        ><SongList
-          :songList="songList"
-          :extrafields="[{ key: 'title' }, { key: 'album' }, { key: 'artists' }]"
-          @onRowDoubleClicked="pushInQueue"
-          @onRowContext="getSongContextMenu"
-          @onRowSelected="updateCoverDetails"
-      /></b-col>
-      <b-col cols="4">
+  <b-container fluid class="song-container h-100 w-100">
+    <b-row align-v="center" class="w-100 no-gutters details-background">
+      <b-col class="w-100">
         <SongDetails
+          class="details-container"
           :currentTitle="currentSong ? currentSong.title : ''"
           :currentsubTitle="
             currentSong && currentSong.album && currentSong.album.album_name ? currentSong.album.album_name : ''
@@ -22,6 +15,15 @@
           "
         />
       </b-col>
+    </b-row>
+    <b-row class="no-gutters list-container">
+      <SongList
+        :songList="songList"
+        :extrafields="[{ key: 'title' }, { key: 'album' }, { key: 'artists' }]"
+        @onRowDoubleClicked="pushInQueue"
+        @onRowContext="getSongContextMenu"
+        @onRowSelected="updateCoverDetails"
+      />
     </b-row>
   </b-container>
 </template>
@@ -62,7 +64,39 @@ export default class AllSongs extends mixins(Colors) {
 </script>
 
 <style lang="sass" scoped>
+@import '@/sass/variables.sass'
+@import "~bootstrap/scss/mixins"
+
 .song-container
-  position: absolute
   overflow-y: hidden
+
+.details-container
+  width: 100%
+  padding-top: 15px
+  padding-bottom: 15px
+  @include media-breakpoint-up(xs)
+    height: 120px
+  @include media-breakpoint-up(sm)
+    height: 150px
+  @include media-breakpoint-up(md-c)
+    height: 170px
+  @include media-breakpoint-up(lg-c)
+    height: 200px
+
+
+.list-container
+  @include media-breakpoint-up(xs)
+    height: calc(100% - 120px - 30px)
+  @include media-breakpoint-up(sm)
+    height: calc(100% - 150px - 30px)
+  @include media-breakpoint-up(md-c)
+    height: calc(100% - 170px - 30px)
+  @include media-breakpoint-up(lg-c)
+    height: calc(100% - 200px - 30px)
+
+.details-background
+  margin-top: 15px
+  width: calc(100% - 30px)
+  border-radius: 28px
+  background: var(--secondary)
 </style>

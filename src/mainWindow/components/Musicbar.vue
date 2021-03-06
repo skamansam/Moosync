@@ -1,35 +1,39 @@
 <template>
   <div class="background w-100">
-    <VueSlider
-      :min="0"
-      :max="currentSong ? Math.round(currentSong.duration) : 0"
-      class="timeline"
-      :interval="1"
-      :dotSize="10"
-      :value="timestamp"
-      :duration="0.1"
-      :tooltip="'none'"
-      @change="updateTimestmp"
-    />
-    <b-container fluid class="d-flex h-100">
-      <b-row class="justify-content-between d-flex no-gutters">
-        <b-col col lg="3" class="no-gutters"
-          ><Details
-            :title="currentSong ? currentSong.title : '-'"
-            :artists="currentSong ? currentSong.artists : []"
-            :cover="
-              currentSong && currentSong.album && currentSong.album.album_coverPath
-                ? currentSong.album.album_coverPath
-                : ''
-            "
-            :coverBlob="currentCoverBlob"
-        /></b-col>
-        <b-col col lg="auto" class="no-gutters"
-          ><Controls :duration="currentSong ? currentSong.duration : 0" :timestamp="timestamp"
-        /></b-col>
-        <b-col col lg="3" class="no-gutters"><ExtraControls @onVolumeChange="volumeUpdated" /></b-col>
-      </b-row>
-    </b-container>
+    <div class="musicbar h-100">
+      <VueSlider
+        :min="0"
+        :max="currentSong ? Math.round(currentSong.duration) : 0"
+        class="timeline"
+        :interval="1"
+        :dotSize="10"
+        :value="timestamp"
+        :duration="0.1"
+        :tooltip="'none'"
+        @change="updateTimestmp"
+      />
+      <b-container fluid class="d-flex bar-container">
+        <b-row align-h="between" class="d-flex no-gutters">
+          <b-col cols="3" align-self="center" class="no-gutters"
+            ><Details
+              :title="currentSong ? currentSong.title : '-'"
+              :artists="currentSong ? currentSong.artists : []"
+              :cover="
+                currentSong && currentSong.album && currentSong.album.album_coverPath
+                  ? currentSong.album.album_coverPath
+                  : ''
+              "
+              :coverBlob="currentCoverBlob"
+          /></b-col>
+          <b-col md="6" lg="auto" align-self="center" class="no-gutters"
+            ><Controls :duration="currentSong ? currentSong.duration : 0" :timestamp="timestamp"
+          /></b-col>
+          <b-col cols="3" align-self="center" class="no-gutters"
+            ><ExtraControls @onVolumeChange="volumeUpdated"
+          /></b-col>
+        </b-row>
+      </b-container>
+    </div>
     <AudioStream
       :playerState="playerState"
       :playerType="playerType"
@@ -134,8 +138,6 @@ export default class MusicBar extends mixins(Colors) {
   height: 6.5rem
 
 .timeline-container
-  position: absolute
-  bottom: 6rem
   height: 1rem
   width: 100%
   background-color: #ffffff
@@ -144,9 +146,15 @@ export default class MusicBar extends mixins(Colors) {
   height: 0.5rem !important
   width: 100%
 
+.musicbar
+  position: relative
+
 .vue-slider-process
   background-color: var(--accentPrimary)
 
 .vue-slider-rail
   background-color: var(--tertiary)
+
+.bar-container
+  height: calc(100% - 1rem)
 </style>

@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="w-100">
     <SongView :songList="songList" @onRowContext="getSongContextMenu" />
     <NewPlaylistModal :id="'NewPlaylistModal'" />
   </div>

@@ -16,10 +16,10 @@ protocol.registerSchemesAsPrivileged([{ scheme: 'app', privileges: { secure: tru
 
 export async function createPreferenceWindow() {
   const win = new BrowserWindow({
-    width: 1016,
+    width: 840,
     height: 653,
     minHeight: 653,
-    minWidth: 1016,
+    minWidth: 840,
     backgroundColor: '#212121',
     show: false,
     webPreferences: {

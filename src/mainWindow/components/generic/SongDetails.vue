@@ -1,24 +1,28 @@
 <template>
-  <div class="w-100 image-container d-flex">
-    <b-overlay :show="true" no-center opacity="0.6" blur="2px" variant="dark" class="text-container">
-      <img ref="cover" v-if="imgSrc" :src="'media://' + imgSrc" alt="cover art" />
-      <template #overlay>
-        <div>
-          <div class="text-over title">{{ currentTitle }}</div>
-          <div class="text-over subtitle">{{ currentsubTitle }}</div>
-        </div>
-      </template>
-    </b-overlay>
-  </div>
+  <b-container fluid class="w-100">
+    <b-row class="d-flex h-100 no-gutters">
+      <b-col cols="2" class="d-flex h-100 image-container">
+        <b-img fluid class="h-100 image" ref="cover" v-if="ImgSrc" :src="ImgSrc" alt="cover art" />
+        <Record v-if="!ImgSrc" class="h-100 image" />
+      </b-col>
+      <b-col class="text-container text-truncate">
+        <div class="title text-truncate">{{ currentTitle }}</div>
+        <div class="subtitle text-truncate">{{ currentsubTitle }}</div>
+      </b-col>
+    </b-row>
+  </b-container>
 </template>
 
 <script lang="ts">
 import Colors from '@/utils/mixins/Colors'
 import { mixins } from 'vue-class-component'
 import { Component, Prop, Ref } from 'vue-property-decorator'
+import Record from '@/mainWindow/components/icons/Record.vue'
 
 @Component({
-  components: {},
+  components: {
+    Record,
+  },
 })
 export default class SongDetails extends mixins(Colors) {
   @Ref('cover') imageElement!: HTMLImageElement
@@ -31,6 +35,14 @@ export default class SongDetails extends mixins(Colors) {
 
   @Prop({ default: '' })
   private imgSrc!: string
+
+  get ImgSrc() {
+    if (this.imgSrc) {
+      if (this.imgSrc.startsWith('http')) return this.imgSrc
+      else return 'media://' + this.imgSrc
+    }
+    return ''
+  }
 }
 </script>
 
@@ -38,15 +50,18 @@ export default class SongDetails extends mixins(Colors) {
 @import '@/sass/variables.sass'
 @import "~bootstrap/scss/mixins"
 
-img
-  font-size: 0
+.image
+  border-radius: 25px
 
 .image-container
-  position: relative
-  margin-top: 15px
-
-.image-container img
-  width: 100%
+  @include media-breakpoint-up(xs)
+    min-width: 120px
+  @include media-breakpoint-up(sm)
+    min-width: 150px
+  @include media-breakpoint-up(md-c)
+    min-width: 170px
+  @include media-breakpoint-up(lg-c)
+    min-width: 200px
 
 .text-container > .b-overlay > .bg-dark
   background-image: linear-gradient(0deg, rgba(0, 0, 0, 0.58), rgba(0, 0, 0, 0.58)), radial-gradient(50% 50% at 50% 50%, rgba(255, 255, 255, 0) 0%, rgba(0, 0, 0, 0.2) 100%) !important
@@ -57,24 +72,18 @@ img
   text-align: left
   margin-left: 15px
 
+.text-container
+  margin-left: 15px
+  overflow: hidden
+
 .title
   color: var(--textPrimary)
-  font-size: 2.5vw
-  line-height: 32px
-  @include media-breakpoint-up(md-c)
-    margin-top: 12px
-  @include media-breakpoint-up(lg-c)
-    margin-top: 22px
-  @include media-breakpoint-up(xs)
-    margin-top: 8px
-  @include media-breakpoint-up(xl)
-    margin-top: 30px
-    margin-bottom: 13px
-
+  font-size: 24px
+  text-align: left
 
 .subtitle
   color: var(--textPrimary)
   font-weight: 250
-  font-size: 1vw
-  line-height: 18px
+  text-align: left
+  font-size: 14px
 </style>

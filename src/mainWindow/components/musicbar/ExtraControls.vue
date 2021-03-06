@@ -1,32 +1,28 @@
 <template>
-  <b-container fluid class="d-flex flex-column h-100">
-    <b-row class="flex-grow-1 no-gutters align-items-center justify-content-sm-start justify-content-xl-end">
-      <b-col cols="9" class="d-flex volume-container justify-content-end">
-        <div class="slider-container d-flex">
-          <input
-            type="range"
-            min="0"
-            max="100"
-            value="50"
-            class="slider w-100 align-self-center test"
-            v-bind:style="{
-              background: ComputedGradient,
-            }"
-            id="myRange"
-            aria-label="volume"
-            v-model="volume"
-            v-on:input="emitVolume"
-          />
-        </div>
-        <div class="volume-icon">
-          <VolumeIcon />
-        </div>
-      </b-col>
-      <b-col cols="2">
-        <div class="expand-icon ml-auto"><ExpandIcon /></div
-      ></b-col>
-    </b-row>
-  </b-container>
+  <div class="d-flex justify-content-end">
+    <div class="slider-container d-flex">
+      <input
+        type="range"
+        min="0"
+        max="100"
+        value="50"
+        class="slider w-100 align-self-center test"
+        v-bind:style="{
+          background: ComputedGradient,
+        }"
+        id="myRange"
+        aria-label="volume"
+        v-model="volume"
+        v-on:input="emitVolume"
+      />
+    </div>
+    <div class="volume-icon">
+      <VolumeIcon />
+    </div>
+    <div>
+      <div class="expand-icon ml-auto"><ExpandIcon /></div>
+    </div>
+  </div>
 </template>
 
 <script lang="ts">
@@ -81,7 +77,7 @@ export default class MusicBar extends mixins(Colors) {
 .volume-icon
   height: 22px
   width: 22px
-  margin-top: -5px
+  margin-right: 15px
 
 .expand-icon
   height: 27px

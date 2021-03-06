@@ -1,25 +1,27 @@
 <template>
-  <b-container fluid class="d-flex flex-column h-100">
-    <b-row class="flex-grow-1 align-items-center">
-      <b-col cols="2" class="d-flex justify-content-center">
-        <img ref="cover" class="coverimg" alt="cover img" :src="getCoverImg()" />
-      </b-col>
-      <b-col cols="10">
-        <div class="text song-title text-truncate">{{ title }}</div>
-        <div class="text song-subtitle text-truncate">
-          {{ artists ? artists.join(', ') : '-' }}
-        </div>
-      </b-col>
-    </b-row>
-  </b-container>
+  <div class="d-flex w-100">
+    <img ref="cover" v-if="CoverImg" class="coverimg" alt="cover img" :src="CoverImg" />
+    <Record v-if="!CoverImg" class="coverimg" />
+    <div class="text-container">
+      <div class="text song-title text-truncate">{{ title }}</div>
+      <div class="text song-subtitle text-truncate">
+        {{ artists ? artists.join(', ') : '-' }}
+      </div>
+    </div>
+  </div>
 </template>
 
 <script lang="ts">
 import Colors from '@/utils/mixins/Colors'
 import { mixins } from 'vue-class-component'
 import { Component, Prop, Ref, Watch } from 'vue-property-decorator'
+import Record from '@/mainWindow/components/icons/Record.vue'
 
-@Component({})
+@Component({
+  components: {
+    Record,
+  },
+})
 export default class MusicBar extends mixins(Colors) {
   @Prop({ default: '-' })
   title!: string
@@ -42,7 +44,7 @@ export default class MusicBar extends mixins(Colors) {
     }
   }
 
-  private getCoverImg() {
+  get CoverImg() {
     if (this.cover) {
       if (this.cover.startsWith('http')) {
         return this.cover
@@ -60,6 +62,8 @@ export default class MusicBar extends mixins(Colors) {
 .coverimg
   height: 56px
   width: 56px
+  min-width: 56px
+  margin-right: 15px
 
 .text
   text-align: left
@@ -75,4 +79,7 @@ export default class MusicBar extends mixins(Colors) {
 .song-subtitle
   font-size: 12.2592px
   color:  var(--textSecondary)
+
+.text-container
+  width: calc( 100% - 56px - 15px )
 </style>
