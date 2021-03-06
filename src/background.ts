@@ -36,7 +36,6 @@ export async function createPreferenceWindow() {
     await win.loadURL((process.env.WEBPACK_DEV_SERVER_URL + 'preferenceWindow') as string)
     if (!process.env.IS_TEST) win.webContents.openDevTools()
   } else {
-    createProtocol('app')
     // Load the index.html when not in development
     win.loadURL('app://./preferenceWindow.html')
   }
@@ -113,6 +112,7 @@ app.on('ready', async () => {
       console.error(error)
     }
   })
+  createProtocol('app')
   nativeTheme.themeSource = 'dark'
   await loadPreferences()
   mainWindow = await createWindow()
