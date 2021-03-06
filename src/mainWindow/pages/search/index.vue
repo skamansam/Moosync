@@ -11,7 +11,7 @@
         <RecycleScroller
           class="scroller"
           :items="ComputeTabContent(item.tab)"
-          :item-size="83"
+          :item-size="82"
           key-field="_id"
           v-slot="{ item, index }"
           v-if="result"
@@ -24,6 +24,7 @@
             :coverImg="ComputeTabImage(tab, item)"
             :divider="index != result.songs.length - 1"
             :id="item"
+            :showButtons="true"
             @imgClick="imgClickHandler(tab, $event)"
             @titleClick="titleClickHandler(tab, $event)"
           />

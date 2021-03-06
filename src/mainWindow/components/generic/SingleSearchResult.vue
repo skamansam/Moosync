@@ -1,20 +1,25 @@
 <template>
-  <div :class="first ? 'first' : ''">
-    <div class="d-flex result-container">
-      <div class="img-container" @click="emitImgClick">
-        <div class="play-button m-auto d-flex align-items-center justify-content-center">
+  <b-container fluid class="single-result-container">
+    <b-row align-h="around" class="no-gutters">
+      <b-col cols="1" class="img-container justify-content-around ms-auto" @click="emitImgClick">
+        <div class="play-button me-auto justify-content-center d-flex align-items-center">
           <div class="play-icon"><Play2 /></div>
         </div>
-        <img ref="cover" class="coverimg" alt="cover img" :src="getCoverImg()" />
-      </div>
-      <div class="text-container text-truncate my-auto">
+        <img ref="cover" class="coverimg me-auto d-flex align-items-center" alt="cover img" :src="getCoverImg()" />
+      </b-col>
+      <b-col class="text-container text-truncate my-auto">
         <b-link class="song-title text-truncate" @click="emitTitleClick">{{ title }}</b-link>
         <div class="song-subtitle text-truncate">{{ subtitle }}</div>
-      </div>
-    </div>
-    <div v-if="divider" class="divider" />
-    <div v-if="!divider" class="placeholder" />
-  </div>
+      </b-col>
+      <b-col cols="2" v-if="showButtons" class="buttons"><div></div></b-col>
+    </b-row>
+    <b-row v-if="divider" class="d-flex no-gutters">
+      <div class="divider" />
+    </b-row>
+    <b-row v-if="!divider" class="no-gutters">
+      <div class="placeholder" />
+    </b-row>
+  </b-container>
 </template>
 
 <script lang="ts">
@@ -47,6 +52,9 @@ export default class SingleSearchResult extends mixins(PlayerControls) {
   @Prop({ default: null })
   id!: any
 
+  @Prop({ default: false })
+  showButtons!: boolean
+
   private getCoverImg() {
     if (this.coverImg) {
       if (this.coverImg.startsWith('http')) {
@@ -73,6 +81,8 @@ export default class SingleSearchResult extends mixins(PlayerControls) {
 
 .img-container
   position: relative
+  width: 56px
+  height: 56px
   margin-right: 20px
   &:hover
     .coverimg
@@ -83,8 +93,8 @@ export default class SingleSearchResult extends mixins(PlayerControls) {
 .play-button
   position: absolute
   opacity: 0
-  height: 100%
-  width: 100%
+  height: 56px
+  width: 56px
 
 .coverimg
   height: 56px
@@ -107,14 +117,11 @@ export default class SingleSearchResult extends mixins(PlayerControls) {
 
 .divider
   border-bottom: 1px solid var(--divider) !important
+  width: 100%
+
+.single-result-container
   margin-top: 13px
-  margin-bottom: 13px
-  margin-left: 40px
-  width: calc(100% - 40px)
 
 .placeholder
   height: 13px
-
-.first
-  margin-top: 13px
 </style>
