@@ -3,6 +3,7 @@
 import { BrowserWindow, app, nativeTheme, protocol, session } from 'electron'
 import installExtension, { VUEJS_DEVTOOLS } from 'electron-devtools-installer'
 
+import { createProtocol } from 'vue-cli-plugin-electron-builder/lib'
 import { loadPreferences } from '@/utils/db/preferences'
 import path from 'path'
 import { registerIpcChannels } from '@/utils/ipc/main' // Import for side effects
@@ -59,7 +60,7 @@ export async function createPreferenceWindow() {
     if (!process.env.IS_TEST) win.webContents.openDevTools()
   } else {
     // Load the index.html when not in development
-    win.loadURL('http://localhost/./preferenceWindow.html')
+    win.loadURL('app://./preferenceWindow.html')
   }
   win.removeMenu()
   return win
@@ -80,7 +81,6 @@ async function createWindow() {
       // Use pluginOptions.nodeIntegration, leave this alone
       // See nklayman.github.io/vue-cli-plugin-electron-builder/guide/security.html#node-integration for more info
       nodeIntegration: (process.env.ELECTRON_NODE_INTEGRATION as unknown) as boolean,
-      nodeIntegrationInWorker: true,
       preload: path.join(__dirname, 'preload.js'),
     },
   })
@@ -136,6 +136,7 @@ app.on('ready', async () => {
   })
 
   interceptHttp()
+  createProtocol('app')
   nativeTheme.themeSource = 'dark'
   await loadPreferences()
   mainWindow = await createWindow()
