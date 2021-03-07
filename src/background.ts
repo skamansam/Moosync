@@ -20,19 +20,9 @@ function interceptHttp() {
   // Which will then be intercepted here and normal files will be delivered
   // Essentially spoofing window.location.origin to become http://localhost
   if (!process.env.WEBPACK_DEV_SERVER_URL) {
-    session.defaultSession.protocol.interceptFileProtocol('http', (request, callback) => {
-      let pathName = new URL(request.url).pathname
-      pathName = decodeURI(pathName)
-
-      const filePath = path.join(__dirname, pathName)
-      console.log(filePath)
-
-      // deregister intercept after we handle index.js
-      if (request.url.includes('index.js')) {
-        session.defaultSession.protocol.uninterceptProtocol('http')
-      }
-
-      callback(filePath)
+    session.defaultSession.webRequest.onBeforeRequest({ urls: ['http://localhost/*'] }, (d, c) => {
+      console.log('app://' + d.url.replace('http://localhost/', ''))
+      c({ cancel: false, redirectURL: 'app://./' + d.url.replace('http://localhost/', '') })
     })
   }
 }
@@ -135,8 +125,8 @@ app.on('ready', async () => {
     }
   })
 
-  interceptHttp()
   createProtocol('app')
+  interceptHttp()
   nativeTheme.themeSource = 'dark'
   await loadPreferences()
   mainWindow = await createWindow()
