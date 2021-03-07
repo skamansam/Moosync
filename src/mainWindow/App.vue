@@ -34,8 +34,6 @@ export default class App extends mixins(ThemeHandler) {
     this.populatePlaylists()
     this.registerDevTools()
 
-    window.history.pushState(null, '', 'https://localhost:9000')
-    console.log(window.location)
     // this.testStun()
   }
 
