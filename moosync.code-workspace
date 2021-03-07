@@ -22,8 +22,10 @@
 			"autoload",
 			"minisong",
 			"musicmetadata",
+			"unintercept",
 			"unmarshaled",
-			"vuesax"
+			"vuesax",
+			"ytdl"
 		],
 		"sqltools.connections": [
 			{

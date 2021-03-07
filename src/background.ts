@@ -1,9 +1,8 @@
 'use strict'
 
-import { BrowserWindow, app, nativeTheme, protocol } from 'electron'
+import { BrowserWindow, app, nativeTheme, protocol, session } from 'electron'
 import installExtension, { VUEJS_DEVTOOLS } from 'electron-devtools-installer'
 
-import { createProtocol } from 'vue-cli-plugin-electron-builder/lib'
 import { loadPreferences } from '@/utils/db/preferences'
 import path from 'path'
 import { registerIpcChannels } from '@/utils/ipc/main' // Import for side effects
@@ -13,6 +12,29 @@ export var mainWindow: BrowserWindow
 
 // Scheme must be registered before the app is ready
 protocol.registerSchemesAsPrivileged([{ scheme: 'app', privileges: { secure: true, standard: true } }])
+
+function interceptHttp() {
+  // Since youtube embeds are blocked on custom protocols like file:// or app://
+  // We'll load the app on http://localhost
+  // Which will then be intercepted here and normal files will be delivered
+  // Essentially spoofing window.location.origin to become http://localhost
+  if (!process.env.WEBPACK_DEV_SERVER_URL) {
+    session.defaultSession.protocol.interceptFileProtocol('http', (request, callback) => {
+      let pathName = new URL(request.url).pathname
+      pathName = decodeURI(pathName)
+
+      const filePath = path.join(__dirname, pathName)
+      console.log(filePath)
+
+      // deregister intercept after we handle index.js
+      if (request.url.includes('index.js')) {
+        session.defaultSession.protocol.uninterceptProtocol('http')
+      }
+
+      callback(filePath)
+    })
+  }
+}
 
 export async function createPreferenceWindow() {
   const win = new BrowserWindow({
@@ -37,7 +59,7 @@ export async function createPreferenceWindow() {
     if (!process.env.IS_TEST) win.webContents.openDevTools()
   } else {
     // Load the index.html when not in development
-    win.loadURL('app://./preferenceWindow.html')
+    win.loadURL('http://localhost/./preferenceWindow.html')
   }
   win.removeMenu()
   return win
@@ -69,7 +91,7 @@ async function createWindow() {
     if (!process.env.IS_TEST) win.webContents.openDevTools()
   } else {
     // Load the index.html when not in development
-    win.loadURL('app://./index.html')
+    win.loadURL('http://localhost/./index.html')
   }
   win.removeMenu()
   return win
@@ -112,7 +134,8 @@ app.on('ready', async () => {
       console.error(error)
     }
   })
-  createProtocol('app')
+
+  interceptHttp()
   nativeTheme.themeSource = 'dark'
   await loadPreferences()
   mainWindow = await createWindow()
