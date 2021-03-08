@@ -25,14 +25,18 @@ function interceptHttp() {
       pathName = decodeURI(pathName)
 
       const filePath = path.join(__dirname, pathName)
-      console.log(filePath)
 
       // deregister intercept after we handle index.js
+      // Reregister on page refresh
       if (request.url.includes('index.js')) {
         session.defaultSession.protocol.uninterceptProtocol('http')
       }
 
-      callback(filePath)
+      try {
+        callback(filePath)
+      } catch (e) {
+        console.log(e)
+      }
     })
   }
 }
