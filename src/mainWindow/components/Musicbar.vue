@@ -13,7 +13,7 @@
         @change="updateTimestmp"
       />
       <b-container fluid class="d-flex bar-container">
-        <b-row align-h="between" class="d-flex no-gutters">
+        <b-row align-h="between" class="d-flex no-gutters w-100">
           <b-col cols="3" align-self="center" class="no-gutters"
             ><Details
               :title="currentSong ? currentSong.title : '-'"

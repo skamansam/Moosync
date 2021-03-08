@@ -1,10 +1,10 @@
 <template>
   <div class="search-content w-100">
-    <v-tabs v-model="tab" fixed-tabs background-color="primary" dark class="tab-holder fixed-tabs-bar">
-      <v-tab v-for="item in items" :href="`#${item.tab}`" :key="item.tab">
-        {{ item.tab }}
-      </v-tab>
-    </v-tabs>
+    <v-card color="var(--primary)">
+      <v-tabs fixed-tabs v-model="tab" dark background-color="primary" show-arrows>
+        <v-tab v-for="item in items" :key="item.tab" :href="`#${item.tab}`"> {{ item.tab }} </v-tab>
+      </v-tabs>
+    </v-card>
 
     <v-tabs-items v-model="tab" class="tab-content-holder">
       <v-tab-item v-for="item in items" :id="item.tab" :key="item.tab" :eager="true" class="tab-content-holder">

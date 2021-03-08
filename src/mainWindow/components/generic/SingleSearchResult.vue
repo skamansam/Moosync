@@ -13,7 +13,7 @@
       </b-col>
       <b-col cols="2" v-if="showButtons" class="buttons"><div></div></b-col>
     </b-row>
-    <b-row v-if="divider" class="d-flex no-gutters">
+    <b-row v-if="divider" class="divider-row d-flex no-gutters">
       <div class="divider" />
     </b-row>
     <b-row v-if="!divider" class="no-gutters">
@@ -124,4 +124,7 @@ export default class SingleSearchResult extends mixins(PlayerControls) {
 
 .placeholder
   height: 13px
+
+.divider-row
+  margin-top: 13px
 </style>
