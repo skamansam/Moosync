@@ -38,6 +38,30 @@
   </div>
 </template>
 
+<script lang="ts">
+import { IpcEvents, WindowEvents } from '@/utils/ipc/main/constants'
+import { ipcRendererHolder } from '@/utils/ipc/renderer'
+import { Component, Vue } from 'vue-property-decorator'
+@Component({})
+export default class Sidebar extends Vue {
+  private onMinimize() {
+    ipcRendererHolder
+      .send<void>(IpcEvents.BROWSER_WINDOWS, { type: WindowEvents.MIN_MAIN })
+      .catch((e) => console.log(e))
+  }
+  private onMaximize() {
+    ipcRendererHolder
+      .send<void>(IpcEvents.BROWSER_WINDOWS, { type: WindowEvents.MAX_MAIN })
+      .catch((e) => console.log(e))
+  }
+  private onClose() {
+    ipcRendererHolder
+      .send<void>(IpcEvents.BROWSER_WINDOWS, { type: WindowEvents.CLOSE_MAIN })
+      .catch((e) => console.log(e))
+  }
+}
+</script>
+
 <style lang="scss" scoped>
 .titlebar {
   position: relative;

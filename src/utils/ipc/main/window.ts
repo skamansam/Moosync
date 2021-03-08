@@ -19,6 +19,16 @@ export class BrowserWindowChannel implements IpcChannelInterface {
         break
       case WindowEvents.OPEN_FILE_BROWSER:
         this.getFolder(event, request)
+        break
+      case WindowEvents.CLOSE_MAIN:
+        this.closeMainWindow(event, request)
+        break
+      case WindowEvents.MAX_MAIN:
+        this.maxMainWindow(event, request)
+        break
+      case WindowEvents.MIN_MAIN:
+        this.minMainWindow(event, request)
+        break
     }
   }
 
@@ -56,5 +66,26 @@ export class BrowserWindowChannel implements IpcChannelInterface {
           event.reply(request.responseChannel, folders)
         })
     }
+  }
+
+  private closeMainWindow(event: Electron.IpcMainEvent, request: IpcRequest) {
+    if (mainWindow) {
+      mainWindow.close()
+    }
+    event.reply(request.responseChannel)
+  }
+
+  private maxMainWindow(event: Electron.IpcMainEvent, request: IpcRequest) {
+    if (mainWindow && mainWindow.maximizable) {
+      mainWindow.maximize()
+    }
+    event.reply(request.responseChannel)
+  }
+
+  private minMainWindow(event: Electron.IpcMainEvent, request: IpcRequest) {
+    if (mainWindow && mainWindow.minimizable) {
+      mainWindow.minimize()
+    }
+    event.reply(request.responseChannel)
   }
 }

@@ -27,6 +27,10 @@ export enum WindowEvents {
   CLOSE_PREFERENCE_WINDOW = 'closePreferencesWindow',
   TOGGLE_DEV_TOOLS = 'toggleDevTools',
   OPEN_FILE_BROWSER = 'openFileBrowser',
+
+  CLOSE_MAIN = 'closeMain',
+  MAX_MAIN = 'maxMain',
+  MIN_MAIN = 'minMain',
 }
 
 export enum AlbumEvents {
