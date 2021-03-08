@@ -1,7 +1,7 @@
 <template>
   <div class="d-flex w-100">
-    <img ref="cover" v-if="CoverImg" class="coverimg" alt="cover img" :src="CoverImg" />
-    <Record v-if="!CoverImg" class="coverimg" />
+    <b-img fluid class="coverimg" v-if="ImgSrc" :src="ImgSrc" alt="cover art" />
+    <Record v-if="!ImgSrc" class="coverimg" />
     <div class="text-container">
       <div class="text song-title text-truncate">{{ title }}</div>
       <div class="text song-subtitle text-truncate">
@@ -44,7 +44,7 @@ export default class MusicBar extends mixins(Colors) {
     }
   }
 
-  get CoverImg() {
+  get ImgSrc() {
     if (this.cover) {
       if (this.cover.startsWith('http')) {
         return this.cover
@@ -64,6 +64,7 @@ export default class MusicBar extends mixins(Colors) {
   width: 56px
   min-width: 56px
   margin-right: 15px
+  border-radius: 10px
 
 .text
   text-align: left
