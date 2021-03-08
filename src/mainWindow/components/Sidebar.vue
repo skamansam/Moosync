@@ -105,9 +105,15 @@ export default class Sidebar extends mixins(Colors) {
   background: linear-gradient(176.27deg, var(--secondary) 1.69%, var(--primary) 72.01%)
   border-radius: 0px 30px 0px 0px
   top: 32px !important
+
+.b-sidebar-body
+  &::-webkit-scrollbar-track
+    margin-top: 0
+    background: transparent !important
 </style>
 
 <style lang="sass" scoped>
+
 .sidebar
   position: absolute
 

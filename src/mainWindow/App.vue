@@ -9,8 +9,6 @@
 </template>
 
 <script lang="ts">
-// import {Themes} from '@/commonStore/themeState'
-
 import { Playlist } from '@/models/playlists'
 import { IpcEvents, PlaylistEvents, ScannerEvents, WindowEvents } from '@/utils/ipc/main/constants'
 
