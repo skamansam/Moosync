@@ -1,7 +1,6 @@
 <template>
   <div class="w-100">
     <SongView :songList="songList" @onRowContext="getSongContextMenu" />
-    <NewPlaylistModal :id="'NewPlaylistModal'" />
   </div>
 </template>
 
@@ -12,7 +11,6 @@ import SongView from '@/mainWindow/components/SongView.vue'
 import { Song } from '@/models/songs'
 import { IpcEvents, PlaylistEvents, SongEvents } from '@/utils/ipc/main/constants'
 import { PlaylistModule } from '@/mainWindow/store/playlists'
-import NewPlaylistModal from '@/mainWindow/components/generic/NewPlaylistModal.vue'
 import { ipcRendererHolder } from '@/utils/ipc/renderer'
 
 import { mixins } from 'vue-class-component'
@@ -21,7 +19,6 @@ import PlaylistContextMenuMixin from '@/utils/mixins/PlaylistContextMenuMixin'
 @Component({
   components: {
     SongView,
-    NewPlaylistModal,
   },
 })
 export default class AllSongs extends mixins(PlaylistContextMenuMixin) {

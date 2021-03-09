@@ -3,7 +3,6 @@ import { IpcMainEvent, ipcMain } from 'electron'
 import { AlbumsChannel } from './albums'
 import { ArtistsChannel } from './artists'
 import { BrowserWindowChannel } from './window'
-import { ContextMenuChannel } from './contextMenu'
 import { GenreChannel } from './genre'
 import { PlaylistsChannel } from './playlists'
 import { PreferenceChannel } from './preferences'
@@ -19,7 +18,6 @@ export function registerIpcChannels() {
     new PlaylistsChannel(),
     new ArtistsChannel(),
     new GenreChannel(),
-    new ContextMenuChannel(),
     new BrowserWindowChannel(),
     new PreferenceChannel(),
     new SearchChannel(),

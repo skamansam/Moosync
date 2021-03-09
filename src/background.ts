@@ -49,6 +49,7 @@ export async function createPreferenceWindow() {
     minWidth: 840,
     backgroundColor: '#212121',
     show: false,
+    frame: false,
     webPreferences: {
       contextIsolation: true,
       // Use pluginOptions.nodeIntegration, leave this alone
@@ -79,7 +80,7 @@ async function createWindow() {
     minWidth: 1016,
     backgroundColor: '#212121',
     titleBarStyle: 'hidden',
-    frame: process.env.WEBPACK_DEV_SERVER_URL ? true : false,
+    frame: false,
     webPreferences: {
       contextIsolation: true,
       // Use pluginOptions.nodeIntegration, leave this alone

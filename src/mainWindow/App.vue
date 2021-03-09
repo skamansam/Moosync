@@ -1,10 +1,12 @@
 <template>
   <div id="app" :style="rootColors">
     <!-- <button v-on:click="scan()">Scan</button> -->
+    <ContextMenu />
     <Titlebar />
     <div>
       <router-view></router-view>
     </div>
+    <NewPlaylistModal :id="'NewPlaylistModal'" />
   </div>
 </template>
 
@@ -18,12 +20,16 @@ import { ipcRendererHolder } from '@/utils/ipc/renderer'
 import Titlebar from '@/commonComponents/Titlebar.vue'
 import { mixins } from 'vue-class-component'
 import ThemeHandler from '@/utils/mixins/ThemeHandler'
+import ContextMenu from './components/generic/Context.vue'
+import NewPlaylistModal from '@/mainWindow/components/generic/NewPlaylistModal.vue'
 
 const stun = require('stun')
 
 @Component({
   components: {
     Titlebar,
+    ContextMenu,
+    NewPlaylistModal,
   },
 })
 export default class App extends mixins(ThemeHandler) {

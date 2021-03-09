@@ -866,6 +866,30 @@
     global-agent "^2.0.2"
     global-tunnel-ng "^2.7.1"
 
+"@fortawesome/fontawesome-common-types@^0.2.34":
+  version "0.2.34"
+  resolved "https://registry.yarnpkg.com/@fortawesome/fontawesome-common-types/-/fontawesome-common-types-0.2.34.tgz#0a8c348bb23b7b760030f5b1d912e582be4ec915"
+  integrity sha512-XcIn3iYbTEzGIxD0/dY5+4f019jIcEIWBiHc3KrmK/ROahwxmZ/s+tdj97p/5K0klz4zZUiMfUlYP0ajhSJjmA==
+
+"@fortawesome/fontawesome-svg-core@^1.2.19":
+  version "1.2.34"
+  resolved "https://registry.yarnpkg.com/@fortawesome/fontawesome-svg-core/-/fontawesome-svg-core-1.2.34.tgz#1d1a7c92537cbc2b8a83eef6b6d824b4b5b46b26"
+  integrity sha512-0KNN0nc5eIzaJxlv43QcDmTkDY1CqeN6J7OCGSs+fwGPdtv0yOQqRjieopBCmw+yd7uD3N2HeNL3Zm5isDleLg==
+  dependencies:
+    "@fortawesome/fontawesome-common-types" "^0.2.34"
+
+"@fortawesome/free-solid-svg-icons@^5.9.0":
+  version "5.15.2"
+  resolved "https://registry.yarnpkg.com/@fortawesome/free-solid-svg-icons/-/free-solid-svg-icons-5.15.2.tgz#25bb035de57cf85aee8072965732368ccc8e8943"
+  integrity sha512-ZfCU+QjaFsdNZmOGmfqEWhzI3JOe37x5dF4kz9GeXvKn/sTxhqMtZ7mh3lBf76SvcYY5/GKFuyG7p1r4iWMQqw==
+  dependencies:
+    "@fortawesome/fontawesome-common-types" "^0.2.34"
+
+"@fortawesome/vue-fontawesome@^0.1.6":
+  version "0.1.10"
+  resolved "https://registry.yarnpkg.com/@fortawesome/vue-fontawesome/-/vue-fontawesome-0.1.10.tgz#eeeec1e4e8850bed0468f938292b06cda793bf34"
+  integrity sha512-b2+SLF31h32LSepVcXe+BQ63yvbq5qmTCy4KfFogCYm2bn68H5sDWUnX+U7MBqnM2aeEk9M7xSoqGnu+wSdY6w==
+
 "@hapi/address@2.x.x":
   version "2.1.4"
   resolved "https://registry.yarnpkg.com/@hapi/address/-/address-2.1.4.tgz"
@@ -1196,6 +1220,17 @@
   dependencies:
     "@babel/runtime" "^7.7.2"
     regenerator-runtime "^0.13.3"
+
+"@kiyoaki_w/vue-context@^1.0.3":
+  version "1.0.3"
+  resolved "https://registry.yarnpkg.com/@kiyoaki_w/vue-context/-/vue-context-1.0.3.tgz#8f36ba4cd2a3bb8991deaa2ed3f11faab8094a01"
+  integrity sha512-JZp2XlsSv0jUZGyhpbGUJUosTh86eBcbrtyhPYbr8qe2vKuM5Xw+6cPYzOb4YqF/yZXT5yjDWDxbjSks3g15rw==
+  dependencies:
+    "@fortawesome/fontawesome-svg-core" "^1.2.19"
+    "@fortawesome/free-solid-svg-icons" "^5.9.0"
+    "@fortawesome/vue-fontawesome" "^0.1.6"
+    core-js "^2.6.5"
+    vue "^2.6.10"
 
 "@mrmlnc/readdir-enhanced@^2.2.1":
   version "2.2.1"
@@ -3658,6 +3693,11 @@ core-js-compat@^3.6.5, core-js-compat@^3.8.0:
   dependencies:
     browserslist "^4.16.1"
     semver "7.0.0"
+
+core-js@^2.6.5:
+  version "2.6.12"
+  resolved "https://registry.yarnpkg.com/core-js/-/core-js-2.6.12.tgz#d9333dfa7b065e347cc5682219d6f690859cc2ec"
+  integrity sha512-Kb2wC0fvsWfQrgk8HU5lW6U/Lcs8+9aaYcy4ZFc6DDlo4nZ7n70dEgE5rtR0oG6ufKDUnrwfWL1mXR5ljDatrQ==
 
 core-js@^3.6.5:
   version "3.8.3"
@@ -11057,6 +11097,13 @@ vue-cli-plugin-electron-builder@~2.0.0-rc.5:
     webpack-merge "^4.2.2"
     yargs "^15.3.1"
 
+vue-context-menu-popup@^1.0.4:
+  version "1.0.4"
+  resolved "https://registry.yarnpkg.com/vue-context-menu-popup/-/vue-context-menu-popup-1.0.4.tgz#c99f922fefa78f6ec3775aa35fe344752f25c087"
+  integrity sha512-Q9X2aQXnL87OrQS7okXu/w+Q5tzX/Mgs6GoLMABjVrovEydAYJCJM8kus+LGd8OX73/TGvjxsYNWx/hHDU+Ypw==
+  dependencies:
+    vue "^2.5.17"
+
 vue-electron@^1.0.6:
   version "1.0.6"
   resolved "https://registry.yarnpkg.com/vue-electron/-/vue-electron-1.0.6.tgz"
@@ -11182,7 +11229,7 @@ vue-virtual-scroller@^1.0.10:
     vue-observe-visibility "^0.4.4"
     vue-resize "^0.4.5"
 
-vue@^2.6.12:
+vue@^2.5.17, vue@^2.6.10, vue@^2.6.12:
   version "2.6.12"
   resolved "https://registry.yarnpkg.com/vue/-/vue-2.6.12.tgz#f5ebd4fa6bd2869403e29a896aed4904456c9123"
   integrity sha512-uhmLFETqPPNyuLLbsKz6ioJ4q7AZHzD8ZVFNATNyICSZouqP2Sz0rotWQC8UNBF6VGSCs5abnKJoStA6JbCbfg==

@@ -68,8 +68,6 @@ export enum EventBus {
   UPDATE_AUDIO_TIME = 'timestamp-update',
   SONG_SELECTED = 'song-select',
   COVER_SELECTED = 'cover-select',
-}
-
-export enum ContextMenuEvents {
-  SONGS_MENU = 'songsMenu',
+  SHOW_CONTEXT = 'show-context',
+  SHOW_NEW_PLAYLIST_MODAL = 'show-new-playlist-modal',
 }

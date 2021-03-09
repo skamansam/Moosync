@@ -10,6 +10,7 @@ import store from '@/commonStore'
 import vuetify from '@/mainWindow/plugins/vuetify'
 
 Vue.config.productionTip = false
+export const bus = new Vue()
 
 new Vue({
   components: { App },

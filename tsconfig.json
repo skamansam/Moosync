@@ -21,5 +21,13 @@
     "lib": ["esnext", "dom", "dom.iterable", "scripthost"]
   },
   "typeRoots": ["./node_modules", "./node_modules/@types", "./src/types/declarations"],
-  "include": ["src/**/*.ts", "src/**/*.tsx", "src/**/*.vue", "tests/**/*.ts", "tests/**/*.tsx", "src/store/index.ts"]
+  "include": [
+    "src/**/*.ts",
+    "src/**/*.tsx",
+    "src/**/*.vue",
+    "tests/**/*.ts",
+    "tests/**/*.tsx",
+    "src/store/index.ts",
+    "src/mainWindow/plugins/kicontext.js"
+  ]
 }

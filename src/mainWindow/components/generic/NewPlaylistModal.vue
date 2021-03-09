@@ -9,25 +9,41 @@
 </template>
 
 <script lang="ts">
-import { IpcEvents, PlaylistEvents } from '@/utils/ipc/main/constants'
+import { EventBus, IpcEvents, PlaylistEvents } from '@/utils/ipc/main/constants'
 import { ipcRendererHolder } from '@/utils/ipc/renderer'
 import { PlaylistModule } from '@/mainWindow/store/playlists'
 import { Component, Prop } from 'vue-property-decorator'
 import Colors from '@/utils/mixins/Colors'
 import { mixins } from 'vue-class-component'
+import { bus } from '@/mainWindow/main'
 
 @Component({})
 export default class NewPlaylistModal extends mixins(Colors) {
   @Prop({ default: 'NewPlaylistModal' })
   private id!: string
+  private showing: boolean = false
+  private callback: ((id: string) => void) | null = null
 
-  private createPlaylist() {
+  private async createPlaylist() {
     ipcRendererHolder
-      .send<void>(IpcEvents.PLAYLIST, { type: PlaylistEvents.CREATE_PLAYLIST, params: { name: 'henlo' } })
-      .then(() => {
+      .send<string>(IpcEvents.PLAYLIST, { type: PlaylistEvents.CREATE_PLAYLIST, params: { name: 'henlo' } })
+      .then((playlist_id: string) => {
         this.$bvModal.hide(this.id)
         PlaylistModule.setUpdated(true)
+        if (this.callback) {
+          this.callback(playlist_id)
+          this.callback = null
+        }
       })
+  }
+
+  mounted() {
+    bus.$on(EventBus.SHOW_NEW_PLAYLIST_MODAL, (callback: (id: string) => void) => {
+      if (!this.showing) {
+        this.callback = callback
+        this.$bvModal.show(this.id)
+      }
+    })
   }
 }
 </script>

@@ -16,9 +16,10 @@ import MusicBar from '@/mainWindow/components/Musicbar.vue'
 import Sidebar from '@/mainWindow/components/Sidebar.vue'
 import TopBar from '@/mainWindow/components/TopBar.vue'
 import { Component } from 'vue-property-decorator'
-import Vue from 'vue'
 import { ipcRendererHolder } from '@/utils/ipc/renderer'
 import { PreferenceEvents } from '@/utils/ipc/main/constants'
+import PlaylistContextMenuMixin from '@/utils/mixins/PlaylistContextMenuMixin'
+import { mixins } from 'vue-class-component'
 
 @Component({
   components: {
@@ -27,7 +28,7 @@ import { PreferenceEvents } from '@/utils/ipc/main/constants'
     MusicBar,
   },
 })
-export default class DefaultLayout extends Vue {
+export default class DefaultLayout extends mixins(PlaylistContextMenuMixin) {
   private refreshRouter: boolean = false
   mounted() {
     ipcRendererHolder.listen(PreferenceEvents.PREFERENCE_REFRESH, () => {

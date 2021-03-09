@@ -17,12 +17,17 @@ export default class PlayerControls extends Vue {
     PlayerModule.prevSong()
   }
 
-  public queueSong(song: Song) {
-    PlayerModule.pushInQueue(song)
+  public queueSong(...songs: Song[]) {
+    for (const s of songs) {
+      PlayerModule.pushInQueue(s)
+    }
   }
 
-  public playTop(song: Song) {
-    PlayerModule.loadInQueueTop(song)
+  public playTop(...songs: Song[]) {
+    for (const s of songs) {
+      PlayerModule.loadInQueueTop(s)
+    }
+
     PlayerModule.nextSong()
   }
 

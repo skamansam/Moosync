@@ -62,8 +62,8 @@ export default class SongList extends mixins(Colors) {
     window.addEventListener('resize', this.rerenderTable)
   }
 
-  private onRowContext(item: Song) {
-    this.$emit('onRowContext', item)
+  private onRowContext(item: Song, index: number, event: Event) {
+    this.$emit('onRowContext', event, item)
   }
 
   private onRowDoubleClicked(item: Song) {

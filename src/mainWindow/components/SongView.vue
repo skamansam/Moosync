@@ -57,8 +57,8 @@ export default class AllSongs extends mixins(Colors) {
     if (items) this.currentSong = items[items.length - 1]
   }
 
-  private getSongContextMenu(item: Song) {
-    this.$emit('onRowContext', item)
+  private getSongContextMenu(event: Event, item: Song) {
+    this.$emit('onRowContext', event, item)
   }
 }
 </script>
