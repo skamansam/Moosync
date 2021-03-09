@@ -1,6 +1,6 @@
 'use strict'
 
-import { BrowserWindow, app, nativeTheme, protocol, session } from 'electron'
+import { BrowserWindow, Menu, Tray, app, nativeTheme, protocol, session } from 'electron'
 import installExtension, { VUEJS_DEVTOOLS } from 'electron-devtools-installer'
 
 import { createProtocol } from 'vue-cli-plugin-electron-builder/lib'
@@ -13,6 +13,9 @@ export var mainWindow: BrowserWindow
 
 // Scheme must be registered before the app is ready
 protocol.registerSchemesAsPrivileged([{ scheme: 'app', privileges: { secure: true, standard: true } }])
+
+let isQuitting = false
+let tray: Tray
 
 function interceptHttp() {
   // Since youtube embeds are blocked on custom protocols like file:// or app://
@@ -48,7 +51,7 @@ export async function createPreferenceWindow() {
     minHeight: 653,
     minWidth: 840,
     backgroundColor: '#212121',
-    show: false,
+    show: true,
     frame: false,
     webPreferences: {
       contextIsolation: true,
@@ -71,6 +74,33 @@ export async function createPreferenceWindow() {
   return win
 }
 
+function initializeTray() {
+  tray = new Tray(path.join(__static, 'logo.png'))
+  tray.setContextMenu(
+    Menu.buildFromTemplate([
+      {
+        label: 'Show App',
+        click: function () {
+          tray.destroy()
+          mainWindow.show()
+        },
+      },
+      {
+        label: 'Quit',
+        click: function () {
+          isQuitting = true
+          app.quit()
+        },
+      },
+    ])
+  )
+
+  tray.on('double-click', () => {
+    mainWindow.show()
+    tray.destroy()
+  })
+}
+
 async function createWindow() {
   // Create the browser window.
   const win = new BrowserWindow({
@@ -80,6 +110,8 @@ async function createWindow() {
     minWidth: 1016,
     backgroundColor: '#212121',
     titleBarStyle: 'hidden',
+    parent: mainWindow,
+    modal: true,
     frame: false,
     webPreferences: {
       contextIsolation: true,
@@ -99,6 +131,14 @@ async function createWindow() {
     win.loadURL('http://localhost/./index.html')
   }
   win.removeMenu()
+
+  win.on('close', function (event) {
+    if (!isQuitting) {
+      event.preventDefault()
+      mainWindow.hide()
+      initializeTray()
+    }
+  })
   return win
 }
 
@@ -115,6 +155,10 @@ app.on('activate', () => {
   // On macOS it's common to re-create a window in the app when the
   // dock icon is clicked and there are no other windows open.
   if (BrowserWindow.getAllWindows().length === 0) createWindow()
+})
+
+app.on('before-quit', function () {
+  isQuitting = true
 })
 
 // This method will be called when Electron has finished

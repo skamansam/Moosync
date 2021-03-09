@@ -41,13 +41,13 @@ export class BrowserWindowChannel implements IpcChannelInterface {
   private async openPreferenceWindow(event: Electron.IpcMainEvent, request: IpcRequest) {
     if (!this.preferenceWindow || this.preferenceWindow.isDestroyed())
       this.preferenceWindow = await createPreferenceWindow()
-    this.preferenceWindow.show()
-
     event.reply(request.responseChannel, null)
   }
 
   private closePreferenceWindow(event: Electron.IpcMainEvent, request: IpcRequest) {
     if (this.preferenceWindow && !this.preferenceWindow.isDestroyed() && this.preferenceWindow.isVisible) {
+      // Hide window before to make it seem responsive
+      this.preferenceWindow.hide()
       this.preferenceWindow.close()
       this.preferenceWindow = null
     }
@@ -55,14 +55,14 @@ export class BrowserWindowChannel implements IpcChannelInterface {
   }
 
   private maxPreferenceWindow(event: Electron.IpcMainEvent, request: IpcRequest) {
-    if (this.preferenceWindow && this.preferenceWindow.maximizable) {
+    if (this.preferenceWindow && !this.preferenceWindow.isDestroyed() && this.preferenceWindow.maximizable) {
       this.preferenceWindow.maximize()
     }
     event.reply(request.responseChannel)
   }
 
   private minPreferenceWindow(event: Electron.IpcMainEvent, request: IpcRequest) {
-    if (this.preferenceWindow && this.preferenceWindow.minimizable) {
+    if (this.preferenceWindow && !this.preferenceWindow.isDestroyed() && this.preferenceWindow.minimizable) {
       this.preferenceWindow.minimize()
     }
     event.reply(request.responseChannel)
@@ -90,6 +90,8 @@ export class BrowserWindowChannel implements IpcChannelInterface {
 
   private closeMainWindow(event: Electron.IpcMainEvent, request: IpcRequest) {
     if (mainWindow) {
+      // Hide window before to make it seem responsive
+      mainWindow.hide()
       mainWindow.close()
     }
     event.reply(request.responseChannel)
