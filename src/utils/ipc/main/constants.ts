@@ -23,14 +23,17 @@ export enum PreferenceEvents {
 }
 
 export enum WindowEvents {
-  OPEN_PREFERENCE_WINDOW = 'openPreferencesWindow',
-  CLOSE_PREFERENCE_WINDOW = 'closePreferencesWindow',
   TOGGLE_DEV_TOOLS = 'toggleDevTools',
   OPEN_FILE_BROWSER = 'openFileBrowser',
 
   CLOSE_MAIN = 'closeMain',
   MAX_MAIN = 'maxMain',
   MIN_MAIN = 'minMain',
+
+  OPEN_PREF = 'openPref',
+  CLOSE_PREF = 'closePref',
+  MAX_PREF = 'maxPref',
+  MIN_PREF = 'minPref',
 }
 
 export enum AlbumEvents {

@@ -8,11 +8,17 @@ export class BrowserWindowChannel implements IpcChannelInterface {
   preferenceWindow: BrowserWindow | null = null
   handle(event: Electron.IpcMainEvent, request: IpcRequest): void {
     switch (request.type) {
-      case WindowEvents.OPEN_PREFERENCE_WINDOW:
+      case WindowEvents.OPEN_PREF:
         this.openPreferenceWindow(event, request)
         break
-      case WindowEvents.CLOSE_PREFERENCE_WINDOW:
+      case WindowEvents.CLOSE_PREF:
         this.closePreferenceWindow(event, request)
+        break
+      case WindowEvents.MIN_PREF:
+        this.minPreferenceWindow(event, request)
+        break
+      case WindowEvents.MAX_PREF:
+        this.maxPreferenceWindow(event, request)
         break
       case WindowEvents.TOGGLE_DEV_TOOLS:
         this.toggleDevTools(event, request)
@@ -46,6 +52,20 @@ export class BrowserWindowChannel implements IpcChannelInterface {
       this.preferenceWindow = null
     }
     event.reply(request.responseChannel, null)
+  }
+
+  private maxPreferenceWindow(event: Electron.IpcMainEvent, request: IpcRequest) {
+    if (this.preferenceWindow && this.preferenceWindow.maximizable) {
+      this.preferenceWindow.maximize()
+    }
+    event.reply(request.responseChannel)
+  }
+
+  private minPreferenceWindow(event: Electron.IpcMainEvent, request: IpcRequest) {
+    if (this.preferenceWindow && this.preferenceWindow.minimizable) {
+      this.preferenceWindow.minimize()
+    }
+    event.reply(request.responseChannel)
   }
 
   private toggleDevTools(event: Electron.IpcMainEvent, request: IpcRequest) {

@@ -82,7 +82,7 @@ export default class Sidebar extends mixins(Colors) {
   }
 
   private openSettings() {
-    ipcRendererHolder.send<void>(IpcEvents.BROWSER_WINDOWS, { type: WindowEvents.OPEN_PREFERENCE_WINDOW })
+    ipcRendererHolder.send<void>(IpcEvents.BROWSER_WINDOWS, { type: WindowEvents.OPEN_PREF })
   }
 
   private registerListeners() {

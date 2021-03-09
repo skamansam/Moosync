@@ -1,6 +1,6 @@
 <template>
   <div id="app" :style="rootColors">
-    <Titlebar />
+    <Titlebar windowType="preference-window" />
     <div class="content">
       <router-view></router-view>
     </div>
@@ -40,7 +40,7 @@ export default class App extends mixins(ThemeHandler) {
   }
 
   private closeWindow() {
-    ipcRendererHolder.send<void>(IpcEvents.BROWSER_WINDOWS, { type: WindowEvents.CLOSE_PREFERENCE_WINDOW })
+    ipcRendererHolder.send<void>(IpcEvents.BROWSER_WINDOWS, { type: WindowEvents.CLOSE_PREF })
   }
 
   private async writePreferences() {

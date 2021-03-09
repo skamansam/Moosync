@@ -41,22 +41,36 @@
 <script lang="ts">
 import { IpcEvents, WindowEvents } from '@/utils/ipc/main/constants'
 import { ipcRendererHolder } from '@/utils/ipc/renderer'
-import { Component, Vue } from 'vue-property-decorator'
+import { Component, Prop, Vue } from 'vue-property-decorator'
 @Component({})
 export default class Sidebar extends Vue {
+  @Prop({ default: 'main-window' })
+  private windowType!: 'main-window' | 'preference-window'
+
+  private getWindowEvent(event: 'close' | 'min' | 'max'): WindowEvents {
+    switch (event) {
+      case 'close':
+        return this.windowType == 'main-window' ? WindowEvents.CLOSE_MAIN : WindowEvents.CLOSE_PREF
+      case 'min':
+        return this.windowType == 'main-window' ? WindowEvents.MIN_MAIN : WindowEvents.MIN_PREF
+      case 'max':
+        return this.windowType == 'main-window' ? WindowEvents.MAX_MAIN : WindowEvents.MAX_PREF
+    }
+  }
+
   private onMinimize() {
     ipcRendererHolder
-      .send<void>(IpcEvents.BROWSER_WINDOWS, { type: WindowEvents.MIN_MAIN })
+      .send<void>(IpcEvents.BROWSER_WINDOWS, { type: this.getWindowEvent('min') })
       .catch((e) => console.log(e))
   }
   private onMaximize() {
     ipcRendererHolder
-      .send<void>(IpcEvents.BROWSER_WINDOWS, { type: WindowEvents.MAX_MAIN })
+      .send<void>(IpcEvents.BROWSER_WINDOWS, { type: this.getWindowEvent('max') })
       .catch((e) => console.log(e))
   }
   private onClose() {
     ipcRendererHolder
-      .send<void>(IpcEvents.BROWSER_WINDOWS, { type: WindowEvents.CLOSE_MAIN })
+      .send<void>(IpcEvents.BROWSER_WINDOWS, { type: this.getWindowEvent('close') })
       .catch((e) => console.log(e))
   }
 }
