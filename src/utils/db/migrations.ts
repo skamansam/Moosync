@@ -5,9 +5,9 @@ export const migrations = [
   CREATE TABLE allsongs (
     _id VARCHAR(36) PRIMARY KEY,
     path TEXT,
-    size TEXT NOT NULL,
-    inode TEXT NOT NULL,
-    deviceno TEXT NOT NULL,
+    size TEXT,
+    inode TEXT,
+    deviceno TEXT,
     title TEXT,
     date TEXT,
     year TEXT,
@@ -127,7 +127,7 @@ export const migrations = [
   // 05-03-2021
   `
   -- Up
-  ALTER TABLE allsongs ADD type TEXT NOT NULL DEFAULT LOCAL;
+  ALTER TABLE allsongs ADD type TEXT NOT NULL DEFAULT 'LOCAL';
   ALTER TABLE allsongs ADD url TEXT;
 
   -- Down

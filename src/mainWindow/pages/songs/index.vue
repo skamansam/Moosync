@@ -14,14 +14,14 @@ import { PlaylistModule } from '@/mainWindow/store/playlists'
 import { ipcRendererHolder } from '@/utils/ipc/renderer'
 
 import { mixins } from 'vue-class-component'
-import PlaylistContextMenuMixin from '@/utils/mixins/PlaylistContextMenuMixin'
+import ContextMenuMixin from '@/utils/mixins/ContextMenuMixin'
 
 @Component({
   components: {
     SongView,
   },
 })
-export default class AllSongs extends mixins(PlaylistContextMenuMixin) {
+export default class AllSongs extends mixins(ContextMenuMixin) {
   private songList: Song[] = []
   private currentSong: Song | null = null
 

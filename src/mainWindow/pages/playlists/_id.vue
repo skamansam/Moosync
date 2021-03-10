@@ -22,7 +22,7 @@ import { IpcEvents, PlaylistEvents } from '@/utils/ipc/main/constants'
 import { Song } from '@/models/songs'
 
 import { mixins } from 'vue-class-component'
-import PlaylistContextMenuMixin from '@/utils/mixins/PlaylistContextMenuMixin'
+import ContextMenuMixin from '@/utils/mixins/ContextMenuMixin'
 import { Playlist } from '@/models/playlists'
 
 @Component({
@@ -30,7 +30,7 @@ import { Playlist } from '@/models/playlists'
     SongView,
   },
 })
-export default class SinglePlaylistView extends mixins(PlaylistContextMenuMixin) {
+export default class SinglePlaylistView extends mixins(ContextMenuMixin) {
   private playlist: Playlist | null = null
   private songList: Song[] = []
 

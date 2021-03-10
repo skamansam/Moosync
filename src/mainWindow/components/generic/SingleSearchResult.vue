@@ -1,5 +1,5 @@
 <template>
-  <b-container fluid class="single-result-container">
+  <b-container fluid class="single-result-container" @contextmenu.prevent="emitContextMenu($event)">
     <b-row align-h="around" class="no-gutters">
       <b-col cols="1" class="img-container justify-content-around ms-auto" @click="emitImgClick">
         <div class="play-button me-auto justify-content-center d-flex align-items-center">
@@ -71,6 +71,10 @@ export default class SingleSearchResult extends mixins(PlayerControls) {
 
   private emitTitleClick() {
     this.$emit('titleClick', this.id)
+  }
+
+  private emitContextMenu(event: Event) {
+    this.$emit('onContextMenu', event, this.id)
   }
 }
 </script>

@@ -27,6 +27,7 @@
             :showButtons="true"
             @imgClick="imgClickHandler(tab, $event)"
             @titleClick="titleClickHandler(tab, $event)"
+            @onContextMenu="contextMenuHandler(tab, ...arguments)"
           />
         </RecycleScroller>
       </v-tab-item>
@@ -52,17 +53,17 @@ import { artists } from '@/models/artists'
 import { Genre } from '@/models/genre'
 import { Playlist } from '@/models/playlists'
 import { Song } from '@/models/songs'
-import PlayerControls from '@/utils/mixins/PlayerControls'
 import { mixins } from 'vue-class-component'
 import RouterPushes from '@/utils/mixins/RouterPushes'
-import { YoutubeItem } from '@/models/youtube'
+import { toSong, YoutubeItem } from '@/models/youtube'
+import ContextMenuMixin from '@/utils/mixins/ContextMenuMixin'
 
 @Component({
   components: {
     SingleSearchResult,
   },
 })
-export default class SearchPage extends mixins(PlayerControls, RouterPushes) {
+export default class SearchPage extends mixins(RouterPushes, ContextMenuMixin) {
   private term: string = ''
   private tab = null
   private result: SearchResult | null = null
@@ -83,7 +84,7 @@ export default class SearchPage extends mixins(PlayerControls, RouterPushes) {
       })
       .then((result) => {
         this.result = result
-        console.log(this.result)
+        console.log(this.result.youtube)
       })
   }
 
@@ -205,7 +206,14 @@ export default class SearchPage extends mixins(PlayerControls, RouterPushes) {
         this.playPlaylist(item as Playlist)
         return
       case 'Youtube':
-        this.playYoutube(item as YoutubeItem)
+        this.playTop(...toSong(item as YoutubeItem))
+    }
+  }
+
+  private contextMenuHandler(tab: string, event: Event, item: any) {
+    switch (tab) {
+      case 'Youtube':
+        this.getYoutubeContextMenu(event, item as YoutubeItem)
     }
   }
 
@@ -248,21 +256,6 @@ export default class SearchPage extends mixins(PlayerControls, RouterPushes) {
           this.queueSong(value)
         })
       )
-  }
-
-  private playYoutube(item: YoutubeItem) {
-    this.playTop({
-      _id: item._id,
-      title: item.yt_title,
-      album: {
-        album_name: item.yt_album,
-        album_coverPath: item.yt_coverImage,
-      },
-      artists: [item.yt_artist],
-      duration: item.duration,
-      type: 'YOUTUBE',
-      url: item._id,
-    })
   }
 
   created() {

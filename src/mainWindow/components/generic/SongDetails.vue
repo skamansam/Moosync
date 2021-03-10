@@ -51,6 +51,7 @@ export default class SongDetails extends mixins(Colors) {
 @import "~bootstrap/scss/mixins"
 
 .image
+  object-fit: none
   border-radius: 25px
 
 .image-container
@@ -80,6 +81,9 @@ export default class SongDetails extends mixins(Colors) {
   color: var(--textPrimary)
   font-size: 24px
   text-align: left
+
+.dummy
+  margin-top: 75%
 
 .subtitle
   color: var(--textPrimary)

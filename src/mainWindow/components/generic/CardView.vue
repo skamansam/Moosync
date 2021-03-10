@@ -1,13 +1,6 @@
 <template>
   <div>
-    <b-card
-      :title="title"
-      :sub-title="subtitle"
-      :img-src="imgSrc ? 'media://' + imgSrc : ''"
-      img-alt="Album Art"
-      img-top
-      class="mb-2 card-body"
-    >
+    <b-card :title="title" :sub-title="subtitle" :img-src="ImgSrc" img-alt="Album Art" img-top class="mb-2 card-body">
     </b-card>
   </div>
 </template>
@@ -29,6 +22,14 @@ export default class SongDetails extends mixins(Colors) {
 
   @Prop({ default: '' })
   private imgSrc!: string
+
+  get ImgSrc() {
+    if (this.imgSrc) {
+      if (this.imgSrc.startsWith('http')) return this.imgSrc
+      else return 'media://' + this.imgSrc
+    }
+    return ''
+  }
 }
 </script>
 

@@ -24,14 +24,14 @@ import { Song } from '@/models/songs'
 import { PlaylistModule } from '@/mainWindow/store/playlists'
 
 import { mixins } from 'vue-class-component'
-import PlaylistContextMenuMixin from '@/utils/mixins/PlaylistContextMenuMixin'
+import ContextMenuMixin from '@/utils/mixins/ContextMenuMixin'
 
 @Component({
   components: {
     SongView,
   },
 })
-export default class SingleAlbumView extends mixins(PlaylistContextMenuMixin) {
+export default class SingleAlbumView extends mixins(ContextMenuMixin) {
   private album: Album | null = null
   private songList: Song[] = []
 
