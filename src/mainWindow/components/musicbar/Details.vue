@@ -16,21 +16,19 @@ import Colors from '@/utils/mixins/Colors'
 import { mixins } from 'vue-class-component'
 import { Component, Prop, Ref, Watch } from 'vue-property-decorator'
 import Record from '@/mainWindow/components/icons/Record.vue'
+import ImageLoader from '@/utils/mixins/ImageLoader'
 
 @Component({
   components: {
     Record,
   },
 })
-export default class MusicBar extends mixins(Colors) {
+export default class MusicBar extends mixins(Colors, ImageLoader) {
   @Prop({ default: '-' })
   title!: string
 
   @Prop({ default: () => [] })
   artists!: string[]
-
-  @Prop({ default: '' })
-  cover!: string
 
   @Prop({ default: null })
   private coverBlob!: Blob | null
@@ -42,16 +40,6 @@ export default class MusicBar extends mixins(Colors) {
     if (this.coverBlob) {
       this.imageElement.src = URL.createObjectURL(this.coverBlob)
     }
-  }
-
-  get ImgSrc() {
-    if (this.cover) {
-      if (this.cover.startsWith('http')) {
-        return this.cover
-      }
-      return `media://${this.cover}`
-    }
-    return ''
   }
 }
 </script>

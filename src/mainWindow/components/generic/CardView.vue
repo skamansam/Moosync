@@ -7,29 +7,19 @@
 
 <script lang="ts">
 import Colors from '@/utils/mixins/Colors'
+import ImageLoader from '@/utils/mixins/ImageLoader'
 import { mixins } from 'vue-class-component'
 import { Component, Prop } from 'vue-property-decorator'
 
 @Component({
   components: {},
 })
-export default class SongDetails extends mixins(Colors) {
+export default class SongDetails extends mixins(Colors, ImageLoader) {
   @Prop({ default: '' })
   private title!: string
 
   @Prop({ default: '' })
   private subtitle!: string
-
-  @Prop({ default: '' })
-  private imgSrc!: string
-
-  get ImgSrc() {
-    if (this.imgSrc) {
-      if (this.imgSrc.startsWith('http')) return this.imgSrc
-      else return 'media://' + this.imgSrc
-    }
-    return ''
-  }
 }
 </script>
 

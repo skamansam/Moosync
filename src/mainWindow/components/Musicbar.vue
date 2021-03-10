@@ -18,7 +18,7 @@
             ><Details
               :title="currentSong ? currentSong.title : '-'"
               :artists="currentSong ? currentSong.artists : []"
-              :cover="
+              :imgSrc="
                 currentSong && currentSong.album && currentSong.album.album_coverPath
                   ? currentSong.album.album_coverPath
                   : ''

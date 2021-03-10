@@ -18,13 +18,14 @@ import Colors from '@/utils/mixins/Colors'
 import { mixins } from 'vue-class-component'
 import { Component, Prop, Ref } from 'vue-property-decorator'
 import Record from '@/mainWindow/components/icons/Record.vue'
+import ImageLoader from '@/utils/mixins/ImageLoader'
 
 @Component({
   components: {
     Record,
   },
 })
-export default class SongDetails extends mixins(Colors) {
+export default class SongDetails extends mixins(Colors, ImageLoader) {
   @Ref('cover') imageElement!: HTMLImageElement
 
   @Prop({ default: '' })
@@ -32,17 +33,6 @@ export default class SongDetails extends mixins(Colors) {
 
   @Prop({ default: '' })
   private currentsubTitle!: string
-
-  @Prop({ default: '' })
-  private imgSrc!: string
-
-  get ImgSrc() {
-    if (this.imgSrc) {
-      if (this.imgSrc.startsWith('http')) return this.imgSrc
-      else return 'media://' + this.imgSrc
-    }
-    return ''
-  }
 }
 </script>
 
