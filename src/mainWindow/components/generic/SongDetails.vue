@@ -6,10 +6,8 @@
         <div
           fluid
           class="h-100 w-100 image"
-          ref="cover"
           v-if="ImgSrc && ImgSrc.startsWith('http')"
           :style="{ backgroundImage: 'url(' + ImgSrc + ')' }"
-          alt="cover art"
         />
         <Record v-if="!ImgSrc" class="h-100 image" />
       </b-col>
@@ -24,7 +22,7 @@
 <script lang="ts">
 import Colors from '@/utils/mixins/Colors'
 import { mixins } from 'vue-class-component'
-import { Component, Prop, Ref } from 'vue-property-decorator'
+import { Component, Prop } from 'vue-property-decorator'
 import Record from '@/mainWindow/components/icons/Record.vue'
 import ImageLoader from '@/utils/mixins/ImageLoader'
 
@@ -34,8 +32,6 @@ import ImageLoader from '@/utils/mixins/ImageLoader'
   },
 })
 export default class SongDetails extends mixins(Colors, ImageLoader) {
-  @Ref('cover') imageElement!: HTMLImageElement
-
   @Prop({ default: '' })
   private currentTitle!: string
 
