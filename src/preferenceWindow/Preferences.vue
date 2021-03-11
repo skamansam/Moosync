@@ -16,7 +16,7 @@ import { Component } from 'vue-property-decorator'
 import Titlebar from '@/commonComponents/Titlebar.vue'
 import { Preferences } from '@/utils/db/constants'
 import { ipcRendererHolder } from '@/utils/ipc/renderer'
-import { IpcEvents, PreferenceEvents, WindowEvents } from '@/utils/ipc/main/constants'
+import { IpcEvents, PreferenceEvents, ScannerEvents, WindowEvents } from '@/utils/ipc/main/constants'
 import { PreferencesModule } from './store/preferences'
 import { mixins } from 'vue-class-component'
 import ThemeHandler from '@/utils/mixins/ThemeHandler'
@@ -44,10 +44,14 @@ export default class App extends mixins(ThemeHandler) {
   }
 
   private async writePreferences() {
-    return ipcRendererHolder.send<void>(IpcEvents.PREFERENCES, {
+    ipcRendererHolder.send<void>(IpcEvents.PREFERENCES, {
       type: PreferenceEvents.SAVE_PREFERENCES,
       params: { preferences: PreferencesModule.preferences },
     })
+
+    if (PreferencesModule.pathsChanged) {
+      ipcRendererHolder.send<void>(IpcEvents.SCANNER, { type: ScannerEvents.SCAN_MUSIC })
+    }
   }
 }
 </script>

@@ -38,6 +38,7 @@ export default class scanner extends Vue {
 
   private removePath(path: string) {
     PreferencesModule.removePath(path)
+    PreferencesModule.setPathsChanged(true)
     console.log(this.musicPaths)
   }
 
@@ -46,6 +47,7 @@ export default class scanner extends Vue {
       .send<Electron.OpenDialogReturnValue>(IpcEvents.BROWSER_WINDOWS, { type: WindowEvents.OPEN_FILE_BROWSER })
       .then((data) => {
         PreferencesModule.addPaths(...data.filePaths)
+        PreferencesModule.setPathsChanged(true)
       })
   }
 }
