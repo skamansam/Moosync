@@ -66,6 +66,7 @@ export enum ArtistEvents {
 export enum SongEvents {
   GET_ALL_SONGS = 'getAllSongs',
   STORE_SONG = 'storeSong',
+  REMOVE_SONG = 'removeSong',
 }
 
 export enum EventBus {

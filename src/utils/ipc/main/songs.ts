@@ -14,7 +14,10 @@ export class SongsChannel implements IpcChannelInterface {
         this.getAllSongs(event, request)
         break
       case SongEvents.STORE_SONG:
-        this.storeSong(event, request)
+        this.storeSongs(event, request)
+        break
+      case SongEvents.REMOVE_SONG:
+        this.removeSongs(event, request)
         break
     }
   }
@@ -25,7 +28,22 @@ export class SongsChannel implements IpcChannelInterface {
       .catch((e) => console.log(e))
   }
 
-  private storeSong(event: Electron.IpcMainEvent, request: IpcRequest) {
+  private removeSongs(event: Electron.IpcMainEvent, request: IpcRequest) {
+    let promises: Promise<void>[] = []
+    if (request.params.songs) {
+      const songs = request.params.songs as Song[]
+      for (const s of songs) {
+        promises.push(SongDB.removeSong(s._id!))
+      }
+    }
+    Promise.all(promises)
+      .then((data) => {
+        event.reply(request.responseChannel, data)
+      })
+      .catch((e) => console.log(e))
+  }
+
+  private storeSongs(event: Electron.IpcMainEvent, request: IpcRequest) {
     let promises: Promise<void>[] = []
     if (request.params.songs) {
       const songs = request.params.songs as Song[]

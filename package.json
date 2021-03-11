@@ -85,6 +85,9 @@
     "vue-cli-plugin-electron-builder": "~2.0.0-rc.5",
     "vue-template-compiler": "^2.6.11"
   },
+  "optionalDependencies": {
+    "@nodert-win10-20h1/windows.media.transcoding": "^0.1.0"
+  },
   "eslintConfig": {
     "root": true,
     "env": {

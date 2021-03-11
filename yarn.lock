@@ -1266,6 +1266,13 @@
     "@nodelib/fs.scandir" "2.1.4"
     fastq "^1.6.0"
 
+"@nodert-win10-20h1/windows.media.transcoding@^0.1.0":
+  version "0.1.0"
+  resolved "https://registry.yarnpkg.com/@nodert-win10-20h1/windows.media.transcoding/-/windows.media.transcoding-0.1.0.tgz#ddb15b4fb699e292a8b5fb16d353e4611c28839a"
+  integrity sha512-oE6QPKqg+1T2gwS0/A7xl18RjI0KZ857RpgR12Roe4eL1JqyhumNgYNeLReH1kmG+qvtPxQKpaXziQF+GQHcbg==
+  dependencies:
+    nan latest
+
 "@npmcli/move-file@^1.0.1":
   version "1.1.1"
   resolved "https://registry.yarnpkg.com/@npmcli/move-file/-/move-file-1.1.1.tgz"
@@ -7542,7 +7549,7 @@ mz@^2.4.0:
     object-assign "^4.0.1"
     thenify-all "^1.0.0"
 
-nan@^2.12.1:
+nan@^2.12.1, nan@latest:
   version "2.14.2"
   resolved "https://registry.yarnpkg.com/nan/-/nan-2.14.2.tgz#f5376400695168f4cc694ac9393d0c9585eeea19"
   integrity sha512-M2ufzIiINKCuDfBSAUr1vWQ+vuVcA9kqx8JJUsbQi6yf1uGRyb7HfpdfUr5qLXf3B/t8dPvcjhKMmlfnP47EzQ==
