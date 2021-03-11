@@ -2,11 +2,12 @@
   <b-container fluid class="w-100">
     <b-row class="d-flex h-100 no-gutters">
       <b-col cols="2" class="d-flex h-100 image-container">
+        <b-img v-if="ImgSrc && ImgSrc.startsWith('media')" class="image h-100" :src="ImgSrc" />
         <div
           fluid
           class="h-100 w-100 image"
           ref="cover"
-          v-if="ImgSrc"
+          v-if="ImgSrc && ImgSrc.startsWith('http')"
           :style="{ backgroundImage: 'url(' + ImgSrc + ')' }"
           alt="cover art"
         />
@@ -54,14 +55,7 @@ export default class SongDetails extends mixins(Colors, ImageLoader) {
   border-radius: 25px
 
 .image-container
-  @include media-breakpoint-up(xs)
-    max-width: 180px
-  @include media-breakpoint-up(sm)
-    max-width: 180px
-  @include media-breakpoint-up(md-c)
-    max-width: 180px
-  @include media-breakpoint-up(lg-c)
-    max-width: 180px
+  max-width: 170px
 
 .text-container > .b-overlay > .bg-dark
   background-image: linear-gradient(0deg, rgba(0, 0, 0, 0.58), rgba(0, 0, 0, 0.58)), radial-gradient(50% 50% at 50% 50%, rgba(255, 255, 255, 0) 0%, rgba(0, 0, 0, 0.2) 100%) !important
