@@ -2,7 +2,14 @@
   <b-container fluid class="w-100">
     <b-row class="d-flex h-100 no-gutters">
       <b-col cols="2" class="d-flex h-100 image-container">
-        <b-img fluid class="h-100 image" ref="cover" v-if="ImgSrc" :src="ImgSrc" alt="cover art" />
+        <div
+          fluid
+          class="h-100 w-100 image"
+          ref="cover"
+          v-if="ImgSrc"
+          :style="{ backgroundImage: 'url(' + ImgSrc + ')' }"
+          alt="cover art"
+        />
         <Record v-if="!ImgSrc" class="h-100 image" />
       </b-col>
       <b-col class="text-container text-truncate">
@@ -42,17 +49,19 @@ export default class SongDetails extends mixins(Colors, ImageLoader) {
 
 .image
   object-fit: none
+  background-position-x: -70px
+  background-repeat: no-repeat
   border-radius: 25px
 
 .image-container
   @include media-breakpoint-up(xs)
-    min-width: 120px
+    max-width: 180px
   @include media-breakpoint-up(sm)
-    min-width: 150px
+    max-width: 180px
   @include media-breakpoint-up(md-c)
-    min-width: 170px
+    max-width: 180px
   @include media-breakpoint-up(lg-c)
-    min-width: 200px
+    max-width: 180px
 
 .text-container > .b-overlay > .bg-dark
   background-image: linear-gradient(0deg, rgba(0, 0, 0, 0.58), rgba(0, 0, 0, 0.58)), radial-gradient(50% 50% at 50% 50%, rgba(255, 255, 255, 0) 0%, rgba(0, 0, 0, 0.2) 100%) !important

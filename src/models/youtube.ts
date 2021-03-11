@@ -17,7 +17,7 @@ export function toSong(...item: YoutubeItem[]): Song[] {
       title: s.yt_title ? s.yt_title.trim() : '',
       album: {
         album_name: s.yt_album ? s.yt_album.trim() : '',
-        album_coverPath: `https://img.youtube.com/vi/${s._id}/hqdefault.jpg`,
+        album_coverPath: `https://img.youtube.com/vi/${s._id}/mqdefault.jpg`,
       },
       artists: s.yt_artist ? s.yt_artist.trim().split(/,|&/) : [],
       duration: s.duration,
