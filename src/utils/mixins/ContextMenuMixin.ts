@@ -28,7 +28,7 @@ export default class ContextMenuMixin extends mixins(PlayerControls) {
     })
   }
 
-  private populatePlaylistMenu(item: Song[]): MenuItem[] {
+  private populatePlaylistMenu(item: Song[], exclude?: string): MenuItem[] {
     let menu: MenuItem[] = [
       {
         label: 'New Playlist',
@@ -37,6 +37,9 @@ export default class ContextMenuMixin extends mixins(PlayerControls) {
       },
     ]
     for (const [key, val] of Object.entries(this.playlists)) {
+      if (key == exclude) {
+        continue
+      }
       menu.push({
         label: val,
         handler: () => {
@@ -47,7 +50,7 @@ export default class ContextMenuMixin extends mixins(PlayerControls) {
     return menu
   }
 
-  public getSongContextMenu(event: Event, ...item: Song[]) {
+  public getSongContextMenu(exclude: string | undefined, event: Event, ...item: Song[]) {
     let items = [
       {
         label: 'Play Now',
@@ -63,7 +66,7 @@ export default class ContextMenuMixin extends mixins(PlayerControls) {
       },
       {
         label: 'Add To Playlist',
-        children: this.populatePlaylistMenu(item),
+        children: this.populatePlaylistMenu(item, exclude),
       },
     ]
     bus.$emit(EventBus.SHOW_CONTEXT, event, items)

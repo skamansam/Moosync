@@ -9,7 +9,7 @@
       <div>{{ album_name }}</div>
     </b-row>
     <b-row>
-      <SongView :songList="songList" @onRowContext="getSongContextMenu" />
+      <SongView :songList="songList" @onRowContext="getSongContextMenu(undefined, ...arguments)" />
     </b-row>
   </b-container>
 </template>
