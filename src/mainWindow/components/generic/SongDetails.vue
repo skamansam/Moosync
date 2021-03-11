@@ -49,7 +49,6 @@ export default class SongDetails extends mixins(Colors, ImageLoader) {
 @import "~bootstrap/scss/mixins"
 
 .image
-  object-fit: none
   background-position-x: -70px
   background-repeat: no-repeat
   border-radius: 25px
