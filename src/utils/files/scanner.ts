@@ -77,7 +77,7 @@ export class MusicScanner {
       path: filePath,
       inode: stats.ino.toString(),
       deviceno: stats.dev.toString(),
-      size: stats.size.toString(),
+      size: stats.size,
     })
   }
 

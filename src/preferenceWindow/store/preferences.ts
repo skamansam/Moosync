@@ -12,6 +12,7 @@ export enum PeerMode {
 @Module
 class Preference extends VuexModule {
   preferences: Preferences = defaultPreferences
+  pathsChanged: boolean = false
 
   @Mutation
   setPreferences(preferences: Preferences) {
@@ -24,6 +25,11 @@ class Preference extends VuexModule {
     if (index !== -1) {
       this.preferences.musicPaths[index].enabled = args.value
     }
+  }
+
+  @Mutation
+  setPathsChanged(value: boolean) {
+    this.pathsChanged = value
   }
 
   @Mutation

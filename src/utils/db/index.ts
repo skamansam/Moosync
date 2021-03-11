@@ -96,10 +96,8 @@ class SongDBInstance extends DBUtils {
     })
   }
 
-  public async getBySize(size: string): Promise<{ _id: string }[]> {
-    return new Promise((resolve) => {
-      resolve(this.db.query(`SELECT _id FROM allsongs WHERE size = ?`, size))
-    })
+  public async getBySize(size: number): Promise<{ _id: string }[]> {
+    return this.db.query(`SELECT * FROM allsongs WHERE size = ?`, size)
   }
 
   public async getInfoByID(id: string): Promise<{ path: string; inode: string; deviceno: string }[]> {

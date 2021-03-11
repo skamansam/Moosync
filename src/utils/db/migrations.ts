@@ -5,7 +5,7 @@ export const migrations = [
   CREATE TABLE allsongs (
     _id VARCHAR(36) PRIMARY KEY,
     path TEXT,
-    size TEXT,
+    size NUMBER,
     inode TEXT,
     deviceno TEXT,
     title TEXT,

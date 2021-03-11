@@ -2,7 +2,7 @@ import { Album } from '@/models/albums'
 export interface Song {
   _id?: string
   path?: string
-  size?: string
+  size?: number
   title: string
   album?: Album
   artists?: string[]
@@ -26,7 +26,7 @@ export interface Song {
 export interface marshaledSong {
   _id: string
   path?: string
-  size?: string
+  size?: number
   title: string
   album_id?: string
   album_name?: string
@@ -54,7 +54,7 @@ export interface marshaledSong {
 
 export interface stats {
   path: string
-  size: string
+  size: number
   inode: string
   deviceno: string
 }
