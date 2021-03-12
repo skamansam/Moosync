@@ -14,6 +14,7 @@ export enum IpcEvents {
 export enum SearchEvents {
   SEARCH_SONGS_COMPACT = 'searchCompact',
   SEARCH_ALL = 'searchAll',
+  SEARCH_YT = 'searchYT',
 }
 
 export enum PreferenceEvents {

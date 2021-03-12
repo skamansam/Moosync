@@ -66,7 +66,7 @@ import ContextMenuMixin from '@/utils/mixins/ContextMenuMixin'
 export default class SearchPage extends mixins(RouterPushes, ContextMenuMixin) {
   private term: string = ''
   private tab = null
-  private result: SearchResult | null = null
+  private result: SearchResult = {}
   private items = [
     { tab: 'Songs' },
     { tab: 'Albums' },
@@ -84,7 +84,14 @@ export default class SearchPage extends mixins(RouterPushes, ContextMenuMixin) {
       })
       .then((result) => {
         this.result = result
-        console.log(this.result.youtube)
+        return ipcRendererHolder
+          .send<YoutubeItem[]>(IpcEvents.SEARCH, {
+            type: SearchEvents.SEARCH_YT,
+            params: {
+              searchTerm: this.term,
+            },
+          })
+          .then((data) => (this.result.youtube = data))
       })
   }
 

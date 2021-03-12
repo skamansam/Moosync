@@ -3,7 +3,7 @@ import { IpcEvents, SearchEvents } from './constants'
 import { getDisabledPaths, preferences } from '@/utils/db/preferences'
 
 import { SongDB } from '@/utils/db'
-import { ytScraper } from '@/utils/files/scrapeYt'
+import { ytScraper } from '@/utils/fetchers/searchYT'
 
 export class SearchChannel implements IpcChannelInterface {
   name = IpcEvents.SEARCH
@@ -15,6 +15,9 @@ export class SearchChannel implements IpcChannelInterface {
       case SearchEvents.SEARCH_ALL:
         this.searchAll(event, request)
         break
+      case SearchEvents.SEARCH_YT:
+        this.searchYT(event, request)
+        break
     }
   }
 
@@ -22,11 +25,17 @@ export class SearchChannel implements IpcChannelInterface {
     if (request.params && request.params.searchTerm) {
       SongDB.searchAll(request.params.searchTerm, getDisabledPaths(preferences.musicPaths))
         .then((data) => {
-          ytScraper.searchTerm(request.params.searchTerm).then((ytData) => {
-            data.youtube = ytData
-            event.reply(request.responseChannel, data)
-          })
+          event.reply(request.responseChannel, data)
         })
+        .catch((e) => console.log(e))
+    }
+  }
+
+  private searchYT(event: Electron.IpcMainEvent, request: IpcRequest) {
+    if (request.params && request.params.searchTerm) {
+      ytScraper
+        .searchTerm(request.params.searchTerm)
+        .then((data) => event.reply(request.responseChannel, data))
         .catch((e) => console.log(e))
     }
   }
