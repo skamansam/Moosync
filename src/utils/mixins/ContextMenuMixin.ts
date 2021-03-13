@@ -1,19 +1,13 @@
-import {} from '../ipc/renderer'
-
 import { Component } from 'vue-property-decorator'
 import { EventBus } from '@/utils/ipc/main/constants'
-import { IpcEvents } from '@/utils/ipc/main/constants'
 import { MenuItem } from 'vue-context-menu-popup'
 import PlayerControls from '@/utils/mixins/PlayerControls'
-import { PlaylistEvents } from '@/utils/ipc/main/constants'
 import { PlaylistModule } from '@/mainWindow/store/playlists'
 import { Song } from '@/models/songs'
 import { bus } from '@/mainWindow/main'
-import { ipcRendererHolder } from '@/utils/ipc/renderer/index'
 import { mixins } from 'vue-class-component'
 import { YoutubeItem } from '@/models/youtube'
 import { toSong } from '@/models/youtube'
-import { SongEvents } from '@/utils/ipc/main/constants'
 
 @Component
 export default class ContextMenuMixin extends mixins(PlayerControls) {
@@ -21,11 +15,8 @@ export default class ContextMenuMixin extends mixins(PlayerControls) {
     return PlaylistModule.playlists
   }
 
-  private addToPlaylist(playlist_id: string, songs: Song[]) {
-    ipcRendererHolder.send<void>(IpcEvents.PLAYLIST, {
-      type: PlaylistEvents.ADD_TO_PLAYLIST,
-      params: { playlist_id: playlist_id, song_ids: songs },
-    })
+  private async addToPlaylist(playlist_id: string, songs: Song[]) {
+    window.DBUtils.addToPlaylist(playlist_id, ...songs)
   }
 
   private populatePlaylistMenu(item: Song[], exclude?: string): MenuItem[] {
@@ -88,12 +79,7 @@ export default class ContextMenuMixin extends mixins(PlayerControls) {
       },
       {
         label: 'Add To Library',
-        handler: () => {
-          ipcRendererHolder.send<void>(IpcEvents.SONG, {
-            type: SongEvents.STORE_SONG,
-            params: { songs: toSong(...item) },
-          })
-        },
+        handler: () => window.DBUtils.storeSongs(toSong(...item)),
       },
       {
         label: 'Add To Playlist',

@@ -9,8 +9,7 @@
 </template>
 
 <script lang="ts">
-import { EventBus, IpcEvents, PlaylistEvents } from '@/utils/ipc/main/constants'
-import { ipcRendererHolder } from '@/utils/ipc/renderer'
+import { EventBus } from '@/utils/ipc/main/constants'
 import { PlaylistModule } from '@/mainWindow/store/playlists'
 import { Component, Prop } from 'vue-property-decorator'
 import Colors from '@/utils/mixins/Colors'
@@ -25,16 +24,13 @@ export default class NewPlaylistModal extends mixins(Colors) {
   private callback: ((id: string) => void) | null = null
 
   private async createPlaylist() {
-    ipcRendererHolder
-      .send<string>(IpcEvents.PLAYLIST, { type: PlaylistEvents.CREATE_PLAYLIST, params: { name: 'henlo' } })
-      .then((playlist_id: string) => {
-        this.$bvModal.hide(this.id)
-        PlaylistModule.setUpdated(true)
-        if (this.callback) {
-          this.callback(playlist_id)
-          this.callback = null
-        }
-      })
+    let playlist_id = await window.DBUtils.createPlaylist('henlo')
+    this.$bvModal.hide(this.id)
+    PlaylistModule.setUpdated(true)
+    if (this.callback) {
+      this.callback(playlist_id)
+      this.callback = null
+    }
   }
 
   mounted() {

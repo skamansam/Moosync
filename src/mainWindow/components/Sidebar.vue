@@ -46,8 +46,6 @@ import Tabs from '@/mainWindow/components/sidebar/Tabs.vue'
 import Gears from '@/mainWindow/components/icons/Gears.vue'
 import { PeerMode, SyncModule } from '@/mainWindow/store/syncState'
 import { Component, Ref } from 'vue-property-decorator'
-import { ipcRendererHolder } from '@/utils/ipc/renderer'
-import { IpcEvents, WindowEvents } from '@/utils/ipc/main/constants'
 import Colors from '@/utils/mixins/Colors'
 import { mixins } from 'vue-class-component'
 
@@ -82,7 +80,7 @@ export default class Sidebar extends mixins(Colors) {
   }
 
   private openSettings() {
-    ipcRendererHolder.send<void>(IpcEvents.BROWSER_WINDOWS, { type: WindowEvents.OPEN_PREF })
+    window.WindowUtils.openPreferenceWindow()
   }
 
   private registerListeners() {

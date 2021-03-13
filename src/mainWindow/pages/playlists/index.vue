@@ -15,10 +15,8 @@
 
 <script lang="ts">
 import { Playlist } from '@/models/playlists'
-import { IpcEvents, PlaylistEvents } from '@/utils/ipc/main/constants'
 import { Component } from 'vue-property-decorator'
 import CardView from '@/mainWindow/components/generic/CardView.vue'
-import { ipcRendererHolder } from '@/utils/ipc/renderer'
 import { mixins } from 'vue-class-component'
 import RouterPushes from '@/utils/mixins/RouterPushes'
 
@@ -29,12 +27,8 @@ import RouterPushes from '@/utils/mixins/RouterPushes'
 })
 export default class Albums extends mixins(RouterPushes) {
   private playlists: Playlist[] = []
-  private getPlaylists() {
-    ipcRendererHolder
-      .send<Playlist[]>(IpcEvents.PLAYLIST, { type: PlaylistEvents.GET_ALL_PLAYLISTS })
-      .then((data) => {
-        this.playlists = data
-      })
+  private async getPlaylists() {
+    this.playlists = await window.DBUtils.getAllPlaylists()
   }
 
   mounted() {

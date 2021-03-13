@@ -11,10 +11,8 @@
 
 <script lang="ts">
 import { Genre } from '@/models/genre'
-import { GenreEvents, IpcEvents } from '@/utils/ipc/main/constants'
 import { Component } from 'vue-property-decorator'
 import CardView from '@/mainWindow/components/generic/CardView.vue'
-import { ipcRendererHolder } from '@/utils/ipc/renderer'
 import { mixins } from 'vue-class-component'
 import RouterPushes from '@/utils/mixins/RouterPushes'
 
@@ -25,12 +23,8 @@ import RouterPushes from '@/utils/mixins/RouterPushes'
 })
 export default class Genres extends mixins(RouterPushes) {
   private genres: Genre[] = []
-  private getgenres() {
-    ipcRendererHolder
-      .send<Genre[]>(IpcEvents.GENRE, { type: GenreEvents.GET_ALL_GENRE })
-      .then((data) => {
-        this.genres = data
-      })
+  private async getgenres() {
+    this.genres = await window.DBUtils.getAllGenres()
   }
 
   mounted() {

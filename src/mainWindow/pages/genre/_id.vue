@@ -17,8 +17,6 @@
 <script lang="ts">
 import { Component, Prop } from 'vue-property-decorator'
 import SongView from '@/mainWindow/components/SongView.vue'
-import { ipcRendererHolder } from '@/utils/ipc/renderer'
-import { IpcEvents, GenreEvents } from '@/utils/ipc/main/constants'
 import { Song } from '@/models/songs'
 import { Genre } from '@/models/genre'
 
@@ -47,15 +45,8 @@ export default class SingleAlbumView extends mixins(ContextMenuMixin) {
     this.fetchgenre()
   }
 
-  private fetchgenre() {
-    ipcRendererHolder
-      .send<Song[]>(IpcEvents.GENRE, {
-        type: GenreEvents.GET_GENRE,
-        params: { id: this.genre_id },
-      })
-      .then((data) => {
-        this.songList = data
-      })
+  private async fetchgenre() {
+    this.songList = await window.DBUtils.getSingleGenre(this.genre_id)
   }
 }
 </script>

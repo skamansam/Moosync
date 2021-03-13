@@ -11,10 +11,8 @@
 
 <script lang="ts">
 import { artists } from '@/models/artists'
-import { ArtistEvents, IpcEvents } from '@/utils/ipc/main/constants'
 import { Component } from 'vue-property-decorator'
 import CardView from '@/mainWindow/components/generic/CardView.vue'
-import { ipcRendererHolder } from '@/utils/ipc/renderer'
 import { mixins } from 'vue-class-component'
 import RouterPushes from '@/utils/mixins/RouterPushes'
 
@@ -25,12 +23,8 @@ import RouterPushes from '@/utils/mixins/RouterPushes'
 })
 export default class Artists extends mixins(RouterPushes) {
   private artistList: artists[] = []
-  private getArtists() {
-    ipcRendererHolder
-      .send<artists[]>(IpcEvents.ARTIST, { type: ArtistEvents.GET_ALL_ARTISTS })
-      .then((data) => {
-        this.artistList = data
-      })
+  private async getArtists() {
+    this.artistList = await window.DBUtils.getAllArtists()
   }
 
   mounted() {

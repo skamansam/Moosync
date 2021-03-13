@@ -20,8 +20,6 @@
 import { Component } from 'vue-property-decorator'
 import Vue from 'vue'
 import { PreferencesModule } from '../store/preferences'
-import { ipcRendererHolder } from '@/utils/ipc/renderer'
-import { IpcEvents, WindowEvents } from '@/utils/ipc/main/constants'
 
 @Component({})
 export default class scanner extends Vue {
@@ -43,12 +41,10 @@ export default class scanner extends Vue {
   }
 
   private openFileBrowser() {
-    ipcRendererHolder
-      .send<Electron.OpenDialogReturnValue>(IpcEvents.BROWSER_WINDOWS, { type: WindowEvents.OPEN_FILE_BROWSER })
-      .then((data) => {
-        PreferencesModule.addPaths(...data.filePaths)
-        PreferencesModule.setPathsChanged(true)
-      })
+    window.WindowUtils.openFileBrowser().then((data) => {
+      PreferencesModule.addPaths(...data.filePaths)
+      PreferencesModule.setPathsChanged(true)
+    })
   }
 }
 </script>

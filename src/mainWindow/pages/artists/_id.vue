@@ -17,8 +17,6 @@
 <script lang="ts">
 import { Component, Prop } from 'vue-property-decorator'
 import SongView from '@/mainWindow/components/SongView.vue'
-import { ipcRendererHolder } from '@/utils/ipc/renderer'
-import { ArtistEvents, IpcEvents } from '@/utils/ipc/main/constants'
 import { Song } from '@/models/songs'
 
 import { mixins } from 'vue-class-component'
@@ -47,15 +45,8 @@ export default class SingleArtistView extends mixins(ContextMenuMixin) {
     this.fetchArtist()
   }
 
-  private fetchArtist() {
-    ipcRendererHolder
-      .send<Song[]>(IpcEvents.ARTIST, {
-        type: ArtistEvents.GET_ARTIST,
-        params: { id: this.artist_id },
-      })
-      .then((data) => {
-        this.songList = data
-      })
+  private async fetchArtist() {
+    this.songList = await window.DBUtils.getSingleArtist(this.artist_id)
   }
 }
 </script>

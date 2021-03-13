@@ -45,8 +45,6 @@
 import { Component } from 'vue-property-decorator'
 import Search from '@/mainWindow/components/icons/Search.vue'
 import { SearchResult } from '@/models/searchResult'
-import { ipcRendererHolder } from '@/utils/ipc/renderer'
-import { IpcEvents, SearchEvents } from '@/utils/ipc/main/constants'
 import SingleSearchResult from '@/mainWindow/components/generic/SingleSearchResult.vue'
 import Colors from '@/utils/mixins/Colors'
 import { mixins } from 'vue-class-component'
@@ -89,17 +87,10 @@ export default class Sidebar extends mixins(Colors, PlayerControls) {
       .catch(() => {})
     this.showSearchResults = false
   }
-  private onTextChange(value: string) {
+  private async onTextChange(value: string) {
     if (value) {
       this.showSearchResults = true
-      ipcRendererHolder
-        .send<SearchResult>(IpcEvents.SEARCH, {
-          type: SearchEvents.SEARCH_SONGS_COMPACT,
-          params: { searchTerm: value },
-        })
-        .then((result) => {
-          this.results = result
-        })
+      this.results = await window.SearchUtils.searchCompact(value)
     } else {
       this.showSearchResults = false
       this.results = null

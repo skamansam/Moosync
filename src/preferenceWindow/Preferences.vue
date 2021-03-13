@@ -14,9 +14,6 @@
 <script lang="ts">
 import { Component } from 'vue-property-decorator'
 import Titlebar from '@/commonComponents/Titlebar.vue'
-import { Preferences } from '@/utils/db/constants'
-import { ipcRendererHolder } from '@/utils/ipc/renderer'
-import { IpcEvents, PreferenceEvents, ScannerEvents, WindowEvents } from '@/utils/ipc/main/constants'
 import { PreferencesModule } from './store/preferences'
 import { mixins } from 'vue-class-component'
 import ThemeHandler from '@/utils/mixins/ThemeHandler'
@@ -32,25 +29,19 @@ export default class App extends mixins(ThemeHandler) {
   }
 
   private loadPreferences() {
-    ipcRendererHolder
-      .send<Preferences>(IpcEvents.PREFERENCES, { type: PreferenceEvents.LOAD_PREFERENCES })
-      .then((data) => {
-        PreferencesModule.setPreferences(data)
-      })
+    window.PreferenceUtils.load().then((data) => {
+      PreferencesModule.setPreferences(data)
+    })
   }
 
   private closeWindow() {
-    ipcRendererHolder.send<void>(IpcEvents.BROWSER_WINDOWS, { type: WindowEvents.CLOSE_PREF })
+    window.WindowUtils.closePreferenceWindow()
   }
 
   private async writePreferences() {
-    ipcRendererHolder.send<void>(IpcEvents.PREFERENCES, {
-      type: PreferenceEvents.SAVE_PREFERENCES,
-      params: { preferences: PreferencesModule.preferences },
-    })
-
+    await window.PreferenceUtils.save(PreferencesModule.preferences)
     if (PreferencesModule.pathsChanged) {
-      ipcRendererHolder.send<void>(IpcEvents.SCANNER, { type: ScannerEvents.SCAN_MUSIC })
+      await window.ScannerUtils.scan()
     }
   }
 }

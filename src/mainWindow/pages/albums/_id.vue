@@ -18,8 +18,6 @@
 import { Component, Prop } from 'vue-property-decorator'
 import SongView from '@/mainWindow/components/SongView.vue'
 import { Album } from '@/models/albums'
-import { ipcRendererHolder } from '@/utils/ipc/renderer'
-import { AlbumEvents, IpcEvents } from '@/utils/ipc/main/constants'
 import { Song } from '@/models/songs'
 import { PlaylistModule } from '@/mainWindow/store/playlists'
 
@@ -52,15 +50,8 @@ export default class SingleAlbumView extends mixins(ContextMenuMixin) {
     this.fetchAlbum()
   }
 
-  private fetchAlbum() {
-    ipcRendererHolder
-      .send<Song[]>(IpcEvents.ALBUM, {
-        type: AlbumEvents.GET_ALBUM,
-        params: { id: this.album_id },
-      })
-      .then((data) => {
-        this.songList = data
-      })
+  private async fetchAlbum() {
+    this.songList = await window.DBUtils.getSingleAlbum(this.album_id)
   }
 }
 </script>

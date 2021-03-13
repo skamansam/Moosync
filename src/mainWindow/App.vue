@@ -1,6 +1,5 @@
 <template>
   <div id="app" :style="rootColors">
-    <!-- <button v-on:click="scan()">Scan</button> -->
     <ContextMenu />
     <Titlebar />
     <div>
@@ -11,12 +10,8 @@
 </template>
 
 <script lang="ts">
-import { Playlist } from '@/models/playlists'
-import { IpcEvents, PlaylistEvents, ScannerEvents, WindowEvents } from '@/utils/ipc/main/constants'
-
 import { playlistInfo, PlaylistModule } from '@/mainWindow/store/playlists'
 import { Component } from 'vue-property-decorator'
-import { ipcRendererHolder } from '@/utils/ipc/renderer'
 import Titlebar from '@/commonComponents/Titlebar.vue'
 import { mixins } from 'vue-class-component'
 import ThemeHandler from '@/utils/mixins/ThemeHandler'
@@ -44,19 +39,11 @@ export default class App extends mixins(ThemeHandler) {
   private registerDevTools() {
     document.addEventListener('keydown', function (e) {
       if (e.code === 'F12') {
-        ipcRendererHolder.send<void>(IpcEvents.BROWSER_WINDOWS, { type: WindowEvents.TOGGLE_DEV_TOOLS })
+        window.WindowUtils.toggleDevTools()
       } else if (e.code === 'F5') {
         location.reload()
       }
     })
-  }
-
-  private scan() {
-    ipcRendererHolder
-      .send<void>(IpcEvents.SCANNER, { type: ScannerEvents.SCAN_MUSIC })
-      .then((data) => {
-        console.log(data)
-      })
   }
 
   public testStun(): void {
@@ -82,16 +69,13 @@ export default class App extends mixins(ThemeHandler) {
     )
   }
 
-  private populatePlaylists() {
-    ipcRendererHolder
-      .send<Playlist[]>(IpcEvents.PLAYLIST, { type: PlaylistEvents.GET_ALL_PLAYLISTS })
-      .then((data) => {
-        let playlists: playlistInfo = {}
-        for (let p of data) {
-          playlists[p.playlist_id] = p.playlist_name
-        }
-        PlaylistModule.setPlaylists(playlists)
-      })
+  private async populatePlaylists() {
+    let RawPlaylists = await window.DBUtils.getAllPlaylists()
+    let playlists: playlistInfo = {}
+    for (let p of RawPlaylists) {
+      playlists[p.playlist_id] = p.playlist_name
+    }
+    PlaylistModule.setPlaylists(playlists)
   }
 }
 </script>

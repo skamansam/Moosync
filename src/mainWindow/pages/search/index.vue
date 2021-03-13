@@ -37,15 +37,6 @@
 
 <script lang="ts">
 import { SearchResult } from '@/models/searchResult'
-import {
-  AlbumEvents,
-  ArtistEvents,
-  GenreEvents,
-  IpcEvents,
-  PlaylistEvents,
-  SearchEvents,
-} from '@/utils/ipc/main/constants'
-import { ipcRendererHolder } from '@/utils/ipc/renderer'
 import { Component, Watch } from 'vue-property-decorator'
 import SingleSearchResult from '@/mainWindow/components/generic/SingleSearchResult.vue'
 import { Album } from '@/models/albums'
@@ -76,23 +67,9 @@ export default class SearchPage extends mixins(RouterPushes, ContextMenuMixin) {
     { tab: 'Youtube' },
   ]
 
-  private fetchData() {
-    ipcRendererHolder
-      .send<SearchResult>(IpcEvents.SEARCH, {
-        type: SearchEvents.SEARCH_ALL,
-        params: { searchTerm: this.term },
-      })
-      .then((result) => {
-        this.result = result
-        return ipcRendererHolder
-          .send<YoutubeItem[]>(IpcEvents.SEARCH, {
-            type: SearchEvents.SEARCH_YT,
-            params: {
-              searchTerm: this.term,
-            },
-          })
-          .then((data) => (this.result.youtube = data))
-      })
+  private async fetchData() {
+    this.result = await window.SearchUtils.searchAll(this.term)
+    this.result.youtube = await window.SearchUtils.searchYT(this.term)
   }
 
   private ComputeTabContent(tab: string) {
@@ -224,45 +201,32 @@ export default class SearchPage extends mixins(RouterPushes, ContextMenuMixin) {
     }
   }
 
-  private playAlbum(item: Album) {
-    ipcRendererHolder
-      .send<Song[]>(IpcEvents.ALBUM, { type: AlbumEvents.GET_ALBUM, params: { id: item.album_id } })
-      .then((songs) =>
-        songs.forEach((value) => {
-          this.queueSong(value)
-        })
-      )
+  private async playAlbum(item: Album) {
+    let songs = await window.DBUtils.getSingleAlbum(item.album_id!)
+    songs.forEach((value) => {
+      this.queueSong(value)
+    })
   }
 
-  private playArtist(item: artists) {
-    ipcRendererHolder
-      .send<Song[]>(IpcEvents.ARTIST, { type: ArtistEvents.GET_ARTIST, params: { id: item.artist_id } })
-      .then((songs) =>
-        songs.forEach((value) => {
-          this.queueSong(value)
-        })
-      )
+  private async playArtist(item: artists) {
+    let songs = await window.DBUtils.getSingleArtist(item.artist_id)
+    songs.forEach((value) => {
+      this.queueSong(value)
+    })
   }
 
-  private playGenre(item: Genre) {
-    ipcRendererHolder
-      .send<Song[]>(IpcEvents.GENRE, { type: GenreEvents.GET_GENRE, params: { id: item.genre_id } })
-      .then((songs) =>
-        songs.forEach((value) => {
-          console.log(value)
-          this.queueSong(value)
-        })
-      )
+  private async playGenre(item: Genre) {
+    let songs = await window.DBUtils.getSingleGenre(item.genre_id)
+    songs.forEach((value) => {
+      this.queueSong(value)
+    })
   }
 
-  private playPlaylist(item: Playlist) {
-    ipcRendererHolder
-      .send<Song[]>(IpcEvents.PLAYLIST, { type: PlaylistEvents.GET_PLAYLIST, params: { id: item.playlist_id } })
-      .then((songs) =>
-        songs.forEach((value) => {
-          this.queueSong(value)
-        })
-      )
+  private async playPlaylist(item: Playlist) {
+    let songs = await window.DBUtils.getSinglePlaylist(item.playlist_id)
+    songs.forEach((value) => {
+      this.queueSong(value)
+    })
   }
 
   created() {
