@@ -45,4 +45,5 @@ export default class SongDetails extends mixins(Colors, ImageLoader) {
 .card-body > img
   mix-blend-mode: normal
   border-radius: 16px
+  height: 100%
 </style>

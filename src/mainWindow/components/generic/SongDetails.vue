@@ -2,13 +2,7 @@
   <b-container fluid class="w-100">
     <b-row class="d-flex h-100 no-gutters">
       <b-col cols="2" class="d-flex h-100 image-container">
-        <b-img v-if="ImgSrc && ImgSrc.startsWith('media')" class="image h-100" :src="ImgSrc" />
-        <div
-          fluid
-          class="h-100 w-100 image"
-          v-if="ImgSrc && ImgSrc.startsWith('http')"
-          :style="{ backgroundImage: 'url(' + ImgSrc + ')' }"
-        />
+        <b-img v-if="ImgSrc" class="image h-100" :src="ImgSrc" />
         <Record v-if="!ImgSrc" class="h-100 image" />
       </b-col>
       <b-col class="text-container text-truncate">
@@ -45,8 +39,6 @@ export default class SongDetails extends mixins(Colors, ImageLoader) {
 @import "~bootstrap/scss/mixins"
 
 .image
-  background-position-x: -70px
-  background-repeat: no-repeat
   border-radius: 25px
 
 .image-container

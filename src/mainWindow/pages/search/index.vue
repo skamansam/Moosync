@@ -59,17 +59,32 @@ export default class SearchPage extends mixins(RouterPushes, ContextMenuMixin) {
   private tab = null
   private result: SearchResult = {}
   private items = [
-    { tab: 'Songs' },
-    { tab: 'Albums' },
-    { tab: 'Artists' },
-    { tab: 'Genres' },
-    { tab: 'Playlists' },
-    { tab: 'Youtube' },
+    { tab: 'Songs', key: true },
+    { tab: 'Albums', key: true },
+    { tab: 'Artists', key: true },
+    { tab: 'Genres', key: true },
+    { tab: 'Playlists', key: true },
+    { tab: 'Youtube', key: true },
   ]
 
   private async fetchData() {
     this.result = await window.SearchUtils.searchAll(this.term)
+    this.refreshLocal()
+
     this.result.youtube = await window.SearchUtils.searchYT(this.term)
+    this.refreshYoutube()
+
+    console.log(this.result.youtube)
+  }
+
+  private refreshLocal() {
+    for (let i = 0; i < 5; i++) {
+      this.items[i].key = !this.items[i].key
+    }
+  }
+
+  private refreshYoutube() {
+    this.items[5].key = !this.items[5].key
   }
 
   private ComputeTabContent(tab: string) {

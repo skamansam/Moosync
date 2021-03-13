@@ -1,19 +1,6 @@
 <template>
   <div class="d-flex w-100">
-    <b-img
-      fluid
-      ref="cover"
-      class="coverimg"
-      v-if="ImgSrc && ImgSrc.startsWith('media')"
-      :src="ImgSrc"
-      alt="cover art"
-    />
-    <div
-      fluid
-      class="coverimg"
-      v-if="ImgSrc && ImgSrc.startsWith('http')"
-      :style="{ backgroundImage: 'url(' + ImgSrc + ')' }"
-    />
+    <b-img fluid ref="cover" class="coverimg" v-if="ImgSrc" :src="ImgSrc" alt="cover art" />
     <Record v-if="!ImgSrc" class="coverimg" />
     <div class="text-container">
       <div class="text song-title text-truncate">{{ title }}</div>
@@ -66,9 +53,6 @@ export default class MusicBar extends mixins(Colors, ImageLoader) {
   min-width: 56px
   margin-right: 15px
   border-radius: 10px
-  background-position-x: -20px
-  background-repeat: no-repeat
-  background-size: 95px 56px
 
 
 .text

@@ -12,6 +12,7 @@ class YTScraper {
     let results = await this.YTMusic.search(term, 'song')
     let final: YoutubeItem[] = []
     results.content.forEach((item) => {
+      console.log(item.thumbnails)
       final.push({
         _id: item.videoId,
         yt_title: item.name,
