@@ -26,7 +26,10 @@
               :coverBlob="currentCoverBlob"
           /></b-col>
           <b-col md="6" lg="auto" align-self="center" class="no-gutters"
-            ><Controls :duration="currentSong ? currentSong.duration : 0" :timestamp="timestamp"
+            ><Controls
+              :playing="playerState == PlayerState.PLAYING"
+              :duration="currentSong ? currentSong.duration : 0"
+              :timestamp="timestamp"
           /></b-col>
           <b-col cols="3" align-self="center" class="no-gutters"
             ><ExtraControls @onVolumeChange="volumeUpdated"
@@ -73,6 +76,7 @@ export default class MusicBar extends mixins(Colors) {
   private volume: number = 50
   private currentCoverBlob: Blob | null = null
   private playerState: PlayerState = PlayerState.STOPPED
+  private PlayerState = PlayerState
 
   private updateTimestmp(value: number) {
     this.forceSeek = value

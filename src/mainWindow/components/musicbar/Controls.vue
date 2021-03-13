@@ -3,7 +3,7 @@
     <b-col cols="auto" class="timestamp">{{ formatDuration(timestamp) }} / {{ formatDuration(duration) }}</b-col>
     <b-col cols="auto" v-on:click="prevSong()"><LastTrack /></b-col>
     <b-col cols="auto"><Repeat /></b-col>
-    <b-col cols="auto" v-on:click="togglePlayerState()"><Play /></b-col>
+    <b-col cols="auto" v-on:click="togglePlayerState()"><Play :play="playing" /></b-col>
     <b-col cols="auto" v-on:click="nextSong()"><NextTrack /></b-col>
     <b-col cols="auto"><Shuffle /></b-col>
     <!-- <b-col cols="2" class="d-none d-xl-block"></b-col> -->
@@ -11,7 +11,6 @@
 </template>
 
 <script lang="ts">
-import { PlayerModule, PlayerState } from '@/mainWindow/store/playerState'
 import { Component, Prop } from 'vue-property-decorator'
 import LastTrack from '@/mainWindow/components/icons/LastTrack.vue'
 import NextTrack from '@/mainWindow/components/icons/NextTrack.vue'
@@ -37,9 +36,8 @@ export default class MusicBar extends mixins(PlayerControls) {
   @Prop({ default: 0 })
   private timestamp!: number
 
-  mounted() {
-    this.setupListeners()
-  }
+  @Prop({ default: true })
+  private playing!: boolean
 
   private formatDuration(n: number) {
     let tmp = new Date(n * 1000).toISOString().substr(11, 8)
@@ -49,16 +47,6 @@ export default class MusicBar extends mixins(PlayerControls) {
     }
 
     return tmp
-  }
-
-  private setupListeners() {
-    PlayerModule.$watch(
-      (playerModule) => playerModule.playerState,
-      (newState: PlayerState) => {
-        // TODO: Change icons
-        console.log(newState)
-      }
-    )
   }
 }
 </script>
@@ -74,6 +62,7 @@ export default class MusicBar extends mixins(PlayerControls) {
   font-size: 18px
   line-height: 170.19%
   overflow: hidden
+  width: 136px
 
 .invisible
   min-width: 0%
