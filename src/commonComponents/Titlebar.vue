@@ -48,8 +48,11 @@ export default class Sidebar extends Vue {
   private onMinimize() {
     this.windowType == 'main-window' ? window.WindowUtils.minMainWindow() : window.WindowUtils.minPreferenceWindow()
   }
-  private onMaximize() {
-    this.windowType == 'main-window' ? window.WindowUtils.maxMainWindow() : window.WindowUtils.maxPreferenceWindow()
+  private async onMaximize() {
+    let isMax = await (this.windowType == 'main-window'
+      ? window.WindowUtils.maxMainWindow()
+      : window.WindowUtils.maxPreferenceWindow())
+    if (isMax) null // TODO: Switch max/restore icons here
   }
   private onClose() {
     this.windowType == 'main-window' ? window.WindowUtils.closeMainWindow() : window.WindowUtils.closePreferenceWindow()

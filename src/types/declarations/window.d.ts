@@ -40,16 +40,17 @@ interface preferenceUtils {
 }
 
 interface windowUtils {
-  openPreferenceWindow: () => Promise<Void>
-  closePreferenceWindow: () => Promise<Void>
-  minPreferenceWindow: () => Promise<Void>
-  maxPreferenceWindow: () => Promise<Void>
-  closeMainWindow: () => Promise<Void>
-  minMainWindow: () => Promise<Void>
-  maxMainWindow: () => Promise<Void>
-  openFileBrowser: () => Promise<Void>
-  toggleDevTools: () => Promise<Void>
+  openPreferenceWindow: () => Promise<void>
+  closePreferenceWindow: () => Promise<void>
+  minPreferenceWindow: () => Promise<void>
+  maxPreferenceWindow: () => Promise<boolean>
+  closeMainWindow: () => Promise<void>
+  minMainWindow: () => Promise<void>
+  maxMainWindow: () => Promise<boolean>
+  openFileBrowser: () => Promise<Electron.OpenDialogReturnValue>
+  toggleDevTools: () => Promise<void>
 }
+E
 
 declare global {
   interface Window {

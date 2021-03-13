@@ -56,9 +56,13 @@ export class BrowserWindowChannel implements IpcChannelInterface {
 
   private maxPreferenceWindow(event: Electron.IpcMainEvent, request: IpcRequest) {
     if (this.preferenceWindow && !this.preferenceWindow.isDestroyed() && this.preferenceWindow.maximizable) {
-      this.preferenceWindow.maximize()
+      if (this.preferenceWindow.isMaximized()) {
+        this.preferenceWindow.restore()
+      } else {
+        this.preferenceWindow.maximize()
+      }
     }
-    event.reply(request.responseChannel)
+    event.reply(request.responseChannel, this.preferenceWindow ? this.preferenceWindow.isMaximized() : false)
   }
 
   private minPreferenceWindow(event: Electron.IpcMainEvent, request: IpcRequest) {
@@ -98,10 +102,14 @@ export class BrowserWindowChannel implements IpcChannelInterface {
   }
 
   private maxMainWindow(event: Electron.IpcMainEvent, request: IpcRequest) {
-    if (mainWindow && mainWindow.maximizable) {
-      mainWindow.maximize()
+    if (mainWindow.maximizable) {
+      if (mainWindow.isMaximized()) {
+        mainWindow.restore()
+      } else {
+        mainWindow.maximize()
+      }
     }
-    event.reply(request.responseChannel)
+    event.reply(request.responseChannel, mainWindow.isMaximized())
   }
 
   private minMainWindow(event: Electron.IpcMainEvent, request: IpcRequest) {
