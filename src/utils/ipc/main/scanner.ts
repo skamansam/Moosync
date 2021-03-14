@@ -9,6 +9,8 @@ import { loadPreferences } from '@/utils/db/preferences'
 
 export class ScannerChannel implements IpcChannelInterface {
   name = IpcEvents.SCANNER
+  private scanQueued: { queued: boolean; event?: IpcMainEvent; request?: IpcRequest } = { queued: false }
+  private scanning: boolean = false
   handle(event: IpcMainEvent, request: IpcRequest) {
     switch (request.type) {
       case ScannerEvents.SCAN_MUSIC:
@@ -18,19 +20,22 @@ export class ScannerChannel implements IpcChannelInterface {
   }
 
   private ScanSongs(event: IpcMainEvent, request: IpcRequest) {
-    loadPreferences()
-      .then((preferences) => {
-        const scanner = new MusicScanner(...preferences.musicPaths)
-        console.log(preferences)
-        scanner
-          .start()
-          .then(() => {
-            event.reply(request.responseChannel, { status: 'done' })
-            this.ScrapeCovers()
-          })
-          .catch((err) => console.log(err))
-      })
-      .catch((err) => console.log(err))
+    // TODO: Implement queuing
+    if (!this.scanning) {
+      this.scanning = true
+      loadPreferences()
+        .then((preferences) => {
+          const scanner = new MusicScanner(...preferences.musicPaths)
+          scanner
+            .start()
+            .then(() => {
+              event.reply(request.responseChannel, { status: 'done' })
+              this.ScrapeCovers()
+            })
+            .catch((err) => console.log(err))
+        })
+        .catch((err) => console.log(err))
+    }
   }
 
   private ScrapeCovers() {
