@@ -20,7 +20,7 @@
       <VolumeIcon />
     </div>
     <div>
-      <div class="expand-icon ml-auto"><ExpandIcon /></div>
+      <div class="expand-icon ml-auto" :class="{ open: sliderOpen }" @click="emitToggleSlider"><ExpandIcon /></div>
     </div>
   </div>
 </template>
@@ -41,9 +41,15 @@ import { mixins } from 'vue-class-component'
 export default class MusicBar extends mixins(Colors) {
   // TODO: Load last used volume
   private volume: number = 50
+  private sliderOpen: boolean = false
 
   private emitVolume() {
     this.$emit('onVolumeChange', this.volume)
+  }
+
+  private emitToggleSlider() {
+    this.sliderOpen = !this.sliderOpen
+    this.$emit('onToggleSlider', this.sliderOpen)
   }
 
   get ComputedGradient(): string {
@@ -82,6 +88,10 @@ export default class MusicBar extends mixins(Colors) {
 .expand-icon
   height: 27px
   width: 18px
+  transition: transform 0.2s linear
+
+.open
+  transform: rotate(180deg)
 
 .test
   min-width: 0
