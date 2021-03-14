@@ -28,7 +28,7 @@ export default class ThemeHandler extends mixins(Colors) {
   private registerThemeListeners() {
     ThemesModule.$watch(
       (themesModule) => themesModule.rootVars,
-      async (newColors: { [key: string]: string }) => {
+      (newColors: { [key: string]: string }) => {
         this.root.style.setProperty('--primary', newColors['--primary'])
       }
     )

@@ -61,7 +61,9 @@ export default class Sidebar extends mixins(Colors) {
   @Ref('roomid')
   private roomInput!: HTMLInputElement
 
-  private roomID: string = ''
+  get roomID() {
+    return SyncModule.roomID
+  }
 
   private setWatcher() {
     SyncModule.setMode(PeerMode.WATCHER)
@@ -81,19 +83,6 @@ export default class Sidebar extends mixins(Colors) {
 
   private openSettings() {
     window.WindowUtils.openPreferenceWindow()
-  }
-
-  private registerListeners() {
-    SyncModule.$watch(
-      (syncModule) => syncModule.roomID,
-      async (newState: string) => {
-        this.roomID = newState
-      }
-    )
-  }
-
-  mounted() {
-    this.registerListeners()
   }
 }
 </script>

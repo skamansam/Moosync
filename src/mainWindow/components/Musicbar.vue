@@ -55,7 +55,6 @@ import Details from '@/mainWindow/components/musicbar/Details.vue'
 import ExtraControls from '@/mainWindow/components/musicbar/ExtraControls.vue'
 
 import { Component } from 'vue-property-decorator'
-import { Song } from '@/models/songs'
 import { PlayerModule, PlayerState, PlayerType } from '@/mainWindow/store/playerState'
 import { SyncModule } from '@/mainWindow/store/syncState'
 import Colors from '@/utils/mixins/Colors'
@@ -70,12 +69,9 @@ import { mixins } from 'vue-class-component'
   },
 })
 export default class MusicBar extends mixins(Colors) {
-  private currentSong: Song | null = null
   private timestamp: number = 0
   private forceSeek: number = 0
   private volume: number = 50
-  private currentCoverBlob: Blob | null = null
-  private playerState: PlayerState = PlayerState.STOPPED
   private PlayerState = PlayerState
 
   private updateTimestmp(value: number) {
@@ -86,42 +82,16 @@ export default class MusicBar extends mixins(Colors) {
     return PlayerModule.playerType
   }
 
-  mounted() {
-    this.registerSongInfoListeners()
-    this.registerSyncInfoListeners()
+  get currentSong() {
+    return SyncModule.currentSongDets ?? PlayerModule.currentSong
   }
 
-  private registerSongInfoListeners() {
-    PlayerModule.$watch(
-      (playerModule) => playerModule.currentSong,
-      (newSong: Song | null) => {
-        this.currentSong = newSong
-      }
-    )
-
-    PlayerModule.$watch(
-      (playerModule) => playerModule.playerState,
-      async (newState: PlayerState) => {
-        this.playerState = newState
-      }
-    )
+  get currentCoverBlob() {
+    return SyncModule.currentCover
   }
 
-  private registerSyncInfoListeners() {
-    // TODO: Decide when to play local or remote track
-    SyncModule.$watch(
-      (syncModule) => syncModule.currentSongDets,
-      (newSong: Song | null) => {
-        this.currentSong = newSong
-      }
-    )
-
-    SyncModule.$watch(
-      (syncModule) => syncModule.currentCover,
-      async (newCover: Blob | null) => {
-        this.currentCoverBlob = newCover
-      }
-    )
+  get playerState() {
+    return PlayerModule.playerState
   }
 
   private updateTimestamp(timestamp: number) {
