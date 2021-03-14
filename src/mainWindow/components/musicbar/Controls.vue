@@ -5,7 +5,7 @@
     <b-col cols="auto"><Repeat /></b-col>
     <b-col cols="auto" v-on:click="togglePlayerState()"><Play :play="playing" /></b-col>
     <b-col cols="auto" v-on:click="nextSong()"><NextTrack /></b-col>
-    <b-col cols="auto"><Shuffle /></b-col>
+    <b-col cols="auto" v-on:click="shuffle()"><Shuffle /></b-col>
     <!-- <b-col cols="2" class="d-none d-xl-block"></b-col> -->
   </b-row>
 </template>

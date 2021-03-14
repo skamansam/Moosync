@@ -39,6 +39,10 @@ export default class PlayerControls extends Vue {
     PlayerModule.setState(PlayerState.PAUSED)
   }
 
+  public shuffle() {
+    PlayerModule.shuffle()
+  }
+
   public togglePlayerState() {
     if (this.playerState == PlayerState.PAUSED || this.playerState == PlayerState.STOPPED) {
       PlayerModule.setState(PlayerState.PLAYING)

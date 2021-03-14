@@ -64,6 +64,25 @@ class Queue {
     }
     return null
   }
+
+  // https://stackoverflow.com/a/12646864
+  private randomizeArray() {
+    for (let i: number = this.order.length - 1; i > 0; i--) {
+      var j = Math.floor(Math.random() * (i + 1))
+      var temp = this.order[i]
+      this.order[i] = this.order[j]
+      this.order[j] = temp
+    }
+  }
+
+  public shuffle(): void {
+    console.log('here')
+    const currentSong = this.order[this.index]
+    this.order.splice(this.index, 1)
+    this.randomizeArray()
+    this.order.unshift(currentSong)
+    this.index = 0
+  }
 }
 
 @Module
@@ -112,6 +131,11 @@ class Player extends VuexModule {
   @Mutation
   loadInQueueTop(Song: Song) {
     this.songQueue.pushAtIndex(Song)
+  }
+
+  @Mutation
+  shuffle() {
+    this.songQueue.shuffle()
   }
 
   @Action
