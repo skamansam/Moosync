@@ -2,12 +2,14 @@
   <div class="search-content w-100">
     <v-card color="var(--primary)">
       <v-tabs fixed-tabs v-model="tab" dark background-color="primary" show-arrows>
-        <v-tab v-for="item in items" :key="item.tab" :href="`#${item.tab}`"> {{ item.tab }} </v-tab>
+        <v-tab v-for="item in items" :key="item.tab" :href="`#${item.tab}`">
+          {{ item.tab }}
+        </v-tab>
       </v-tabs>
     </v-card>
 
     <v-tabs-items v-model="tab" class="tab-content-holder">
-      <v-tab-item v-for="item in items" :id="item.tab" :key="item.tab" :eager="true" class="tab-content-holder">
+      <v-tab-item v-for="item in items" :id="item.tab" :key="item.key" :eager="true" class="tab-content-holder">
         <RecycleScroller
           class="scroller"
           :items="ComputeTabContent(item.tab)"
@@ -59,12 +61,12 @@ export default class SearchPage extends mixins(RouterPushes, ContextMenuMixin) {
   private tab = null
   private result: SearchResult = {}
   private items = [
-    { tab: 'Songs', key: true },
-    { tab: 'Albums', key: true },
-    { tab: 'Artists', key: true },
-    { tab: 'Genres', key: true },
-    { tab: 'Playlists', key: true },
-    { tab: 'Youtube', key: true },
+    { tab: 'Songs', count: 0, key: 'Songs-0' },
+    { tab: 'Albums', count: 0, key: 'Albums-0' },
+    { tab: 'Artists', count: 0, key: 'Artists-0' },
+    { tab: 'Genres', count: 0, key: 'Genres-0' },
+    { tab: 'Playlists', count: 0, key: 'Playlists-0' },
+    { tab: 'Youtube', count: 0, key: 'Youtube-0' },
   ]
 
   private async fetchData() {
@@ -73,18 +75,16 @@ export default class SearchPage extends mixins(RouterPushes, ContextMenuMixin) {
 
     this.result.youtube = await window.SearchUtils.searchYT(this.term)
     this.refreshYoutube()
-
-    console.log(this.result.youtube)
   }
 
   private refreshLocal() {
     for (let i = 0; i < 5; i++) {
-      this.items[i].key = !this.items[i].key
+      this.items[i].key = this.items[i].key.split('-')[0] + this.items[i].count++
     }
   }
 
   private refreshYoutube() {
-    this.items[5].key = !this.items[5].key
+    this.items[5].key = 'Youtube' + this.items[5].count++
   }
 
   private ComputeTabContent(tab: string) {

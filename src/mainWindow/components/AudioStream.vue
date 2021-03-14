@@ -148,7 +148,6 @@ export default class AudioStream extends mixins(Colors) {
     }
 
     this.YTplayer!.on('timeupdate', (time: number) => {
-      console.log('here')
       if (this.playerType == PlayerType.YOUTUBE) this.$emit('onTimeUpdate', time)
     })
   }
