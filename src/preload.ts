@@ -51,7 +51,7 @@ contextBridge.exposeInMainWorld('DBUtils', {
 contextBridge.exposeInMainWorld('PreferenceUtils', {
   load: () => ipcRendererHolder.send(IpcEvents.PREFERENCES, { type: PreferenceEvents.LOAD_PREFERENCES }),
   save: (preferences: Preferences) =>
-    ipcRendererHolder.send(IpcEvents.SEARCH, {
+    ipcRendererHolder.send(IpcEvents.PREFERENCES, {
       type: PreferenceEvents.SAVE_PREFERENCES,
       params: { preferences: preferences },
     }),
