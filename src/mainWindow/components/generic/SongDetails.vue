@@ -40,6 +40,7 @@ export default class SongDetails extends mixins(Colors, ImageLoader) {
 
 .image
   border-radius: 25px
+  max-width: 100%
 
 .image-container
   max-width: 170px
