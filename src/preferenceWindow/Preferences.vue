@@ -12,6 +12,7 @@
 </template>
 
 <script lang="ts">
+import Vue from 'vue'
 import { Component } from 'vue-property-decorator'
 import Titlebar from '@/commonComponents/Titlebar.vue'
 import { PreferencesModule } from './store/preferences'
@@ -41,7 +42,7 @@ export default class App extends mixins(ThemeHandler) {
   private async writePreferences() {
     await window.PreferenceUtils.save(PreferencesModule.preferences)
     if (PreferencesModule.pathsChanged) {
-      await window.ScannerUtils.scan()
+      Vue.nextTick(() => window.ScannerUtils.scan())
     }
   }
 }
