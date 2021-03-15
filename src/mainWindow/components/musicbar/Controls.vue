@@ -2,7 +2,7 @@
   <b-row align-v="center" class="justify-content-center">
     <b-col cols="auto" class="timestamp">{{ formatDuration(timestamp) }} / {{ formatDuration(duration) }}</b-col>
     <b-col cols="auto" v-on:click="prevSong()"><LastTrack /></b-col>
-    <b-col cols="auto"><Repeat /></b-col>
+    <b-col cols="auto" v-on:click="toggleRepeat()"><Repeat /></b-col>
     <b-col cols="auto" v-on:click="togglePlayerState()"><Play :play="playing" /></b-col>
     <b-col cols="auto" v-on:click="nextSong()"><NextTrack /></b-col>
     <b-col cols="auto" v-on:click="shuffle()"><Shuffle /></b-col>
@@ -19,6 +19,7 @@ import Repeat from '@/mainWindow/components/icons/Repeat.vue'
 import Shuffle from '@/mainWindow/components/icons/Shuffle.vue'
 import { mixins } from 'vue-class-component'
 import PlayerControls from '@/utils/mixins/PlayerControls'
+import { PlayerModule } from '@/mainWindow/store/playerState'
 
 @Component({
   components: {
@@ -38,6 +39,14 @@ export default class MusicBar extends mixins(PlayerControls) {
 
   @Prop({ default: true })
   private playing!: boolean
+
+  get repeat() {
+    return PlayerModule.Repeat
+  }
+
+  private toggleRepeat() {
+    PlayerModule.setRepeat(!this.repeat)
+  }
 
   private formatDuration(n: number) {
     let tmp = new Date(n * 1000).toISOString().substr(11, 8)

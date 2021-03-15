@@ -4,9 +4,9 @@
       <div class="musicbar h-100">
         <VueSlider
           :min="0"
-          :max="currentSong ? Math.round(currentSong.duration) : 0"
+          :max="currentSong ? currentSong.duration : 0"
           class="timeline"
-          :interval="1"
+          :interval="currentSong ? currentSong.duration / 100 : 1"
           :dotSize="10"
           :value="timestamp"
           :duration="0.1"

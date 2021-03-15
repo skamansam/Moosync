@@ -91,6 +91,7 @@ class Player extends VuexModule {
   private type: PlayerType = PlayerType.LOCAL
   private currentSongDets: Song | null = null
   private songQueue = new Queue()
+  private repeat: boolean = false
 
   get playerState() {
     return this.state
@@ -106,6 +107,10 @@ class Player extends VuexModule {
 
   get playerType() {
     return this.type
+  }
+
+  get Repeat() {
+    return this.repeat
   }
 
   @Mutation
@@ -136,6 +141,11 @@ class Player extends VuexModule {
   @Mutation
   shuffle() {
     this.songQueue.shuffle()
+  }
+
+  @Mutation
+  setRepeat(value: boolean) {
+    this.repeat = value
   }
 
   @Action

@@ -41,6 +41,10 @@ export default class AudioStream extends mixins(Colors) {
 
   private isFirst: boolean = true
 
+  get SongRepeat() {
+    return PlayerModule.Repeat
+  }
+
   @Watch('playerState')
   onPlayerStateChanged(newState: PlayerState) {
     if (this.playerType == PlayerType.LOCAL) this.handleLocalPlayerState(newState).catch((e) => console.log(e))
@@ -62,7 +66,7 @@ export default class AudioStream extends mixins(Colors) {
     }
   }
 
-  @Watch('volume') onMatchChanged(newValue: number) {
+  @Watch('volume') onVolumeChanged(newValue: number) {
     if (this.playerType == PlayerType.LOCAL) this.audioElement.volume = newValue / 100
     else if (this.playerType == PlayerType.YOUTUBE) this.YTplayer!.setVolume(newValue)
   }
@@ -91,9 +95,18 @@ export default class AudioStream extends mixins(Colors) {
     this.$root.$on('create-room', () => this.createRoom())
   }
 
+  private onSongEnded() {
+    this.SongRepeat
+      ? () => {
+          this.onSeek(0)
+          this.onPlayerStateChanged(PlayerState.PLAYING)
+        }
+      : PlayerModule.nextSong()
+  }
+
   private registerAudioListeners() {
-    this.audioElement.onended = () => PlayerModule.nextSong()
-    this.YTplayer!.on('ended', () => PlayerModule.nextSong())
+    this.audioElement.onended = () => this.onSongEnded()
+    this.YTplayer!.on('ended', () => this.onSongEnded())
   }
 
   private registerListeners() {
