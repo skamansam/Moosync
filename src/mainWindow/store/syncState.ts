@@ -11,7 +11,7 @@ export enum PeerMode {
 
 @Module
 class Sync extends VuexModule {
-  mode: PeerMode = PeerMode.WATCHER
+  mode: PeerMode = PeerMode.UNDEFINED
   currentSongDets: Song | null = null
   currentCover: Blob | null = null
   roomID: string = ''

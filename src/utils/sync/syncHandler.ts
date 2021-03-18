@@ -11,9 +11,10 @@ interface DataChannelMessage<T> {
 export class SyncHolder {
   private peerConnection: {
     [key: string]: {
-      peer: RTCPeerConnection | null
-      trackchannel: RTCDataChannel | null
-      coverchannel: RTCDataChannel | null
+      peer?: RTCPeerConnection
+      trackInfoChannel?: RTCDataChannel
+      coverChannel?: RTCDataChannel
+      streamChannel?: RTCDataChannel
     }
   } = {}
   private socketConnection: Socket
@@ -35,7 +36,9 @@ export class SyncHolder {
   private setLocalTrackCallback: (() => void) | null = null
   private onRemoteTrackCallback: ((event: RTCTrackEvent) => void) | null = null
   private onRemoteCoverCallback: ((event: Blob) => void) | null = null
-  private fetchCoverCallback: (() => Buffer | null) | null = null
+  private onRemoteStreamCallback: ((event: Blob) => void) | null = null
+
+  private getLocalCover: (() => Promise<ArrayBuffer | null>) | null = null
 
   constructor(url?: string) {
     this.socketConnection = io(url ? url : 'http://localhost:4000', this.connectionOptions)
@@ -64,12 +67,16 @@ export class SyncHolder {
     this.onRemoteTrackCallback = callback
   }
 
-  set fetchCover(callback: () => Buffer | null) {
-    this.fetchCoverCallback = callback
+  set fetchCover(callback: () => Promise<ArrayBuffer | null>) {
+    this.getLocalCover = callback
   }
 
   set onRemoteCover(callback: (event: Blob) => void) {
     this.onRemoteCoverCallback = callback
+  }
+
+  set onRemoteStream(callback: (event: Blob) => void) {
+    this.onRemoteStreamCallback = callback
   }
 
   set peerMode(mode: PeerMode) {
@@ -96,27 +103,35 @@ export class SyncHolder {
 
   private setPeer(id: string, peer: RTCPeerConnection) {
     if (this.peerConnection[id]) this.peerConnection[id].peer = peer
-    else this.peerConnection[id] = { peer: peer, trackchannel: null, coverchannel: null }
+    else this.peerConnection[id] = { peer: peer }
   }
 
   private setTrackChannel(id: string, trackChannel: RTCDataChannel) {
-    if (this.peerConnection[id]) this.peerConnection[id].trackchannel = trackChannel
-    else this.peerConnection[id] = { peer: null, trackchannel: trackChannel, coverchannel: null }
+    if (this.peerConnection[id]) this.peerConnection[id].trackInfoChannel = trackChannel
+    else this.peerConnection[id] = { trackInfoChannel: trackChannel }
   }
 
   private setCoverChannel(id: string, coverChannel: RTCDataChannel) {
-    if (this.peerConnection[id]) this.peerConnection[id].coverchannel = coverChannel
-    else this.peerConnection[id] = { peer: null, trackchannel: null, coverchannel: coverChannel }
+    if (this.peerConnection[id]) this.peerConnection[id].coverChannel = coverChannel
+    else this.peerConnection[id] = { coverChannel: coverChannel }
+  }
+
+  private setStreamChannel(id: string, streamChannel: RTCDataChannel) {
+    if (this.peerConnection[id]) this.peerConnection[id].streamChannel = streamChannel
+    else this.peerConnection[id] = { streamChannel: streamChannel }
   }
 
   private makeDataChannel(id: string, peer: RTCPeerConnection) {
     let trackChannel = peer.createDataChannel('track-channel')
     let coverChannel = peer.createDataChannel('cover-channel')
+    let streamChannel = peer.createDataChannel('stream-channel')
 
     this.handleTrackChannel(trackChannel)
     this.handleCoverChannel(coverChannel)
+    this.handleStreamChannel(streamChannel)
     this.setTrackChannel(id, trackChannel)
     this.setCoverChannel(id, coverChannel)
+    this.setStreamChannel(id, streamChannel)
   }
 
   private handleTrackChannel(channel: RTCDataChannel) {
@@ -155,8 +170,25 @@ export class SyncHolder {
     }
   }
 
+  private handleStreamChannel(channel: RTCDataChannel) {
+    let fragmentReceiver = new FragmentReceiver(this.onRemoteStreamCallback)
+
+    channel.onopen = (event) => {
+      console.log('open stream channel', event)
+    }
+
+    channel.onmessage = (event) => {
+      fragmentReceiver.receive(event.data)
+    }
+
+    channel.onclose = (event) => {
+      console.log('stream closed', event)
+    }
+  }
+
   private addRemoteCandidate() {
     this.socketConnection.on('candidate', (id: string, candidate: RTCIceCandidate) => {
+      console.log('got candidate')
       this.peerConnection[id].peer?.addIceCandidate(new RTCIceCandidate(candidate))
     })
   }
@@ -172,7 +204,6 @@ export class SyncHolder {
   private joinedRoom() {
     this.socketConnection.on('joinedRoom', (roomID: string) => {
       this.onJoinedRoomCallback ? this.onJoinedRoomCallback(roomID) : null
-      this.start()
     })
   }
 
@@ -181,7 +212,7 @@ export class SyncHolder {
   private makeOffer(id: string, peer: RTCPeerConnection) {
     // Send offer to signalling server
     peer
-      .createOffer({})
+      .createOffer()
       .then((sdp) => peer.setLocalDescription(sdp))
       .then(() => this.socketConnection.emit('offer', id, peer.localDescription))
   }
@@ -194,9 +225,11 @@ export class SyncHolder {
 
   private needsNegotiation(id: string, peer: RTCPeerConnection) {
     peer.onnegotiationneeded = () => {
+      console.log('negotiation needed')
       if (!this.isNegotiating[id]) {
         this.isNegotiating[id] = true
         this.makeOffer(id, peer)
+        console.log('negotiating')
       }
     }
   }
@@ -209,12 +242,23 @@ export class SyncHolder {
 
   private sendTrackMetadata(id: string, trackInfo: Song | null) {
     if (trackInfo)
-      this.peerConnection[id].trackchannel!.send(JSON.stringify({ type: 'trackChange', message: trackInfo }))
-    let cover = this.fetchCoverCallback ? this.fetchCoverCallback() : null
-    if (cover) {
-      let fragmentSender = new FragmentSender(cover, this.peerConnection[id].coverchannel!)
-      fragmentSender.send()
+      this.peerConnection[id].trackInfoChannel!.send(JSON.stringify({ type: 'trackChange', message: trackInfo }))
+    if (this.getLocalCover) {
+      this.getLocalCover().then((buf) => {
+        console.log('resolved', buf)
+        if (buf) {
+          console.log(buf.byteLength)
+          let fragmentSender = new FragmentSender(buf, this.peerConnection[id].coverChannel!)
+          fragmentSender.send()
+        }
+      })
     }
+  }
+
+  private sendStream(id: string, stream: ArrayBuffer) {
+    let fragmentSender = new FragmentSender(stream, this.peerConnection[id].streamChannel!)
+    console.log('Stream length: ' + stream.byteLength)
+    fragmentSender.send()
   }
 
   // public replaceTrack(track: MediaStreamTrack, song: Song) {
@@ -230,24 +274,27 @@ export class SyncHolder {
   // Replace whole stream instead of tracks since playback time gets
   // messed up on track change and a slight delay is
   // observed after resuming from broadcaster
-  public addStream(stream: MediaStream, song: Song) {
+  public addStream(stream: ArrayBuffer, song: Song) {
     for (let i in this.peerConnection) {
-      const connection = this.peerConnection[i]!
-      let senders = connection.peer!.getSenders()
-      for (let j in senders) {
-        connection.peer!.removeTrack(senders[j])
-      }
-      stream.getTracks().forEach((track) => {
-        connection.peer!.addTrack(track, stream)
-      })
+      // const connection = this.peerConnection[i]!
+      // let senders = connection.peer!.getSenders()
+      // for (let j in senders) {
+      //   connection.peer!.removeTrack(senders[j])
+      // }
+      // stream.getTracks().forEach((track) => {
+      //   console.log('adding track')
+      //   connection.peer!.addTrack(track, stream)
+      //   console.log(connection.peer)
+      // })
       this.sendTrackMetadata(i, song)
+      this.sendStream(i, stream)
 
-      if (this.stream) {
-        this.stream.getTracks().forEach((track) => {
-          track.stop()
-        })
-      }
-      this.stream = stream
+      // if (this.stream) {
+      //   this.stream.getTracks().forEach((track) => {
+      //     track.stop()
+      //   })
+      // }
+      // this.stream = stream
     }
   }
 
@@ -257,6 +304,8 @@ export class SyncHolder {
 
   private onStream(id: string, peer: RTCPeerConnection) {
     peer.ontrack = (event: RTCTrackEvent) => {
+      console.log('got stream')
+      console.log(this.mode, this.BroadcasterID, id)
       if (this.mode == PeerMode.WATCHER && id == this.BroadcasterID) {
         this.onRemoteTrackCallback ? this.onRemoteTrackCallback(event) : null
       }
@@ -272,6 +321,7 @@ export class SyncHolder {
 
     this.listenSignalingState(id, peer)
     this.onDataChannel(id, peer)
+    console.log('listening for stream')
     this.onStream(id, peer)
 
     peer
@@ -292,6 +342,9 @@ export class SyncHolder {
       } else if (channel.label === 'cover-channel') {
         this.handleCoverChannel(channel)
         this.setCoverChannel(id, channel)
+      } else if (channel.label === 'stream-channel') {
+        this.handleStreamChannel(channel)
+        this.setStreamChannel(id, channel)
       }
     }
   }
@@ -308,6 +361,7 @@ export class SyncHolder {
 
   private setupInitiator(id: string) {
     let peer = this.makePeer(id)
+    console.log('made peer')
     this.listenSignalingState(id, peer)
     this.makeDataChannel(id, peer)
 
@@ -338,11 +392,13 @@ export class SyncHolder {
 
   private onOffer() {
     this.socketConnection.on('offer', (id: string, description: RTCSessionDescription) => {
+      console.log('setting up watcher')
       this.setupWatcher(id, description)
     })
   }
 
   public start() {
+    console.log('started')
     this.addRemoteCandidate()
     this.onOffer()
     this.onUserJoined()

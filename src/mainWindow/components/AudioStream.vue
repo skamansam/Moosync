@@ -45,22 +45,28 @@ export default class AudioStream extends mixins(Colors) {
     return PlayerModule.Repeat
   }
 
+  get isSyncing() {
+    return SyncModule.mode == PeerMode.WATCHER
+  }
+
   @Watch('playerState')
   onPlayerStateChanged(newState: PlayerState) {
-    if (this.playerType == PlayerType.LOCAL) this.handleLocalPlayerState(newState).catch((e) => console.log(e))
+    if (this.playerType == PlayerType.LOCAL || this.isSyncing)
+      this.handleLocalPlayerState(newState).catch((e) => console.log(e))
     else if (this.playerType == PlayerType.YOUTUBE) this.handleYoutubePlayerState(newState)
   }
 
   @Watch('playerType')
   onPlayerTypeChanged(newType: PlayerType) {
-    this.playerType = newType
-    if (this.playerType == PlayerType.YOUTUBE) this.handleLocalPlayerState(PlayerState.STOPPED)
-    else this.handleYoutubePlayerState(PlayerState.STOPPED)
+    if (!this.isSyncing) {
+      if (newType == PlayerType.YOUTUBE) this.handleLocalPlayerState(PlayerState.STOPPED)
+      else this.handleYoutubePlayerState(PlayerState.STOPPED)
+    }
   }
 
   @Watch('currentSong')
   onSongChanged(newSong: Song | null) {
-    if (newSong) {
+    if (newSong && !this.isSyncing) {
       if (this.playerType == PlayerType.LOCAL) this.loadAudio(newSong)
       else if (this.playerType == PlayerType.YOUTUBE) this.loadAudioYoutube(newSong)
     }
@@ -80,6 +86,10 @@ export default class AudioStream extends mixins(Colors) {
   private isLocalSongLoaded: boolean = false
   private isYoutubeSongLoaded: boolean = false
   private YTplayer: YTPlayer | undefined
+
+  created() {
+    this.peerHolder.start()
+  }
 
   mounted() {
     this.setupYTPlayer()
@@ -140,10 +150,7 @@ export default class AudioStream extends mixins(Colors) {
     this.isLocalSongLoaded = true
 
     if (this.peerHolder && this.peerHolder.peerMode == PeerMode.BROADCASTER) {
-      let stream = this.audioElement.captureStream()
-      stream.onaddtrack = () => {
-        this.peerHolder.addStream(stream, song)
-      }
+      this.getStream().then((buf) => this.peerHolder.addStream(buf, song))
     }
 
     if (this.isFirst) {
@@ -213,11 +220,10 @@ export default class AudioStream extends mixins(Colors) {
   }
 
   private async getStream() {
-    return new Promise<MediaStream>((resolve) => {
-      let stream = this.audioElement.captureStream()
-      stream.onaddtrack = () => {
-        resolve(stream)
-      }
+    return new Promise<ArrayBuffer>((resolve) => {
+      fetch(this.audioElement.src)
+        .then((data) => data.arrayBuffer())
+        .then((buf) => resolve(buf))
     })
   }
 
@@ -232,14 +238,33 @@ export default class AudioStream extends mixins(Colors) {
 
     this.peerHolder.setLocalTrack = () => {
       if (this.peerHolder.peerMode == PeerMode.BROADCASTER) {
-        if (this.audioElement.src)
+        if (this.audioElement.src) {
+          console.log('set local track')
           this.getStream().then((stream) => this.peerHolder.addStream(stream, this.currentSong!))
+        }
       }
     }
 
     this.peerHolder.onRemoteTrack = (event) => {
+      console.log('got Stream')
       this.audioElement.srcObject = event.streams[0]
       this.audioElement.play().catch((e) => console.log(e))
+    }
+
+    this.peerHolder.fetchCover = () => {
+      return new Promise<ArrayBuffer | null>((resolve) => {
+        if (this.currentSong && this.currentSong.album && this.currentSong.album.album_coverPath) {
+          fetch('media://' + this.currentSong.album.album_coverPath)
+            .then((resp) => resp.arrayBuffer())
+            .then((buf) => resolve(buf))
+        } else {
+          resolve(null)
+        }
+      })
+    }
+
+    this.peerHolder.onRemoteStream = (event) => {
+      console.log('got stream from datachannel', event.size)
     }
   }
 }

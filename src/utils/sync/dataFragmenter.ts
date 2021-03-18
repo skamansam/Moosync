@@ -47,6 +47,7 @@ export class FragmentSender {
       this.sendData()
     }
     this.sendData()
+    console.log('send over ' + this.channel!.label)
   }
 }
 
@@ -62,6 +63,7 @@ export class FragmentReceiver {
 
   private endTransfer() {
     let file = new Blob(this.file)
+    console.log(this.onDataReceivedCallback)
     this.onDataReceivedCallback ? this.onDataReceivedCallback(file) : null
   }
 
@@ -69,6 +71,7 @@ export class FragmentReceiver {
     switch (typeof data) {
       case 'string':
         var tmp = JSON.parse(data) as fragmentedData
+        console.log(tmp)
         switch (tmp.type) {
           case 'end':
             // TODO: End using byteLength instead
