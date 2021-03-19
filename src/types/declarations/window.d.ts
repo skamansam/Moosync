@@ -30,8 +30,10 @@ interface searchUtils {
   searchYT: (term: string) => Promise<YoutubeItem[]>
 }
 
-interface scannerUtils {
+interface fileUtils {
   scan: () => Promise<void>
+  saveAudioTOFile: (path: string, blob: Buffer) => Promise<void>
+  isFileExists: (path: string) => Promise<boolean>
 }
 
 interface preferenceUtils {
@@ -56,7 +58,7 @@ declare global {
   interface Window {
     DBUtils: DBUtils
     SearchUtils: searchUtils
-    ScannerUtils: scannerUtils
+    FileUtils: fileUtils
     PreferenceUtils: preferenceUtils
     WindowUtils: windowUtils
   }

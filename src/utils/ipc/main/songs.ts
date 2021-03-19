@@ -5,6 +5,9 @@ import { SongDB } from '../../db'
 import { getDisabledPaths } from '@/utils/db/preferences'
 import { preferences } from '../../db/preferences'
 import { Song } from '@/models/songs'
+import fs from 'fs'
+import path from 'path'
+import { app } from 'electron'
 
 export class SongsChannel implements IpcChannelInterface {
   name = IpcEvents.SONG
@@ -18,6 +21,12 @@ export class SongsChannel implements IpcChannelInterface {
         break
       case SongEvents.REMOVE_SONG:
         this.removeSongs(event, request)
+        break
+      case SongEvents.SAVE_TO_FILE:
+        this.saveToFile(event, request)
+        break
+      case SongEvents.FILE_EXISTS:
+        this.fileExists(event, request)
         break
     }
   }
@@ -56,5 +65,30 @@ export class SongsChannel implements IpcChannelInterface {
         event.reply(request.responseChannel, data)
       })
       .catch((e) => console.log(e))
+  }
+
+  private saveToFile(event: Electron.IpcMainEvent, request: IpcRequest) {
+    if (request.params.path && request.params.blob) {
+      const cacheDir = path.join(app.getPath('cache'), app.getName(), 'audioCache')
+      const filePath = path.join(cacheDir, request.params.path)
+      if (fs.existsSync(cacheDir)) {
+        if (fs.existsSync(filePath)) {
+          fs.unlinkSync(filePath)
+        }
+      } else {
+        fs.mkdirSync(cacheDir)
+      }
+      fs.createWriteStream(filePath).write(request.params.blob)
+    }
+    event.reply(request.responseChannel)
+  }
+
+  private fileExists(event: Electron.IpcMainEvent, request: IpcRequest) {
+    if (request.params.path) {
+      event.reply(
+        request.responseChannel,
+        fs.existsSync(path.join(app.getPath('cache'), app.getName(), 'audioCache', request.params.path))
+      )
+    }
   }
 }

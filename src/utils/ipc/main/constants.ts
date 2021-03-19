@@ -68,6 +68,8 @@ export enum SongEvents {
   GET_ALL_SONGS = 'getAllSongs',
   STORE_SONG = 'storeSong',
   REMOVE_SONG = 'removeSong',
+  SAVE_TO_FILE = 'saveToFile',
+  FILE_EXISTS = 'fileExists',
 }
 
 export enum EventBus {

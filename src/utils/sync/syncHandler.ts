@@ -37,7 +37,11 @@ export class SyncHolder {
   private onRemoteTrackCallback: ((event: RTCTrackEvent) => void) | null = null
   private onRemoteCoverCallback: ((event: Blob) => void) | null = null
   private onRemoteStreamCallback: ((event: Blob) => void) | null = null
+  private onPrefetchAddedCallback: ((id: string, song: Song) => void) | null = null
+  private onPrefetchSetCallback: ((map: { [key: string]: Song[] }) => void) | null = null
+  private onRemoteSongFetchCallback: (() => void) | null = null
 
+  private getLocalSong: ((songID: string) => Promise<ArrayBuffer | null>) | null = null
   private getLocalCover: (() => Promise<ArrayBuffer | null>) | null = null
 
   constructor(url?: string) {
@@ -77,6 +81,22 @@ export class SyncHolder {
 
   set onRemoteStream(callback: (event: Blob) => void) {
     this.onRemoteStreamCallback = callback
+  }
+
+  set onPrefetchAdded(callback: (id: string, song: Song) => void) {
+    this.onPrefetchAddedCallback = callback
+  }
+
+  set onRemoteFetch(callback: () => void) {
+    this.onRemoteSongFetchCallback = callback
+  }
+
+  set onPrefetchSet(callback: (map: { [key: string]: Song[] }) => void) {
+    this.onPrefetchSetCallback = callback
+  }
+
+  set fetchSong(callback: (songID: string) => Promise<ArrayBuffer | null>) {
+    this.getLocalSong = callback
   }
 
   set peerMode(mode: PeerMode) {
@@ -255,9 +275,8 @@ export class SyncHolder {
     }
   }
 
-  private sendStream(id: string, stream: ArrayBuffer) {
+  private sendStream(id: string, stream: ArrayBuffer | null) {
     let fragmentSender = new FragmentSender(stream, this.peerConnection[id].streamChannel!)
-    console.log('Stream length: ' + stream.byteLength)
     fragmentSender.send()
   }
 
@@ -287,7 +306,7 @@ export class SyncHolder {
       //   console.log(connection.peer)
       // })
       this.sendTrackMetadata(i, song)
-      this.sendStream(i, stream)
+      // this.sendStream(i, stream)
 
       // if (this.stream) {
       //   this.stream.getTracks().forEach((track) => {
@@ -390,6 +409,21 @@ export class SyncHolder {
     }
   }
 
+  private listenPreFetch() {
+    this.socketConnection.on('addToPrefetch', (id: string, song: Song) => {
+      this.onPrefetchAddedCallback ? this.onPrefetchAddedCallback(id, song) : null
+    })
+
+    this.socketConnection.on('setPrefetch', (prefetch: { [key: string]: Song[] }) => {
+      this.onPrefetchSetCallback ? this.onPrefetchSetCallback(prefetch) : null
+    })
+
+    this.socketConnection.on('requestedFetch', (id: string, songID: string) => {
+      console.log('got request')
+      this.getLocalSong ? this.getLocalSong(songID).then((buf) => this.sendStream(id, buf)) : null
+    })
+  }
+
   private onOffer() {
     this.socketConnection.on('offer', (id: string, description: RTCSessionDescription) => {
       console.log('setting up watcher')
@@ -397,11 +431,20 @@ export class SyncHolder {
     })
   }
 
+  public requestSong(id: string, songID: string) {
+    console.log('requested song')
+    this.socketConnection.emit('requestSong', id, songID)
+  }
+
+  public addToQueue(song: Song) {
+    this.socketConnection.emit('prefetch', song)
+  }
+
   public start() {
-    console.log('started')
     this.addRemoteCandidate()
     this.onOffer()
     this.onUserJoined()
     this.onAnswer()
+    this.listenPreFetch()
   }
 }

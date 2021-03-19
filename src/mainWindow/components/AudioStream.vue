@@ -40,6 +40,7 @@ export default class AudioStream extends mixins(Colors) {
   currentSong!: Song | null
 
   private isFirst: boolean = true
+  private isFetching: boolean = false
 
   get SongRepeat() {
     return PlayerModule.Repeat
@@ -150,7 +151,9 @@ export default class AudioStream extends mixins(Colors) {
     this.isLocalSongLoaded = true
 
     if (this.peerHolder && this.peerHolder.peerMode == PeerMode.BROADCASTER) {
-      this.getStream().then((buf) => this.peerHolder.addStream(buf, song))
+      this.peerHolder.addToQueue(song)
+      console.log('added to queue')
+      // this.getStream().then((buf) => this.peerHolder.addStream(buf, song))
     }
 
     if (this.isFirst) {
@@ -239,16 +242,9 @@ export default class AudioStream extends mixins(Colors) {
     this.peerHolder.setLocalTrack = () => {
       if (this.peerHolder.peerMode == PeerMode.BROADCASTER) {
         if (this.audioElement.src) {
-          console.log('set local track')
-          this.getStream().then((stream) => this.peerHolder.addStream(stream, this.currentSong!))
+          this.peerHolder.addToQueue(this.currentSong!)
         }
       }
-    }
-
-    this.peerHolder.onRemoteTrack = (event) => {
-      console.log('got Stream')
-      this.audioElement.srcObject = event.streams[0]
-      this.audioElement.play().catch((e) => console.log(e))
     }
 
     this.peerHolder.fetchCover = () => {
@@ -264,8 +260,57 @@ export default class AudioStream extends mixins(Colors) {
     }
 
     this.peerHolder.onRemoteStream = (event) => {
-      console.log('got stream from datachannel', event.size)
+      let reader = new FileReader()
+      reader.onload = async () => {
+        if (reader.readyState == 2) {
+          const buffer = Buffer.from(reader.result as ArrayBuffer)
+          await window.FileUtils.saveAudioTOFile(SyncModule.currentFetchSong, buffer)
+          this.fetchRemoteSong()
+        }
+      }
+      reader.readAsArrayBuffer(event)
     }
+
+    this.peerHolder.onPrefetchAdded = (id, song) => {
+      SyncModule.addToPrefetch({ id: id, song: song })
+      SyncModule.setPrefetchChange()
+    }
+
+    this.peerHolder.onPrefetchSet = (prefetch) => {
+      SyncModule.setPrefetch(prefetch)
+      SyncModule.setPrefetchChange()
+    }
+
+    this.peerHolder.fetchSong = (songID) => {
+      return new Promise((resolve) => {
+        if (PlayerModule.queue.data[songID].path) {
+          fetch('media://' + PlayerModule.queue.data[songID].path!)
+            .then((resp) => resp.arrayBuffer())
+            .then((buf) => resolve(buf))
+        }
+      })
+    }
+
+    SyncModule.$watch(
+      (syncModule) => syncModule.prefetchChange,
+      () => {
+        if (!this.isFetching) this.fetchRemoteSong()
+      }
+    )
+  }
+
+  private async fetchRemoteSong() {
+    for (const senderID in SyncModule.prefetch) {
+      for (const song of SyncModule.prefetch[senderID]) {
+        const isExists = await window.FileUtils.isFileExists(song._id!)
+        if (!isExists) {
+          SyncModule.setCurrentFetchSong(song._id!)
+          this.peerHolder.requestSong(senderID, song._id!)
+          return
+        }
+      }
+    }
+    this.isFetching = false
   }
 }
 </script>

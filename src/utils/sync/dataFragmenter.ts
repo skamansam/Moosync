@@ -40,6 +40,10 @@ export class FragmentSender {
   }
 
   public send() {
+    if (this.data == null) {
+      // TODO: handle null
+      return
+    }
     let header = JSON.stringify({ type: 'byteLength', message: this.byteLength })
     this.channel!.send(header)
     this.channel!.bufferedAmountLowThreshold = chunkLimit - 1
@@ -47,7 +51,6 @@ export class FragmentSender {
       this.sendData()
     }
     this.sendData()
-    console.log('send over ' + this.channel!.label)
   }
 }
 

@@ -42,7 +42,7 @@ export default class App extends mixins(ThemeHandler) {
   private async writePreferences() {
     await window.PreferenceUtils.save(PreferencesModule.preferences)
     if (PreferencesModule.pathsChanged) {
-      Vue.nextTick(() => window.ScannerUtils.scan())
+      Vue.nextTick(() => window.FileUtils.scan())
     }
   }
 }

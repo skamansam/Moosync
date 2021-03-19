@@ -14,6 +14,9 @@ class Sync extends VuexModule {
   mode: PeerMode = PeerMode.UNDEFINED
   currentSongDets: Song | null = null
   currentCover: Blob | null = null
+  prefetch: { [key: string]: Song[] } = {}
+  prefetchChange: boolean = false
+  currentFetchSong: string = ''
   roomID: string = ''
 
   @Mutation
@@ -32,8 +35,28 @@ class Sync extends VuexModule {
   }
 
   @Mutation
+  addToPrefetch(arg: { id: string; song: Song }) {
+    this.prefetch[arg.id] ? this.prefetch[arg.id].push(arg.song) : (this.prefetch[arg.id] = [arg.song])
+  }
+
+  @Mutation
+  setPrefetch(prefetch: { [key: string]: Song[] }) {
+    this.prefetch = prefetch
+  }
+
+  @Mutation
+  setPrefetchChange() {
+    this.prefetchChange = !this.prefetchChange
+  }
+
+  @Mutation
   setCover(cover: Blob) {
     this.currentCover = cover
+  }
+
+  @Mutation
+  setCurrentFetchSong(id: string) {
+    this.currentFetchSong = id
   }
 }
 
