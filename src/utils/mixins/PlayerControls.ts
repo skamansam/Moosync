@@ -1,3 +1,4 @@
+import { bus } from '@/mainWindow/main'
 import { Component, Vue } from 'vue-property-decorator'
 import { PlayerModule, PlayerState } from '../../mainWindow/store/playerState'
 
@@ -20,12 +21,14 @@ export default class PlayerControls extends Vue {
   public queueSong(...songs: Song[]) {
     for (const s of songs) {
       PlayerModule.pushInQueue(s)
+      bus.$emit('queuedSong', s)
     }
   }
 
   public playTop(...songs: Song[]) {
     for (const s of songs) {
       PlayerModule.loadInQueueTop(s)
+      bus.$emit('queuedSong', s)
     }
 
     PlayerModule.nextSong()

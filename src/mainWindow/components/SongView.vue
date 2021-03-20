@@ -20,7 +20,7 @@
       <SongList
         :songList="songList"
         :extrafields="[{ key: 'title' }, { key: 'album' }, { key: 'artists' }]"
-        @onRowDoubleClicked="pushInQueue"
+        @onRowDoubleClicked="queueSong"
         @onRowContext="getSongContextMenu"
         @onRowSelected="updateCoverDetails"
       />
@@ -33,9 +33,9 @@ import { Component, Prop } from 'vue-property-decorator'
 import SongList from '@/mainWindow/components/generic/SongList.vue'
 import SongDetails from '@/mainWindow/components/generic/SongDetails.vue'
 import { Song } from '@/models/songs'
-import { PlayerModule } from '@/mainWindow/store/playerState'
 import Colors from '@/utils/mixins/Colors'
 import { mixins } from 'vue-class-component'
+import PlayerControls from '@/utils/mixins/PlayerControls'
 
 @Component({
   components: {
@@ -43,15 +43,11 @@ import { mixins } from 'vue-class-component'
     SongDetails,
   },
 })
-export default class AllSongs extends mixins(Colors) {
+export default class AllSongs extends mixins(Colors, PlayerControls) {
   @Prop({ default: () => [] })
   private songList!: Song[]
 
   private currentSong: Song | null = null
-
-  private pushInQueue(item: Song) {
-    PlayerModule.pushInQueue(item)
-  }
 
   private updateCoverDetails(items: Song[]) {
     if (items) this.currentSong = items[items.length - 1]

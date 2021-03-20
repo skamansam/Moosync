@@ -65,9 +65,8 @@ export class FragmentReceiver {
   }
 
   private endTransfer() {
-    let file = new Blob(this.file)
-    console.log(this.onDataReceivedCallback)
-    this.onDataReceivedCallback ? this.onDataReceivedCallback(file) : null
+    this.onDataReceivedCallback ? this.onDataReceivedCallback(new Blob(this.file)) : null
+    this.file = []
   }
 
   public receive(data: ArrayBuffer) {

@@ -276,7 +276,7 @@ export class SyncHolder {
   }
 
   private sendStream(id: string, stream: ArrayBuffer | null) {
-    let fragmentSender = new FragmentSender(stream, this.peerConnection[id].streamChannel!)
+    const fragmentSender = new FragmentSender(stream, this.peerConnection[id].streamChannel!)
     fragmentSender.send()
   }
 
@@ -432,7 +432,6 @@ export class SyncHolder {
   }
 
   public requestSong(id: string, songID: string) {
-    console.log('requested song')
     this.socketConnection.emit('requestSong', id, songID)
   }
 

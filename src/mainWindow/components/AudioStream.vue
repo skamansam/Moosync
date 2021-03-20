@@ -16,6 +16,7 @@ import { Component, Prop, Ref, Watch } from 'vue-property-decorator'
 import YTPlayer from 'yt-player'
 import Colors from '@/utils/mixins/Colors'
 import { mixins } from 'vue-class-component'
+import { bus } from '../main'
 
 @Component({})
 export default class AudioStream extends mixins(Colors) {
@@ -149,12 +150,6 @@ export default class AudioStream extends mixins(Colors) {
   private loadAudio(song: Song) {
     this.audioElement.src = 'media://' + song.path
     this.isLocalSongLoaded = true
-
-    if (this.peerHolder && this.peerHolder.peerMode == PeerMode.BROADCASTER) {
-      this.peerHolder.addToQueue(song)
-      console.log('added to queue')
-      // this.getStream().then((buf) => this.peerHolder.addStream(buf, song))
-    }
 
     if (this.isFirst) {
       PlayerModule.setState(PlayerState.PLAYING)
@@ -297,6 +292,10 @@ export default class AudioStream extends mixins(Colors) {
         if (!this.isFetching) this.fetchRemoteSong()
       }
     )
+
+    bus.$on('queuedSong', (song: Song) => {
+      if (this.peerHolder.peerMode == PeerMode.BROADCASTER) this.peerHolder.addToQueue(song)
+    })
   }
 
   private async fetchRemoteSong() {
