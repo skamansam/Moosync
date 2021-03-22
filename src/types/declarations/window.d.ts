@@ -32,8 +32,8 @@ interface searchUtils {
 
 interface fileUtils {
   scan: () => Promise<void>
-  saveAudioTOFile: (path: string, blob: Buffer) => Promise<void>
-  isFileExists: (path: string) => Promise<boolean>
+  saveAudioTOFile: (path: string, blob: Buffer) => Promise<string>
+  isFileExists: (path: string) => Promise<string | null>
 }
 
 interface preferenceUtils {

@@ -151,6 +151,13 @@ export default class AudioStream extends mixins(Colors) {
     this.audioElement.src = 'media://' + song.path
     this.isLocalSongLoaded = true
 
+    if (this.peerHolder.peerMode == PeerMode.BROADCASTER) {
+      this.peerHolder.PlaySong(song)
+      PlayerModule.setState(PlayerState.PAUSED)
+      this.handleLocalPlayerState(PlayerState.PAUSED)
+      return
+    }
+
     if (this.isFirst) {
       PlayerModule.setState(PlayerState.PLAYING)
       this.handleLocalPlayerState(PlayerState.PLAYING)
@@ -226,12 +233,19 @@ export default class AudioStream extends mixins(Colors) {
   }
 
   private syncListeners() {
-    this.peerHolder.onRemoteTrackInfo = (event) => {
-      SyncModule.setSong(event.message as Song)
+    this.peerHolder.onRemoteTrackInfo = async (event) => {
+      if (this.peerHolder.peerMode == PeerMode.WATCHER) {
+        SyncModule.setSong(event)
+        const isExists = await window.FileUtils.isFileExists(event._id!)
+        if (isExists) {
+          this.peerHolder.emitReady()
+          this.audioElement.src = 'media://' + isExists
+        }
+      }
     }
 
     this.peerHolder.onRemoteCover = (event) => {
-      SyncModule.setCover(event)
+      if (this.peerHolder.peerMode == PeerMode.WATCHER) SyncModule.setCover(event)
     }
 
     this.peerHolder.setLocalTrack = () => {
@@ -259,7 +273,12 @@ export default class AudioStream extends mixins(Colors) {
       reader.onload = async () => {
         if (reader.readyState == 2) {
           const buffer = Buffer.from(reader.result as ArrayBuffer)
-          await window.FileUtils.saveAudioTOFile(SyncModule.currentFetchSong, buffer)
+          const filePath = await window.FileUtils.saveAudioTOFile(SyncModule.currentFetchSong, buffer)
+          if (SyncModule.currentSongDets!._id == SyncModule.currentFetchSong) {
+            this.peerHolder.emitReady()
+            this.audioElement.src = 'media://' + filePath
+          }
+
           this.fetchRemoteSong()
         }
       }
@@ -284,6 +303,12 @@ export default class AudioStream extends mixins(Colors) {
             .then((buf) => resolve(buf))
         }
       })
+    }
+
+    this.peerHolder.playerStateHandler = async (state) => {
+      this.isLocalSongLoaded = true
+      PlayerModule.setState(state)
+      await this.handleLocalPlayerState(state)
     }
 
     SyncModule.$watch(

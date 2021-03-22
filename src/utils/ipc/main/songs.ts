@@ -79,17 +79,15 @@ export class SongsChannel implements IpcChannelInterface {
         fs.mkdirSync(cacheDir)
       }
       fs.writeFile(filePath, request.params.blob, () => {
-        event.reply(request.responseChannel)
+        event.reply(request.responseChannel, filePath)
       })
     }
   }
 
   private fileExists(event: Electron.IpcMainEvent, request: IpcRequest) {
     if (request.params.path) {
-      event.reply(
-        request.responseChannel,
-        fs.existsSync(path.join(app.getPath('cache'), app.getName(), 'audioCache', request.params.path))
-      )
+      const filePath = path.join(app.getPath('cache'), app.getName(), 'audioCache', request.params.path)
+      event.reply(request.responseChannel, fs.existsSync(filePath) ? filePath : null)
     }
   }
 }
