@@ -206,8 +206,12 @@ export class SyncHolder {
   }
 
   private sendStream(id: string, stream: ArrayBuffer | null) {
-    const fragmentSender = new FragmentSender(stream, this.peerConnection[id].streamChannel!)
-    fragmentSender.send()
+    if (this.peerConnection[id].streamChannel!.readyState == 'open') {
+      const fragmentSender = new FragmentSender(stream, this.peerConnection[id].streamChannel!)
+      fragmentSender.send()
+    } else {
+      console.log('data channel is in state: ', this.peerConnection[id].streamChannel!.readyState)
+    }
   }
 
   public PlaySong(song: Song) {
