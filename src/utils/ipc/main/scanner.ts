@@ -9,7 +9,6 @@ import { loadPreferences } from '@/utils/db/preferences'
 
 export class ScannerChannel implements IpcChannelInterface {
   name = IpcEvents.SCANNER
-  private scanQueued: { queued: boolean; event?: IpcMainEvent; request?: IpcRequest } = { queued: false }
   private scanning: boolean = false
   handle(event: IpcMainEvent, request: IpcRequest) {
     switch (request.type) {
@@ -32,9 +31,15 @@ export class ScannerChannel implements IpcChannelInterface {
               event.reply(request.responseChannel, { status: 'done' })
               this.ScrapeCovers()
             })
-            .catch((err) => console.log(err))
+            .catch((err) => {
+              console.log(err)
+              this.scanning = false
+            })
         })
-        .catch((err) => console.log(err))
+        .catch((err) => {
+          console.log(err)
+          this.scanning = false
+        })
     }
   }
 
@@ -44,6 +49,7 @@ export class ScannerChannel implements IpcChannelInterface {
       console.log(results.filter((result: any[]) => result))
       coverScraper.fetchArtworks().then((results: any[]) => {
         console.log(results.filter((result: any[]) => result))
+        this.scanning = false
       })
     })
   }

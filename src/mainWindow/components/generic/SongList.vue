@@ -8,8 +8,8 @@
       sticky-header
       :no-border-collapse="true"
       selectable
-      select-mode="single"
-      primary-key="title"
+      select-mode="range"
+      primary-key="_id"
       :key="test"
       @row-dblclicked="onRowDoubleClicked"
       @row-selected="onRowSelected"
@@ -42,6 +42,7 @@ export default class SongList extends mixins(Colors) {
   private test: boolean = false
   private lastSelect: string = ''
   private resizer!: Resizer
+  private selected: Song[] = []
 
   @Prop({ default: [] })
   private songList!: Song[]
@@ -63,7 +64,7 @@ export default class SongList extends mixins(Colors) {
   }
 
   private onRowContext(item: Song, index: number, event: Event) {
-    this.$emit('onRowContext', event, item)
+    this.$emit('onRowContext', event, this.selected ? this.selected : [item])
   }
 
   private onRowDoubleClicked(item: Song) {
@@ -71,8 +72,9 @@ export default class SongList extends mixins(Colors) {
   }
 
   private onRowSelected(items: Song[]) {
-    if (items[0] && items[0]._id !== this.lastSelect) {
-      this.lastSelect = items[0]._id!
+    if (items[items.length - 1] && items[items.length - 1]._id !== this.lastSelect) {
+      this.lastSelect = items[items.length - 1]._id!
+      this.selected = items
       this.$emit('onRowSelected', items)
     }
   }

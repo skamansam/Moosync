@@ -25,4 +25,5 @@ export abstract class Player {
 
   protected abstract listenOnEnded(): void
   protected abstract listenOnTimeUpdate(): void
+  abstract removeAllListeners(): void
 }

@@ -53,7 +53,7 @@ class Queue {
   }
 
   public prev() {
-    if (this.index >= 0) this.index -= 1
+    if (this.index > 0) this.index -= 1
     else this.index = this.order.length - 1
   }
 

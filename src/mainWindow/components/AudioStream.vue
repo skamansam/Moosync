@@ -2,7 +2,7 @@
   <div>
     <div ref="audioHolder">
       <div id="yt-player" class="yt-player"></div>
-      <audio ref="audio" style="position: absolute; top: 100px" />
+      <audio ref="audio" />
     </div>
   </div>
 </template>
@@ -60,6 +60,7 @@ export default class AudioStream extends mixins(Colors, SyncMixin) {
   @Watch('playerType')
   onPlayerTypeChanged(newType: PlayerType) {
     this.activePlayer.stop()
+    this.activePlayer.removeAllListeners()
     switch (newType) {
       case PlayerType.LOCAL:
         this.activePlayer = this.localPlayer
@@ -68,6 +69,7 @@ export default class AudioStream extends mixins(Colors, SyncMixin) {
         this.activePlayer = this.ytPlayer
         break
     }
+    this.registerPlayerListeners()
   }
 
   @Watch('currentSong')

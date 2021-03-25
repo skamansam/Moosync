@@ -4,11 +4,11 @@
       <div class="musicbar h-100">
         <VueSlider
           :min="0"
-          :max="currentSong ? currentSong.duration : 0"
+          :max="currentSong ? parseFloat(currentSong.duration.toFixed(3)) : 0"
           class="timeline"
-          :interval="currentSong ? currentSong.duration / 100 : 1"
+          :interval="0.001"
           :dotSize="10"
-          :value="timestamp"
+          :value="parseFloat(timestamp.toFixed(3))"
           :duration="0.1"
           :tooltip="'none'"
           @change="updateTimestmp"
