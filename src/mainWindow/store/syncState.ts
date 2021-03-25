@@ -2,6 +2,7 @@ import { Module, Mutation, VuexModule } from 'vuex-class-modules'
 
 import { Song } from '@/models/songs'
 import store from '@/commonStore'
+import { prefetchData } from '@/utils/sync/syncHandler'
 
 export enum PeerMode {
   WATCHER,
@@ -14,8 +15,7 @@ class Sync extends VuexModule {
   mode: PeerMode = PeerMode.UNDEFINED
   currentSongDets: Song | null = null
   currentCover: Blob | null = null
-  prefetch: { [key: string]: Song[] } = {}
-  prefetchChange: boolean = false
+  prefetch: prefetchData[] = []
   currentFetchSong: string = ''
   roomID: string = ''
 
@@ -35,18 +35,22 @@ class Sync extends VuexModule {
   }
 
   @Mutation
-  addToPrefetch(arg: { id: string; song: Song }) {
-    this.prefetch[arg.id] ? this.prefetch[arg.id].push(arg.song) : (this.prefetch[arg.id] = [arg.song])
+  addToPrefetch(prefetch: prefetchData) {
+    this.prefetch.push(prefetch)
   }
 
   @Mutation
-  setPrefetch(prefetch: { [key: string]: Song[] }) {
+  setPrefetch(prefetch: prefetchData[]) {
     this.prefetch = prefetch
   }
 
   @Mutation
-  setPrefetchChange() {
-    this.prefetchChange = !this.prefetchChange
+  prioritize(index: number) {
+    if (index < this.prefetch.length) {
+      let item = this.prefetch[index]
+      this.prefetch.splice(index, 1)
+      this.prefetch.unshift(item)
+    }
   }
 
   @Mutation

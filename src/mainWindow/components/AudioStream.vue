@@ -9,17 +9,18 @@
 
 <script lang="ts">
 import { Song } from '@/models/songs'
-import { SyncHolder } from '@/utils/sync/syncHandler'
 import { PlayerModule, PlayerState, PlayerType } from '@/mainWindow/store/playerState'
-import { PeerMode, SyncModule } from '@/mainWindow/store/syncState'
 import { Component, Prop, Ref, Watch } from 'vue-property-decorator'
 import YTPlayer from 'yt-player'
 import Colors from '@/utils/mixins/Colors'
 import { mixins } from 'vue-class-component'
-import { bus } from '../main'
+import { Player } from '@/utils/players/player'
+import { YoutubePlayer } from '@/utils/players/youtube'
+import { LocalPlayer } from '@/utils/players/local'
+import SyncMixin from '@/utils/mixins/SyncMixin'
 
 @Component({})
-export default class AudioStream extends mixins(Colors) {
+export default class AudioStream extends mixins(Colors, SyncMixin) {
   @Ref('audio') audioElement!: ExtendedHtmlAudioElement
 
   @Prop({ default: '' })
@@ -40,66 +41,62 @@ export default class AudioStream extends mixins(Colors) {
   @Prop({ default: null })
   currentSong!: Song | null
 
+  private activePlayer!: Player
+  private ytPlayer!: YoutubePlayer
+  private localPlayer!: LocalPlayer
+
   private isFirst: boolean = true
-  private isFetching: boolean = false
 
   get SongRepeat() {
     return PlayerModule.Repeat
   }
 
-  get isSyncing() {
-    return SyncModule.mode == PeerMode.WATCHER
-  }
-
   @Watch('playerState')
   onPlayerStateChanged(newState: PlayerState) {
-    if (this.playerType == PlayerType.LOCAL || this.isSyncing)
-      this.handleLocalPlayerState(newState).catch((e) => console.log(e))
-    else if (this.playerType == PlayerType.YOUTUBE) this.handleYoutubePlayerState(newState)
+    this.handleActivePlayerState(newState)
+    this.emitPlayerState(newState)
   }
 
   @Watch('playerType')
   onPlayerTypeChanged(newType: PlayerType) {
-    if (!this.isSyncing) {
-      if (newType == PlayerType.YOUTUBE) this.handleLocalPlayerState(PlayerState.STOPPED)
-      else this.handleYoutubePlayerState(PlayerState.STOPPED)
+    this.activePlayer.stop()
+    switch (newType) {
+      case PlayerType.LOCAL:
+        this.activePlayer = this.localPlayer
+        break
+      case PlayerType.YOUTUBE:
+        this.activePlayer = this.ytPlayer
+        break
     }
   }
 
   @Watch('currentSong')
   onSongChanged(newSong: Song | null) {
-    if (newSong && !this.isSyncing) {
-      if (this.playerType == PlayerType.LOCAL) this.loadAudio(newSong)
-      else if (this.playerType == PlayerType.YOUTUBE) this.loadAudioYoutube(newSong)
-    }
+    if (newSong && !this.isWatching) this.loadAudio(newSong)
   }
 
   @Watch('volume') onVolumeChanged(newValue: number) {
-    if (this.playerType == PlayerType.LOCAL) this.audioElement.volume = newValue / 100
-    else if (this.playerType == PlayerType.YOUTUBE) this.YTplayer!.setVolume(newValue)
+    this.activePlayer.volume = newValue
   }
 
   @Watch('forceSeek') onSeek(newValue: number) {
-    if (this.playerType == PlayerType.LOCAL) this.audioElement.currentTime = newValue
-    else if (this.playerType == PlayerType.YOUTUBE) this.YTplayer!.seek(newValue)
-  }
-
-  private peerHolder = new SyncHolder()
-  private isLocalSongLoaded: boolean = false
-  private isYoutubeSongLoaded: boolean = false
-  private YTplayer: YTPlayer | undefined
-
-  created() {
-    this.peerHolder.start()
+    this.activePlayer.currentTime = newValue
   }
 
   mounted() {
-    this.setupYTPlayer()
+    this.setupPlayers()
+    this.setupSync()
     this.registerListeners()
   }
 
-  private setupYTPlayer() {
-    this.YTplayer = new YTPlayer('#yt-player')
+  private setupPlayers() {
+    this.ytPlayer = new YoutubePlayer(new YTPlayer('#yt-player'))
+    this.localPlayer = new LocalPlayer(this.audioElement)
+    this.activePlayer = this.localPlayer
+  }
+
+  private setupSync() {
+    this.setSongSrcCallback = (src: string) => (this.audioElement.src = src)
   }
 
   private registerRoomListeners() {
@@ -108,233 +105,49 @@ export default class AudioStream extends mixins(Colors) {
   }
 
   private onSongEnded() {
-    this.SongRepeat
-      ? () => {
-          this.onSeek(0)
-          this.onPlayerStateChanged(PlayerState.PLAYING)
-        }
-      : PlayerModule.nextSong()
+    if (this.SongRepeat) {
+      this.activePlayer.currentTime = 0
+      this.activePlayer.play()
+    } else {
+      PlayerModule.nextSong()
+    }
   }
 
-  private registerAudioListeners() {
-    this.audioElement.onended = () => this.onSongEnded()
-    this.YTplayer!.on('ended', () => this.onSongEnded())
+  private registerPlayerListeners() {
+    this.activePlayer.onEnded = () => this.onSongEnded()
+    this.activePlayer.onTimeUpdate = (time) => this.$emit('onTimeUpdate', time)
   }
 
   private registerListeners() {
-    this.registerAudioListeners()
+    this.registerPlayerListeners()
     this.registerRoomListeners()
-    this.syncListeners()
-    this.handleAudioTimeUpdate()
   }
 
-  private unloadAudio() {
-    this.audioElement.srcObject = null
-    this.isLocalSongLoaded = false
-  }
-
-  private loadAudioYoutube(item: Song) {
-    this.YTplayer!.load(item.url!)
-    this.isYoutubeSongLoaded = true
-    this.YTplayer!.setVolume(this.volume)
-
+  private handleFirstPlayback() {
     if (this.isFirst) {
       PlayerModule.setState(PlayerState.PLAYING)
-      this.handleYoutubePlayerState(PlayerState.PLAYING)
       this.isFirst = false
-    } else {
-      this.handleYoutubePlayerState(PlayerModule.playerState)
     }
+    this.handleActivePlayerState(PlayerModule.playerState)
   }
 
   private loadAudio(song: Song) {
-    this.audioElement.src = 'media://' + song.path
-    this.isLocalSongLoaded = true
+    this.activePlayer.load(song.path ?? song.url)
 
-    if (this.peerHolder.peerMode == PeerMode.BROADCASTER) {
-      this.peerHolder.PlaySong(song)
-      PlayerModule.setState(PlayerState.PAUSED)
-      this.handleLocalPlayerState(PlayerState.PAUSED)
-      return
-    }
+    if (this.handleBroadcasterAudioLoad(song)) return
 
-    if (this.isFirst) {
-      PlayerModule.setState(PlayerState.PLAYING)
-      this.handleLocalPlayerState(PlayerState.PLAYING)
-      this.isFirst = false
-    } else {
-      this.handleLocalPlayerState(PlayerModule.playerState)
-    }
+    this.handleFirstPlayback()
   }
 
-  private handleAudioTimeUpdate() {
-    this.audioElement.ontimeupdate = (e: Event) => {
-      this.$emit('onTimeUpdate', (e.currentTarget as HTMLAudioElement).currentTime)
+  private async handleActivePlayerState(newState: PlayerState) {
+    switch (newState) {
+      case PlayerState.PLAYING:
+        return this.activePlayer.play()
+      case PlayerState.PAUSED:
+        return this.activePlayer.pause()
+      case PlayerState.STOPPED:
+        return this.activePlayer.stop()
     }
-
-    this.YTplayer!.on('timeupdate', (time: number) => {
-      if (this.playerType == PlayerType.YOUTUBE) this.$emit('onTimeUpdate', time)
-    })
-  }
-
-  private async handleLocalPlayerState(newState: PlayerState) {
-    if (this.isLocalSongLoaded) {
-      switch (newState) {
-        case PlayerState.PLAYING:
-          return this.audioElement.play()
-        case PlayerState.PAUSED:
-          return this.audioElement.pause()
-        case PlayerState.STOPPED:
-          this.isLocalSongLoaded = false
-          return this.unloadAudio()
-      }
-    }
-  }
-
-  private handleYoutubePlayerState(newState: PlayerState) {
-    if (this.isYoutubeSongLoaded) {
-      switch (newState) {
-        case PlayerState.PLAYING:
-          return this.YTplayer!.play()
-        case PlayerState.PAUSED:
-          return this.YTplayer!.pause()
-        case PlayerState.STOPPED:
-          this.isYoutubeSongLoaded = false
-          return this.YTplayer!.stop()
-      }
-    }
-  }
-
-  private initializeRTC(mode: PeerMode) {
-    this.peerHolder.peerMode = mode
-    SyncModule.setMode(mode)
-
-    this.peerHolder.onJoinedRoom = (id: string) => {
-      SyncModule.setRoom(id)
-    }
-  }
-
-  private joinRoom(id: string) {
-    this.initializeRTC(PeerMode.WATCHER)
-    this.peerHolder.joinRoom(id)
-  }
-
-  private createRoom() {
-    this.initializeRTC(PeerMode.BROADCASTER)
-    this.peerHolder.createRoom()
-  }
-
-  private async getStream() {
-    return new Promise<ArrayBuffer>((resolve) => {
-      fetch(this.audioElement.src)
-        .then((data) => data.arrayBuffer())
-        .then((buf) => resolve(buf))
-    })
-  }
-
-  private syncListeners() {
-    this.peerHolder.onRemoteTrackInfo = async (event) => {
-      if (this.peerHolder.peerMode == PeerMode.WATCHER) {
-        SyncModule.setSong(event)
-        const isExists = await window.FileUtils.isFileExists(event._id!)
-        if (isExists) {
-          this.peerHolder.emitReady()
-          this.audioElement.src = 'media://' + isExists
-        }
-      }
-    }
-
-    this.peerHolder.onRemoteCover = (event) => {
-      if (this.peerHolder.peerMode == PeerMode.WATCHER) SyncModule.setCover(event)
-    }
-
-    this.peerHolder.setLocalTrack = () => {
-      if (this.peerHolder.peerMode == PeerMode.BROADCASTER) {
-        if (this.audioElement.src) {
-          this.peerHolder.addToQueue(this.currentSong!)
-        }
-      }
-    }
-
-    this.peerHolder.fetchCover = () => {
-      return new Promise<ArrayBuffer | null>((resolve) => {
-        if (this.currentSong && this.currentSong.album && this.currentSong.album.album_coverPath) {
-          fetch('media://' + this.currentSong.album.album_coverPath)
-            .then((resp) => resp.arrayBuffer())
-            .then((buf) => resolve(buf))
-        } else {
-          resolve(null)
-        }
-      })
-    }
-
-    this.peerHolder.onRemoteStream = (event) => {
-      let reader = new FileReader()
-      reader.onload = async () => {
-        if (reader.readyState == 2) {
-          const buffer = Buffer.from(reader.result as ArrayBuffer)
-          const filePath = await window.FileUtils.saveAudioTOFile(SyncModule.currentFetchSong, buffer)
-          if (SyncModule.currentSongDets!._id == SyncModule.currentFetchSong) {
-            this.peerHolder.emitReady()
-            this.audioElement.src = 'media://' + filePath
-          }
-
-          this.fetchRemoteSong()
-        }
-      }
-      reader.readAsArrayBuffer(event)
-    }
-
-    this.peerHolder.onPrefetchAdded = (id, song) => {
-      SyncModule.addToPrefetch({ id: id, song: song })
-      SyncModule.setPrefetchChange()
-    }
-
-    this.peerHolder.onPrefetchSet = (prefetch) => {
-      SyncModule.setPrefetch(prefetch)
-      SyncModule.setPrefetchChange()
-    }
-
-    this.peerHolder.fetchSong = (songID) => {
-      return new Promise((resolve) => {
-        if (PlayerModule.queue.data[songID].path) {
-          fetch('media://' + PlayerModule.queue.data[songID].path!)
-            .then((resp) => resp.arrayBuffer())
-            .then((buf) => resolve(buf))
-        }
-      })
-    }
-
-    this.peerHolder.playerStateHandler = async (state) => {
-      this.isLocalSongLoaded = true
-      PlayerModule.setState(state)
-      await this.handleLocalPlayerState(state)
-    }
-
-    SyncModule.$watch(
-      (syncModule) => syncModule.prefetchChange,
-      () => {
-        if (!this.isFetching) this.fetchRemoteSong()
-      }
-    )
-
-    bus.$on('queuedSong', (song: Song) => {
-      if (this.peerHolder.peerMode == PeerMode.BROADCASTER) this.peerHolder.addToQueue(song)
-    })
-  }
-
-  private async fetchRemoteSong() {
-    for (const senderID in SyncModule.prefetch) {
-      for (const song of SyncModule.prefetch[senderID]) {
-        const isExists = await window.FileUtils.isFileExists(song._id!)
-        if (!isExists) {
-          SyncModule.setCurrentFetchSong(song._id!)
-          this.peerHolder.requestSong(senderID, song._id!)
-          return
-        }
-      }
-    }
-    this.isFetching = false
   }
 }
 </script>

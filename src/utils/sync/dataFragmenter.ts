@@ -73,7 +73,6 @@ export class FragmentReceiver {
     switch (typeof data) {
       case 'string':
         var tmp = JSON.parse(data) as fragmentedData
-        console.log(tmp)
         switch (tmp.type) {
           case 'end':
             // TODO: End using byteLength instead
