@@ -14,7 +14,13 @@
           <div>
             <b-tabs content-class="mt-3">
               <b-tab title="Join" active>
-                <input ref="roomid" class="inputtext" placeholder="Enter room ID" aria-label="room id" />
+                <b-form-input
+                  ref="roomid"
+                  :formatter="formatter"
+                  class="inputtext"
+                  placeholder="Enter room ID"
+                  aria-label="room id"
+                />
                 <button v-on:click="joinRoom()">Join room</button>
                 <h3>{{ roomID }}</h3>
               </b-tab>
@@ -63,6 +69,10 @@ export default class Sidebar extends mixins(Colors) {
 
   get roomID() {
     return SyncModule.roomID
+  }
+
+  public formatter(value: string) {
+    return value.toUpperCase()
   }
 
   private setWatcher() {
