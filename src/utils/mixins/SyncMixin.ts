@@ -100,6 +100,8 @@ export default class SyncMixin extends Vue {
     this.peerHolder.onPrefetchSet = SyncModule.setPrefetch
     this.peerHolder.fetchSong = this.getLocalSong
     this.peerHolder.playerStateHandler = this.handleRemotePlayerState
+    // TODO: Handle this event somewhere
+    this.peerHolder.peerConnectionStateHandler = (id, state) => bus.$emit('onPeerConnectionStateChange', id, state)
 
     SyncModule.$watch((syncModule) => syncModule.prefetch, this.beginFetching)
 

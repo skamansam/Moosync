@@ -10,6 +10,12 @@ export interface prefetchData {
   sender: string
 }
 
+export enum peerConnectionState {
+  CONNECTED,
+  CONNECTING,
+  DISCONNECTED,
+}
+
 export class SyncHolder {
   private peerConnection: {
     [key: string]: {
@@ -31,13 +37,29 @@ export class SyncHolder {
   }
 
   private STUN = {
-    urls: 'stun:stun.l.google.com:19302',
+    urls: [
+      'stun:stun.l.google.com:19302',
+      'stun:stun.l.google.com:19302',
+      'stun:stun1.l.google.com:19302',
+      'stun:stun2.l.google.com:19302',
+      'stun:stun3.l.google.com:19302',
+      'stun:stun4.l.google.com:19302',
+      'stun:stun.ekiga.net',
+      'stun:stun.ideasip.com',
+      'stun:stun.rixtelecom.se',
+      'stun:stun.schlund.de',
+      'stun:stun.stunprotocol.org:3478',
+      'stun:stun.voiparound.com',
+      'stun:stun.voipbuster.com',
+      'stun:stun.voipstunt.com',
+      'stun:stun.voxgratia.org',
+    ],
   }
 
-  private TURN = {
-    urls: 'turn:oveno@106.213.78.186:',
-    credential: '1234',
-  }
+  // private TURN = {
+  //   urls: 'turn:oveno@106.213.78.186:',
+  //   credential: '1234',
+  // }
 
   private readyPeers: string[] = []
 
@@ -49,6 +71,7 @@ export class SyncHolder {
   private onPrefetchAddedCallback: ((song: prefetchData) => void) | null = null
   private onPrefetchSetCallback: ((data: prefetchData[]) => void) | null = null
   private onPlayerStateChangeCallback: ((state: PlayerState) => void) | null = null
+  private onPeerStateChangeCallback: ((id: string, state: peerConnectionState) => void) | null = null
 
   private getLocalSong: ((songID: string) => Promise<ArrayBuffer | null>) | null = null
   private getLocalCover: (() => Promise<ArrayBuffer | null>) | null = null
@@ -100,6 +123,10 @@ export class SyncHolder {
     this.onPlayerStateChangeCallback = callback
   }
 
+  set peerConnectionStateHandler(callback: (id: string, state: peerConnectionState) => void) {
+    this.onPeerStateChangeCallback = callback
+  }
+
   set peerMode(mode: PeerMode) {
     this.mode = mode
   }
@@ -117,7 +144,12 @@ export class SyncHolder {
 
   private makePeer(id: string): RTCPeerConnection {
     // Creates new peer
-    let peer = new RTCPeerConnection({ iceServers: [this.STUN, this.TURN] })
+    let peer = new RTCPeerConnection({ iceServers: [this.STUN] })
+
+    // Report changes to connection state
+    this.listenPeerConnected(id, peer)
+    if (this.onPeerStateChangeCallback) this.onPeerStateChangeCallback(id, peerConnectionState.CONNECTING)
+
     this.onLocalCandidate(id, peer)
     return peer
   }
@@ -201,6 +233,21 @@ export class SyncHolder {
       if (!this.isNegotiating[id]) {
         this.isNegotiating[id] = true
         this.makeOffer(id, peer)
+      }
+    }
+  }
+
+  private listenPeerConnected(id: string, peer: RTCPeerConnection) {
+    peer.onconnectionstatechange = (e) => {
+      if (this.onPeerStateChangeCallback) {
+        switch ((e.target as RTCPeerConnection).connectionState) {
+          case 'connected':
+            this.onPeerStateChangeCallback(id, peerConnectionState.CONNECTED)
+            break
+          case 'disconnected':
+          case 'failed':
+            this.onPeerStateChangeCallback(id, peerConnectionState.DISCONNECTED)
+        }
       }
     }
   }
