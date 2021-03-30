@@ -1,5 +1,5 @@
 <template>
-  <div class="topbar-container d-flex w-100 align-items-center">
+  <div class="topbar-container d-flex align-items-center">
     <b-container fluid class="d-flex">
       <b-row class="flex-grow-1 justify-content-start">
         <b-col cols="9"> <Search /> </b-col>
@@ -29,5 +29,4 @@ export default class TopBar extends mixins(Colors) {}
 .topbar-container
   background: var(--primary)
   height: 70px
-  padding-left: calc(261px + 30px + 7.5px)
 </style>

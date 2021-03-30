@@ -8,12 +8,19 @@
       v-slot="{ navigate, isActive }"
     >
       <div class="d-flex button-bar" v-on:click="navigate" v-bind:class="{ 'button-active': isActive }">
-        <div class="whitebar" v-if="isActive"></div>
-        <div class="d-flex align-items-center icon-padding icon-transition" v-bind:class="{ 'icon-active': isActive }">
+        <div class="whitebar" v-if="isActive && isOpen"></div>
+        <div
+          class="d-flex align-items-center icon-transition"
+          v-bind:class="{
+            'icon-active': isActive && isOpen,
+            'icon-padding-closed': !isOpen,
+            'icon-padding-open': isOpen,
+          }"
+        >
           <div class="icon">
             <component v-bind:is="item.component"></component>
           </div>
-          <div class="text-padding text-format">{{ item.title }}</div>
+          <div v-if="isOpen" class="text-padding text-format">{{ item.title }}</div>
         </div>
       </div>
     </router-link>
@@ -21,7 +28,7 @@
 </template>
 
 <script lang="ts">
-import { Component } from 'vue-property-decorator'
+import { Component, Prop } from 'vue-property-decorator'
 import { ActiveTab } from '@/utils/ui/enums'
 import Playlists from '@/mainWindow/components/icons/Playlists.vue'
 import AllSongs from '@/mainWindow/components/icons/AllSongs.vue'
@@ -58,6 +65,9 @@ export default class Sidebar extends mixins(Colors) {
 
   private active: ActiveTab = ActiveTab.ALLSONGS
 
+  @Prop({ default: true })
+  private isOpen!: boolean
+
   private setActive(i: number, navigate: Function): void {
     this.active = i
     navigate(this)
@@ -72,13 +82,16 @@ export default class Sidebar extends mixins(Colors) {
   width: 38px
   height: 38px
 
-.icon-padding
+.icon-padding-open
   padding: 0.25rem 0rem 0.25rem 1.8rem
+
+.icon-padding-closed
+  padding:  0.5rem 0rem 0.25rem 1rem
 
 .icon-transition
   transition: 0.1s
 
-.icon-transition:hover
+.icon-padding-open.icon-transition:hover
   margin-left: 0.6rem
 
 .text-padding

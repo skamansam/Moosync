@@ -1,10 +1,18 @@
 <template>
-  <b-sidebar width="261px" visible id="sidebar" no-header-close no-close-on-route-change sidebar-class="gradient">
+  <b-sidebar
+    :width="isOpen ? '261px' : '70px'"
+    visible
+    id="sidebar"
+    no-header-close
+    no-close-on-route-change
+    sidebar-class="gradient"
+  >
     <template #header>
       <div class="d-flex w-100 mt-3 justify-content-between">
-        <Toggle />
-        <Rooms id="rooms" />
+        <Toggle class="toggle" @click.native="toggleOpen()" />
+        <Rooms id="rooms" v-if="showRoomsButton" />
         <b-popover
+          v-if="isOpen"
           :target="`rooms`"
           placement="rightbottom"
           title="Rooms"
@@ -35,7 +43,7 @@
       </div>
     </template>
     <template #default
-      ><div class="extra-margin-top"><Tabs /></div>
+      ><div class="extra-margin-top"><Tabs :isOpen="isOpen" /></div>
     </template>
     <template #footer>
       <div class="footer">
@@ -66,9 +74,21 @@ import { mixins } from 'vue-class-component'
 export default class Sidebar extends mixins(Colors) {
   @Ref('roomid')
   private roomInput!: HTMLInputElement
+  private isOpen: boolean = true
+  private showRoomsButton: boolean = true
 
   get roomID() {
     return SyncModule.roomID
+  }
+
+  private toggleOpen() {
+    this.isOpen = !this.isOpen
+
+    // Delay showing of rooms button since it makes the toggle button smaller while sidebar size is transitioning
+    if (this.showRoomsButton == false) setTimeout(() => (this.showRoomsButton = true), 100)
+    else this.showRoomsButton = false
+
+    this.$emit('toggleOpen', this.isOpen)
   }
 
   public formatter(value: string) {
@@ -103,6 +123,9 @@ export default class Sidebar extends mixins(Colors) {
   border-radius: 0px 30px 0px 0px
   top: 32px !important
 
+.b-sidebar
+  transition: 0.2s
+
 .b-sidebar-body
   &::-webkit-scrollbar-track
     margin-top: 0
@@ -110,6 +133,8 @@ export default class Sidebar extends mixins(Colors) {
 </style>
 
 <style lang="sass" scoped>
+.toggle
+  margin-left: 8px
 
 .sidebar
   position: absolute

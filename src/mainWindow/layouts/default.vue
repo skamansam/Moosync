@@ -1,9 +1,9 @@
 <template>
   <div class="appContainer">
-    <TopBar class="topbar" />
+    <TopBar class="topbar" :class="{ 'is-open': isSidebarOpen }" />
     <MusicBar class="musicbar" />
-    <Sidebar class="sidebar" />
-    <div class="d-flex main-content">
+    <Sidebar class="sidebar" @toggleOpen="toggleSidebar" />
+    <div class="d-flex main-content" :class="{ 'is-open': isSidebarOpen }">
       <transition name="slide-fade">
         <router-view :key="refreshRouter"></router-view>
       </transition>
@@ -28,8 +28,13 @@ import { mixins } from 'vue-class-component'
 })
 export default class DefaultLayout extends mixins(ContextMenuMixin) {
   private refreshRouter: boolean = false
+  private isSidebarOpen: boolean = true
   mounted() {
     //TODO: Refresh Router on preference change
+  }
+
+  toggleSidebar(isOpen: boolean) {
+    this.isSidebarOpen = isOpen
   }
 }
 </script>
@@ -47,10 +52,16 @@ export default class DefaultLayout extends mixins(ContextMenuMixin) {
 .topbar
   position: fixed
   z-index: -3
+  left: calc(70px + 30px + 7.5px)
+  width: calc(100% - 70px - 30px - 7.5px)
+  transition: 0.2s
+  &.is-open
+    width: calc(100% - 261px - 30px - 7.5px)
+    left: calc(261px + 30px + 7.5px)
 
 .main-content
   position: absolute
-  left: calc(261px + 30px)
+  left: calc(30px + 70px)
   top: calc(70px + 18px + 4px)
   right: 0
   bottom: calc(6rem + 30px)
@@ -58,6 +69,10 @@ export default class DefaultLayout extends mixins(ContextMenuMixin) {
   overflow-y: scroll
   overflow-x: hidden
   z-index: -4
+  transition: 0.2s
+  &.is-open
+    left: calc(261px + 30px)
+    height: calc(100% - (6rem + 30px) - 70px + 16px)
 </style>
 
 <style lang="sass">
