@@ -83,6 +83,7 @@ function initializeTray() {
         label: 'Show App',
         click: function () {
           tray.destroy()
+          isQuitting = false
           mainWindow.show()
         },
       },
@@ -140,7 +141,23 @@ async function createWindow() {
       initializeTray()
     }
   })
+
+  win.on('show', () => {
+    win.focus()
+  })
   return win
+}
+
+if (!isDevelopment) {
+  if (!app.requestSingleInstanceLock()) {
+    app.quit()
+  }
+  app.on('second-instance', () => {
+    if (mainWindow && !mainWindow.isFocused()) {
+      if (tray && !tray.isDestroyed()) tray.destroy()
+      mainWindow.show()
+    }
+  })
 }
 
 // Quit when all windows are closed.

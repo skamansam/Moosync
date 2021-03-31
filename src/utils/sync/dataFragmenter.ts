@@ -11,9 +11,9 @@ export class FragmentSender {
   private offset: number
   private byteEnd: number
 
-  private channel: RTCDataChannel | null = null
+  private channel?: RTCDataChannel
 
-  constructor(data: any, channel: RTCDataChannel) {
+  constructor(data: any, channel: RTCDataChannel | undefined) {
     this.channel = channel
     this.data = data
     this.byteLength = this.data.byteLength
@@ -40,17 +40,15 @@ export class FragmentSender {
   }
 
   public send() {
-    if (this.data == null) {
-      // TODO: handle null
-      return
-    }
-    let header = JSON.stringify({ type: 'byteLength', message: this.byteLength })
-    this.channel!.send(header)
-    this.channel!.bufferedAmountLowThreshold = chunkLimit - 1
-    this.channel!.onbufferedamountlow = () => {
+    if (this.data) {
+      let header = JSON.stringify({ type: 'byteLength', message: this.byteLength })
+      this.channel!.send(header)
+      this.channel!.bufferedAmountLowThreshold = chunkLimit - 1
+      this.channel!.onbufferedamountlow = () => {
+        this.sendData()
+      }
       this.sendData()
     }
-    this.sendData()
   }
 }
 
@@ -58,9 +56,9 @@ export class FragmentReceiver {
   private file: BlobPart[] = []
   private byteLength: number = 0
 
-  private onDataReceivedCallback: ((data: Blob) => void) | null
+  private onDataReceivedCallback?: (data: Blob) => void
 
-  constructor(callback: ((data: Blob) => void) | null) {
+  constructor(callback?: (data: Blob) => void) {
     this.onDataReceivedCallback = callback
   }
 

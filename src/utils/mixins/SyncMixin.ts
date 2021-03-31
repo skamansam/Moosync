@@ -50,7 +50,6 @@ export default class SyncMixin extends Vue {
       let buf = await resp.arrayBuffer()
       return buf
     }
-    return null
   }
 
   private saveRemoteStream(event: Blob) {
@@ -140,6 +139,7 @@ export default class SyncMixin extends Vue {
   }
 
   protected joinRoom(id: string) {
+    console.log('joining')
     this.initializeRTC(PeerMode.WATCHER)
     this.peerHolder.joinRoom(id)
   }

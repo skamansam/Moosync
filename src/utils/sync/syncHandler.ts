@@ -63,18 +63,18 @@ export class SyncHolder {
 
   private readyPeers: string[] = []
 
-  private onJoinedRoomCallback: ((id: string) => void) | null = null
-  private onRemoteTrackInfoCallback: ((event: Song) => void) | null = null
-  private onRemoteTrackCallback: ((event: RTCTrackEvent) => void) | null = null
-  private onRemoteCoverCallback: ((event: Blob) => void) | null = null
-  private onRemoteStreamCallback: ((event: Blob) => void) | null = null
-  private onPrefetchAddedCallback: ((song: prefetchData) => void) | null = null
-  private onPrefetchSetCallback: ((data: prefetchData[]) => void) | null = null
-  private onPlayerStateChangeCallback: ((state: PlayerState) => void) | null = null
-  private onPeerStateChangeCallback: ((id: string, state: peerConnectionState) => void) | null = null
+  private onJoinedRoomCallback?: (id: string) => void
+  private onRemoteTrackInfoCallback?: (event: Song) => void
+  private onRemoteTrackCallback?: (event: RTCTrackEvent) => void
+  private onRemoteCoverCallback?: (event: Blob) => void
+  private onRemoteStreamCallback?: (event: Blob) => void
+  private onPrefetchAddedCallback?: (song: prefetchData) => void
+  private onPrefetchSetCallback?: (data: prefetchData[]) => void
+  private onPlayerStateChangeCallback?: (state: PlayerState) => void
+  private onPeerStateChangeCallback?: (id: string, state: peerConnectionState) => void
 
-  private getLocalSong: ((songID: string) => Promise<ArrayBuffer | null>) | null = null
-  private getLocalCover: (() => Promise<ArrayBuffer | null>) | null = null
+  private getLocalSong?: (songID: string) => Promise<ArrayBuffer | null>
+  private getLocalCover?: () => Promise<ArrayBuffer | undefined>
 
   constructor(url?: string) {
     this.socketConnection = io(url ? url : 'http://localhost:4000', this.connectionOptions)
@@ -95,7 +95,7 @@ export class SyncHolder {
     this.onRemoteTrackCallback = callback
   }
 
-  set fetchCover(callback: () => Promise<ArrayBuffer | null>) {
+  set fetchCover(callback: () => Promise<ArrayBuffer | undefined>) {
     this.getLocalCover = callback
   }
 
@@ -420,7 +420,7 @@ export class SyncHolder {
     }
   }
 
-  private emitCover(cover: ArrayBuffer | null, id: string) {
+  private emitCover(cover: ArrayBuffer | undefined, id: string) {
     if (cover) {
       let fragmentSender = new FragmentSender(cover, this.peerConnection[id].coverChannel!)
       fragmentSender.send()

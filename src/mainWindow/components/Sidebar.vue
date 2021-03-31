@@ -23,7 +23,7 @@
             <b-tabs content-class="mt-3">
               <b-tab title="Join" active>
                 <b-form-input
-                  ref="roomid"
+                  v-model="roomInput"
                   :formatter="formatter"
                   class="inputtext"
                   placeholder="Enter room ID"
@@ -59,7 +59,7 @@ import Toggle from '@/mainWindow/components/icons/Toggle.vue'
 import Tabs from '@/mainWindow/components/sidebar/Tabs.vue'
 import Gears from '@/mainWindow/components/icons/Gears.vue'
 import { PeerMode, SyncModule } from '@/mainWindow/store/syncState'
-import { Component, Ref } from 'vue-property-decorator'
+import { Component } from 'vue-property-decorator'
 import Colors from '@/utils/mixins/Colors'
 import { mixins } from 'vue-class-component'
 
@@ -72,8 +72,7 @@ import { mixins } from 'vue-class-component'
   },
 })
 export default class Sidebar extends mixins(Colors) {
-  @Ref('roomid')
-  private roomInput!: HTMLInputElement
+  private roomInput: String = ''
   private isOpen: boolean = true
   private showRoomsButton: boolean = true
 
@@ -104,7 +103,7 @@ export default class Sidebar extends mixins(Colors) {
   }
 
   private joinRoom() {
-    this.$root.$emit('join-room', this.roomInput.value)
+    this.$root.$emit('join-room', this.roomInput)
   }
 
   private createRoom() {
