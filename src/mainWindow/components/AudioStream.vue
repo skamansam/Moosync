@@ -83,6 +83,7 @@ export default class AudioStream extends mixins(Colors, SyncMixin) {
 
   @Watch('forceSeek') onSeek(newValue: number) {
     this.activePlayer.currentTime = newValue
+    this.remoteSeek(newValue)
   }
 
   mounted() {
@@ -99,6 +100,7 @@ export default class AudioStream extends mixins(Colors, SyncMixin) {
 
   private setupSync() {
     this.setSongSrcCallback = (src: string) => (this.audioElement.src = src)
+    this.onSeekCallback = (time: number) => (this.activePlayer.currentTime = time)
   }
 
   private registerRoomListeners() {
@@ -135,6 +137,7 @@ export default class AudioStream extends mixins(Colors, SyncMixin) {
 
   private loadAudio(song: Song) {
     this.activePlayer.load(song.path ?? song.url)
+    this.activePlayer.volume = this.volume
 
     if (this.handleBroadcasterAudioLoad(song)) return
 

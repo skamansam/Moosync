@@ -52,11 +52,24 @@ class SongDBInstance extends DBUtils {
 
   public async removeSong(song_id: string) {
     this.db.transaction((song_id: string) => {
+      // Selecting multiple times to also count occurrence
+      let album_ids: { count: number; album: string } = this.db.queryFirstRow(
+        'SELECT count(id) as count, album FROM album_bridge WHERE album = (SELECT album FROM album_bridge WHERE song = ?)',
+        song_id
+      ) as { count: number; album: string }
+      let artist_ids: { count: number; artist: string } = this.db.queryFirstRow(
+        'SELECT count(id) as count, artist FROM artists_bridge WHERE artist = (SELECT artist FROM artists_bridge WHERE song = ?)',
+        song_id
+      ) as { count: number; artist: string }
+
       this.db.delete('artists_bridge', { song: song_id })
       this.db.delete('album_bridge', { song: song_id })
       this.db.delete('genre_bridge', { song: song_id })
       this.db.delete('playlist_bridge', { song: song_id })
       this.db.delete('allsongs', { _id: song_id })
+
+      if (album_ids.count == 1) this.db.delete('albums', { album_id: album_ids.album })
+      if (artist_ids.count == 1) this.db.delete('artists', { artist_id: artist_ids.artist })
     })(song_id)
   }
 

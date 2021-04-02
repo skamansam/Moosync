@@ -5,14 +5,8 @@
         <SongDetails
           class="details-container"
           :currentTitle="currentSong ? currentSong.title : ''"
-          :currentsubTitle="
-            currentSong && currentSong.album && currentSong.album.album_name ? currentSong.album.album_name : ''
-          "
-          :imgSrc="
-            currentSong && currentSong.album && currentSong.album.album_coverPath
-              ? currentSong.album.album_coverPath
-              : ''
-          "
+          :currentsubTitle="getAlbumName(currentSong)"
+          :imgSrc="getImg(currentSong)"
         />
       </b-col>
     </b-row>
@@ -36,6 +30,7 @@ import { Song } from '@/models/songs'
 import Colors from '@/utils/mixins/Colors'
 import { mixins } from 'vue-class-component'
 import PlayerControls from '@/utils/mixins/PlayerControls'
+import ModelHelper from '@/utils/mixins/ModelHelper'
 
 @Component({
   components: {
@@ -43,7 +38,7 @@ import PlayerControls from '@/utils/mixins/PlayerControls'
     SongDetails,
   },
 })
-export default class AllSongs extends mixins(Colors, PlayerControls) {
+export default class AllSongs extends mixins(Colors, PlayerControls, ModelHelper) {
   @Prop({ default: () => [] })
   private songList!: Song[]
 

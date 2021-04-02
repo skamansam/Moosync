@@ -15,7 +15,7 @@ import { v4 } from 'uuid'
 
 const audioPatterns = new RegExp('.flac|.mp3|.ogg|.m4a|.webm|.wav|.wv', 'i')
 export async function writeBuffer(data: image) {
-  return (await Jimp.read(data.data)).cover(320, 320).quality(80).writeAsync(data.path)
+  return (await Jimp.read(data.data)).cover(800, 800).quality(80).writeAsync(data.path)
 }
 
 async function getInfo(data: mm.IAudioMetadata, stats: stats, coverPath?: string): Promise<Song> {

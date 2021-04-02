@@ -91,7 +91,7 @@ function initializeTray() {
         label: 'Quit',
         click: function () {
           isQuitting = true
-          app.quit()
+          app.exit()
         },
       },
     ])

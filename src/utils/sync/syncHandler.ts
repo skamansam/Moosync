@@ -71,7 +71,10 @@ export class SyncHolder {
   private onPrefetchAddedCallback?: (song: prefetchData) => void
   private onPrefetchSetCallback?: (data: prefetchData[]) => void
   private onPlayerStateChangeCallback?: (state: PlayerState) => void
+  private onSeekCallback?: (time: number) => void
   private onPeerStateChangeCallback?: (id: string, state: peerConnectionState) => void
+  private onDataSentCallback?: (id: string) => void
+  private onAllReadyCallback?: () => void
 
   private getLocalSong?: (songID: string) => Promise<ArrayBuffer | null>
   private getLocalCover?: () => Promise<ArrayBuffer | undefined>
@@ -119,12 +122,24 @@ export class SyncHolder {
     this.getLocalSong = callback
   }
 
+  set onSeek(callback: (time: number) => void) {
+    this.onSeekCallback = callback
+  }
+
   set playerStateHandler(callback: (state: PlayerState) => void) {
     this.onPlayerStateChangeCallback = callback
   }
 
   set peerConnectionStateHandler(callback: (id: string, state: peerConnectionState) => void) {
     this.onPeerStateChangeCallback = callback
+  }
+
+  set onDataSent(callback: (id: string) => void) {
+    this.onDataSentCallback = callback
+  }
+
+  set onAllReady(callback: () => void) {
+    this.onAllReadyCallback = callback
   }
 
   set peerMode(mode: PeerMode) {
@@ -224,7 +239,7 @@ export class SyncHolder {
 
   private onAnswer() {
     this.socketConnection.on('answer', (id: string, description: RTCSessionDescription) => {
-      if (this.isNegotiating) this.peerConnection[id].peer!.setRemoteDescription(description)
+      if (this.isNegotiating[id]) this.peerConnection[id].peer!.setRemoteDescription(description)
     })
   }
 
@@ -252,9 +267,16 @@ export class SyncHolder {
     }
   }
 
+  private onDataSentHandler(id: string) {
+    // TODO: Show state of each user on ui
+    this.onDataSentCallback ? this.onDataSentCallback(id) : null
+  }
+
   private sendStream(id: string, stream: ArrayBuffer | null) {
     if (this.peerConnection[id].streamChannel!.readyState == 'open') {
-      const fragmentSender = new FragmentSender(stream, this.peerConnection[id].streamChannel!)
+      const fragmentSender = new FragmentSender(stream, this.peerConnection[id].streamChannel!, () =>
+        this.onDataSentHandler(id)
+      )
       fragmentSender.send()
     } else {
       console.log('data channel is in state: ', this.peerConnection[id].streamChannel!.readyState)
@@ -382,18 +404,31 @@ export class SyncHolder {
     })
   }
 
+  private listenAllReady() {
+    this.socketConnection.on('allReady', () => {
+      this.onAllReadyCallback ? this.onAllReadyCallback() : null
+      this.onPlayerStateChangeCallback ? this.onPlayerStateChangeCallback(PlayerState.PLAYING) : null
+    })
+  }
+
   private checkAllReady() {
     if (this.readyPeers.length == Object.keys(this.peerConnection).length) {
-      this.socketConnection.emit('playerStateChange', PlayerState.PLAYING)
+      this.socketConnection.emit('allReady')
       this.readyPeers = []
-      console.log('emited ready')
       this.onPlayerStateChangeCallback ? this.onPlayerStateChangeCallback(PlayerState.PLAYING) : null
+      this.onAllReadyCallback ? this.onAllReadyCallback() : null
     }
   }
 
   private listenPlayerState() {
     this.socketConnection.on('playerStateChange', (state: PlayerState) => {
       this.onPlayerStateChangeCallback ? this.onPlayerStateChangeCallback(state) : null
+    })
+  }
+
+  private listenSeek() {
+    this.socketConnection.on('forceSeek', (time: number) => {
+      this.onSeekCallback ? this.onSeekCallback(time) : null
     })
   }
 
@@ -412,6 +447,10 @@ export class SyncHolder {
 
   public emitPlayerState(state: PlayerState) {
     this.socketConnection.emit('playerStateChange', state)
+  }
+
+  public emitSeek(time: number) {
+    this.socketConnection.emit('forceSeek', time)
   }
 
   private sendTrackMetadata(trackInfo: Song | null) {
@@ -455,5 +494,7 @@ export class SyncHolder {
     this.listenPreFetch()
     this.listenTrackChange()
     this.listenPlayerState()
+    this.listenSeek()
+    this.listenAllReady()
   }
 }

@@ -13,12 +13,15 @@ export class FragmentSender {
 
   private channel?: RTCDataChannel
 
-  constructor(data: any, channel: RTCDataChannel | undefined) {
+  private onDataSentCallback?: () => void
+
+  constructor(data: any, channel: RTCDataChannel | undefined, callback?: () => void) {
     this.channel = channel
     this.data = data
     this.byteLength = this.data.byteLength
     this.offset = 0
     this.byteEnd = this.byteLength <= chunkLimit ? this.byteLength : chunkLimit
+    this.onDataSentCallback = callback
   }
 
   private sendData() {
@@ -31,6 +34,7 @@ export class FragmentSender {
       if (this.offset >= this.byteLength) {
         this.channel!.send(JSON.stringify({ type: 'end' }))
         this.channel!.onbufferedamountlow = null
+        this.onDataSentCallback ? this.onDataSentCallback() : null
       }
 
       if (this.byteEnd >= this.byteLength) {

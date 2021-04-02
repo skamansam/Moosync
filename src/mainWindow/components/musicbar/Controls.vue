@@ -3,7 +3,8 @@
     <b-col cols="auto" class="timestamp">{{ formatDuration(timestamp) }} / {{ formatDuration(duration) }}</b-col>
     <b-col cols="auto" v-on:click="prevSong()"><LastTrack /></b-col>
     <b-col cols="auto" v-on:click="toggleRepeat()"><Repeat /></b-col>
-    <b-col cols="auto" v-on:click="togglePlayerState()"><Play :play="playing" /></b-col>
+    <b-col cols="auto" v-if="loading"><b-spinner label="Loading..."></b-spinner></b-col>
+    <b-col cols="auto" v-if="!loading" v-on:click="togglePlayerState()"><Play :play="playing" /></b-col>
     <b-col cols="auto" v-on:click="nextSong()"><NextTrack /></b-col>
     <b-col cols="auto" v-on:click="shuffle()"><Shuffle /></b-col>
     <!-- <b-col cols="2" class="d-none d-xl-block"></b-col> -->
@@ -39,6 +40,9 @@ export default class MusicBar extends mixins(PlayerControls) {
 
   @Prop({ default: true })
   private playing!: boolean
+
+  @Prop({ default: false })
+  private loading!: boolean
 
   get repeat() {
     return PlayerModule.Repeat

@@ -18,6 +18,7 @@ class Sync extends VuexModule {
   prefetch: prefetchData[] = []
   currentFetchSong: string = ''
   roomID: string = ''
+  waitingSync: boolean = false
 
   @Mutation
   setMode(mode: PeerMode) {
@@ -42,6 +43,11 @@ class Sync extends VuexModule {
   @Mutation
   setPrefetch(prefetch: prefetchData[]) {
     this.prefetch = prefetch
+  }
+
+  @Mutation
+  setWaiting(wait: boolean) {
+    this.waitingSync = wait
   }
 
   @Mutation

@@ -19,11 +19,7 @@
               ><Details
                 :title="currentSong ? currentSong.title : '-'"
                 :artists="currentSong ? currentSong.artists : []"
-                :imgSrc="
-                  currentSong && currentSong.album && currentSong.album.album_coverPath
-                    ? currentSong.album.album_coverPath
-                    : ''
-                "
+                :imgSrc="getImg(currentSong)"
                 :coverBlob="currentCoverBlob"
             /></b-col>
             <b-col md="6" lg="auto" align-self="center" class="no-gutters"
@@ -31,6 +27,7 @@
                 :playing="playerState == PlayerState.PLAYING"
                 :duration="currentSong ? currentSong.duration : 0"
                 :timestamp="timestamp"
+                :loading="waiting"
             /></b-col>
             <b-col cols="3" align-self="center" class="no-gutters"
               ><ExtraControls @onVolumeChange="volumeUpdated" @onToggleSlider="toggleSlider"
@@ -47,7 +44,9 @@
         :volume="volume"
       />
     </div>
-    <div class="slider" :class="{ open: sliderPosition }"></div>
+    <div class="slider" :class="{ open: sliderPosition }">
+      <MusicInfo :imgSrc="getImg(currentSong)" />
+    </div>
   </div>
 </template>
 
@@ -56,12 +55,14 @@ import AudioStream from '@/mainWindow/components/AudioStream.vue'
 import Controls from '@/mainWindow/components/musicbar/Controls.vue'
 import Details from '@/mainWindow/components/musicbar/Details.vue'
 import ExtraControls from '@/mainWindow/components/musicbar/ExtraControls.vue'
+import MusicInfo from '@/mainWindow/components/musicbar/MusicInfo.vue'
 
 import { Component } from 'vue-property-decorator'
 import { PlayerModule, PlayerState, PlayerType } from '@/mainWindow/store/playerState'
-import { SyncModule } from '@/mainWindow/store/syncState'
+import { PeerMode, SyncModule } from '@/mainWindow/store/syncState'
 import Colors from '@/utils/mixins/Colors'
 import { mixins } from 'vue-class-component'
+import ModelHelper from '@/utils/mixins/ModelHelper'
 
 @Component({
   components: {
@@ -69,9 +70,10 @@ import { mixins } from 'vue-class-component'
     Controls,
     ExtraControls,
     AudioStream,
+    MusicInfo,
   },
 })
-export default class MusicBar extends mixins(Colors) {
+export default class MusicBar extends mixins(Colors, ModelHelper) {
   private timestamp: number = 0
   private forceSeek: number = 0
   private volume: number = 50
@@ -96,6 +98,10 @@ export default class MusicBar extends mixins(Colors) {
 
   get playerState() {
     return PlayerModule.playerState
+  }
+
+  get waiting() {
+    return SyncModule.mode != PeerMode.UNDEFINED && SyncModule.waitingSync
   }
 
   private toggleSlider(position: boolean) {

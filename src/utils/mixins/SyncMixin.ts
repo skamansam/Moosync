@@ -2,15 +2,18 @@ import { bus } from '@/mainWindow/main'
 import { PlayerModule, PlayerState } from '@/mainWindow/store/playerState'
 import { PeerMode, SyncModule } from '@/mainWindow/store/syncState'
 import { Song } from '@/models/songs'
-import { Component, Vue } from 'vue-property-decorator'
+import { Component } from 'vue-property-decorator'
 import { SyncHolder } from '../sync/syncHandler'
+import { mixins } from 'vue-class-component'
+import ModelHelper from '@/utils/mixins/ModelHelper'
 
 @Component
-export default class SyncMixin extends Vue {
+export default class SyncMixin extends mixins(ModelHelper) {
   private isFetching: boolean = false
-  private peerHolder = new SyncHolder()
+  private peerHolder = new SyncHolder('http://retardnetwork.cf:4000')
   private isRemoteStateChange: boolean = false
   public setSongSrcCallback!: (src: string) => void
+  public onSeekCallback!: (time: number) => void
 
   created() {
     this.peerHolder.start()
@@ -31,6 +34,7 @@ export default class SyncMixin extends Vue {
   private async setRemoteTrackInfo(event: Song) {
     if (this.peerHolder.peerMode == PeerMode.WATCHER) {
       SyncModule.setSong(event)
+      SyncModule.setWaiting(true)
       const isExists = await window.FileUtils.isFileExists(event._id!)
       if (isExists) {
         this.peerHolder.emitReady()
@@ -45,8 +49,8 @@ export default class SyncMixin extends Vue {
 
   private async getLocalCover() {
     const currentSong = PlayerModule.currentSong
-    if (currentSong && currentSong.album && currentSong.album.album_coverPath) {
-      const resp = await fetch('media://' + currentSong.album.album_coverPath)
+    if (this.isAlbumExists(currentSong)) {
+      const resp = await fetch('media://' + currentSong!.album!.album_coverPath)
       let buf = await resp.arrayBuffer()
       return buf
     }
@@ -82,6 +86,10 @@ export default class SyncMixin extends Vue {
     PlayerModule.setState(state)
   }
 
+  private onRemoteSeek(time: number) {
+    this.onSeekCallback(time)
+  }
+
   private addToPrefetchQueue(song: Song) {
     if (this.peerHolder.peerMode == PeerMode.BROADCASTER) this.peerHolder.addToQueue(song)
   }
@@ -101,6 +109,8 @@ export default class SyncMixin extends Vue {
     this.peerHolder.playerStateHandler = this.handleRemotePlayerState
     // TODO: Handle this event somewhere
     this.peerHolder.peerConnectionStateHandler = (id, state) => bus.$emit('onPeerConnectionStateChange', id, state)
+    this.peerHolder.onSeek = this.onRemoteSeek
+    this.peerHolder.onAllReady = () => SyncModule.setWaiting(false)
 
     SyncModule.$watch((syncModule) => syncModule.prefetch, this.beginFetching)
 
@@ -124,6 +134,7 @@ export default class SyncMixin extends Vue {
     if (this.peerHolder.peerMode == PeerMode.BROADCASTER) {
       PlayerModule.setState(PlayerState.PAUSED)
       this.peerHolder.PlaySong(song)
+      SyncModule.setWaiting(true)
       return true
     }
     return false
@@ -139,7 +150,6 @@ export default class SyncMixin extends Vue {
   }
 
   protected joinRoom(id: string) {
-    console.log('joining')
     this.initializeRTC(PeerMode.WATCHER)
     this.peerHolder.joinRoom(id)
   }
@@ -147,6 +157,10 @@ export default class SyncMixin extends Vue {
   protected createRoom() {
     this.initializeRTC(PeerMode.BROADCASTER)
     this.peerHolder.createRoom()
+  }
+
+  protected remoteSeek(time: number) {
+    this.peerHolder.emitSeek(time)
   }
 
   protected emitPlayerState(newState: PlayerState) {
