@@ -56,10 +56,11 @@ export class SyncHolder {
     ],
   }
 
-  // private TURN = {
-  //   urls: 'turn:oveno@106.213.78.186:',
-  //   credential: '1234',
-  // }
+  private TURN = {
+    urls: 'turn:retardnetwork.cf:7888',
+    username: 'oveno',
+    credential: '1234',
+  }
 
   private readyPeers: string[] = []
 
@@ -159,7 +160,7 @@ export class SyncHolder {
 
   private makePeer(id: string): RTCPeerConnection {
     // Creates new peer
-    let peer = new RTCPeerConnection({ iceServers: [this.STUN] })
+    let peer = new RTCPeerConnection({ iceServers: [this.STUN, this.TURN] })
 
     // Report changes to connection state
     this.listenPeerConnected(id, peer)
