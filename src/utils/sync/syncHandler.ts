@@ -305,14 +305,6 @@ export class SyncHolder {
   public PlaySong(song: Song) {
     this.sendTrackMetadata(song)
     this.requestReadyStatus()
-
-    // if (this.getLocalCover) {
-    //   this.getLocalCover().then((cover) => {
-    //     for (const i in this.peerConnection) {
-    //       this.sendCover(cover, i)
-    //     }
-    //   })
-    // }
   }
 
   public createRoom() {

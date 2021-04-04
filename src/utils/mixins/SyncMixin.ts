@@ -31,19 +31,27 @@ export default class SyncMixin extends mixins(ModelHelper) {
     return SyncModule.mode != PeerMode.UNDEFINED
   }
 
+  private async checkCover(event: Song, from: string) {
+    const isCoverExists = await window.FileUtils.isFileExists('image', event._id!)
+
+    if (isCoverExists) SyncModule.setCover(isCoverExists)
+    else this.peerHolder.requestCover(from, event._id!)
+  }
+
+  private async checkAudio(event: Song) {
+    const isAudioExists = await window.FileUtils.isFileExists('audio', event._id!)
+    if (isAudioExists) {
+      if (SyncModule.isReadyRequested) this.peerHolder.emitReady()
+      this.setSongSrcCallback('media://' + isAudioExists)
+    } else SyncModule.prioritize(SyncModule.prefetch.findIndex((x) => x._id === event._id))
+  }
+
   private async setRemoteTrackInfo(event: Song, from: string) {
     if (this.peerHolder.peerMode == PeerMode.WATCHER && event._id) {
       SyncModule.setSong(event)
       PlayerModule.setState(PlayerState.LOADING)
-      const isAudioExists = await window.FileUtils.isFileExists('audio', event._id!)
-      const isCoverExists = await window.FileUtils.isFileExists('image', event._id!)
-      if (isCoverExists) SyncModule.setCover(isCoverExists)
-      else this.peerHolder.requestCover(from, event._id!)
-
-      if (isAudioExists) {
-        if (SyncModule.isReadyRequested) this.peerHolder.emitReady()
-        this.setSongSrcCallback('media://' + isAudioExists)
-      } else SyncModule.prioritize(SyncModule.prefetch.findIndex((x) => x._id === event._id))
+      this.checkCover(event, from)
+      this.checkAudio(event)
     }
   }
 
@@ -78,7 +86,7 @@ export default class SyncMixin extends mixins(ModelHelper) {
         const buffer = Buffer.from(reader.result as ArrayBuffer)
         const filePath = await window.FileUtils.saveAudioTOFile(SyncModule.currentFetchSong, buffer)
         if (SyncModule.currentSongDets!._id == SyncModule.currentFetchSong) {
-          this.peerHolder.emitReady()
+          if (SyncModule.isReadyRequested) this.peerHolder.emitReady()
           if (this.setSongSrcCallback) this.setSongSrcCallback('media://' + filePath)
         }
         this.fetchRemoteSong()
@@ -114,11 +122,21 @@ export default class SyncMixin extends mixins(ModelHelper) {
   }
 
   private async handleReadyRequest(isReadyRequested: boolean) {
-    if (isReadyRequested) {
-      if (!this.isFetching) this.peerHolder.emitReady
-      else {
-        if (SyncModule.currentFetchSong != SyncModule.currentSongDets!._id) {
-          const isAudioExists = await window.FileUtils.isFileExists('audio', SyncModule.currentSongDets!._id!)
+    if (isReadyRequested && SyncModule.currentSongDets) {
+      const isAudioExists = await window.FileUtils.isFileExists('audio', SyncModule.currentSongDets._id!)
+      if (!this.isFetching) {
+        /*
+         * If the room is already streaming and another user joins in, everyone's state will be set to LOADING.
+         * The users who already were playing the song might not be fetching and should only check if the audio exists
+         */
+        if (isAudioExists) this.peerHolder.emitReady()
+      } else {
+        /*
+         * If the user is fetching a song, check if it matches the current playing.
+         * If it does, then let it fetch and emitReady will be handled by saveRemoteStream
+         * Otherwise check if audio exists and emitReady if it does
+         */
+        if (SyncModule.currentFetchSong != SyncModule.currentSongDets._id) {
           if (isAudioExists) this.peerHolder.emitReady()
         }
       }
