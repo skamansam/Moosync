@@ -75,7 +75,7 @@ export default class MusicBar extends mixins(PlayerControls) {
   font-size: 18px
   line-height: 170.19%
   overflow: hidden
-  width: 139px
+  width: 150px
 
 .invisible
   min-width: 0%

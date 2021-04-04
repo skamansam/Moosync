@@ -31,26 +31,41 @@ export default class SyncMixin extends mixins(ModelHelper) {
     return SyncModule.mode != PeerMode.UNDEFINED
   }
 
-  private async setRemoteTrackInfo(event: Song) {
+  private async setRemoteTrackInfo(event: Song, from: string) {
     if (this.peerHolder.peerMode == PeerMode.WATCHER) {
       SyncModule.setSong(event)
-      SyncModule.setWaiting(true)
-      const isExists = await window.FileUtils.isFileExists(event._id!)
-      if (isExists) {
-        this.peerHolder.emitReady()
-        this.setSongSrcCallback('media://' + isExists)
+      PlayerModule.setState(PlayerState.LOADING)
+      const isAudioExists = await window.FileUtils.isFileExists('audio', event._id!)
+      const isCoverExists = await window.FileUtils.isFileExists('image', event._id!)
+      if (isCoverExists) SyncModule.setCover(isCoverExists)
+      else this.peerHolder.requestCover(from, event._id!)
+
+      if (isAudioExists) {
+        if (SyncModule.isReadyRequested) this.peerHolder.emitReady()
+        this.setSongSrcCallback('media://' + isAudioExists)
       } else SyncModule.prioritize(SyncModule.prefetch.findIndex((x) => x._id === event._id))
     }
   }
 
   private setRemoteCover(event: Blob) {
-    if (this.peerHolder.peerMode == PeerMode.WATCHER) SyncModule.setCover(event)
+    if (this.peerHolder.peerMode == PeerMode.WATCHER && SyncModule.currentSongDets) {
+      let reader = new FileReader()
+      let songID = SyncModule.currentSongDets._id!
+      reader.onload = async () => {
+        if (reader.readyState == 2) {
+          const buffer = Buffer.from(reader.result as ArrayBuffer)
+          const filePath = await window.FileUtils.saveImageToFile(songID, buffer)
+          SyncModule.setCover(filePath)
+        }
+      }
+      reader.readAsArrayBuffer(event)
+    }
   }
 
-  private async getLocalCover() {
-    const currentSong = PlayerModule.currentSong
-    if (this.isAlbumExists(currentSong)) {
-      const resp = await fetch('media://' + currentSong!.album!.album_coverPath)
+  private async getLocalCover(songID: string) {
+    const song = PlayerModule.queue.data[songID]
+    if (song && this.isAlbumExists(song)) {
+      const resp = await fetch('media://' + song!.album!.album_coverPath)
       let buf = await resp.arrayBuffer()
       return buf
     }
@@ -98,6 +113,18 @@ export default class SyncMixin extends mixins(ModelHelper) {
     if (!this.isFetching) this.fetchRemoteSong()
   }
 
+  private async handleReadyRequest(isReadyRequested: boolean) {
+    if (isReadyRequested) {
+      if (!this.isFetching) this.peerHolder.emitReady
+      else {
+        if (SyncModule.currentFetchSong != SyncModule.currentSongDets!._id) {
+          const isAudioExists = await window.FileUtils.isFileExists('audio', SyncModule.currentSongDets!._id!)
+          if (isAudioExists) this.peerHolder.emitReady()
+        }
+      }
+    }
+  }
+
   private syncListeners() {
     this.peerHolder.onRemoteTrackInfo = this.setRemoteTrackInfo
     this.peerHolder.onRemoteCover = this.setRemoteCover
@@ -106,13 +133,16 @@ export default class SyncMixin extends mixins(ModelHelper) {
     this.peerHolder.onPrefetchAdded = SyncModule.addToPrefetch
     this.peerHolder.onPrefetchSet = SyncModule.setPrefetch
     this.peerHolder.fetchSong = this.getLocalSong
+    this.peerHolder.fetchCurrentSong = () => PlayerModule.currentSong
     this.peerHolder.playerStateHandler = this.handleRemotePlayerState
     // TODO: Handle this event somewhere
     this.peerHolder.peerConnectionStateHandler = (id, state) => bus.$emit('onPeerConnectionStateChange', id, state)
     this.peerHolder.onSeek = this.onRemoteSeek
-    this.peerHolder.onAllReady = () => SyncModule.setWaiting(false)
+    this.peerHolder.onReadyRequested = SyncModule.setReadyRequested
+    // this.peerHolder.onAllReady = () => SyncModule.setWaiting(false)
 
     SyncModule.$watch((syncModule) => syncModule.prefetch, this.beginFetching)
+    SyncModule.$watch((syncModule) => syncModule.isReadyRequested, this.handleReadyRequest)
 
     bus.$on('queuedSong', this.addToPrefetchQueue)
   }
@@ -120,7 +150,7 @@ export default class SyncMixin extends mixins(ModelHelper) {
   private async fetchRemoteSong() {
     this.isFetching = true
     for (const prefetch of SyncModule.prefetch) {
-      const isExists = await window.FileUtils.isFileExists(prefetch._id!)
+      const isExists = await window.FileUtils.isFileExists('audio', prefetch._id!)
       if (!isExists) {
         SyncModule.setCurrentFetchSong(prefetch._id)
         this.peerHolder.requestSong(prefetch.sender, prefetch._id!)
@@ -132,9 +162,8 @@ export default class SyncMixin extends mixins(ModelHelper) {
 
   protected handleBroadcasterAudioLoad(song: Song): boolean {
     if (this.peerHolder.peerMode == PeerMode.BROADCASTER) {
-      PlayerModule.setState(PlayerState.PAUSED)
+      PlayerModule.setState(PlayerState.LOADING)
       this.peerHolder.PlaySong(song)
-      SyncModule.setWaiting(true)
       return true
     }
     return false

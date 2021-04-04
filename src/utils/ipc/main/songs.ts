@@ -22,8 +22,11 @@ export class SongsChannel implements IpcChannelInterface {
       case SongEvents.REMOVE_SONG:
         this.removeSongs(event, request)
         break
-      case SongEvents.SAVE_TO_FILE:
-        this.saveToFile(event, request)
+      case SongEvents.SAVE_AUDIO_TO_FILE:
+        this.saveAudioToFile(event, request)
+        break
+      case SongEvents.SAVE_IMAGE_TO_FILE:
+        this.saveImageToFile(event, request)
         break
       case SongEvents.FILE_EXISTS:
         this.fileExists(event, request)
@@ -67,7 +70,7 @@ export class SongsChannel implements IpcChannelInterface {
       .catch((e) => console.log(e))
   }
 
-  private saveToFile(event: Electron.IpcMainEvent, request: IpcRequest) {
+  private saveAudioToFile(event: Electron.IpcMainEvent, request: IpcRequest) {
     if (request.params.path && request.params.blob) {
       const cacheDir = path.join(app.getPath('cache'), app.getName(), 'audioCache')
       const filePath = path.join(cacheDir, request.params.path)
@@ -84,10 +87,35 @@ export class SongsChannel implements IpcChannelInterface {
     }
   }
 
+  private saveImageToFile(event: Electron.IpcMainEvent, request: IpcRequest) {
+    if (request.params.path && request.params.blob) {
+      const cacheDir = path.join(app.getPath('cache'), app.getName(), 'imageCache')
+      const filePath = path.join(cacheDir, request.params.path)
+      if (fs.existsSync(cacheDir)) {
+        if (fs.existsSync(filePath)) {
+          fs.unlinkSync(filePath)
+        }
+      } else {
+        fs.mkdirSync(cacheDir)
+      }
+      fs.writeFile(filePath, request.params.blob, () => {
+        event.reply(request.responseChannel, filePath)
+      })
+    }
+  }
+
   private fileExists(event: Electron.IpcMainEvent, request: IpcRequest) {
-    if (request.params.path) {
-      const filePath = path.join(app.getPath('cache'), app.getName(), 'audioCache', request.params.path)
-      event.reply(request.responseChannel, fs.existsSync(filePath) ? filePath : null)
+    if (request.params.path && request.params.type) {
+      switch (request.params.type) {
+        case 'audio':
+          var filePath = path.join(app.getPath('cache'), app.getName(), 'audioCache', request.params.path)
+          event.reply(request.responseChannel, fs.existsSync(filePath) ? filePath : null)
+          break
+        case 'image':
+          var filePath = path.join(app.getPath('cache'), app.getName(), 'imageCache', request.params.path)
+          event.reply(request.responseChannel, fs.existsSync(filePath) ? filePath : null)
+          break
+      }
     }
   }
 }

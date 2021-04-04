@@ -149,6 +149,7 @@ export default class AudioStream extends mixins(Colors, SyncMixin) {
       case PlayerState.PLAYING:
         return this.activePlayer.play()
       case PlayerState.PAUSED:
+      case PlayerState.LOADING:
         return this.activePlayer.pause()
       case PlayerState.STOPPED:
         return this.activePlayer.stop()

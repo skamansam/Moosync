@@ -68,7 +68,8 @@ export enum SongEvents {
   GET_ALL_SONGS = 'getAllSongs',
   STORE_SONG = 'storeSong',
   REMOVE_SONG = 'removeSong',
-  SAVE_TO_FILE = 'saveToFile',
+  SAVE_AUDIO_TO_FILE = 'saveAudioToFile',
+  SAVE_IMAGE_TO_FILE = 'saveImageToFile',
   FILE_EXISTS = 'fileExists',
 }
 

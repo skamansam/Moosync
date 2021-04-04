@@ -33,7 +33,8 @@ interface searchUtils {
 interface fileUtils {
   scan: () => Promise<void>
   saveAudioTOFile: (path: string, blob: Buffer) => Promise<string>
-  isFileExists: (path: string) => Promise<string | null>
+  saveImageToFile: (path: string, blob: Buffer) => Promise<string>
+  isFileExists: (type: 'audio' | 'image', path: string) => Promise<string | null>
 }
 
 interface preferenceUtils {

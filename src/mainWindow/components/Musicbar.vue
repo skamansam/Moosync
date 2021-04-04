@@ -20,7 +20,7 @@
                 :title="currentSong ? currentSong.title : '-'"
                 :artists="currentSong ? currentSong.artists : []"
                 :imgSrc="getImg(currentSong)"
-                :coverBlob="currentCoverBlob"
+                :remoteCover="remoteCover"
             /></b-col>
             <b-col md="6" lg="auto" align-self="center" class="no-gutters"
               ><Controls
@@ -59,7 +59,7 @@ import MusicInfo from '@/mainWindow/components/musicbar/MusicInfo.vue'
 
 import { Component } from 'vue-property-decorator'
 import { PlayerModule, PlayerState, PlayerType } from '@/mainWindow/store/playerState'
-import { PeerMode, SyncModule } from '@/mainWindow/store/syncState'
+import { SyncModule } from '@/mainWindow/store/syncState'
 import Colors from '@/utils/mixins/Colors'
 import { mixins } from 'vue-class-component'
 import ModelHelper from '@/utils/mixins/ModelHelper'
@@ -92,7 +92,7 @@ export default class MusicBar extends mixins(Colors, ModelHelper) {
     return SyncModule.currentSongDets ?? PlayerModule.currentSong
   }
 
-  get currentCoverBlob() {
+  get remoteCover() {
     return SyncModule.currentCover
   }
 
@@ -101,7 +101,7 @@ export default class MusicBar extends mixins(Colors, ModelHelper) {
   }
 
   get waiting() {
-    return SyncModule.mode != PeerMode.UNDEFINED && SyncModule.waitingSync
+    return PlayerModule.playerState == PlayerState.LOADING
   }
 
   private toggleSlider(position: boolean) {

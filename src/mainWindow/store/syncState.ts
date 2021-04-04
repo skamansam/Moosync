@@ -14,11 +14,11 @@ export enum PeerMode {
 class Sync extends VuexModule {
   mode: PeerMode = PeerMode.UNDEFINED
   currentSongDets: Song | null = null
-  currentCover: Blob | null = null
+  currentCover: string = ''
   prefetch: prefetchData[] = []
   currentFetchSong: string = ''
   roomID: string = ''
-  waitingSync: boolean = false
+  isReadyRequested: boolean = false
 
   @Mutation
   setMode(mode: PeerMode) {
@@ -46,11 +46,6 @@ class Sync extends VuexModule {
   }
 
   @Mutation
-  setWaiting(wait: boolean) {
-    this.waitingSync = wait
-  }
-
-  @Mutation
   prioritize(index: number) {
     if (index < this.prefetch.length) {
       let item = this.prefetch[index]
@@ -60,8 +55,13 @@ class Sync extends VuexModule {
   }
 
   @Mutation
-  setCover(cover: Blob) {
+  setCover(cover: string) {
     this.currentCover = cover
+  }
+
+  @Mutation
+  setReadyRequested(value: boolean) {
+    this.isReadyRequested = value
   }
 
   @Mutation

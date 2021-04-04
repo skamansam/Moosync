@@ -37,12 +37,12 @@ export default class MusicBar extends mixins(Colors, ImageLoader) {
   @Prop({ default: () => [] })
   artists!: string[]
 
-  @Prop({ default: null })
-  private coverBlob!: Blob | null
+  @Prop({ default: '' })
+  private remoteCover!: String
 
   get coverBlobBase64() {
-    if (this.coverBlob) {
-      return URL.createObjectURL(this.coverBlob)
+    if (this.remoteCover) {
+      return 'media://' + this.remoteCover
     }
     return null
   }

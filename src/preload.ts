@@ -60,9 +60,11 @@ contextBridge.exposeInMainWorld('PreferenceUtils', {
 contextBridge.exposeInMainWorld('FileUtils', {
   scan: () => ipcRendererHolder.send(IpcEvents.SCANNER, { type: ScannerEvents.SCAN_MUSIC }),
   saveAudioTOFile: (path: string, blob: Buffer) =>
-    ipcRendererHolder.send(IpcEvents.SONG, { type: SongEvents.SAVE_TO_FILE, params: { path: path, blob: blob } }),
-  isFileExists: async (path: string) =>
-    await ipcRendererHolder.send(IpcEvents.SONG, { type: SongEvents.FILE_EXISTS, params: { path: path } }),
+    ipcRendererHolder.send(IpcEvents.SONG, { type: SongEvents.SAVE_AUDIO_TO_FILE, params: { path: path, blob: blob } }),
+  saveImageToFile: (path: string, blob: Buffer) =>
+    ipcRendererHolder.send(IpcEvents.SONG, { type: SongEvents.SAVE_IMAGE_TO_FILE, params: { path: path, blob: blob } }),
+  isFileExists: async (type: 'audio' | 'image', path: string) =>
+    await ipcRendererHolder.send(IpcEvents.SONG, { type: SongEvents.FILE_EXISTS, params: { type: type, path: path } }),
 })
 
 contextBridge.exposeInMainWorld('SearchUtils', {

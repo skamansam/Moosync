@@ -35,6 +35,7 @@ export class SyncHolder {
     timeout: 10000,
     transports: ['websocket'],
   }
+  private isListeningReady: boolean = false
 
   private STUN = {
     urls: [
@@ -65,7 +66,7 @@ export class SyncHolder {
   private readyPeers: string[] = []
 
   private onJoinedRoomCallback?: (id: string) => void
-  private onRemoteTrackInfoCallback?: (event: Song) => void
+  private onRemoteTrackInfoCallback?: (event: Song, frmo: string) => void
   private onRemoteTrackCallback?: (event: RTCTrackEvent) => void
   private onRemoteCoverCallback?: (event: Blob) => void
   private onRemoteStreamCallback?: (event: Blob) => void
@@ -76,9 +77,11 @@ export class SyncHolder {
   private onPeerStateChangeCallback?: (id: string, state: peerConnectionState) => void
   private onDataSentCallback?: (id: string) => void
   private onAllReadyCallback?: () => void
+  private onReadyRequestedCallback?: (value: boolean) => void
 
+  private getCurrentSong?: () => Song | null
   private getLocalSong?: (songID: string) => Promise<ArrayBuffer | null>
-  private getLocalCover?: () => Promise<ArrayBuffer | undefined>
+  private getLocalCover?: (songID: string) => Promise<ArrayBuffer | undefined>
 
   constructor(url?: string) {
     this.socketConnection = io(url ? url : 'http://localhost:4000', this.connectionOptions)
@@ -91,7 +94,7 @@ export class SyncHolder {
     this.onJoinedRoomCallback = callback
   }
 
-  set onRemoteTrackInfo(callback: (event: Song) => void) {
+  set onRemoteTrackInfo(callback: (event: Song, from: string) => void) {
     this.onRemoteTrackInfoCallback = callback
   }
 
@@ -99,7 +102,7 @@ export class SyncHolder {
     this.onRemoteTrackCallback = callback
   }
 
-  set fetchCover(callback: () => Promise<ArrayBuffer | undefined>) {
+  set fetchCover(callback: (songID: string) => Promise<ArrayBuffer | undefined>) {
     this.getLocalCover = callback
   }
 
@@ -123,6 +126,10 @@ export class SyncHolder {
     this.getLocalSong = callback
   }
 
+  set fetchCurrentSong(callback: () => Song | null) {
+    this.getCurrentSong = callback
+  }
+
   set onSeek(callback: (time: number) => void) {
     this.onSeekCallback = callback
   }
@@ -141,6 +148,10 @@ export class SyncHolder {
 
   set onAllReady(callback: () => void) {
     this.onAllReadyCallback = callback
+  }
+
+  set onReadyRequested(callback: (value: boolean) => void) {
+    this.onReadyRequestedCallback = callback
   }
 
   set peerMode(mode: PeerMode) {
@@ -225,8 +236,15 @@ export class SyncHolder {
   }
 
   private joinedRoom() {
-    this.socketConnection.on('joinedRoom', (roomID: string) => {
+    this.socketConnection.on('joinedRoom', (roomID: string, isCreator: boolean) => {
       this.onJoinedRoomCallback ? this.onJoinedRoomCallback(roomID) : null
+      if (isCreator) {
+        const song = this.getCurrentSong ? this.getCurrentSong() : null
+        if (song) {
+          this.addToQueue(song)
+          this.PlaySong(song)
+        }
+      }
     })
   }
 
@@ -286,14 +304,15 @@ export class SyncHolder {
 
   public PlaySong(song: Song) {
     this.sendTrackMetadata(song)
+    this.requestReadyStatus()
 
-    if (this.getLocalCover) {
-      this.getLocalCover().then((cover) => {
-        for (const i in this.peerConnection) {
-          this.emitCover(cover, i)
-        }
-      })
-    }
+    // if (this.getLocalCover) {
+    //   this.getLocalCover().then((cover) => {
+    //     for (const i in this.peerConnection) {
+    //       this.sendCover(cover, i)
+    //     }
+    //   })
+    // }
   }
 
   public createRoom() {
@@ -360,9 +379,26 @@ export class SyncHolder {
     })
   }
 
+  private requestReadyStatus() {
+    if (Object.keys(this.peerConnection).length == 0) {
+      this.checkAllReady()
+      return
+    }
+    this.isListeningReady = true
+    this.socketConnection.emit('requestReady')
+  }
+
+  private listenReadyRequest() {
+    this.socketConnection.on('requestReady', () => {
+      this.onReadyRequestedCallback ? this.onReadyRequestedCallback(true) : null
+    })
+  }
+
   private onUserJoined() {
     this.socketConnection.on('userJoined', (id: string) => {
+      this.playerStateHandler ? this.playerStateHandler(PlayerState.LOADING) : null
       this.setupInitiator(id)
+      this.requestReadyStatus()
     })
   }
 
@@ -381,8 +417,12 @@ export class SyncHolder {
       this.onPrefetchSetCallback ? this.onPrefetchSetCallback(prefetch) : null
     })
 
-    this.socketConnection.on('requestedFetch', (id: string, songID: string) => {
+    this.socketConnection.on('requestedSong', (id: string, songID: string) => {
       this.getLocalSong ? this.getLocalSong(songID).then((buf) => this.sendStream(id, buf)) : null
+    })
+
+    this.socketConnection.on('requestedCover', (id: string, songID: string) => {
+      this.getLocalCover ? this.getLocalCover(songID).then((buf) => this.sendCover(id, buf)) : null
     })
   }
 
@@ -393,8 +433,8 @@ export class SyncHolder {
   }
 
   private listenTrackChange() {
-    this.socketConnection.on('trackChange', (metadata: Song) => {
-      this.onRemoteTrackInfoCallback ? this.onRemoteTrackInfoCallback(metadata) : null
+    this.socketConnection.on('trackChange', (metadata: Song, from: string) => {
+      this.onRemoteTrackInfoCallback ? this.onRemoteTrackInfoCallback(metadata, from) : null
     })
   }
 
@@ -437,13 +477,17 @@ export class SyncHolder {
     this.socketConnection.emit('requestSong', id, songID)
   }
 
+  public requestCover(id: string, songID: string) {
+    this.socketConnection.emit('requestCover', id, songID)
+  }
+
   public addToQueue(song: Song) {
     this.socketConnection.emit('prefetch', this.stripToPrefetch(song))
   }
 
   public emitReady() {
-    console.log('ready')
     this.socketConnection.emit('ready')
+    this.onReadyRequestedCallback ? this.onReadyRequestedCallback(false) : null
   }
 
   public emitPlayerState(state: PlayerState) {
@@ -460,7 +504,7 @@ export class SyncHolder {
     }
   }
 
-  private emitCover(cover: ArrayBuffer | undefined, id: string) {
+  private sendCover(id: string, cover?: ArrayBuffer) {
     if (cover) {
       let fragmentSender = new FragmentSender(cover, this.peerConnection[id].coverChannel!)
       fragmentSender.send()
@@ -472,12 +516,10 @@ export class SyncHolder {
   }
 
   private stripToMetadata(song: Song): Song {
-    return {
-      _id: song._id!,
-      title: song.title,
-      duration: song.duration,
-      type: song.type,
-    }
+    let tmp: Song = JSON.parse(JSON.stringify(song))
+    delete tmp.path
+    if (tmp.album) delete tmp.album.album_coverPath
+    return tmp
   }
 
   private setPeerReady(id: string) {
@@ -496,6 +538,7 @@ export class SyncHolder {
     this.listenTrackChange()
     this.listenPlayerState()
     this.listenSeek()
+    this.listenReadyRequest()
     this.listenAllReady()
   }
 }
