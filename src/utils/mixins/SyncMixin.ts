@@ -32,7 +32,7 @@ export default class SyncMixin extends mixins(ModelHelper) {
   }
 
   private async setRemoteTrackInfo(event: Song, from: string) {
-    if (this.peerHolder.peerMode == PeerMode.WATCHER) {
+    if (this.peerHolder.peerMode == PeerMode.WATCHER && event._id) {
       SyncModule.setSong(event)
       PlayerModule.setState(PlayerState.LOADING)
       const isAudioExists = await window.FileUtils.isFileExists('audio', event._id!)
