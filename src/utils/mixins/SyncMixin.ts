@@ -114,7 +114,7 @@ export default class SyncMixin extends mixins(ModelHelper) {
   }
 
   private addToPrefetchQueue(song: Song) {
-    if (this.peerHolder.peerMode == PeerMode.BROADCASTER) this.peerHolder.addToQueue(song)
+    if (this.isSyncing) this.peerHolder.addToQueue(song)
   }
 
   private beginFetching() {
