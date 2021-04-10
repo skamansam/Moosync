@@ -2,8 +2,8 @@
   <b-container fluid class="w-100">
     <b-row class="d-flex h-100 no-gutters">
       <b-col cols="2" class="d-flex h-100 image-container">
-        <b-img v-if="ImgSrc" class="image h-100" :src="ImgSrc" />
-        <Record v-if="!ImgSrc" class="h-100 image" />
+        <b-img v-if="ImgSrc && !forceEmptyImg" class="image h-100" :src="ImgSrc" @error="handleImageError" />
+        <Record v-if="!ImgSrc || forceEmptyImg" class="h-100 image" />
       </b-col>
       <b-col class="text-container text-truncate">
         <div class="title text-truncate">{{ currentTitle }}</div>
@@ -31,6 +31,10 @@ export default class SongDetails extends mixins(Colors, ImageLoader) {
 
   @Prop({ default: '' })
   private currentsubTitle!: string
+
+  private handleImageError() {
+    this.forceEmptyImg = true
+  }
 }
 </script>
 
@@ -40,7 +44,7 @@ export default class SongDetails extends mixins(Colors, ImageLoader) {
 
 .image
   border-radius: 25px
-  max-width: 100%
+  // max-width: 100%
 
 .image-container
   max-width: 170px

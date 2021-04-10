@@ -1,7 +1,15 @@
 <template>
   <div class="d-flex w-100">
-    <b-img fluid ref="cover" class="coverimg" v-if="ImgSrc" :src="ImgSrc" alt="cover art" />
-    <Record v-if="!ImgSrc" class="coverimg" />
+    <b-img
+      fluid
+      ref="cover"
+      class="coverimg"
+      v-if="ImgSrc && !forceEmptyImg"
+      :src="ImgSrc"
+      alt="cover art"
+      @error="handleImageError"
+    />
+    <Record v-if="!ImgSrc || forceEmptyImg" class="coverimg" />
     <div class="text-container">
       <div class="text song-title text-truncate">{{ title }}</div>
       <div class="text song-subtitle text-truncate">
@@ -29,6 +37,10 @@ export default class MusicBar extends mixins(Colors, ImageLoader) {
 
   @Prop({ default: () => [] })
   artists!: string[]
+
+  private handleImageError() {
+    this.forceEmptyImg = true
+  }
 }
 </script>
 
