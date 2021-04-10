@@ -1,14 +1,7 @@
 <template>
   <div class="d-flex w-100">
-    <b-img
-      fluid
-      ref="cover"
-      class="coverimg"
-      v-if="ImgSrc || coverBlobBase64"
-      :src="!coverBlobBase64 ? ImgSrc : coverBlobBase64"
-      alt="cover art"
-    />
-    <Record v-if="!(ImgSrc || coverBlobBase64)" class="coverimg" />
+    <b-img fluid ref="cover" class="coverimg" v-if="ImgSrc" :src="ImgSrc" alt="cover art" />
+    <Record v-if="!ImgSrc" class="coverimg" />
     <div class="text-container">
       <div class="text song-title text-truncate">{{ title }}</div>
       <div class="text song-subtitle text-truncate">
@@ -21,7 +14,7 @@
 <script lang="ts">
 import Colors from '@/utils/mixins/Colors'
 import { mixins } from 'vue-class-component'
-import { Component, Prop, Ref } from 'vue-property-decorator'
+import { Component, Prop } from 'vue-property-decorator'
 import Record from '@/mainWindow/components/icons/Record.vue'
 import ImageLoader from '@/utils/mixins/ImageLoader'
 
@@ -36,19 +29,6 @@ export default class MusicBar extends mixins(Colors, ImageLoader) {
 
   @Prop({ default: () => [] })
   artists!: string[]
-
-  @Prop({ default: '' })
-  private remoteCover!: String
-
-  get coverBlobBase64() {
-    if (this.remoteCover) {
-      return 'media://' + this.remoteCover
-    }
-    return null
-  }
-
-  @Ref('cover')
-  private imageElement!: HTMLImageElement
 }
 </script>
 

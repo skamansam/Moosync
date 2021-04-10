@@ -77,7 +77,6 @@ class Queue {
   }
 
   public shuffle(): void {
-    console.log('here')
     const currentSong = this.order[this.index]
     this.order.splice(this.index, 1)
     this.randomizeArray()

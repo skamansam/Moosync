@@ -74,7 +74,7 @@ export default class AudioStream extends mixins(Colors, SyncMixin) {
 
   @Watch('currentSong')
   onSongChanged(newSong: Song | null) {
-    if (newSong && !this.isWatching) this.loadAudio(newSong)
+    if (newSong) this.loadAudio(newSong)
   }
 
   @Watch('volume') onVolumeChanged(newValue: number) {

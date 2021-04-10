@@ -1,8 +1,8 @@
-import { bus } from '@/mainWindow/main'
 import { Component, Vue } from 'vue-property-decorator'
 import { PlayerModule, PlayerState } from '../../mainWindow/store/playerState'
 
 import { Song } from '../../models/songs'
+import { PeerMode, SyncModule } from '@/mainWindow/store/syncState'
 
 @Component
 export default class PlayerControls extends Vue {
@@ -10,28 +10,34 @@ export default class PlayerControls extends Vue {
     return PlayerModule.playerState
   }
 
+  get isSyncing() {
+    return SyncModule.mode !== PeerMode.UNDEFINED
+  }
+
   public nextSong() {
-    PlayerModule.nextSong()
+    if (this.isSyncing) SyncModule.setQueueIndex(SyncModule.queueIndex + 1)
+    else PlayerModule.nextSong()
   }
 
   public prevSong() {
-    PlayerModule.prevSong()
+    if (this.isSyncing) SyncModule.setQueueIndex(SyncModule.queueIndex - 1)
+    else PlayerModule.prevSong()
   }
 
   public queueSong(...songs: Song[]) {
     for (const s of songs) {
-      PlayerModule.pushInQueue(s)
-      bus.$emit('queuedSong', s)
+      if (this.isSyncing) SyncModule.addToLocalQueue(s)
+      else PlayerModule.pushInQueue(s)
     }
   }
 
   public playTop(...songs: Song[]) {
     for (const s of songs) {
-      PlayerModule.loadInQueueTop(s)
-      bus.$emit('queuedSong', s)
+      if (this.isSyncing) SyncModule.addToLocalQueue(s)
+      else PlayerModule.loadInQueueTop(s)
     }
 
-    PlayerModule.nextSong()
+    if (this.isSyncing) PlayerModule.nextSong()
   }
 
   public play() {

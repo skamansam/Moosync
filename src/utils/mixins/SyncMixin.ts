@@ -12,6 +12,7 @@ export default class SyncMixin extends mixins(ModelHelper) {
   private isFetching: boolean = false
   private peerHolder = new SyncHolder('http://retardnetwork.cf:4000')
   private isRemoteStateChange: boolean = false
+  private isRemoteTrackChange: boolean = false
   public setSongSrcCallback!: (src: string) => void
   public onSeekCallback!: (time: number) => void
 
@@ -46,8 +47,10 @@ export default class SyncMixin extends mixins(ModelHelper) {
     } else SyncModule.prioritize(SyncModule.prefetch.findIndex((x) => x._id === event._id))
   }
 
-  private async setRemoteTrackInfo(event: Song, from: string) {
-    if (this.peerHolder.peerMode == PeerMode.WATCHER && event._id) {
+  private async setRemoteTrackInfo(event: Song, from: string, songIndex: number) {
+    SyncModule.setQueueIndex(songIndex)
+    if (this.isSyncing && this.peerHolder.socketID !== from && event._id) {
+      this.isRemoteTrackChange = true
       SyncModule.setSong(event)
       PlayerModule.setState(PlayerState.LOADING)
       this.checkCover(event, from)
@@ -56,7 +59,7 @@ export default class SyncMixin extends mixins(ModelHelper) {
   }
 
   private setRemoteCover(event: Blob) {
-    if (this.peerHolder.peerMode == PeerMode.WATCHER && SyncModule.currentSongDets) {
+    if (this.isSyncing && SyncModule.currentSongDets) {
       let reader = new FileReader()
       let songID = SyncModule.currentSongDets._id!
       reader.onload = async () => {
@@ -71,12 +74,13 @@ export default class SyncMixin extends mixins(ModelHelper) {
   }
 
   private async getLocalCover(songID: string) {
-    const song = PlayerModule.queue.data[songID]
+    const song = SyncModule.localQueue.find((song) => song._id == songID)
     if (song && this.isAlbumExists(song)) {
       const resp = await fetch('media://' + song!.album!.album_coverPath)
       let buf = await resp.arrayBuffer()
       return buf
     }
+    return null
   }
 
   private saveRemoteStream(event: Blob) {
@@ -96,8 +100,9 @@ export default class SyncMixin extends mixins(ModelHelper) {
   }
 
   private async getLocalSong(songID: string) {
-    if (PlayerModule.queue.data[songID].path) {
-      const resp = await fetch('media://' + PlayerModule.queue.data[songID].path!)
+    const song = SyncModule.localQueue.find((song) => song._id === songID)
+    if (song) {
+      const resp = await fetch('media://' + song.path!)
       let buf = await resp.arrayBuffer()
       return buf
     }
@@ -113,8 +118,10 @@ export default class SyncMixin extends mixins(ModelHelper) {
     this.onSeekCallback(time)
   }
 
-  private addToPrefetchQueue(song: Song) {
-    if (this.isSyncing) this.peerHolder.addToQueue(song)
+  private addToPrefetchQueue(...song: Song[]) {
+    if (this.isSyncing) {
+      for (const s of song) this.peerHolder.addToQueue(s)
+    }
   }
 
   private beginFetching() {
@@ -143,6 +150,10 @@ export default class SyncMixin extends mixins(ModelHelper) {
     }
   }
 
+  private addRecentSongToPrefetch(songs: Song[]) {
+    this.addToPrefetchQueue(songs[songs.length - 1])
+  }
+
   private syncListeners() {
     this.peerHolder.onRemoteTrackInfo = this.setRemoteTrackInfo
     this.peerHolder.onRemoteCover = this.setRemoteCover
@@ -150,6 +161,9 @@ export default class SyncMixin extends mixins(ModelHelper) {
     this.peerHolder.onRemoteStream = this.saveRemoteStream
     this.peerHolder.onPrefetchAdded = SyncModule.addToPrefetch
     this.peerHolder.onPrefetchSet = SyncModule.setPrefetch
+    this.peerHolder.onQueueAdd = SyncModule.addQueueItem
+    this.peerHolder.onQueueSet = SyncModule.setQueueItem
+    this.peerHolder.getRequestedSong = this.playRequested
     this.peerHolder.fetchSong = this.getLocalSong
     this.peerHolder.fetchCurrentSong = () => PlayerModule.currentSong
     this.peerHolder.playerStateHandler = this.handleRemotePlayerState
@@ -161,8 +175,15 @@ export default class SyncMixin extends mixins(ModelHelper) {
 
     SyncModule.$watch((syncModule) => syncModule.prefetch, this.beginFetching)
     SyncModule.$watch((syncModule) => syncModule.isReadyRequested, this.handleReadyRequest)
+    SyncModule.$watch((syncModule) => syncModule.localQueue, this.addRecentSongToPrefetch)
+    SyncModule.$watch((syncModule) => syncModule.queueIndex, this.requestPlay)
+  }
 
-    bus.$on('queuedSong', this.addToPrefetchQueue)
+  private playRequested(songIndex: number) {
+    const song = SyncModule.localQueue.find((item) => item._id === SyncModule.queueOrder[songIndex])
+    if (song) {
+      SyncModule.setSong(song)
+    }
   }
 
   private async fetchRemoteSong() {
@@ -179,9 +200,16 @@ export default class SyncMixin extends mixins(ModelHelper) {
   }
 
   protected handleBroadcasterAudioLoad(song: Song): boolean {
-    if (this.peerHolder.peerMode == PeerMode.BROADCASTER) {
+    if (this.isSyncing) {
+      if (this.isRemoteTrackChange) {
+        this.isRemoteTrackChange = false
+        return true
+      }
+
       PlayerModule.setState(PlayerState.LOADING)
+      SyncModule.setCover('')
       this.peerHolder.PlaySong(song)
+
       return true
     }
     return false
@@ -215,5 +243,13 @@ export default class SyncMixin extends mixins(ModelHelper) {
       this.peerHolder.emitPlayerState(newState)
     }
     this.isRemoteStateChange = false
+  }
+
+  protected playNow(song: Song) {
+    this.peerHolder.addToQueueAndPlay(song)
+  }
+
+  private requestPlay(song_index: number) {
+    this.peerHolder.requestPlay(song_index)
   }
 }

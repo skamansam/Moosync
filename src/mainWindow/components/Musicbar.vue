@@ -19,8 +19,7 @@
               ><Details
                 :title="currentSong ? currentSong.title : '-'"
                 :artists="currentSong ? currentSong.artists : []"
-                :imgSrc="getImg(currentSong)"
-                :remoteCover="remoteCover"
+                :imgSrc="cover"
             /></b-col>
             <b-col md="6" lg="auto" align-self="center" class="no-gutters"
               ><Controls
@@ -98,6 +97,10 @@ export default class MusicBar extends mixins(Colors, ModelHelper) {
 
   get playerState() {
     return PlayerModule.playerState
+  }
+
+  get cover() {
+    return this.remoteCover ? this.remoteCover : this.getImg(this.currentSong)
   }
 
   get waiting() {

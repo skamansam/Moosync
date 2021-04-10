@@ -19,6 +19,9 @@ class Sync extends VuexModule {
   currentFetchSong: string = ''
   roomID: string = ''
   isReadyRequested: boolean = false
+  queueOrder: string[] = []
+  queueIndex: number = 0
+  localQueue: Song[] = []
 
   @Mutation
   setMode(mode: PeerMode) {
@@ -67,6 +70,27 @@ class Sync extends VuexModule {
   @Mutation
   setCurrentFetchSong(id: string) {
     this.currentFetchSong = id
+  }
+
+  @Mutation
+  addQueueItem(value: string) {
+    this.queueOrder.push(value)
+  }
+
+  @Mutation
+  setQueueItem(value: string[]) {
+    this.queueOrder = value
+  }
+
+  @Mutation
+  setQueueIndex(value: number) {
+    if (this.queueIndex < 0) this.queueIndex = this.queueOrder.length - 1
+    else this.queueIndex = value
+  }
+
+  @Mutation
+  addToLocalQueue(value: Song) {
+    this.localQueue.push(value)
   }
 }
 

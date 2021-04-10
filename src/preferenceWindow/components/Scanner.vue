@@ -37,7 +37,6 @@ export default class scanner extends Vue {
   private removePath(path: string) {
     PreferencesModule.removePath(path)
     PreferencesModule.setPathsChanged(true)
-    console.log(this.musicPaths)
   }
 
   private openFileBrowser() {
