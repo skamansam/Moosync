@@ -52,6 +52,7 @@ interface windowUtils {
   maxMainWindow: () => Promise<boolean>
   openFileBrowser: () => Promise<Electron.OpenDialogReturnValue>
   toggleDevTools: () => Promise<void>
+  setMainWindowResizeListener: (callback: () => void) => void
 }
 E
 

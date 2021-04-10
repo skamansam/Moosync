@@ -81,6 +81,10 @@ contextBridge.exposeInMainWorld('WindowUtils', {
   closePreferenceWindow: () => ipcRendererHolder.send(IpcEvents.BROWSER_WINDOWS, { type: WindowEvents.CLOSE_PREF }),
   minPreferenceWindow: () => ipcRendererHolder.send(IpcEvents.BROWSER_WINDOWS, { type: WindowEvents.MIN_PREF }),
   maxPreferenceWindow: () => ipcRendererHolder.send(IpcEvents.BROWSER_WINDOWS, { type: WindowEvents.MAX_PREF }),
+  setMainWindowResizeListener: (callback: () => void) => {
+    ipcRendererHolder.on(WindowEvents.MAX_MAIN, callback)
+    ipcRendererHolder.on(WindowEvents.MIN_MAIN, callback)
+  },
   closeMainWindow: () => ipcRendererHolder.send(IpcEvents.BROWSER_WINDOWS, { type: WindowEvents.CLOSE_MAIN }),
   minMainWindow: () => ipcRendererHolder.send(IpcEvents.BROWSER_WINDOWS, { type: WindowEvents.MIN_MAIN }),
   maxMainWindow: () => ipcRendererHolder.send(IpcEvents.BROWSER_WINDOWS, { type: WindowEvents.MAX_MAIN }),

@@ -60,7 +60,7 @@ export default class SongList extends mixins(Colors) {
 
   mounted() {
     this.resizer = new Resizer(document)
-    window.addEventListener('resize', this.rerenderTable)
+    window.WindowUtils.setMainWindowResizeListener(this.rerenderTable)
   }
 
   private onRowContext(item: Song, index: number, event: Event) {
@@ -83,7 +83,7 @@ export default class SongList extends mixins(Colors) {
     // TODO: Sort content without b-table sort since we have table resizers
   }
 
-  // For some reason table isn't rerendered on window size change
+  // For some reason table isn't rerendered on window size change through maximize and minimize functions
   private rerenderTable() {
     this.test = !this.test
     this.$nextTick().then(() => {
