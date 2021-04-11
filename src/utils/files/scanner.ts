@@ -104,10 +104,10 @@ export class MusicScanner {
   }
 
   private async updateCounts() {
-    await SongDB.updateSongCountAlbum()
-    await SongDB.updateSongCountArtists()
-    await SongDB.updateSongCountGenre()
-    await SongDB.updateSongCountPlaylists()
+    SongDB.updateSongCountAlbum()
+    SongDB.updateSongCountArtists()
+    SongDB.updateSongCountGenre()
+    SongDB.updateSongCountPlaylists()
   }
 
   public async start() {
@@ -145,31 +145,70 @@ export class MusicScanner {
     })
   }
 
-  private async storeSong(info: stats): Promise<void> {
+  private async isDuplicate(info: stats): Promise<boolean> {
     const songsBySize = await SongDB.getBySize(info.size)
     if (songsBySize.length > 0) {
       for (let i in songsBySize) {
         const SongInfo = (await SongDB.getInfoByID(songsBySize[i]._id))[0]
         if (info.deviceno === SongInfo.deviceno) {
           if (info.inode === SongInfo.inode) {
-            return
+            return true
           }
         } else {
           const hash1 = await this.generateChecksum(info.path)
           const hash2 = await this.generateChecksum(SongInfo.path)
 
-          if (hash1 == hash2) return
+          if (hash1 == hash2) return true
         }
       }
     }
-    let scanned = await this.processFile(info)
-    if (scanned.cover) {
-      await writeBuffer(scanned.cover)
+    return false
+  }
+
+  private async storeSong(info: stats): Promise<void> {
+    const isDuplicate = await this.isDuplicate(info)
+    if (!isDuplicate) {
+      let scanned = await this.processFile(info)
+
+      if (scanned.song.album) {
+        const album = await SongDB.getAlbumByName(scanned.song.album.album_name!)
+        if (!album || !(album && album.album_coverPath)) {
+          if (scanned.cover) {
+            console.log('scanned cover for', scanned.song.title)
+            await writeBuffer(scanned.cover)
+          }
+        }
+      }
+
+      let result = SongDB.store(scanned.song)
+      console.log(scanned.song.title)
+      return new Promise((resolve) => {
+        resolve(result)
+      })
     }
-    let result = SongDB.store(scanned.song)
-    console.log(scanned.song.title)
-    return new Promise((resolve) => {
-      resolve(result)
-    })
+  }
+
+  public async verifyCovers() {
+    const albums = await SongDB.getAllAlbums()
+    for (const a of albums) {
+      if (a.album_coverPath) {
+        console.log(a.album_name)
+        try {
+          await fsP.access(a.album_coverPath, fs.constants.F_OK)
+        } catch (e) {
+          const albumSongs = await SongDB.getAlbumSongs(a.album_id!)
+          for (const s of albumSongs) {
+            if (s.path) {
+              let metadata = await mm.parseFile(s.path)
+              let cover = getCover(metadata, path.dirname(s.path))
+              if (cover) {
+                await writeBuffer(cover)
+                break
+              }
+            }
+          }
+        }
+      }
+    }
   }
 }
