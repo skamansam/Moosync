@@ -1,6 +1,7 @@
 const webpack = require('webpack');
 const VuetifyLoaderPlugin = require('vuetify-loader/lib/plugin')
-
+const ThreadsPlugin = require('threads-plugin')
+// const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 
 module.exports = {
   runtimeCompiler: true,
@@ -21,7 +22,7 @@ module.exports = {
       new webpack.DefinePlugin({
         'process.browser': 'true'
       }),
-      new VuetifyLoaderPlugin()
+      new VuetifyLoaderPlugin(),
     ],
     externals: ['better-sqlite3', 'youtube-music-api'],
     devtool: 'source-map'
@@ -29,7 +30,8 @@ module.exports = {
   pluginOptions: {
     electronBuilder: {
       builderOptions: {
-        publish: ['github']
+        publish: ['github'],
+        asarUnpack: ['*.worker.js'],
       },
       nodeIntegration: false,
       disableMainProcessTypescript: false,
@@ -38,6 +40,10 @@ module.exports = {
       externals: [
         'better-sqlite3'
       ],
+      chainWebpackMainProcess: (config) => {
+        config.plugin('thread')
+          .use(ThreadsPlugin, [{ target: 'electron-node-worker' }]);
+      },
     },
     autoRouting: {
       pages: 'src/mainWindow/pages',

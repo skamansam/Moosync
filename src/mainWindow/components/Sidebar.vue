@@ -12,7 +12,7 @@
         <Toggle class="toggle" @click.native="toggleOpen()" />
         <Rooms id="rooms" v-if="showRoomsButton" />
         <b-popover
-          v-if="isOpen"
+          v-if="isOpen || showRoomsButton"
           :target="`rooms`"
           placement="rightbottom"
           title="Rooms"

@@ -43,6 +43,7 @@
     "rfc4648": "^1.4.0",
     "socket.io-client": "^3.0.5",
     "stun": "^2.1.0",
+    "threads": "^1.6.3",
     "utf-8-validate": "^5.0.4",
     "uuid": "^8.3.2",
     "vue": "^2.6.12",
@@ -79,11 +80,13 @@
     "prettier": "2.2.1",
     "sass": "^1.32.4",
     "sass-loader": "^10.1.1",
+    "threads-plugin": "^1.4.0",
     "typescript": "^3.9.3",
     "vue-auto-routing": "^1.0.0",
     "vue-cli-plugin-auto-routing": "~1.2.0",
     "vue-cli-plugin-electron-builder": "~2.0.0-rc.5",
-    "vue-template-compiler": "^2.6.11"
+    "vue-template-compiler": "^2.6.11",
+    "webpack-bundle-analyzer": "^4.4.1"
   },
   "optionalDependencies": {
     "@nodert-win10-20h1/windows.media.transcoding": "^0.1.0"
