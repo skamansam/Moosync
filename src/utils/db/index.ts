@@ -7,6 +7,7 @@ import { Playlist } from '../../models/playlists'
 import { SearchResult } from '../../models/searchResult'
 import { artists } from '@/models/artists'
 import { v4 } from 'uuid'
+import { promises as fsP } from 'fs'
 
 class SongDBInstance extends DBUtils {
   private getMetaCommon(
@@ -68,8 +69,18 @@ class SongDBInstance extends DBUtils {
       this.db.delete('playlist_bridge', { song: song_id })
       this.db.delete('allsongs', { _id: song_id })
 
-      if (album_ids.count == 1) this.db.delete('albums', { album_id: album_ids.album })
-      if (artist_ids.count == 1) this.db.delete('artists', { artist_id: artist_ids.artist })
+      if (album_ids.count == 1) {
+        this.getAlbumByID(album_ids.album).then((album) => {
+          if (album!.album_coverPath) fsP.unlink(album!.album_coverPath)
+          this.db.delete('albums', { album_id: album_ids.album })
+        })
+      }
+      if (artist_ids.count == 1) {
+        this.getArtistsByID(artist_ids.artist).then((artist) => {
+          if (artist!.artist_coverPath) fsP.unlink(artist!.artist_coverPath)
+          this.db.delete('artists', { artist_id: artist_ids.artist })
+        })
+      }
     })(song_id)
   }
 
@@ -131,6 +142,14 @@ class SongDBInstance extends DBUtils {
     )
   }
 
+  public async getAlbumByID(id: string): Promise<Album | undefined> {
+    return this.db.queryFirstRow(`SELECT * FROM albums WHERE albums.album_id = ?`, id)
+  }
+
+  public async getAlbumByName(name: string): Promise<Album | undefined> {
+    return this.db.queryFirstRow(`SELECT * FROM albums WHERE albums.album_name = ?`, name)
+  }
+
   public async getAlbumSongs(id: string, exclude?: string[]): Promise<Song[]> {
     let marshaled: marshaledSong[] = this.db.query(
       `SELECT *, ${this.addGroupConcatClause()} FROM album_bridge
@@ -160,6 +179,10 @@ class SongDBInstance extends DBUtils {
       }
     }
     return id as string
+  }
+
+  public async updateAlbum(album: Album): Promise<void> {
+    this.db.updateWithBlackList('albums', album, ['album_id = ?', album.album_id], ['album_id', 'album_name'])
   }
 
   public updateSongCountAlbum() {
@@ -253,6 +276,10 @@ class SongDBInstance extends DBUtils {
         ${this.addExcludeWhereClause(true, exclude)}
         GROUP BY A.artist_id`
     )
+  }
+
+  public async getArtistsByID(id: string): Promise<artists | undefined> {
+    return this.db.queryFirstRow(`SELECT * FROM artists WHERE artist_id = ?`, id)
   }
 
   public async getArtistSongs(id: string, exclude?: string[]): Promise<Song[]> {

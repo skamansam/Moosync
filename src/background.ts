@@ -7,6 +7,7 @@ import { createProtocol } from 'vue-cli-plugin-electron-builder/lib'
 import { loadPreferences } from '@/utils/db/preferences'
 import path from 'path'
 import { registerIpcChannels } from '@/utils/ipc/main' // Import for side effects
+import 'threads/register'
 
 const isDevelopment = process.env.NODE_ENV !== 'production'
 export var mainWindow: BrowserWindow
@@ -117,6 +118,7 @@ async function createWindow() {
     frame: false,
     webPreferences: {
       contextIsolation: true,
+      nodeIntegrationInWorker: true,
       // Use pluginOptions.nodeIntegration, leave this alone
       // See nklayman.github.io/vue-cli-plugin-electron-builder/guide/security.html#node-integration for more info
       nodeIntegration: (process.env.ELECTRON_NODE_INTEGRATION as unknown) as boolean,
