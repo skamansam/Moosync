@@ -99,7 +99,7 @@ export default class AudioStream extends mixins(Colors, SyncMixin) {
   }
 
   private setupSync() {
-    this.setSongSrcCallback = (src: string) => (this.audioElement.src = src)
+    this.setSongSrcCallback = (src: string) => this.activePlayer.load(src)
     this.onSeekCallback = (time: number) => (this.activePlayer.currentTime = time)
   }
 
@@ -136,8 +136,10 @@ export default class AudioStream extends mixins(Colors, SyncMixin) {
   }
 
   private loadAudio(song: Song) {
-    this.activePlayer.load(song.path ?? song.url)
+    if (song.path || song.url) this.activePlayer.load('media://' + song.path ?? song.url)
+
     this.activePlayer.volume = this.volume
+    console.log('load audio normal', song)
 
     if (this.handleBroadcasterAudioLoad(song)) return
 

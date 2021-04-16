@@ -28,8 +28,11 @@ export class SongsChannel implements IpcChannelInterface {
       case SongEvents.SAVE_IMAGE_TO_FILE:
         this.saveImageToFile(event, request)
         break
-      case SongEvents.FILE_EXISTS:
-        this.fileExists(event, request)
+      case SongEvents.AUDIO_EXISTS:
+        this.fileExists(event, request, 'audio')
+        break
+      case SongEvents.IMAGE_EXISTS:
+        this.fileExists(event, request, 'image')
         break
     }
   }
@@ -104,9 +107,9 @@ export class SongsChannel implements IpcChannelInterface {
     }
   }
 
-  private fileExists(event: Electron.IpcMainEvent, request: IpcRequest) {
-    if (request.params.path && request.params.type) {
-      switch (request.params.type) {
+  private fileExists(event: Electron.IpcMainEvent, request: IpcRequest, type: 'audio' | 'image') {
+    if (request.params.path) {
+      switch (type) {
         case 'audio':
           var filePath = path.join(app.getPath('cache'), app.getName(), 'audioCache', request.params.path)
           event.reply(request.responseChannel, fs.existsSync(filePath) ? filePath : null)

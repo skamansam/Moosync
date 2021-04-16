@@ -63,8 +63,10 @@ contextBridge.exposeInMainWorld('FileUtils', {
     ipcRendererHolder.send(IpcEvents.SONG, { type: SongEvents.SAVE_AUDIO_TO_FILE, params: { path: path, blob: blob } }),
   saveImageToFile: (path: string, blob: Buffer) =>
     ipcRendererHolder.send(IpcEvents.SONG, { type: SongEvents.SAVE_IMAGE_TO_FILE, params: { path: path, blob: blob } }),
-  isFileExists: async (type: 'audio' | 'image', path: string) =>
-    await ipcRendererHolder.send(IpcEvents.SONG, { type: SongEvents.FILE_EXISTS, params: { type: type, path: path } }),
+  isAudioExists: (path: string) =>
+    ipcRendererHolder.send(IpcEvents.SONG, { type: SongEvents.AUDIO_EXISTS, params: { path: path } }),
+  isImageExists: (path: string) =>
+    ipcRendererHolder.send(IpcEvents.SONG, { type: SongEvents.IMAGE_EXISTS, params: { path: path } }),
 })
 
 contextBridge.exposeInMainWorld('SearchUtils', {

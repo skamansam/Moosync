@@ -36,8 +36,7 @@ export default class PlayerControls extends Vue {
       if (this.isSyncing) SyncModule.addToLocalQueue(s)
       else PlayerModule.loadInQueueTop(s)
     }
-
-    if (this.isSyncing) PlayerModule.nextSong()
+    this.nextSong()
   }
 
   public play() {

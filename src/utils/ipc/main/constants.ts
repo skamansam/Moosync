@@ -70,7 +70,8 @@ export enum SongEvents {
   REMOVE_SONG = 'removeSong',
   SAVE_AUDIO_TO_FILE = 'saveAudioToFile',
   SAVE_IMAGE_TO_FILE = 'saveImageToFile',
-  FILE_EXISTS = 'fileExists',
+  AUDIO_EXISTS = 'fileExists',
+  IMAGE_EXISTS = 'imageExists',
 }
 
 export enum EventBus {

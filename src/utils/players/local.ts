@@ -9,7 +9,7 @@ export class LocalPlayer extends Player {
   }
 
   load(src?: string): void {
-    if (src) this.playerInstance.src = 'media://' + src
+    if (src) this.playerInstance.src = src
   }
 
   async play(): Promise<void> {

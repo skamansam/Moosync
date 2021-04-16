@@ -33,14 +33,14 @@ export default class SyncMixin extends mixins(ModelHelper) {
   }
 
   private async checkCover(event: Song, from: string) {
-    const isCoverExists = await window.FileUtils.isFileExists('image', event._id!)
+    const isCoverExists = await window.FileUtils.isImageExists(event._id!)
 
     if (isCoverExists) SyncModule.setCover(isCoverExists)
     else this.peerHolder.requestCover(from, event._id!)
   }
 
   private async checkAudio(event: Song) {
-    const isAudioExists = await window.FileUtils.isFileExists('audio', event._id!)
+    const isAudioExists = await window.FileUtils.isAudioExists(event._id!)
     if (isAudioExists) {
       if (SyncModule.isReadyRequested) this.peerHolder.emitReady()
       this.setSongSrcCallback('media://' + isAudioExists)
@@ -75,7 +75,7 @@ export default class SyncMixin extends mixins(ModelHelper) {
 
   private async getLocalCover(songID: string) {
     const song = SyncModule.localQueue.find((song) => song._id == songID)
-    if (song && this.isAlbumExists(song)) {
+    if (song && this.isAlbumCoverExists(song)) {
       const resp = await fetch('media://' + song!.album!.album_coverPath)
       let buf = await resp.arrayBuffer()
       return buf
@@ -130,7 +130,7 @@ export default class SyncMixin extends mixins(ModelHelper) {
 
   private async handleReadyRequest(isReadyRequested: boolean) {
     if (isReadyRequested && SyncModule.currentSongDets) {
-      const isAudioExists = await window.FileUtils.isFileExists('audio', SyncModule.currentSongDets._id!)
+      const isAudioExists = await window.FileUtils.isAudioExists(SyncModule.currentSongDets._id!)
       if (!this.isFetching) {
         /*
          * If the room is already streaming and another user joins in, everyone's state will be set to LOADING.
@@ -189,7 +189,7 @@ export default class SyncMixin extends mixins(ModelHelper) {
   private async fetchRemoteSong() {
     this.isFetching = true
     for (const prefetch of SyncModule.prefetch) {
-      const isExists = await window.FileUtils.isFileExists('audio', prefetch._id!)
+      const isExists = await window.FileUtils.isAudioExists(prefetch._id!)
       if (!isExists) {
         SyncModule.setCurrentFetchSong(prefetch._id)
         this.peerHolder.requestSong(prefetch.sender, prefetch._id!)
