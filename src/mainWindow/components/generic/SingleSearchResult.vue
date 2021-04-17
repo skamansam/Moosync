@@ -86,6 +86,7 @@ export default class SingleSearchResult extends mixins(PlayerControls) {
 .img-container
   position: relative
   width: 56px
+  min-width: 56px
   height: 56px
   margin-right: 20px
   &:hover

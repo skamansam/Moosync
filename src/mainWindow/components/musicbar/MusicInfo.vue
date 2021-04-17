@@ -1,32 +1,27 @@
 <template>
   <b-container class="d-flex w-100 h-100 musicinfo-container">
-    <b-row align-h="around" class="d-flex">
-      <b-col cols="6" align-self="center" class="no-gutters">
-        <div>
+    <b-row align-h="around" class="d-flex w-100">
+      <b-col cols="7" align-self="center" class="no-gutters w-100">
+        <div class="h-100">
           <b-img class="albumart w-100" v-if="ImgSrc" :src="ImgSrc" />
           <Record class="albumart w-100" v-if="!ImgSrc" />
         </div>
       </b-col>
-      <b-col cols="6" align-self="center" class="queue-container d-flex no-gutters">
+      <b-col cols="5" align-self="center" class="queue-container d-flex no-gutters h-100">
         <div>
-          <RecycleScroller
-            class="scroller w-100 h-100"
-            :items="queueOrder"
-            :item-size="82"
-            key-field="_id"
-            v-slot="{ item, index }"
-            :direction="'vertical'"
-          >
-            <SingleSearchResult
-              :set="(song = getQueueItem(item))"
-              :first="index == 0"
-              :title="song.title"
-              :subtitle="getArtists(song)"
-              :coverImg="getImg(song)"
-              :divider="index != queueOrder.length - 1"
-              :id="item"
-              :showButtons="true"
-            />
+          <RecycleScroller class="scroller" :items="queueOrder" :item-size="82" key-field="_id" :direction="'vertical'">
+            <template v-slot="{ item, index }">
+              <SingleSearchResult
+                :set="(song = getQueueItem(item))"
+                :first="index == 0"
+                :title="song.title"
+                :subtitle="getArtists(song)"
+                :coverImg="getImg(song)"
+                :divider="index != queueOrder.length - 1"
+                :id="item"
+                :showButtons="true"
+              />
+            </template>
           </RecycleScroller>
         </div>
       </b-col>
@@ -63,16 +58,24 @@ export default class MusicInfo extends mixins(Colors, ImageLoader, ModelHelper) 
 
 <style lang="sass" scoped>
 .albumart
-  max-width: 600px
+  border-radius: 28px
+  max-width: min(600px, calc(100vh - 7.5rem - 1rem - 30px))
+  max-height: calc(100vh - 7.5rem - 1rem - 30px)
   -webkit-user-select: none
   user-select: none
 
 .musicinfo-container
-  max-width: 80% !important
+  max-width: 100% !important
   max-height: calc(100%)
 
 .queue-container
-  max-height: 600px
+  max-height: calc(100vh - 7.5rem - 1rem - 30px)
+  padding-right: 30px
   div
     width: 100% !important
+
+.scroller
+  height: 100%
+  &::-webkit-scrollbar-track
+    margin: 0
 </style>
