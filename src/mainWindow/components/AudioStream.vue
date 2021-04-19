@@ -44,6 +44,7 @@ export default class AudioStream extends mixins(Colors, SyncMixin) {
   private localPlayer!: LocalPlayer
 
   private isFirst: boolean = true
+  private oldState: PlayerState = PlayerState.PAUSED
 
   get SongRepeat() {
     return vxm.player.Repeat
@@ -124,6 +125,10 @@ export default class AudioStream extends mixins(Colors, SyncMixin) {
   private registerPlayerListeners() {
     this.activePlayer.onEnded = () => this.onSongEnded()
     this.activePlayer.onTimeUpdate = (time) => this.$emit('onTimeUpdate', time)
+    this.activePlayer.onLoad = () => {
+      console.log('here')
+      vxm.player.state = this.oldState === PlayerState.LOADING ? PlayerState.PAUSED : this.oldState
+    }
 
     vxm.player.$watch('volume', this.onVolumeChanged)
   }
@@ -145,6 +150,9 @@ export default class AudioStream extends mixins(Colors, SyncMixin) {
   }
 
   private loadAudio(song: Song, loadedState: boolean) {
+    this.oldState = vxm.player.state
+    vxm.player.state = PlayerState.LOADING
+
     if (song.path) this.activePlayer.load('media://' + song.path)
     else if (song.url) this.activePlayer.load(song.url)
 

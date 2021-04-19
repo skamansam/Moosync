@@ -50,6 +50,10 @@ export class YoutubePlayer extends Player {
     this.playerInstance.on('timeupdate', this.onTimeUpdateCallback!)
   }
 
+  protected listenOnLoad(): void {
+    this.playerInstance.on('cued', this.onLoadCallback!)
+  }
+
   removeAllListeners(): void {
     this.playerInstance.removeAllListeners()
   }

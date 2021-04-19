@@ -49,6 +49,10 @@ export class LocalPlayer extends Player {
       this.onTimeUpdateCallback!((e.currentTarget as HTMLAudioElement).currentTime)
   }
 
+  protected listenOnLoad(): void {
+    this.playerInstance.oncanplay = this.onLoadCallback!
+  }
+
   removeAllListeners(): void {
     this.playerInstance.onended = null
     this.playerInstance.ontimeupdate = null

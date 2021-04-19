@@ -1,5 +1,6 @@
 export abstract class Player {
   protected onEndedCallback: (() => void) | undefined
+  protected onLoadCallback: (() => void) | undefined
   protected onTimeUpdateCallback: ((time: number) => void) | undefined
 
   abstract load(src?: string, volume?: number): void
@@ -23,7 +24,13 @@ export abstract class Player {
     this.listenOnTimeUpdate()
   }
 
+  set onLoad(callback: () => void) {
+    this.onLoadCallback = callback
+    this.listenOnLoad()
+  }
+
   protected abstract listenOnEnded(): void
   protected abstract listenOnTimeUpdate(): void
+  protected abstract listenOnLoad(): void
   abstract removeAllListeners(): void
 }
