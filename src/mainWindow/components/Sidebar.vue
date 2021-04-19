@@ -58,10 +58,11 @@ import Rooms from '@/mainWindow/components/icons/Rooms.vue'
 import Toggle from '@/mainWindow/components/icons/Toggle.vue'
 import Tabs from '@/mainWindow/components/sidebar/Tabs.vue'
 import Gears from '@/mainWindow/components/icons/Gears.vue'
-import { PeerMode, SyncModule } from '@/mainWindow/store/syncState'
+import { PeerMode } from '@/mainWindow/store/syncState'
 import { Component } from 'vue-property-decorator'
 import Colors from '@/utils/mixins/Colors'
 import { mixins } from 'vue-class-component'
+import { vxm } from '../store'
 
 @Component({
   components: {
@@ -77,7 +78,7 @@ export default class Sidebar extends mixins(Colors) {
   private showRoomsButton: boolean = true
 
   get roomID() {
-    return SyncModule.roomID
+    return vxm.sync.roomID
   }
 
   private toggleOpen() {
@@ -95,11 +96,11 @@ export default class Sidebar extends mixins(Colors) {
   }
 
   private setWatcher() {
-    SyncModule.setMode(PeerMode.WATCHER)
+    vxm.sync.setMode(PeerMode.WATCHER)
   }
 
   private setBroadcaster() {
-    SyncModule.setMode(PeerMode.BROADCASTER)
+    vxm.sync.setMode(PeerMode.BROADCASTER)
   }
 
   private joinRoom() {

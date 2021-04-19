@@ -1,7 +1,5 @@
-import { Module, Mutation, VuexModule } from 'vuex-class-modules'
 import { Preferences, defaultPreferences } from '@/utils/db/constants'
-
-import store from '@/commonStore'
+import { createModule, mutation } from 'vuex-class-component'
 
 export enum PeerMode {
   WATCHER,
@@ -9,17 +7,20 @@ export enum PeerMode {
   UNDEFINED,
 }
 
-@Module
-class Preference extends VuexModule {
+const VuexModule = createModule({
+  namespaced: 'player',
+})
+
+export class PreferenceStore extends VuexModule {
   preferences: Preferences = defaultPreferences
   pathsChanged: boolean = false
 
-  @Mutation
+  @mutation
   setPreferences(preferences: Preferences) {
     this.preferences = preferences
   }
 
-  @Mutation
+  @mutation
   togglePath(args: { path: string; value: boolean }) {
     let index = this.preferences.musicPaths.findIndex((x) => x.path === args.path)
     if (index !== -1) {
@@ -27,19 +28,19 @@ class Preference extends VuexModule {
     }
   }
 
-  @Mutation
+  @mutation
   setPathsChanged(value: boolean) {
     this.pathsChanged = value
   }
 
-  @Mutation
+  @mutation
   addPaths(...paths: string[]) {
     for (let p of paths) {
       this.preferences.musicPaths.push({ path: p, enabled: true })
     }
   }
 
-  @Mutation
+  @mutation
   removePath(path: string) {
     this.preferences.musicPaths.splice(
       this.preferences.musicPaths.findIndex((x) => x.path === path),
@@ -47,5 +48,3 @@ class Preference extends VuexModule {
     )
   }
 }
-
-export const PreferencesModule = new Preference({ store, name: 'preferences' })

@@ -35,9 +35,9 @@ import { mixins } from 'vue-class-component'
 import { Component } from 'vue-property-decorator'
 import Record from '@/mainWindow/components/icons/Record.vue'
 import ImageLoader from '@/utils/mixins/ImageLoader'
-import { PlayerModule } from '@/mainWindow/store/playerState'
 import SingleSearchResult from '@/mainWindow/components/generic/SingleSearchResult.vue'
 import ModelHelper from '@/utils/mixins/ModelHelper'
+import { vxm } from '@/mainWindow/store'
 
 @Component({
   components: {
@@ -47,11 +47,11 @@ import ModelHelper from '@/utils/mixins/ModelHelper'
 })
 export default class MusicInfo extends mixins(Colors, ImageLoader, ModelHelper) {
   get queueOrder() {
-    return PlayerModule.queue.order
+    return vxm.player.queue.order
   }
 
   private getQueueItem(id: string) {
-    return PlayerModule.queue.data[id]
+    return vxm.player.queue.data[id]
   }
 }
 </script>

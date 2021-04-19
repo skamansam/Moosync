@@ -15,23 +15,53 @@
 import Vue from 'vue'
 import { Component } from 'vue-property-decorator'
 import Titlebar from '@/commonComponents/Titlebar.vue'
-import { PreferencesModule } from './store/preferences'
-import { mixins } from 'vue-class-component'
-import ThemeHandler from '@/utils/mixins/ThemeHandler'
+import { vxm } from '@/preferenceWindow/store'
 
 @Component({
   components: {
     Titlebar,
   },
 })
-export default class App extends mixins(ThemeHandler) {
+export default class App extends Vue {
   created() {
     this.loadPreferences()
   }
 
+  private root = document.documentElement
+  get rootColors() {
+    return vxm.themes.colors
+  }
+
+  private setDefaultTheme() {
+    if (!vxm.themes.colors['--primary'])
+      vxm.themes.colors = {
+        '--primary': '#212121',
+        '--secondary': '#282828',
+        '--tertiary': '#202730',
+        '--lightPrimary': '#404040',
+        '--darkPrimary': '#202224',
+        '--textPrimary': '#ffffff',
+        '--textPrimaryTransparent': '#ffffff03',
+        '--textSecondary': '#565656',
+        '--accentPrimary': '#65CB88',
+        '--divider': 'rgba(79, 79, 79, 0.67)',
+      }
+  }
+
+  private registerThemeListeners() {
+    vxm.themes.$watch('colors', (newColors: { [key: string]: string }) => {
+      this.root.style.setProperty('--primary', newColors['--primary'])
+    })
+  }
+
+  mounted() {
+    this.registerThemeListeners()
+    this.setDefaultTheme()
+  }
+
   private loadPreferences() {
     window.PreferenceUtils.load().then((data) => {
-      PreferencesModule.setPreferences(data)
+      vxm.preferences.setPreferences(data)
     })
   }
 
@@ -40,8 +70,8 @@ export default class App extends mixins(ThemeHandler) {
   }
 
   private async writePreferences() {
-    await window.PreferenceUtils.save(PreferencesModule.preferences)
-    if (PreferencesModule.pathsChanged) {
+    await window.PreferenceUtils.save(vxm.preferences.preferences)
+    if (vxm.preferences.pathsChanged) {
       Vue.nextTick(() => window.FileUtils.scan())
     }
   }

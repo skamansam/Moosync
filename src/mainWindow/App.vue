@@ -10,13 +10,14 @@
 </template>
 
 <script lang="ts">
-import { playlistInfo, PlaylistModule } from '@/mainWindow/store/playlists'
+import { playlistInfo } from '@/mainWindow/store/playlists'
 import { Component } from 'vue-property-decorator'
 import Titlebar from '@/commonComponents/Titlebar.vue'
 import { mixins } from 'vue-class-component'
 import ThemeHandler from '@/utils/mixins/ThemeHandler'
 import ContextMenu from './components/generic/Context.vue'
 import NewPlaylistModal from '@/mainWindow/components/generic/NewPlaylistModal.vue'
+import { vxm } from './store'
 
 const stun = require('stun')
 
@@ -58,15 +59,12 @@ export default class App extends mixins(ThemeHandler) {
   }
 
   private watchPlaylistUpdates() {
-    PlaylistModule.$watch(
-      (playlistModule) => playlistModule.updated,
-      (updated: boolean) => {
-        if (updated) {
-          PlaylistModule.setUpdated(false)
-          this.populatePlaylists()
-        }
+    vxm.playlist.$watch('updated', (updated: boolean) => {
+      if (updated) {
+        vxm.playlist.updated = false
+        this.populatePlaylists()
       }
-    )
+    })
   }
 
   private async populatePlaylists() {
@@ -75,7 +73,7 @@ export default class App extends mixins(ThemeHandler) {
     for (let p of RawPlaylists) {
       playlists[p.playlist_id] = p.playlist_name
     }
-    PlaylistModule.setPlaylists(playlists)
+    vxm.playlist.playlists = playlists
   }
 }
 </script>

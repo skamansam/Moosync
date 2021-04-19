@@ -43,6 +43,11 @@ interface preferenceUtils {
   save: (preference: Preferences) => Promise<void>
 }
 
+interface store {
+  get: (key: string) => Promise<any>
+  set: (key: string, value: string) => Promise<void>
+}
+
 interface windowUtils {
   openPreferenceWindow: () => Promise<void>
   closePreferenceWindow: () => Promise<void>
@@ -55,7 +60,6 @@ interface windowUtils {
   toggleDevTools: () => Promise<void>
   setMainWindowResizeListener: (callback: () => void) => void
 }
-E
 
 declare global {
   interface Window {
@@ -64,5 +68,6 @@ declare global {
     FileUtils: fileUtils
     PreferenceUtils: preferenceUtils
     WindowUtils: windowUtils
+    Store: store
   }
 }

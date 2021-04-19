@@ -9,6 +9,12 @@ export enum IpcEvents {
   BROWSER_WINDOWS = 'browserWindows',
   PREFERENCES = 'preferences',
   SEARCH = 'search',
+  STORE = 'store',
+}
+
+export enum StoreEvents {
+  SET_DATA = 'setData',
+  GET_DATA = 'getData',
 }
 
 export enum SearchEvents {

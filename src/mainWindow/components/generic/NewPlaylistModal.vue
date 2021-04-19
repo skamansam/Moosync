@@ -10,11 +10,11 @@
 
 <script lang="ts">
 import { EventBus } from '@/utils/ipc/main/constants'
-import { PlaylistModule } from '@/mainWindow/store/playlists'
 import { Component, Prop } from 'vue-property-decorator'
 import Colors from '@/utils/mixins/Colors'
 import { mixins } from 'vue-class-component'
 import { bus } from '@/mainWindow/main'
+import { vxm } from '@/mainWindow/store'
 
 @Component({})
 export default class NewPlaylistModal extends mixins(Colors) {
@@ -26,7 +26,7 @@ export default class NewPlaylistModal extends mixins(Colors) {
   private async createPlaylist() {
     let playlist_id = await window.DBUtils.createPlaylist('henlo')
     this.$bvModal.hide(this.id)
-    PlaylistModule.setUpdated(true)
+    vxm.playlist.updated = true
     if (this.callback) {
       this.callback(playlist_id)
       this.callback = null

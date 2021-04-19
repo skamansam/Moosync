@@ -19,30 +19,30 @@
 <script lang="ts">
 import { Component } from 'vue-property-decorator'
 import Vue from 'vue'
-import { PreferencesModule } from '../store/preferences'
+import { vxm } from '@/preferenceWindow/store'
 
 @Component({})
 export default class scanner extends Vue {
   get musicPaths() {
-    return PreferencesModule.preferences.musicPaths
+    return vxm.preferences.preferences.musicPaths
   }
 
   private togglePath(path: string) {
-    PreferencesModule.togglePath({
+    vxm.preferences.togglePath({
       path: path,
       value: (document.getElementById(`checkbox-${path}`) as HTMLInputElement).checked,
     })
   }
 
   private removePath(path: string) {
-    PreferencesModule.removePath(path)
-    PreferencesModule.setPathsChanged(true)
+    vxm.preferences.removePath(path)
+    vxm.preferences.setPathsChanged(true)
   }
 
   private openFileBrowser() {
     window.WindowUtils.openFileBrowser().then((data) => {
-      PreferencesModule.addPaths(...data.filePaths)
-      PreferencesModule.setPathsChanged(true)
+      vxm.preferences.addPaths(...data.filePaths)
+      vxm.preferences.setPathsChanged(true)
     })
   }
 }

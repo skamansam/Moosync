@@ -1,32 +1,7 @@
-import { Module, Mutation, VuexModule } from 'vuex-class-modules'
-
-import store from '@/commonStore'
+import { VuexModule } from './module'
 
 export type playlistInfo = { [key: string]: string }
-
-@Module
-class Playlists extends VuexModule {
-  private allPlaylists: playlistInfo = {}
-
-  private playlistsUpdated: boolean = false
-
-  get playlists(): playlistInfo {
-    return this.allPlaylists
-  }
-
-  get updated() {
-    return this.playlistsUpdated
-  }
-
-  @Mutation
-  setPlaylists(playlists: playlistInfo) {
-    this.allPlaylists = playlists
-  }
-
-  @Mutation
-  setUpdated(updated: boolean) {
-    this.playlistsUpdated = updated
-  }
+export class PlaylistStore extends VuexModule.With({ namespaced: 'playlist' }) {
+  public playlists: playlistInfo = {}
+  public updated: boolean = false
 }
-
-export const PlaylistModule = new Playlists({ store, name: 'playlists' })

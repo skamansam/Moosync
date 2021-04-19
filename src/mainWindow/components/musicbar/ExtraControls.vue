@@ -5,7 +5,6 @@
         type="range"
         min="0"
         max="100"
-        value="50"
         class="slider w-100 align-self-center test"
         v-bind:style="{
           background: ComputedGradient,
@@ -13,7 +12,6 @@
         id="myRange"
         aria-label="volume"
         v-model="volume"
-        v-on:input="emitVolume"
       />
     </div>
     <div class="volume-icon">
@@ -31,6 +29,7 @@ import VolumeIcon from '@/mainWindow/components/icons/Volume.vue'
 import ExpandIcon from '@/mainWindow/components/icons/Expand.vue'
 import Colors from '@/utils/mixins/Colors'
 import { mixins } from 'vue-class-component'
+import { vxm } from '@/mainWindow/store'
 
 @Component({
   components: {
@@ -40,11 +39,15 @@ import { mixins } from 'vue-class-component'
 })
 export default class MusicBar extends mixins(Colors) {
   // TODO: Load last used volume
-  private volume: number = 50
+
   private sliderOpen: boolean = false
 
-  private emitVolume() {
-    this.$emit('onVolumeChange', this.volume)
+  get volume() {
+    return vxm.player.volume
+  }
+
+  set volume(value: number) {
+    vxm.player.volume = value
   }
 
   private emitToggleSlider() {

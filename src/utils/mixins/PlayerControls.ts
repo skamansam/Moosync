@@ -1,65 +1,66 @@
 import { Component, Vue } from 'vue-property-decorator'
-import { PlayerModule, PlayerState } from '../../mainWindow/store/playerState'
+import { PlayerState } from '../../mainWindow/store/playerState'
 
 import { Song } from '../../models/songs'
-import { PeerMode, SyncModule } from '@/mainWindow/store/syncState'
+import { PeerMode } from '@/mainWindow/store/syncState'
+import { vxm } from '@/mainWindow/store'
 
 @Component
 export default class PlayerControls extends Vue {
   get playerState() {
-    return PlayerModule.playerState
+    return vxm.player.playerState
   }
 
   get isSyncing() {
-    return SyncModule.mode !== PeerMode.UNDEFINED
+    return vxm.sync.mode !== PeerMode.UNDEFINED
   }
 
   public nextSong() {
-    if (this.isSyncing) SyncModule.setQueueIndex(SyncModule.queueIndex + 1)
-    else PlayerModule.nextSong()
+    if (this.isSyncing) vxm.sync.setQueueIndex(vxm.sync.queueIndex + 1)
+    else vxm.player.nextSong()
   }
 
   public prevSong() {
-    if (this.isSyncing) SyncModule.setQueueIndex(SyncModule.queueIndex - 1)
-    else PlayerModule.prevSong()
+    if (this.isSyncing) vxm.sync.setQueueIndex(vxm.sync.queueIndex - 1)
+    else vxm.player.prevSong()
   }
 
   public queueSong(...songs: Song[]) {
     for (const s of songs) {
-      if (this.isSyncing) SyncModule.addToLocalQueue(s)
-      else PlayerModule.pushInQueue(s)
+      if (this.isSyncing) vxm.sync.addToLocalQueue(s)
+      else vxm.player.pushInQueue(s)
     }
   }
 
   public playTop(...songs: Song[]) {
     for (const s of songs) {
-      if (this.isSyncing) SyncModule.addToLocalQueue(s)
-      else PlayerModule.loadInQueueTop(s)
+      if (this.isSyncing) vxm.sync.addToLocalQueue(s)
+      else vxm.player.loadInQueueTop(s)
     }
     this.nextSong()
   }
 
   public play() {
-    PlayerModule.setState(PlayerState.PLAYING)
+    vxm.player.state = PlayerState.PLAYING
   }
 
   public pause() {
-    PlayerModule.setState(PlayerState.PAUSED)
+    vxm.player.state = PlayerState.PAUSED
   }
 
   public shuffle() {
-    PlayerModule.shuffle()
+    vxm.player.shuffle()
   }
 
   public togglePlayerState() {
     if (this.playerState == PlayerState.PAUSED || this.playerState == PlayerState.STOPPED) {
-      PlayerModule.setState(PlayerState.PLAYING)
+      vxm.player.state = PlayerState.PLAYING
     } else {
-      PlayerModule.setState(PlayerState.PAUSED)
+      vxm.player.state = PlayerState.PAUSED
     }
   }
 
   public stop() {
-    PlayerModule.setState(PlayerState.STOPPED)
+    vxm.player.state = PlayerState.STOPPED
   }
 }

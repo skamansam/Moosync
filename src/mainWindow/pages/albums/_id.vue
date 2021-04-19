@@ -19,10 +19,10 @@ import { Component, Prop } from 'vue-property-decorator'
 import SongView from '@/mainWindow/components/SongView.vue'
 import { Album } from '@/models/albums'
 import { Song } from '@/models/songs'
-import { PlaylistModule } from '@/mainWindow/store/playlists'
 
 import { mixins } from 'vue-class-component'
 import ContextMenuMixin from '@/utils/mixins/ContextMenuMixin'
+import { vxm } from '@/mainWindow/store'
 
 @Component({
   components: {
@@ -43,7 +43,7 @@ export default class SingleAlbumView extends mixins(ContextMenuMixin) {
   private album_coverPath!: string
 
   get playlists() {
-    return PlaylistModule.playlists
+    return vxm.playlist.playlists
   }
 
   mounted() {

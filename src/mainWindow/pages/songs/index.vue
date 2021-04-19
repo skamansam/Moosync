@@ -9,10 +9,10 @@ import { Component } from 'vue-property-decorator'
 import SongView from '@/mainWindow/components/SongView.vue'
 
 import { Song } from '@/models/songs'
-import { PlaylistModule } from '@/mainWindow/store/playlists'
 
 import { mixins } from 'vue-class-component'
 import ContextMenuMixin from '@/utils/mixins/ContextMenuMixin'
+import { vxm } from '@/mainWindow/store'
 
 @Component({
   components: {
@@ -24,7 +24,7 @@ export default class AllSongs extends mixins(ContextMenuMixin) {
   private currentSong: Song | null = null
 
   get playlists() {
-    return PlaylistModule.playlists
+    return vxm.playlist.playlists
   }
 
   mounted() {

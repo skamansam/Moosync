@@ -9,6 +9,7 @@ import { PreferenceChannel } from './preferences'
 import { ScannerChannel } from './scanner'
 import { SearchChannel } from './search'
 import { SongsChannel } from './songs'
+import { StoreChannel } from './store'
 
 export function registerIpcChannels() {
   const ipcChannels = [
@@ -21,6 +22,7 @@ export function registerIpcChannels() {
     new BrowserWindowChannel(),
     new PreferenceChannel(),
     new SearchChannel(),
+    new StoreChannel(),
   ]
   ipcChannels.forEach((channel) => ipcMain.on(channel.name, (event, request) => channel.handle(event, request)))
 }

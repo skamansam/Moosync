@@ -9,7 +9,7 @@
 
 <script lang="ts">
 import { Song } from '@/models/songs'
-import { PlayerModule, PlayerState, PlayerType } from '@/mainWindow/store/playerState'
+import { PlayerState, PlayerType } from '@/mainWindow/store/playerState'
 import { Component, Prop, Ref, Watch } from 'vue-property-decorator'
 import YTPlayer from 'yt-player'
 import Colors from '@/utils/mixins/Colors'
@@ -18,6 +18,7 @@ import { Player } from '@/utils/players/player'
 import { YoutubePlayer } from '@/utils/players/youtube'
 import { LocalPlayer } from '@/utils/players/local'
 import SyncMixin from '@/utils/mixins/SyncMixin'
+import { vxm } from '../store'
 
 @Component({})
 export default class AudioStream extends mixins(Colors, SyncMixin) {
@@ -26,10 +27,7 @@ export default class AudioStream extends mixins(Colors, SyncMixin) {
   @Prop({ default: '' })
   roomID!: string
 
-  @Prop({ default: 50 })
-  volume!: number
-
-  @Prop({ default: 50 })
+  @Prop({ default: 0 })
   forceSeek!: number
 
   @Prop({ default: PlayerState.STOPPED })
@@ -48,7 +46,11 @@ export default class AudioStream extends mixins(Colors, SyncMixin) {
   private isFirst: boolean = true
 
   get SongRepeat() {
-    return PlayerModule.Repeat
+    return vxm.player.Repeat
+  }
+
+  get volume() {
+    return vxm.player.volume
   }
 
   @Watch('playerState')
@@ -74,10 +76,10 @@ export default class AudioStream extends mixins(Colors, SyncMixin) {
 
   @Watch('currentSong')
   onSongChanged(newSong: Song | null) {
-    if (newSong) this.loadAudio(newSong)
+    if (newSong) this.loadAudio(newSong, false)
   }
 
-  @Watch('volume') onVolumeChanged(newValue: number) {
+  onVolumeChanged(newValue: number) {
     this.activePlayer.volume = newValue
   }
 
@@ -90,6 +92,8 @@ export default class AudioStream extends mixins(Colors, SyncMixin) {
     this.setupPlayers()
     this.setupSync()
     this.registerListeners()
+
+    if (this.currentSong) this.loadAudio(this.currentSong, true)
   }
 
   private setupPlayers() {
@@ -113,13 +117,15 @@ export default class AudioStream extends mixins(Colors, SyncMixin) {
       this.activePlayer.currentTime = 0
       this.activePlayer.play()
     } else {
-      PlayerModule.nextSong()
+      vxm.player.nextSong()
     }
   }
 
   private registerPlayerListeners() {
     this.activePlayer.onEnded = () => this.onSongEnded()
     this.activePlayer.onTimeUpdate = (time) => this.$emit('onTimeUpdate', time)
+
+    vxm.player.$watch('volume', this.onVolumeChanged)
   }
 
   private registerListeners() {
@@ -127,23 +133,26 @@ export default class AudioStream extends mixins(Colors, SyncMixin) {
     this.registerRoomListeners()
   }
 
-  private handleFirstPlayback() {
-    if (this.isFirst) {
-      PlayerModule.setState(PlayerState.PLAYING)
+  private handleFirstPlayback(loadedState: boolean) {
+    if (this.isFirst && !loadedState) {
+      vxm.player.state = PlayerState.PLAYING
       this.isFirst = false
     }
-    this.handleActivePlayerState(PlayerModule.playerState)
+
+    if (loadedState) this.isFirst = false
+
+    this.handleActivePlayerState(vxm.player.playerState)
   }
 
-  private loadAudio(song: Song) {
-    if (song.path || song.url) this.activePlayer.load('media://' + song.path ?? song.url)
+  private loadAudio(song: Song, loadedState: boolean) {
+    if (song.path) this.activePlayer.load('media://' + song.path)
+    else if (song.url) this.activePlayer.load(song.url)
 
     this.activePlayer.volume = this.volume
-    console.log('load audio normal', song)
 
     if (this.handleBroadcasterAudioLoad(song)) return
 
-    this.handleFirstPlayback()
+    this.handleFirstPlayback(loadedState)
   }
 
   private async handleActivePlayerState(newState: PlayerState) {

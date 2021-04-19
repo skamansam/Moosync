@@ -2,17 +2,17 @@ import { Component } from 'vue-property-decorator'
 import { EventBus } from '@/utils/ipc/main/constants'
 import { MenuItem } from 'vue-context-menu-popup'
 import PlayerControls from '@/utils/mixins/PlayerControls'
-import { PlaylistModule } from '@/mainWindow/store/playlists'
 import { Song } from '@/models/songs'
 import { bus } from '@/mainWindow/main'
 import { mixins } from 'vue-class-component'
 import { YoutubeItem } from '@/models/youtube'
 import { toSong } from '@/models/youtube'
+import { vxm } from '@/mainWindow/store'
 
 @Component
 export default class ContextMenuMixin extends mixins(PlayerControls) {
   get playlists() {
-    return PlaylistModule.playlists
+    return vxm.playlist.playlists
   }
 
   private async addToPlaylist(playlist_id: string, songs: Song[]) {

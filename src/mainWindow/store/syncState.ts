@@ -1,17 +1,14 @@
-import { Module, Mutation, VuexModule } from 'vuex-class-modules'
-
 import { Song } from '@/models/songs'
-import store from '@/commonStore'
 import { prefetchData } from '@/utils/sync/syncHandler'
+import { mutation } from 'vuex-class-component'
+import { VuexModule } from './module'
 
 export enum PeerMode {
   WATCHER,
   BROADCASTER,
   UNDEFINED,
 }
-
-@Module
-class Sync extends VuexModule {
+export class SyncStore extends VuexModule.With({ namespaced: 'sync' }) {
   mode: PeerMode = PeerMode.UNDEFINED
   currentSongDets: Song | null = null
   currentCover: string = ''
@@ -23,32 +20,32 @@ class Sync extends VuexModule {
   queueIndex: number = 0
   localQueue: Song[] = []
 
-  @Mutation
+  @mutation
   setMode(mode: PeerMode) {
     this.mode = mode
   }
 
-  @Mutation
+  @mutation
   setRoom(id: string) {
     this.roomID = id
   }
 
-  @Mutation
+  @mutation
   setSong(song: Song) {
     this.currentSongDets = song
   }
 
-  @Mutation
+  @mutation
   addToPrefetch(prefetch: prefetchData) {
     this.prefetch.push(prefetch)
   }
 
-  @Mutation
+  @mutation
   setPrefetch(prefetch: prefetchData[]) {
     this.prefetch = prefetch
   }
 
-  @Mutation
+  @mutation
   prioritize(index: number) {
     if (index < this.prefetch.length) {
       let item = this.prefetch[index]
@@ -57,41 +54,39 @@ class Sync extends VuexModule {
     }
   }
 
-  @Mutation
+  @mutation
   setCover(cover: string) {
     this.currentCover = cover
   }
 
-  @Mutation
+  @mutation
   setReadyRequested(value: boolean) {
     this.isReadyRequested = value
   }
 
-  @Mutation
+  @mutation
   setCurrentFetchSong(id: string) {
     this.currentFetchSong = id
   }
 
-  @Mutation
+  @mutation
   addQueueItem(value: string) {
     this.queueOrder.push(value)
   }
 
-  @Mutation
+  @mutation
   setQueueItem(value: string[]) {
     this.queueOrder = value
   }
 
-  @Mutation
+  @mutation
   setQueueIndex(value: number) {
     if (this.queueIndex < 0) this.queueIndex = this.queueOrder.length - 1
     else this.queueIndex = value
   }
 
-  @Mutation
+  @mutation
   addToLocalQueue(value: Song) {
     this.localQueue.push(value)
   }
 }
-
-export const SyncModule = new Sync({ store, name: 'sync' })

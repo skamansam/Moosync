@@ -1,6 +1,6 @@
 import { ArtistEvents, IpcEvents } from './constants'
 import { IpcChannelInterface, IpcRequest } from '.'
-import { getDisabledPaths, preferences } from '@/utils/db/preferences'
+import { getDisabledPaths, loadPreferences } from '@/utils/db/preferences'
 
 import { SongDB } from '@/utils/db'
 
@@ -17,7 +17,8 @@ export class ArtistsChannel implements IpcChannelInterface {
     }
   }
 
-  private getAllArtists(event: Electron.IpcMainEvent, request: IpcRequest) {
+  private async getAllArtists(event: Electron.IpcMainEvent, request: IpcRequest) {
+    const preferences = await loadPreferences()
     SongDB.getAllArtists(getDisabledPaths(preferences.musicPaths))
       .then((data) => {
         event.reply(request.responseChannel, data)
@@ -25,8 +26,9 @@ export class ArtistsChannel implements IpcChannelInterface {
       .catch((e) => console.log(e))
   }
 
-  private getArtist(event: Electron.IpcMainEvent, request: IpcRequest) {
+  private async getArtist(event: Electron.IpcMainEvent, request: IpcRequest) {
     if (request.params.id) {
+      const preferences = await loadPreferences()
       SongDB.getArtistSongs(request.params.id, getDisabledPaths(preferences.musicPaths))
         .then((data) => {
           event.reply(request.responseChannel, data)

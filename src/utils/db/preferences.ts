@@ -1,27 +1,21 @@
 import { Preferences, defaultPreferences, musicPaths } from './constants'
 
-import { app } from 'electron'
-import fs from 'fs'
-import path from 'path'
 import { preferencesChanged } from '../ipc/main/preferences'
+import Store from 'electron-store'
 
-export var preferences: Preferences = defaultPreferences
+export const store = new Store()
 
 export async function savePreferences(prefs: Preferences) {
   let jsonStr = JSON.stringify(prefs)
-  fs.promises.writeFile(path.join(app.getPath('appData'), app.getName(), 'preferences.json'), jsonStr)
-  preferences = prefs
+  store.set('prefs', jsonStr)
 
   // Notify the mainwindow of preference changes
   preferencesChanged()
 }
 
 export async function loadPreferences() {
-  if (fs.existsSync(path.join(app.getPath('appData'), app.getName(), 'preferences.json'))) {
-    let data = await fs.promises.readFile(path.join(app.getPath('appData'), app.getName(), 'preferences.json'), 'utf8')
-    preferences = JSON.parse(data)
-    return preferences
-  }
+  let tmp = store.get('prefs')
+  if (tmp) return JSON.parse(tmp as string)
   return defaultPreferences
 }
 

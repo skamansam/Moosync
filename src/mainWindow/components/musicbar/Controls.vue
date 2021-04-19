@@ -20,7 +20,7 @@ import Repeat from '@/mainWindow/components/icons/Repeat.vue'
 import Shuffle from '@/mainWindow/components/icons/Shuffle.vue'
 import { mixins } from 'vue-class-component'
 import PlayerControls from '@/utils/mixins/PlayerControls'
-import { PlayerModule } from '@/mainWindow/store/playerState'
+import { vxm } from '@/mainWindow/store'
 
 @Component({
   components: {
@@ -45,11 +45,11 @@ export default class MusicBar extends mixins(PlayerControls) {
   private loading!: boolean
 
   get repeat() {
-    return PlayerModule.Repeat
+    return vxm.player.Repeat
   }
 
   private toggleRepeat() {
-    PlayerModule.setRepeat(!this.repeat)
+    vxm.player.repeat = !this.repeat
   }
 
   private formatDuration(n: number) {

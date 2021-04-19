@@ -1,19 +1,9 @@
-import { Module, Mutation, VuexModule } from 'vuex-class-modules'
+import { createModule } from 'vuex-class-component'
 
-import store from '.'
+const VuexModule = createModule({
+  namespaced: 'themes',
+})
 
-@Module
-export default class Themes extends VuexModule {
-  private colors: { [key: string]: string } = {}
-
-  get rootVars() {
-    return this.colors
-  }
-
-  @Mutation
-  setRootVars(colors: { [key: string]: string }) {
-    this.colors = colors
-  }
+export default class ThemeStore extends VuexModule {
+  public colors: { [key: string]: string } = {}
 }
-
-export const ThemesModule = new Themes({ store, name: 'themes' })

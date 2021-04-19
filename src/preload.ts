@@ -14,6 +14,7 @@ import {
 } from '@/utils/ipc/main/constants'
 import { Song } from './models/songs'
 import { Preferences } from './utils/db/constants'
+import { StoreEvents } from '@/utils/ipc/main/constants'
 
 const ipcRendererHolder = new IpcRendererHolder(ipcRenderer)
 
@@ -55,6 +56,12 @@ contextBridge.exposeInMainWorld('PreferenceUtils', {
       type: PreferenceEvents.SAVE_PREFERENCES,
       params: { preferences: preferences },
     }),
+})
+
+contextBridge.exposeInMainWorld('Store', {
+  get: (key: string) => ipcRendererHolder.send(IpcEvents.STORE, { type: StoreEvents.GET_DATA, params: { key: key } }),
+  set: (key: string, value: any) =>
+    ipcRendererHolder.send(IpcEvents.STORE, { type: StoreEvents.SET_DATA, params: { key: key, value: value } }),
 })
 
 contextBridge.exposeInMainWorld('FileUtils', {

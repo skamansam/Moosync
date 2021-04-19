@@ -1,7 +1,7 @@
-import { Action, Module, Mutation, VuexModule } from 'vuex-class-modules'
-
 import { Song } from '@/models/songs'
-import store from '@/commonStore'
+
+import { action, mutation } from 'vuex-class-component'
+import { VuexModule } from './module'
 
 export enum AudioType {
   STREAMING,
@@ -85,20 +85,16 @@ class Queue {
   }
 }
 
-@Module
-class Player extends VuexModule {
-  private state: PlayerState = PlayerState.PAUSED
-  private type: PlayerType = PlayerType.LOCAL
-  private currentSongDets: Song | null = null
+export class PlayerStore extends VuexModule.With({ namespaced: 'player' }) {
+  public state: PlayerState = PlayerState.PAUSED
+  public type: PlayerType = PlayerType.LOCAL
+  public currentSong: Song | null = null
   private songQueue = new Queue()
-  private repeat: boolean = false
+  public repeat: boolean = false
+  public volume: number = 50
 
   get playerState() {
     return this.state
-  }
-
-  get currentSong() {
-    return this.currentSongDets
   }
 
   get queue() {
@@ -113,74 +109,48 @@ class Player extends VuexModule {
     return this.repeat
   }
 
-  @Mutation
-  setState(state: PlayerState) {
-    this.state = state
-  }
-
-  @Mutation
-  setPlayerType(type: PlayerType) {
-    this.type = type
-  }
-
-  @Mutation
+  @mutation
   loadInQueue(Song: Song) {
     this.songQueue.push(Song)
   }
 
-  @Mutation
-  setSong(song: Song | null) {
-    this.currentSongDets = song
-  }
-
-  @Mutation
+  @mutation
   loadInQueueTop(Song: Song) {
     this.songQueue.pushAtIndex(Song)
   }
 
-  @Mutation
+  @mutation
   shuffle() {
     this.songQueue.shuffle()
   }
 
-  @Mutation
-  setRepeat(value: boolean) {
-    this.repeat = value
-  }
-
-  @Action
-  loadSong(song: Song | null) {
+  @action async loadSong(song: Song | null) {
     if (song && song.type == 'YOUTUBE') {
-      this.setPlayerType(PlayerType.YOUTUBE)
+      this.type = PlayerType.YOUTUBE
     } else {
-      this.setPlayerType(PlayerType.LOCAL)
+      this.type = PlayerType.LOCAL
     }
-    this.setSong(song)
+    this.currentSong = song
   }
 
-  @Action
-  pushInQueue(Song: Song) {
+  @action async pushInQueue(Song: Song) {
     this.loadInQueue(Song)
-    if (this.currentSongDets == null) {
+    if (this.currentSong == null) {
       this.nextSong()
     }
   }
 
-  @Action
-  pushInQueueTop(Song: Song) {
+  @action async pushInQueueTop(Song: Song) {
     this.loadInQueueTop(Song)
   }
 
-  @Action
-  nextSong() {
+  @action async nextSong() {
     this.songQueue.next()
     this.loadSong(this.songQueue.top)
   }
-  @Action
-  prevSong() {
+
+  @action async prevSong() {
     this.songQueue.prev()
     this.loadSong(this.songQueue.top)
   }
 }
-
-export const PlayerModule = new Player({ store, name: 'player' })

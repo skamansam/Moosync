@@ -29,7 +29,7 @@
                 :loading="waiting"
             /></b-col>
             <b-col cols="3" align-self="center" class="no-gutters"
-              ><ExtraControls @onVolumeChange="volumeUpdated" @onToggleSlider="toggleSlider"
+              ><ExtraControls @onToggleSlider="toggleSlider"
             /></b-col>
           </b-row>
         </b-container>
@@ -40,7 +40,6 @@
         :currentSong="currentSong"
         @onTimeUpdate="updateTimestamp"
         :forceSeek="forceSeek"
-        :volume="volume"
       />
     </div>
     <div class="slider" :class="{ open: sliderPosition }">
@@ -57,11 +56,11 @@ import ExtraControls from '@/mainWindow/components/musicbar/ExtraControls.vue'
 import MusicInfo from '@/mainWindow/components/musicbar/MusicInfo.vue'
 
 import { Component } from 'vue-property-decorator'
-import { PlayerModule, PlayerState, PlayerType } from '@/mainWindow/store/playerState'
-import { SyncModule } from '@/mainWindow/store/syncState'
+import { PlayerState, PlayerType } from '@/mainWindow/store/playerState'
 import Colors from '@/utils/mixins/Colors'
 import { mixins } from 'vue-class-component'
 import ModelHelper from '@/utils/mixins/ModelHelper'
+import { vxm } from '../store'
 
 @Component({
   components: {
@@ -75,7 +74,6 @@ import ModelHelper from '@/utils/mixins/ModelHelper'
 export default class MusicBar extends mixins(Colors, ModelHelper) {
   private timestamp: number = 0
   private forceSeek: number = 0
-  private volume: number = 50
   private PlayerState = PlayerState
   private sliderPosition: boolean = false
 
@@ -84,19 +82,19 @@ export default class MusicBar extends mixins(Colors, ModelHelper) {
   }
 
   get playerType(): PlayerType {
-    return PlayerModule.playerType
+    return vxm.player.playerType
   }
 
   get currentSong() {
-    return SyncModule.currentSongDets ?? PlayerModule.currentSong
+    return vxm.sync.currentSongDets ?? vxm.player.currentSong
   }
 
   get remoteCover() {
-    return SyncModule.currentCover
+    return vxm.sync.currentCover
   }
 
   get playerState() {
-    return PlayerModule.playerState
+    return vxm.player.playerState
   }
 
   get cover() {
@@ -104,7 +102,7 @@ export default class MusicBar extends mixins(Colors, ModelHelper) {
   }
 
   get waiting() {
-    return PlayerModule.playerState == PlayerState.LOADING
+    return vxm.player.playerState == PlayerState.LOADING
   }
 
   private toggleSlider(position: boolean) {
@@ -113,10 +111,6 @@ export default class MusicBar extends mixins(Colors, ModelHelper) {
 
   private updateTimestamp(timestamp: number) {
     this.timestamp = timestamp
-  }
-
-  private volumeUpdated(value: number) {
-    this.volume = value
   }
 }
 </script>
