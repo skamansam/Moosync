@@ -10,6 +10,7 @@ export interface prefetchData {
   album: string
   artist: string
   sender: string
+  type: "LOCAL" | "YOUTUBE"
 }
 
 enum peerConnectionState {
@@ -252,8 +253,12 @@ export class SyncHolder {
 
   private sendStream(id: string, stream: ArrayBuffer | null, channel: RTCDataChannel) {
     if (channel.readyState == 'open') {
-      const fragmentSender = new FragmentSender(stream, channel, () => this.onDataSentHandler(id))
-      fragmentSender.send()
+      try {
+        const fragmentSender = new FragmentSender(stream, channel, () => this.onDataSentHandler(id))
+        fragmentSender.send()
+      } catch (e) {
+        console.log(e);
+      }
       return
     }
     console.log('data channel', channel.label, 'is in state: ', this.peerConnection[id].streamChannel!.readyState)
@@ -551,6 +556,7 @@ export class SyncHolder {
       album: song.album ? song.album.album_name! : '',
       artist: song.artists ? song.artists?.join(',') : '-',
       sender: this.socketConnection.id,
+      type: song.type
     }
   }
 
@@ -562,7 +568,11 @@ export class SyncHolder {
   private stripSong(song: Song): Song {
     let tmp: Song = JSON.parse(JSON.stringify(song))
     delete tmp.path
-    if (tmp.album) delete tmp.album.album_coverPath
+    if (tmp.album && tmp.album.album_coverPath) {
+      // If the image is hosted somewhere then surely the client on the other end can load it... right?
+      if (!tmp.album.album_coverPath.startsWith('http'))
+        delete tmp.album.album_coverPath
+    }
     return tmp
   }
 

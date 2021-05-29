@@ -33,11 +33,18 @@ export default class SyncMixin extends mixins(ModelHelper) {
     return vxm.sync.mode != PeerMode.UNDEFINED
   }
 
+  private isYoutube(song: Song): boolean {
+    return song.type === "YOUTUBE"
+  }
+
   private async checkCover(event: Song, from: string) {
     const isCoverExists = await window.FileUtils.isImageExists(event._id!)
 
     if (isCoverExists) vxm.sync.setCover(isCoverExists)
-    else this.peerHolder.requestCover(from, event._id!)
+    else {
+      vxm.sync.setCover('')
+      this.peerHolder.requestCover(from, event._id!)
+    }
   }
 
   private async checkAudio(event: Song) {
@@ -48,14 +55,32 @@ export default class SyncMixin extends mixins(ModelHelper) {
     } else vxm.sync.prioritize(vxm.sync.prefetch.findIndex((x) => x._id === event._id))
   }
 
+  private async checkYoutubeAudio() {
+    if (vxm.sync.isReadyRequested) this.peerHolder.emitReady()
+  }
+
+  private async checkYoutubeCover(event: Song) {
+    if (event.album && event.album.album_coverPath && event.album.album_coverPath.startsWith('http'))
+      vxm.sync.setCover(event.album.album_coverPath)
+    else
+      vxm.sync.setCover('')
+
+  }
+
   private async setRemoteTrackInfo(event: Song, from: string, songIndex: number) {
     vxm.sync.setQueueIndex(songIndex)
     if (this.isSyncing && this.peerHolder.socketID !== from && event._id) {
       this.isRemoteTrackChange = true
       vxm.sync.setSong(event)
       vxm.player.state = PlayerState.LOADING
-      this.checkCover(event, from)
-      this.checkAudio(event)
+    }
+
+    if (this.isYoutube(event)) {
+      await this.checkYoutubeCover(event)
+      await this.checkYoutubeAudio()
+    } else {
+      await this.checkCover(event, from)
+      await this.checkAudio(event)
     }
   }
 
@@ -131,22 +156,26 @@ export default class SyncMixin extends mixins(ModelHelper) {
 
   private async handleReadyRequest(isReadyRequested: boolean) {
     if (isReadyRequested && vxm.sync.currentSongDets) {
-      const isAudioExists = await window.FileUtils.isAudioExists(vxm.sync.currentSongDets._id!)
-      if (!this.isFetching) {
-        /*
-         * If the room is already streaming and another user joins in, everyone's state will be set to LOADING.
-         * The users who already were playing the song might not be fetching and should only check if the audio exists
-         */
-        if (isAudioExists) this.peerHolder.emitReady()
-      } else {
-        /*
-         * If the user is fetching a song, check if it matches the current playing.
-         * If it does, then let it fetch and emitReady will be handled by saveRemoteStream
-         * Otherwise check if audio exists and emitReady if it does
-         */
-        if (vxm.sync.currentFetchSong != vxm.sync.currentSongDets._id) {
+      if (vxm.sync.currentSongDets.type === "LOCAL") {
+        const isAudioExists = await window.FileUtils.isAudioExists(vxm.sync.currentSongDets._id!)
+        if (!this.isFetching) {
+          /*
+           * If the room is already streaming and another user joins in, everyone's state will be set to LOADING.
+           * The users who already were playing the song might not be fetching and should only check if the audio exists
+           */
           if (isAudioExists) this.peerHolder.emitReady()
+        } else {
+          /*
+           * If the user is fetching a song, check if it matches the current playing.
+           * If it does, then let it fetch and emitReady will be handled by saveRemoteStream
+           * Otherwise check if audio exists and emitReady if it does
+           */
+          if (vxm.sync.currentFetchSong != vxm.sync.currentSongDets._id) {
+            if (isAudioExists) this.peerHolder.emitReady()
+          }
         }
+      } else {
+        this.peerHolder.emitReady()
       }
     }
   }
@@ -190,11 +219,13 @@ export default class SyncMixin extends mixins(ModelHelper) {
   private async fetchRemoteSong() {
     this.isFetching = true
     for (const prefetch of vxm.sync.prefetch) {
-      const isExists = await window.FileUtils.isAudioExists(prefetch._id!)
-      if (!isExists) {
-        vxm.sync.setCurrentFetchSong(prefetch._id)
-        this.peerHolder.requestSong(prefetch.sender, prefetch._id!)
-        return
+      if (prefetch && prefetch.type === "LOCAL") {
+        const isExists = await window.FileUtils.isAudioExists(prefetch._id!)
+        if (!isExists) {
+          vxm.sync.setCurrentFetchSong(prefetch._id)
+          this.peerHolder.requestSong(prefetch.sender, prefetch._id!)
+          return
+        }
       }
     }
     this.isFetching = false

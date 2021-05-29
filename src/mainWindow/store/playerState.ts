@@ -87,7 +87,6 @@ class Queue {
 
 export class PlayerStore extends VuexModule.With({ namespaced: 'player' }) {
   public state: PlayerState = PlayerState.PAUSED
-  public type: PlayerType = PlayerType.LOCAL
   public currentSong: Song | null = null
   private songQueue = new Queue()
   public repeat: boolean = false
@@ -99,10 +98,6 @@ export class PlayerStore extends VuexModule.With({ namespaced: 'player' }) {
 
   get queue() {
     return this.songQueue
-  }
-
-  get playerType() {
-    return this.type
   }
 
   get Repeat() {
@@ -125,11 +120,6 @@ export class PlayerStore extends VuexModule.With({ namespaced: 'player' }) {
   }
 
   @action async loadSong(song: Song | null) {
-    if (song && song.type == 'YOUTUBE') {
-      this.type = PlayerType.YOUTUBE
-    } else {
-      this.type = PlayerType.LOCAL
-    }
     this.currentSong = song
   }
 

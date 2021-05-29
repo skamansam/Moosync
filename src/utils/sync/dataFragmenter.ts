@@ -16,6 +16,10 @@ export class FragmentSender {
   private onDataSentCallback?: () => void
 
   constructor(data: any, channel: RTCDataChannel | undefined, callback?: () => void) {
+    if (data === null) {
+      throw new Error("null data");
+    }
+
     this.channel = channel
     this.data = data
     this.byteLength = this.data.byteLength

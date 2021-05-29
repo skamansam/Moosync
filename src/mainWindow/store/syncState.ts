@@ -31,7 +31,7 @@ export class SyncStore extends VuexModule.With({ namespaced: 'sync' }) {
   }
 
   @mutation
-  setSong(song: Song) {
+  setSong(song: Song | null) {
     this.currentSongDets = song
   }
 
