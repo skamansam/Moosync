@@ -32,7 +32,7 @@ function interceptHttp() {
       const filePath = path.join(__dirname, pathName)
 
       // deregister intercept after we handle index.js
-      // Reregister on page refresh
+      // Re-register on page refresh
       if (request.url.includes('index.js')) {
         session.defaultSession.protocol.uninterceptProtocol('http')
       }
@@ -113,8 +113,6 @@ async function createWindow() {
     minWidth: 1016,
     backgroundColor: '#212121',
     titleBarStyle: 'hidden',
-    parent: mainWindow,
-    modal: true,
     frame: false,
     webPreferences: {
       contextIsolation: true,

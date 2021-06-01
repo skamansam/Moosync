@@ -1,8 +1,9 @@
 <template>
   <div class="appContainer">
     <TopBar class="topbar" :class="{ 'is-open': isSidebarOpen }" />
-    <MusicBar class="musicbar" />
     <Sidebar class="sidebar" @toggleOpen="toggleSidebar" />
+        <MusicBar class="musicbar" />
+
     <div class="d-flex main-content" :class="{ 'is-open': isSidebarOpen }">
       <transition name="slide-fade">
         <router-view :key="refreshRouter"></router-view>
