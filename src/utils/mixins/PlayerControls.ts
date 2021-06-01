@@ -38,6 +38,8 @@ export default class PlayerControls extends Vue {
       else vxm.player.loadInQueueTop(s)
     }
     this.nextSong()
+
+    if (!this.isSyncing) this.play()
   }
 
   public play() {
