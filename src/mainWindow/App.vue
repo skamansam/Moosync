@@ -1,5 +1,5 @@
 <template>
-  <div id="app" :style="rootColors">
+  <div id="app">
     <ContextMenu />
     <Titlebar />
     <div>
@@ -85,10 +85,14 @@ export default class App extends mixins(ThemeHandler) {
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
   background: var(--primary);
-  color: var(--textPrimary);
+  color: var(--textPrimary) !important;
   width: 100%;
   height: 100%;
   /* margin-top: 60px; */
+}
+
+*:focus{
+  outline: none;
 }
 
 body {

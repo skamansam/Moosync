@@ -43,7 +43,7 @@ export class PlaylistsChannel implements IpcChannelInterface {
   }
 
   private createPlaylist(event: Electron.IpcMainEvent, request: IpcRequest) {
-    SongDB.createPlaylist(request.params.name)
+    SongDB.createPlaylist(request.params.name, request.params.desc, request.params.imgSrc)
       .then((data) => {
         event.reply(request.responseChannel, data)
       })

@@ -48,7 +48,11 @@
 				"database": "/home/ovenoboyo/.config/moosync/databases/songs.db"
 			}
 		],
-		"sqltools.useNodeRuntime": true
+		"sqltools.useNodeRuntime": true,
+		"editor.formatOnSave": true,
+		"editor.formatOnPaste": true,
+		"editor.defaultFormatter": "octref.vetur",
+		"vue3snippets.enable-compile-vue-file-on-did-save-code": true
 	},
 	"extensions": {
 		"recommendations": [

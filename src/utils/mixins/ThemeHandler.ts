@@ -10,25 +10,28 @@ export default class ThemeHandler extends Vue {
   }
 
   private setDefaultTheme() {
-    if (!vxm.themes.colors['--primary'])
-      vxm.themes.colors = {
-        '--primary': '#212121',
-        '--secondary': '#282828',
-        '--tertiary': '#202730',
-        '--lightPrimary': '#404040',
-        '--darkPrimary': '#202224',
-        '--textPrimary': '#ffffff',
-        '--textPrimaryTransparent': '#ffffff03',
-        '--textSecondary': '#565656',
-        '--accentPrimary': '#65CB88',
-        '--divider': 'rgba(79, 79, 79, 0.67)',
-      }
+    vxm.themes.colors = {
+      '--primary': '#212121',
+      '--secondary': '#282828',
+      '--tertiary': '#202730',
+      '--textPrimary': '#ffffff',
+      '--textSecondary': '#565656',
+      '--textInverse': '#000000',
+      '--accent': '#65CB88',
+      '--divider': 'rgba(79, 79, 79, 0.67)',
+    }
   }
 
   private registerThemeListeners() {
     vxm.themes.$watch('colors', (newColors: { [key: string]: string }) => {
-      this.root.style.setProperty('--primary', newColors['--primary'])
+      this.setColorsToRoot(newColors)
     })
+  }
+
+  private setColorsToRoot(colors: { [key: string]: string }) {
+    for (const key in colors) {
+      this.root.style.setProperty(key, colors[key])
+    }
   }
 
   mounted() {

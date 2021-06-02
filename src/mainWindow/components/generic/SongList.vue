@@ -156,9 +156,6 @@ table.b-table > tfoot > tr > th[aria-sort="descending"]
   overflow-x: hidden
   margin-bottom: 0 !important
 
-.custom-table-container:hover
-  color: var(--textPrimary)
-
 .custom-table-container > table
   width: 100%
 </style>

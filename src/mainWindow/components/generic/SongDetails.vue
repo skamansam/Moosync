@@ -63,7 +63,6 @@ export default class SongDetails extends mixins(Colors, ImageLoader) {
   overflow: hidden
 
 .title
-  color: var(--textPrimary)
   font-size: 24px
   text-align: left
 
@@ -71,7 +70,6 @@ export default class SongDetails extends mixins(Colors, ImageLoader) {
   margin-top: 75%
 
 .subtitle
-  color: var(--textPrimary)
   font-weight: 250
   text-align: left
   font-size: 14px

@@ -64,7 +64,6 @@ export default class MusicBar extends mixins(Colors, ImageLoader) {
 
 .song-title
   font-size: 19.1549px
-  color:  var(--textPrimary)
 
 .song-subtitle
   font-size: 12.2592px

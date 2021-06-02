@@ -99,7 +99,7 @@ export default class Sidebar extends mixins(Colors) {
   user-select: none
 
 .text-format
-  color:  var(--textPrimary)
+  color:  var(--textPrimary) !important
   font-family: 'Proxima Nova'
 
 .button-bar

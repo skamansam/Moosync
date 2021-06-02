@@ -364,9 +364,9 @@ class SongDBInstance extends DBUtils {
     return this.db.query(`SELECT * FROM playlists`)
   }
 
-  public async createPlaylist(name: string): Promise<string> {
+  public async createPlaylist(name: string, desc: string, imgSrc: string): Promise<string> {
     const id = v4()
-    this.db.insert('playlists', { playlist_id: id, playlist_name: name })
+    this.db.insert('playlists', { playlist_id: id, playlist_name: name, playlist_desc: desc, playlist_coverPath: imgSrc })
     return id
   }
 

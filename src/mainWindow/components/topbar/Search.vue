@@ -123,8 +123,8 @@ export default class Sidebar extends mixins(Colors, PlayerControls) {
   &::-webkit-input-placeholder
     color: var(--textSecondary)
   &:focus
-      background: rgba(0, 0, 0, 0) !important
-      outline: 0
+    background: rgba(0, 0, 0, 0) !important
+    outline: 0
 
 .full-border
   border-radius: 58px

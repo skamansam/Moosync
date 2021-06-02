@@ -20,7 +20,7 @@ interface DBUtils {
   getSingleGenre: (genreID: string) => Promise<Song[]>
   getAllPlaylists: () => Promise<Playlist[]>
   getSinglePlaylist: (PlaylistID: string) => Promise<Song[]>
-  createPlaylist: (name: string) => Promise<string>
+  createPlaylist: (name: string, desc: string, imgSrc: string) => Promise<string>
   addToPlaylist: (playlistID: string, ...songIDs: Song[]) => Promise<void>
 }
 

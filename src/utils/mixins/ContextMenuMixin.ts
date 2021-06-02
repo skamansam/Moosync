@@ -23,8 +23,9 @@ export default class ContextMenuMixin extends mixins(PlayerControls) {
     let menu: MenuItem[] = [
       {
         label: 'New Playlist',
-        handler: () =>
-          bus.$emit(EventBus.SHOW_NEW_PLAYLIST_MODAL, (playlist_id: string) => this.addToPlaylist(playlist_id, item)),
+        handler: () => {
+          bus.$emit(EventBus.SHOW_NEW_PLAYLIST_MODAL, item)
+        }
       },
     ]
     for (const [key, val] of Object.entries(this.playlists)) {

@@ -34,8 +34,8 @@ contextBridge.exposeInMainWorld('DBUtils', {
   getAllPlaylists: () => ipcRendererHolder.send(IpcEvents.PLAYLIST, { type: PlaylistEvents.GET_ALL_PLAYLISTS }),
   getSinglePlaylist: (playlistID: string) =>
     ipcRendererHolder.send(IpcEvents.PLAYLIST, { type: PlaylistEvents.GET_PLAYLIST, params: { id: playlistID } }),
-  createPlaylist: (name: string) =>
-    ipcRendererHolder.send(IpcEvents.PLAYLIST, { type: PlaylistEvents.CREATE_PLAYLIST, params: { name: name } }),
+  createPlaylist: (name: string, desc: string, imgSrc: string) =>
+    ipcRendererHolder.send(IpcEvents.PLAYLIST, { type: PlaylistEvents.CREATE_PLAYLIST, params: { name: name, desc: desc, imgSrc: imgSrc } }),
   addToPlaylist: (playlistID: string, ...songIDs: Song[]) =>
     ipcRendererHolder.send(IpcEvents.PLAYLIST, {
       type: PlaylistEvents.ADD_TO_PLAYLIST,

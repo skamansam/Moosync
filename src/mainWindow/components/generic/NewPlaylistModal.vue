@@ -1,45 +1,213 @@
 <template>
-  <b-modal :id="id" hide-footer>
-    <div class="d-block text-center">
-      <h3>New playlist</h3>
+  <b-modal
+    class="playlist-modal"
+    centered
+    size="lg"
+    :id="id"
+    :ref="id"
+    hide-footer
+    hide-header
+    :static="true"
+  >
+    <div class="modal-content-container">
+      <b-container fluid class="p-0">
+        <b-row no-gutters class="d-flex">
+          <canvas
+            ref="canvas"
+            width="800"
+            height="800"
+            id="playlist-cover"
+            class="playlist-cover"
+          ></canvas>
+          <Record v-if="forceEmptyImg" class="playlist-cover" />
+          <b-col class="playlist-details">
+            <div class="d-flex">
+              <b-input
+                v-model="title"
+                id="playlist-title"
+                class="playlist-title"
+                maxlength="20"
+                placeholder="Playlist Name..."
+                onkeypress="this.style.width = this.value.length + 'ch';"
+              />
+            </div>
+            <p class="songs-count">
+              {{ songCount }} {{ songCount == 1 ? "Song" : "Songs" }}
+            </p>
+          </b-col>
+        </b-row>
+        <b-row no-gutters>
+          <b-form-textarea
+            class="playlist-desc"
+            id="playlist-desc"
+            v-model="desc"
+            placeholder="Description..."
+            rows="3"
+            max-rows="6"
+          ></b-form-textarea>
+        </b-row>
+      </b-container>
+      <b-button class="create-button" @click="createPlaylist">Create</b-button>
     </div>
-    <b-button class="mt-3" variant="outline-danger" block>Close Me</b-button>
-    <b-button class="mt-2" variant="outline-warning" block @click="createPlaylist">Toggle Me</b-button>
   </b-modal>
 </template>
 
 <script lang="ts">
-import { EventBus } from '@/utils/ipc/main/constants'
-import { Component, Prop } from 'vue-property-decorator'
-import Colors from '@/utils/mixins/Colors'
-import { mixins } from 'vue-class-component'
-import { bus } from '@/mainWindow/main'
-import { vxm } from '@/mainWindow/store'
+import { EventBus } from "@/utils/ipc/main/constants";
+import { Component, Prop, Ref } from "vue-property-decorator";
+import Colors from "@/utils/mixins/Colors";
+import { mixins } from "vue-class-component";
+import { bus } from "@/mainWindow/main";
+import { vxm } from "@/mainWindow/store";
+import Record from "@/mainWindow/components/icons/Record.vue";
+import { Song } from "@/models/songs";
 
-@Component({})
+@Component({
+  components: {
+    Record,
+  },
+})
 export default class NewPlaylistModal extends mixins(Colors) {
-  @Prop({ default: 'NewPlaylistModal' })
-  private id!: string
-  private showing: boolean = false
-  private callback: ((id: string) => void) | null = null
+  @Prop({ default: "NewPlaylistModal" })
+  private id!: string;
+
+  private title: string = "New Playlist";
+  private desc: string = "";
+
+  private songs: Song[] = [];
+  private songCount: number = 0;
+
+  private forceEmptyImg: boolean = true;
+
+  private showing: boolean = false;
+
+  @Ref("canvas") private canvas!: HTMLCanvasElement;
+
+  private isDuplicatePlaylistName(): boolean {
+    for (const playlist of Object.values(vxm.playlist.playlists)) {
+      if (this.title === playlist) {
+        return true;
+      }
+    }
+    return false;
+  }
 
   private async createPlaylist() {
-    let playlist_id = await window.DBUtils.createPlaylist('henlo')
-    this.$bvModal.hide(this.id)
-    vxm.playlist.updated = true
-    if (this.callback) {
-      this.callback(playlist_id)
-      this.callback = null
+    // let playlist_id = await window.DBUtils.createPlaylist(
+    //   this.title,
+    //   this.desc,
+    //   /* Add merged image here */ ""
+    // );
+    // this.addToPlaylist(playlist_id, this.songs);
+
+    // this.$bvModal.hide(this.id);
+    // vxm.playlist.updated = true;
+    console.log(this.canvas.toDataURL("image/png"));
+  }
+
+  private handleImageError() {
+    this.forceEmptyImg = true;
+  }
+
+  private getValidImages() {
+    let mergableImages: string[] = [];
+    for (const song of this.songs) {
+      if (song.album && song.album.album_coverPath)
+        mergableImages.push(song.album.album_coverPath);
+    }
+    return mergableImages.slice(0, 4);
+  }
+
+  private createImage(
+    src: string,
+    quad: number,
+    len: number,
+    ctx: CanvasRenderingContext2D
+  ) {
+    let img = new Image();
+    img.src = "media://" + src;
+    img.onload = () => this.drawImage(quad, len, ctx, img);
+  }
+
+  private isExpandedImage(quad: number, len: number) {
+    if (len === 3) {
+      return quad === 1;
+    }
+
+    if (len < 3) return true;
+
+    return false;
+  }
+
+  private getImageSize(quad: number, len: number) {
+    return this.isExpandedImage(quad, len) ? 800 : 400;
+  }
+
+  private drawImage(
+    quad: number,
+    len: number,
+    ctx: CanvasRenderingContext2D,
+    img: HTMLImageElement
+  ) {
+    let size = this.getImageSize(quad, len);
+    switch (quad) {
+      case 0:
+        ctx.drawImage(img, 0, 0, size, size);
+        break;
+      case 1:
+        ctx.drawImage(img, 400, 0, size, size);
+        break;
+      case 2:
+        ctx.drawImage(img, 0, 400, size, size);
+        break;
+      case 3:
+        ctx.drawImage(img, 400, 400, size, size);
+        break;
     }
   }
 
+  private drawWholeImage(ctx: CanvasRenderingContext2D, src: string) {
+    let img = new Image();
+    img.src = "media://" + src;
+    img.onload = () => ctx.drawImage(img, 0, 0, 800, 800);
+  }
+
+  private mergeImages() {
+    let mergableImages = this.getValidImages();
+    if (this.canvas) {
+      let ctx = this.canvas.getContext("2d");
+      for (let i = 0; i < mergableImages.length; i++)
+        this.createImage(mergableImages[i], i, mergableImages.length, ctx!);
+    }
+  }
+
+  private computeImgSrc(value: string): string {
+    if (!value.startsWith("http")) return `media://${value}`;
+    return value;
+  }
+
+  private async addToPlaylist(playlist_id: string, songs: Song[]) {
+    window.DBUtils.addToPlaylist(playlist_id, ...songs);
+  }
+
   mounted() {
-    bus.$on(EventBus.SHOW_NEW_PLAYLIST_MODAL, (callback: (id: string) => void) => {
+    bus.$on(EventBus.SHOW_NEW_PLAYLIST_MODAL, (songs: Song[]) => {
       if (!this.showing) {
-        this.callback = callback
-        this.$bvModal.show(this.id)
+        this.songs = songs;
+        this.songCount = songs.length;
+        this.forceEmptyImg = false;
+        this.desc = "";
+        this.title = "New Playlist";
+
+        this.mergeImages();
+
+        for (let i = 1; this.isDuplicatePlaylistName(); i++) {
+          this.title = `New Playlist ${i}`;
+        }
+
+        this.$bvModal.show(this.id);
       }
-    })
+    });
   }
 }
 </script>
@@ -49,4 +217,75 @@ export default class NewPlaylistModal extends mixins(Colors) {
   background: var(--primary)
   height: 70px
   padding-left: calc(261px + 30px + 7.5px)
+
+.modal-content-container
+  margin: 35px 35px 35px 35px
+
+.playlist-cover
+  width: 157px
+  height: 157px
+  border-radius: 16px
+
+.playlist-desc
+  width: 100%
+  background-color: transparent
+  color: var(--textPrimary)
+  border: 0
+  padding: 0
+  padding-left: 10px
+  margin-top: 15px
+  border-radius: 0
+  border-left: 1px solid transparent
+  &:focus
+    -webkit-box-shadow: none
+    box-shadow: none
+  &:hover
+    border-left: 1px solid var(--accent)
+  &::-webkit-scrollbar-track
+    margin-top: 0
+
+.playlist-details
+  margin-left: 40px
+  max-width: 100%
+
+.songs-count
+  font-family: 'Proxima Nova'
+  font-size: 14px
+  text-align: start
+
+.edit-icon
+  width: 15px
+  height: 15px
+  min-width: 15px
+  min-height: 15px
+  margin-left: 15px
+  margin-top: 5px
+
+.playlist-title
+  font-family: 'Proxima Nova'
+  font-size: 26px
+  max-width: 100%
+  margin-bottom: 15px !important
+  color: var(--textPrimary)
+  background-color: transparent
+  border: 0
+  border-bottom: 1px solid transparent
+  border-radius: 0
+  padding: 0
+  &:hover
+    border-bottom: 1px solid var(--accent)
+  &:focus
+    outline: none
+    -webkit-box-shadow: none
+
+.create-button
+  font-family: 'Proxima Nova'
+  font-size: 16px
+  color: var(--textInverse)
+  background-color: var(--accent)
+  border-radius: 6px
+  float: right
+  margin-bottom: 20px
+  margin-top: 15px
+  border: 0
 </style>

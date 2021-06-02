@@ -56,7 +56,7 @@ export default class MusicBar extends mixins(Colors) {
   }
 
   get ComputedGradient(): string {
-    return `linear-gradient(90deg, ${this.rootColors['--accentPrimary']} 0%, ${this.rootColors['--accentPrimary']} ${this.volume}%, ${this.rootColors['--lightPrimary']} 0%)`
+    return `linear-gradient(90deg, ${this.rootColors['--accent']} 0%, ${this.rootColors['--accent']} ${this.volume}%, ${this.rootColors['--lightPrimary']} 0%)`
   }
 }
 </script>
@@ -78,7 +78,7 @@ export default class MusicBar extends mixins(Colors) {
   width: 12px
   height: 12px
   border-radius: 50%
-  background:  var(--accentPrimary)
+  background:  var(--accent)
 
 .slider::-ms-fill-upper
   background-color:  var(--primary)

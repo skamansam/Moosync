@@ -132,4 +132,12 @@ export const migrations = [
 
   -- Down
   `,
+
+  // 02-06-2021
+  `
+  -- Up
+  ALTER TABLE playlists ADD playlist_desc TEXT;
+
+  -- Down
+  `
 ]

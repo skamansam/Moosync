@@ -99,4 +99,8 @@ export default class DefaultLayout extends mixins(ContextMenuMixin) {
 *::-webkit-scrollbar-track
   margin-top: calc( 0.75rem * 2 + 18px)
   background: var(--primary)
+
+.modal-content
+  background-color: var(--primary) !important
+  color: var(--textPrimary) !important
 </style>

@@ -148,7 +148,7 @@ export default class MusicBar extends mixins(Colors, ModelHelper) {
 
 <style lang="sass">
 .vue-slider-process
-  background-color: var(--accentPrimary)
+  background-color: var(--accent)
 
 .vue-slider-rail
   background-color: var(--tertiary)
