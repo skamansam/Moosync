@@ -20,62 +20,62 @@
       </template>
 
       <template #cell(album)="data">
-        {{ data.item.album.album_name ? data.item.album.album_name : '-' }}
+        {{ data.item.album.album_name ? data.item.album.album_name : "-" }}
       </template>
 
       <template #cell(artists)="data">
-        {{ data.item.artists.length != 0 ? data.item.artists.join(', ') : '-' }}
+        {{ data.item.artists.length != 0 ? data.item.artists.join(", ") : "-" }}
       </template>
     </b-table>
   </div>
 </template>
 
 <script lang="ts">
-import { Song } from '@/models/songs'
-import Colors from '@/utils/mixins/Colors'
-import { Resizer } from '@/utils/ui/resizer'
-import { mixins } from 'vue-class-component'
-import { Component, Prop } from 'vue-property-decorator'
+import { Song } from "@/models/songs";
+import Colors from "@/utils/mixins/Colors";
+import { Resizer } from "@/utils/ui/resizer";
+import { mixins } from "vue-class-component";
+import { Component, Prop } from "vue-property-decorator";
 
 @Component({})
 export default class SongList extends mixins(Colors) {
-  private test: boolean = false
-  private lastSelect: string = ''
-  private resizer!: Resizer
-  private selected: Song[] = []
+  private test: boolean = false;
+  private lastSelect: string = "";
+  private resizer!: Resizer;
+  private selected: Song[] = [];
 
   @Prop({ default: [] })
-  private songList!: Song[]
+  private songList!: Song[];
 
   @Prop({ default: {} })
-  private extrafields!: [{ key: string }]
+  private extrafields!: [{ key: string }];
 
-  private fields: [{ key: string; label?: string; tdClass?: string; thClass?: string }] = [
-    { key: 'index', label: 'Sr. No', tdClass: 'index-no-td', thClass: 'index-no-th' },
-  ]
+  private fields: [
+    { key: string; label?: string; tdClass?: string; thClass?: string }
+  ] = [{ key: "index", label: "Sr. No", tdClass: "index-no-td", thClass: "index-no-th" }];
 
   created() {
-    this.fields.push(...this.extrafields)
+    this.fields.push(...this.extrafields);
   }
 
   mounted() {
-    this.resizer = new Resizer(document)
-    window.WindowUtils.setMainWindowResizeListener(this.rerenderTable)
+    this.resizer = new Resizer(document);
+    window.WindowUtils.setMainWindowResizeListener(this.rerenderTable);
   }
 
   private onRowContext(item: Song, index: number, event: Event) {
-    this.$emit('onRowContext', event, this.selected.length > 1 ? this.selected : [item])
+    this.$emit("onRowContext", event, this.selected.length > 1 ? this.selected : [item]);
   }
 
   private onRowDoubleClicked(item: Song) {
-    this.$emit('onRowDoubleClicked', item)
+    this.$emit("onRowDoubleClicked", item);
   }
 
   private onRowSelected(items: Song[]) {
+    this.selected = items;
     if (items[items.length - 1] && items[items.length - 1]._id !== this.lastSelect) {
-      this.lastSelect = items[items.length - 1]._id!
-      this.selected = items
-      this.$emit('onRowSelected', items)
+      this.lastSelect = items[items.length - 1]._id!;
+      this.$emit("onRowSelected", items);
     }
   }
 
@@ -85,10 +85,10 @@ export default class SongList extends mixins(Colors) {
 
   // For some reason table isn't rerendered on window size change through maximize and minimize functions
   private rerenderTable() {
-    this.test = !this.test
+    this.test = !this.test;
     this.$nextTick().then(() => {
-      this.resizer.addGrips()
-    })
+      this.resizer.addGrips();
+    });
   }
 }
 </script>
@@ -136,6 +136,10 @@ export default class SongList extends mixins(Colors) {
   font-weight: bold
   font-size: 18px
   line-height: 167.19%
+
+.custom-table > tbody > tr
+  &:focus
+    outline: 1px solid var(--accent)
 
 table.b-table > thead > tr > th[aria-sort="ascending"],
 table.b-table > tfoot > tr > th[aria-sort="ascending"]
