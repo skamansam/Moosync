@@ -13,6 +13,7 @@
       <b-container fluid class="p-0">
         <b-row no-gutters class="d-flex">
           <canvas
+            v-if="!forceEmptyImg"
             ref="canvas"
             width="800"
             height="800"
@@ -93,16 +94,14 @@ export default class NewPlaylistModal extends mixins(Colors) {
   }
 
   private async createPlaylist() {
-    // let playlist_id = await window.DBUtils.createPlaylist(
-    //   this.title,
-    //   this.desc,
-    //   /* Add merged image here */ ""
-    // );
-    // this.addToPlaylist(playlist_id, this.songs);
+    const data = this.canvas.toDataURL("image/png");
+    let path = await window.FileUtils.savePlaylistCover(data);
 
-    // this.$bvModal.hide(this.id);
-    // vxm.playlist.updated = true;
-    console.log(this.canvas.toDataURL("image/png"));
+    let playlist_id = await window.DBUtils.createPlaylist(this.title, this.desc, path);
+    this.addToPlaylist(playlist_id, this.songs);
+
+    this.$bvModal.hide(this.id);
+    vxm.playlist.updated = true;
   }
 
   private handleImageError() {
@@ -174,10 +173,15 @@ export default class NewPlaylistModal extends mixins(Colors) {
 
   private mergeImages() {
     let mergableImages = this.getValidImages();
-    if (this.canvas) {
-      let ctx = this.canvas.getContext("2d");
-      for (let i = 0; i < mergableImages.length; i++)
-        this.createImage(mergableImages[i], i, mergableImages.length, ctx!);
+    if (mergableImages.length === 0) {
+      this.forceEmptyImg = true;
+    } else {
+      if (this.canvas) {
+        let ctx = this.canvas.getContext("2d");
+        ctx!.clearRect(0, 0, this.canvas.width, this.canvas.height);
+        for (let i = 0; i < mergableImages.length; i++)
+          this.createImage(mergableImages[i], i, mergableImages.length, ctx!);
+      }
     }
   }
 

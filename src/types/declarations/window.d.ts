@@ -34,6 +34,7 @@ interface fileUtils {
   scan: () => Promise<void>
   saveAudioTOFile: (path: string, blob: Buffer) => Promise<string>
   saveImageToFile: (path: string, blob: Buffer) => Promise<string>
+  savePlaylistCover: (b64: string) => Promise<string>
   isAudioExists: (path: string) => Promise<string | null>
   isImageExists: (path: string) => Promise<string | null>
 }

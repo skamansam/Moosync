@@ -3,6 +3,10 @@ import { IpcEvents, PlaylistEvents } from './constants'
 import { getDisabledPaths, loadPreferences } from '@/utils/db/preferences'
 
 import { SongDB } from '@/utils/db'
+import { app } from 'electron'
+import path from 'path'
+import fs from 'fs';
+import { v4 } from 'uuid';
 
 export class PlaylistsChannel implements IpcChannelInterface {
   name = IpcEvents.PLAYLIST
@@ -19,6 +23,9 @@ export class PlaylistsChannel implements IpcChannelInterface {
         break
       case PlaylistEvents.GET_PLAYLIST:
         this.getPlaylist(event, request)
+        break
+      case PlaylistEvents.SAVE_COVER:
+        this.saveCoverToFile(event, request)
         break
     }
   }
@@ -55,5 +62,23 @@ export class PlaylistsChannel implements IpcChannelInterface {
         event.reply(request.responseChannel, data)
       })
       .catch((e) => console.log(e))
+  }
+
+  private saveCoverToFile(event: Electron.IpcMainEvent, request: IpcRequest) {
+    if (request.params.b64) {
+      const cacheDir = path.join(app.getPath('cache'), app.getName(), '.thumbnails')
+      const filePath = path.join(cacheDir, v4() + ".png")
+      console.log(filePath)
+      if (fs.existsSync(cacheDir)) {
+        if (fs.existsSync(filePath)) {
+          fs.unlinkSync(filePath)
+        }
+      } else {
+        fs.mkdirSync(cacheDir)
+      }
+      fs.writeFile(filePath, request.params.b64.replace(/^data:image\/png;base64,/, ""), 'base64', () => {
+        event.reply(request.responseChannel, filePath)
+      })
+    }
   }
 }

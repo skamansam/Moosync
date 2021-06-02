@@ -74,6 +74,7 @@ contextBridge.exposeInMainWorld('FileUtils', {
     ipcRendererHolder.send(IpcEvents.SONG, { type: SongEvents.AUDIO_EXISTS, params: { path: path } }),
   isImageExists: (path: string) =>
     ipcRendererHolder.send(IpcEvents.SONG, { type: SongEvents.IMAGE_EXISTS, params: { path: path } }),
+  savePlaylistCover: (b64: string) => ipcRendererHolder.send(IpcEvents.PLAYLIST, { type: PlaylistEvents.SAVE_COVER, params: { b64: b64 } })
 })
 
 contextBridge.exposeInMainWorld('SearchUtils', {

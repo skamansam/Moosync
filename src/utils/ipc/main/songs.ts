@@ -115,7 +115,7 @@ export class SongsChannel implements IpcChannelInterface {
           event.reply(request.responseChannel, fs.existsSync(filePath) ? filePath : null)
           break
         case 'image':
-          var filePath = path.join(app.getPath('cache'), app.getName(), 'imageCache', request.params.path)
+          var filePath = path.join(app.getPath('cache'), app.getName(), '.thumbnails', request.params.path)
           event.reply(request.responseChannel, fs.existsSync(filePath) ? filePath : null)
           break
       }
