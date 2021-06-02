@@ -7,7 +7,6 @@
     :ref="id"
     hide-footer
     hide-header
-    :static="true"
   >
     <div class="modal-content-container">
       <b-container fluid class="p-0">
@@ -176,6 +175,7 @@ export default class NewPlaylistModal extends mixins(Colors) {
     if (mergableImages.length === 0) {
       this.forceEmptyImg = true;
     } else {
+      console.log(this.canvas);
       if (this.canvas) {
         let ctx = this.canvas.getContext("2d");
         ctx!.clearRect(0, 0, this.canvas.width, this.canvas.height);
@@ -203,7 +203,7 @@ export default class NewPlaylistModal extends mixins(Colors) {
         this.desc = "";
         this.title = "New Playlist";
 
-        this.mergeImages();
+        this.$nextTick(() => this.mergeImages());
 
         for (let i = 1; this.isDuplicatePlaylistName(); i++) {
           this.title = `New Playlist ${i}`;
