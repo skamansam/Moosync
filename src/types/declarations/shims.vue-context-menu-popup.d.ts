@@ -16,14 +16,14 @@ declare module 'vue-context-menu-popup' {
 
   const component:
     | Component<
-        Vue,
-        DefaultData<Vue>,
-        DefaultMethods<Vue>,
-        DefaultMethods<Vue>,
-        DefaultComputed,
-        PropsDefinition<DefaultProps>,
-        DefaultProps
-      >
+      Vue,
+      DefaultData<Vue>,
+      DefaultMethods<Vue>,
+      DefaultMethods<Vue>,
+      DefaultComputed,
+      PropsDefinition<DefaultProps>,
+      DefaultProps
+    >
     | undefined
 
   export default component

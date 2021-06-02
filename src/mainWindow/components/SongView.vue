@@ -23,14 +23,14 @@
 </template>
 
 <script lang="ts">
-import { Component, Prop } from 'vue-property-decorator'
-import SongList from '@/mainWindow/components/generic/SongList.vue'
-import SongDetails from '@/mainWindow/components/generic/SongDetails.vue'
-import { Song } from '@/models/songs'
-import Colors from '@/utils/mixins/Colors'
-import { mixins } from 'vue-class-component'
-import PlayerControls from '@/utils/mixins/PlayerControls'
-import ModelHelper from '@/utils/mixins/ModelHelper'
+import { Component, Prop } from "vue-property-decorator";
+import SongList from "@/mainWindow/components/generic/SongList.vue";
+import SongDetails from "@/mainWindow/components/generic/SongDetails.vue";
+import { Song } from "@/models/songs";
+import Colors from "@/utils/mixins/Colors";
+import { mixins } from "vue-class-component";
+import PlayerControls from "@/utils/mixins/PlayerControls";
+import ModelHelper from "@/utils/mixins/ModelHelper";
 
 @Component({
   components: {
@@ -40,16 +40,16 @@ import ModelHelper from '@/utils/mixins/ModelHelper'
 })
 export default class AllSongs extends mixins(Colors, PlayerControls, ModelHelper) {
   @Prop({ default: () => [] })
-  private songList!: Song[]
+  private songList!: Song[];
 
-  private currentSong: Song | null = null
+  private currentSong: Song | null = null;
 
   private updateCoverDetails(items: Song[]) {
-    if (items) this.currentSong = items[items.length - 1]
+    if (items) this.currentSong = items[items.length - 1];
   }
 
   private getSongContextMenu(event: Event, item: Song) {
-    this.$emit('onRowContext', event, item)
+    this.$emit("onRowContext", event, item);
   }
 }
 </script>
@@ -73,7 +73,6 @@ export default class AllSongs extends mixins(Colors, PlayerControls, ModelHelper
     height: 170px
   @include media-breakpoint-up(lg-c)
     height: 200px
-
 
 .list-container
   @include media-breakpoint-up(xs)

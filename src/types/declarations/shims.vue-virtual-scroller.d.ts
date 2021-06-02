@@ -12,36 +12,36 @@ declare module 'vue-virtual-scroller' {
 
   export const RecycleScroller:
     | Component<
-        Vue,
-        DefaultData<Vue>,
-        DefaultMethods<Vue>,
-        DefaultMethods<Vue>,
-        DefaultComputed,
-        PropsDefinition<DefaultProps>,
-        DefaultProps
-      >
+      Vue,
+      DefaultData<Vue>,
+      DefaultMethods<Vue>,
+      DefaultMethods<Vue>,
+      DefaultComputed,
+      PropsDefinition<DefaultProps>,
+      DefaultProps
+    >
     | undefined
   export const DynamicScroller:
     | Component<
-        Vue,
-        DefaultData<Vue>,
-        DefaultMethods<Vue>,
-        DefaultMethods<Vue>,
-        DefaultComputed,
-        PropsDefinition<DefaultProps>,
-        DefaultProps
-      >
+      Vue,
+      DefaultData<Vue>,
+      DefaultMethods<Vue>,
+      DefaultMethods<Vue>,
+      DefaultComputed,
+      PropsDefinition<DefaultProps>,
+      DefaultProps
+    >
     | undefined
   export const DynamicScrollerItem:
     | Component<
-        Vue,
-        DefaultData<Vue>,
-        DefaultMethods<Vue>,
-        DefaultMethods<Vue>,
-        DefaultComputed,
-        PropsDefinition<DefaultProps>,
-        DefaultProps
-      >
+      Vue,
+      DefaultData<Vue>,
+      DefaultMethods<Vue>,
+      DefaultMethods<Vue>,
+      DefaultComputed,
+      PropsDefinition<DefaultProps>,
+      DefaultProps
+    >
     | undefined
 
   export function IdState(options?: { idProp?: (vm: any) => any }): ComponentOptions<Vue> | typeof Vue

@@ -2,7 +2,12 @@
   <b-container fluid class="w-100">
     <b-row class="d-flex h-100 no-gutters">
       <b-col cols="2" class="d-flex h-100 image-container">
-        <b-img v-if="ImgSrc && !forceEmptyImg" class="image h-100" :src="ImgSrc" @error="handleImageError" />
+        <b-img
+          v-if="ImgSrc && !forceEmptyImg"
+          class="image h-100"
+          :src="ImgSrc"
+          @error="handleImageError"
+        />
         <Record v-if="!ImgSrc || forceEmptyImg" class="h-100 image" />
       </b-col>
       <b-col class="text-container text-truncate">
@@ -14,11 +19,11 @@
 </template>
 
 <script lang="ts">
-import Colors from '@/utils/mixins/Colors'
-import { mixins } from 'vue-class-component'
-import { Component, Prop } from 'vue-property-decorator'
-import Record from '@/mainWindow/components/icons/Record.vue'
-import ImageLoader from '@/utils/mixins/ImageLoader'
+import Colors from "@/utils/mixins/Colors";
+import { mixins } from "vue-class-component";
+import { Component, Prop } from "vue-property-decorator";
+import Record from "@/mainWindow/components/icons/Record.vue";
+import ImageLoader from "@/utils/mixins/ImageLoader";
 
 @Component({
   components: {
@@ -26,14 +31,14 @@ import ImageLoader from '@/utils/mixins/ImageLoader'
   },
 })
 export default class SongDetails extends mixins(Colors, ImageLoader) {
-  @Prop({ default: '' })
-  private currentTitle!: string
+  @Prop({ default: "" })
+  private currentTitle!: string;
 
-  @Prop({ default: '' })
-  private currentsubTitle!: string
+  @Prop({ default: "" })
+  private currentsubTitle!: string;
 
   private handleImageError() {
-    this.forceEmptyImg = true
+    this.forceEmptyImg = true;
   }
 }
 </script>

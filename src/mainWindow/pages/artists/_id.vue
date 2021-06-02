@@ -9,19 +9,22 @@
       <div>{{ artist_name }}</div>
     </b-row>
     <b-row>
-      <SongView :songList="songList" @onRowContext="getSongContextMenu(undefined, arguments[0], ...arguments[1])" />
+      <SongView
+        :songList="songList"
+        @onRowContext="getSongContextMenu(undefined, arguments[0], ...arguments[1])"
+      />
     </b-row>
   </b-container>
 </template>
 
 <script lang="ts">
-import { Component, Prop } from 'vue-property-decorator'
-import SongView from '@/mainWindow/components/SongView.vue'
-import { Song } from '@/models/songs'
+import { Component, Prop } from "vue-property-decorator";
+import SongView from "@/mainWindow/components/SongView.vue";
+import { Song } from "@/models/songs";
 
-import { mixins } from 'vue-class-component'
-import ContextMenuMixin from '@/utils/mixins/ContextMenuMixin'
-import { artists } from '@/models/artists'
+import { mixins } from "vue-class-component";
+import ContextMenuMixin from "@/utils/mixins/ContextMenuMixin";
+import { artists } from "@/models/artists";
 
 @Component({
   components: {
@@ -29,24 +32,24 @@ import { artists } from '@/models/artists'
   },
 })
 export default class SingleArtistView extends mixins(ContextMenuMixin) {
-  private artist: artists | null = null
-  private songList: Song[] = []
+  private artist: artists | null = null;
+  private songList: Song[] = [];
 
-  @Prop({ default: '' })
-  private artist_id!: string
+  @Prop({ default: "" })
+  private artist_id!: string;
 
-  @Prop({ default: '' })
-  private artist_name!: string
+  @Prop({ default: "" })
+  private artist_name!: string;
 
-  @Prop({ default: '' })
-  private artist_coverPath!: string
+  @Prop({ default: "" })
+  private artist_coverPath!: string;
 
   mounted() {
-    this.fetchArtist()
+    this.fetchArtist();
   }
 
   private async fetchArtist() {
-    this.songList = await window.DBUtils.getSingleArtist(this.artist_id)
+    this.songList = await window.DBUtils.getSingleArtist(this.artist_id);
   }
 }
 </script>

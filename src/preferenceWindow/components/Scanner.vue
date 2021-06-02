@@ -7,7 +7,11 @@
     <b-container class="path-container" fluid>
       <b-row v-for="path in musicPaths" :key="path.path">
         <div class="d-flex path">
-          <b-form-checkbox :checked="path.enabled" :id="`checkbox-${path.path}`" @change="togglePath(path.path)" />
+          <b-form-checkbox
+            :checked="path.enabled"
+            :id="`checkbox-${path.path}`"
+            @change="togglePath(path.path)"
+          />
           <div>{{ path.path }}</div>
           <b-button v-on:click="removePath(path.path)">X</b-button>
         </div>
@@ -17,33 +21,33 @@
 </template>
 
 <script lang="ts">
-import { Component } from 'vue-property-decorator'
-import Vue from 'vue'
-import { vxm } from '@/preferenceWindow/store'
+import { Component } from "vue-property-decorator";
+import Vue from "vue";
+import { vxm } from "@/preferenceWindow/store";
 
 @Component({})
 export default class scanner extends Vue {
   get musicPaths() {
-    return vxm.preferences.preferences.musicPaths
+    return vxm.preferences.preferences.musicPaths;
   }
 
   private togglePath(path: string) {
     vxm.preferences.togglePath({
       path: path,
       value: (document.getElementById(`checkbox-${path}`) as HTMLInputElement).checked,
-    })
+    });
   }
 
   private removePath(path: string) {
-    vxm.preferences.removePath(path)
-    vxm.preferences.setPathsChanged(true)
+    vxm.preferences.removePath(path);
+    vxm.preferences.setPathsChanged(true);
   }
 
   private openFileBrowser() {
     window.WindowUtils.openFileBrowser().then((data) => {
-      vxm.preferences.addPaths(...data.filePaths)
-      vxm.preferences.setPathsChanged(true)
-    })
+      vxm.preferences.addPaths(...data.filePaths);
+      vxm.preferences.setPathsChanged(true);
+    });
   }
 }
 </script>
@@ -52,7 +56,7 @@ export default class scanner extends Vue {
 .path-container
   max-height: 320px
   border-radius: 10px
-  padding:  3px 25px 3px 25px
+  padding: 3px 25px 3px 25px
   border: 3px solid var(--secondary)
   .path
     flex-grow: 1

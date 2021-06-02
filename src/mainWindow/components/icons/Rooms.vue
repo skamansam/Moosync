@@ -1,5 +1,11 @@
 <template>
-  <svg width="34" height="25" viewBox="0 0 34 25" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <svg
+    width="34"
+    height="25"
+    viewBox="0 0 34 25"
+    fill="none"
+    xmlns="http://www.w3.org/2000/svg"
+  >
     <path
       fill-rule="evenodd"
       clip-rule="evenodd"
@@ -7,6 +13,10 @@
       fill="white"
     />
     <path d="M22 19H28M34 19H28M28 19V13M28 19V25" stroke="#282828" stroke-width="5" />
-    <path d="M23.4128 19H28.4128M33.4128 19H28.4128M28.4128 19V14M28.4128 19V24" stroke="white" stroke-width="2" />
+    <path
+      d="M23.4128 19H28.4128M33.4128 19H28.4128M28.4128 19V14M28.4128 19V24"
+      stroke="white"
+      stroke-width="2"
+    />
   </svg>
 </template>

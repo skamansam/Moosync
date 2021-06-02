@@ -15,17 +15,15 @@
       @row-selected="onRowSelected"
       @row-contextmenu="onRowContext"
     >
-      <template #cell(index)="data">
-        {{ data.index + 1 }}
-      </template>
+      <template #cell(index)="data">{{ data.index + 1 }}</template>
 
-      <template #cell(album)="data">
-        {{ data.item.album.album_name ? data.item.album.album_name : "-" }}
-      </template>
+      <template #cell(album)="data">{{
+        data.item.album.album_name ? data.item.album.album_name : "-"
+      }}</template>
 
-      <template #cell(artists)="data">
-        {{ data.item.artists.length != 0 ? data.item.artists.join(", ") : "-" }}
-      </template>
+      <template #cell(artists)="data">{{
+        data.item.artists.length != 0 ? data.item.artists.join(", ") : "-"
+      }}</template>
     </b-table>
   </div>
 </template>
@@ -101,7 +99,7 @@ export default class SongList extends mixins(Colors) {
   padding-left: 10px
 
 .custom-table
-  color:  var(--textPrimary) !important
+  color: var(--textPrimary) !important
   table-layout: fixed
   margin-right: 10px
   min-width: 10px
@@ -109,9 +107,9 @@ export default class SongList extends mixins(Colors) {
 
 .custom-table > thead > tr > th
   background-color: var(--primary) !important
-  color:  var(--textPrimary) !important
+  color: var(--textPrimary) !important
   border-top: 0px !important
-  border-bottom: 1px solid  var(--textSecondary) !important
+  border-bottom: 1px solid var(--textSecondary) !important
   text-align: left
   padding: 12px 0 12px 0 !important
 
@@ -150,7 +148,6 @@ table.b-table > thead > tr > th[aria-sort="descending"],
 table.b-table > tfoot > tr > th[aria-sort="descending"]
   background-image: none !important
   padding-right: 0px !important
-
 
 .custom-table-container
   transition: color .3s ease

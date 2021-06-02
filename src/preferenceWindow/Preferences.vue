@@ -5,17 +5,17 @@
       <router-view></router-view>
     </div>
     <div class="footer-buttons">
-      <b-button v-on:click="closeWindow"> Close </b-button>
-      <b-button v-on:click="writePreferences"> Apply </b-button>
+      <b-button v-on:click="closeWindow">Close</b-button>
+      <b-button v-on:click="writePreferences">Apply</b-button>
     </div>
   </div>
 </template>
 
 <script lang="ts">
-import Vue from 'vue'
-import { Component } from 'vue-property-decorator'
-import Titlebar from '@/commonComponents/Titlebar.vue'
-import { vxm } from '@/preferenceWindow/store'
+import Vue from "vue";
+import { Component } from "vue-property-decorator";
+import Titlebar from "@/commonComponents/Titlebar.vue";
+import { vxm } from "@/preferenceWindow/store";
 
 @Component({
   components: {
@@ -24,55 +24,55 @@ import { vxm } from '@/preferenceWindow/store'
 })
 export default class App extends Vue {
   created() {
-    this.loadPreferences()
+    this.loadPreferences();
   }
 
-  private root = document.documentElement
+  private root = document.documentElement;
   get rootColors() {
-    return vxm.themes.colors
+    return vxm.themes.colors;
   }
 
   private setDefaultTheme() {
-    if (!vxm.themes.colors['--primary'])
+    if (!vxm.themes.colors["--primary"])
       vxm.themes.colors = {
-        '--primary': '#212121',
-        '--secondary': '#282828',
-        '--tertiary': '#202730',
-        '--lightPrimary': '#404040',
-        '--darkPrimary': '#202224',
-        '--textPrimary': '#ffffff',
-        '--textPrimaryTransparent': '#ffffff03',
-        '--textSecondary': '#565656',
-        '--accent': '#65CB88',
-        '--divider': 'rgba(79, 79, 79, 0.67)',
-      }
+        "--primary": "#212121",
+        "--secondary": "#282828",
+        "--tertiary": "#202730",
+        "--lightPrimary": "#404040",
+        "--darkPrimary": "#202224",
+        "--textPrimary": "#ffffff",
+        "--textPrimaryTransparent": "#ffffff03",
+        "--textSecondary": "#565656",
+        "--accent": "#65CB88",
+        "--divider": "rgba(79, 79, 79, 0.67)",
+      };
   }
 
   private registerThemeListeners() {
-    vxm.themes.$watch('colors', (newColors: { [key: string]: string }) => {
-      this.root.style.setProperty('--primary', newColors['--primary'])
-    })
+    vxm.themes.$watch("colors", (newColors: { [key: string]: string }) => {
+      this.root.style.setProperty("--primary", newColors["--primary"]);
+    });
   }
 
   mounted() {
-    this.registerThemeListeners()
-    this.setDefaultTheme()
+    this.registerThemeListeners();
+    this.setDefaultTheme();
   }
 
   private loadPreferences() {
     window.PreferenceUtils.load().then((data) => {
-      vxm.preferences.setPreferences(data)
-    })
+      vxm.preferences.setPreferences(data);
+    });
   }
 
   private closeWindow() {
-    window.WindowUtils.closePreferenceWindow()
+    window.WindowUtils.closePreferenceWindow();
   }
 
   private async writePreferences() {
-    await window.PreferenceUtils.save(vxm.preferences.preferences)
+    await window.PreferenceUtils.save(vxm.preferences.preferences);
     if (vxm.preferences.pathsChanged) {
-      Vue.nextTick(() => window.FileUtils.scan())
+      Vue.nextTick(() => window.FileUtils.scan());
     }
   }
 }

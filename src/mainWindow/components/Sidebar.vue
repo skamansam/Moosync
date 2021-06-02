@@ -42,8 +42,10 @@
         </b-popover>
       </div>
     </template>
-    <template #default
-      ><div class="extra-margin-top"><Tabs :isOpen="isOpen" /></div>
+    <template #default>
+      <div class="extra-margin-top">
+        <Tabs :isOpen="isOpen" />
+      </div>
     </template>
     <template #footer>
       <div class="footer">
@@ -85,8 +87,7 @@ export default class Sidebar extends mixins(Colors) {
     this.isOpen = !this.isOpen;
 
     // Delay showing of rooms button since it makes the toggle button smaller while sidebar size is transitioning
-    if (!this.showRoomsButton)
-      setTimeout(() => (this.showRoomsButton = true), 100);
+    if (!this.showRoomsButton) setTimeout(() => (this.showRoomsButton = true), 100);
     else this.showRoomsButton = false;
 
     this.$emit("toggleOpen", this.isOpen);

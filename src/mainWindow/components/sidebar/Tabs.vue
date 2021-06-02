@@ -7,7 +7,11 @@
       custom
       v-slot="{ navigate, isActive }"
     >
-      <div class="d-flex button-bar" v-on:click="navigate" v-bind:class="{ 'button-active': isActive }">
+      <div
+        class="d-flex button-bar"
+        v-on:click="navigate"
+        v-bind:class="{ 'button-active': isActive }"
+      >
         <div class="whitebar" v-if="isActive && isOpen"></div>
         <div
           class="d-flex align-items-center icon-transition"
@@ -28,18 +32,18 @@
 </template>
 
 <script lang="ts">
-import { Component, Prop } from 'vue-property-decorator'
-import { ActiveTab } from '@/utils/ui/enums'
-import Playlists from '@/mainWindow/components/icons/Playlists.vue'
-import AllSongs from '@/mainWindow/components/icons/AllSongs.vue'
-import Artists from '@/mainWindow/components/icons/Artists.vue'
-import Fav from '@/mainWindow/components/icons/Fav.vue'
-import Genre from '@/mainWindow/components/icons/Genre.vue'
-import Albums from '@/mainWindow/components/icons/Albums.vue'
-import Toggle from '@/mainWindow/components/icons/Toggle.vue'
-import Rooms from '@/mainWindow/components/icons/Rooms.vue'
-import Colors from '@/utils/mixins/Colors'
-import { mixins } from 'vue-class-component'
+import { Component, Prop } from "vue-property-decorator";
+import { ActiveTab } from "@/utils/ui/enums";
+import Playlists from "@/mainWindow/components/icons/Playlists.vue";
+import AllSongs from "@/mainWindow/components/icons/AllSongs.vue";
+import Artists from "@/mainWindow/components/icons/Artists.vue";
+import Fav from "@/mainWindow/components/icons/Fav.vue";
+import Genre from "@/mainWindow/components/icons/Genre.vue";
+import Albums from "@/mainWindow/components/icons/Albums.vue";
+import Toggle from "@/mainWindow/components/icons/Toggle.vue";
+import Rooms from "@/mainWindow/components/icons/Rooms.vue";
+import Colors from "@/utils/mixins/Colors";
+import { mixins } from "vue-class-component";
 
 @Component({
   components: {
@@ -55,22 +59,22 @@ import { mixins } from 'vue-class-component'
 })
 export default class Sidebar extends mixins(Colors) {
   private componentNames = [
-    { component: 'AllSongs', title: 'All Songs', link: '/songs' },
-    { component: 'Playlists', title: 'Playlists', link: '/playlists' },
-    { component: 'Albums', title: 'Albums', link: '/albums' },
-    { component: 'Artists', title: 'Artists', link: '/artists' },
-    { component: 'Genre', title: 'Genre', link: '/genre' },
-    { component: 'Fav', title: 'Favourites', link: '/favs' },
-  ]
+    { component: "AllSongs", title: "All Songs", link: "/songs" },
+    { component: "Playlists", title: "Playlists", link: "/playlists" },
+    { component: "Albums", title: "Albums", link: "/albums" },
+    { component: "Artists", title: "Artists", link: "/artists" },
+    { component: "Genre", title: "Genre", link: "/genre" },
+    { component: "Fav", title: "Favourites", link: "/favs" },
+  ];
 
-  private active: ActiveTab = ActiveTab.ALLSONGS
+  private active: ActiveTab = ActiveTab.ALLSONGS;
 
   @Prop({ default: true })
-  private isOpen!: boolean
+  private isOpen!: boolean;
 
   private setActive(i: number, navigate: Function): void {
-    this.active = i
-    navigate(this)
+    this.active = i;
+    navigate(this);
   }
 }
 </script>
@@ -86,7 +90,7 @@ export default class Sidebar extends mixins(Colors) {
   padding: 0.25rem 0rem 0.25rem 1.8rem
 
 .icon-padding-closed
-  padding:  0.5rem 0rem 0.25rem 1rem
+  padding: 0.5rem 0rem 0.25rem 1rem
 
 .icon-transition
   transition: 0.1s
@@ -99,7 +103,7 @@ export default class Sidebar extends mixins(Colors) {
   user-select: none
 
 .text-format
-  color:  var(--textPrimary) !important
+  color: var(--textPrimary) !important
   font-family: 'Proxima Nova'
 
 .button-bar

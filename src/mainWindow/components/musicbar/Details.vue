@@ -13,18 +13,18 @@
     <div class="text-container">
       <div class="text song-title text-truncate">{{ title }}</div>
       <div class="text song-subtitle text-truncate">
-        {{ artists ? artists.join(', ') : '-' }}
+        {{ artists ? artists.join(", ") : "-" }}
       </div>
     </div>
   </div>
 </template>
 
 <script lang="ts">
-import Colors from '@/utils/mixins/Colors'
-import { mixins } from 'vue-class-component'
-import { Component, Prop } from 'vue-property-decorator'
-import Record from '@/mainWindow/components/icons/Record.vue'
-import ImageLoader from '@/utils/mixins/ImageLoader'
+import Colors from "@/utils/mixins/Colors";
+import { mixins } from "vue-class-component";
+import { Component, Prop } from "vue-property-decorator";
+import Record from "@/mainWindow/components/icons/Record.vue";
+import ImageLoader from "@/utils/mixins/ImageLoader";
 
 @Component({
   components: {
@@ -32,14 +32,14 @@ import ImageLoader from '@/utils/mixins/ImageLoader'
   },
 })
 export default class MusicBar extends mixins(Colors, ImageLoader) {
-  @Prop({ default: '-' })
-  title!: string
+  @Prop({ default: "-" })
+  title!: string;
 
   @Prop({ default: () => [] })
-  artists!: string[]
+  artists!: string[];
 
   private handleImageError() {
-    this.forceEmptyImg = true
+    this.forceEmptyImg = true;
   }
 }
 </script>
@@ -54,7 +54,6 @@ export default class MusicBar extends mixins(Colors, ImageLoader) {
   margin-right: 15px
   border-radius: 10px
 
-
 .text
   text-align: left
   font-family: 'Proxima Nova'
@@ -67,7 +66,7 @@ export default class MusicBar extends mixins(Colors, ImageLoader) {
 
 .song-subtitle
   font-size: 12.2592px
-  color:  var(--textSecondary)
+  color: var(--textSecondary)
 
 .text-container
   width: calc( 100% - 56px - 15px )

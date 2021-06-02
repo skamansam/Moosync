@@ -2,7 +2,7 @@
   <div class="appContainer">
     <TopBar class="topbar" :class="{ 'is-open': isSidebarOpen }" />
     <Sidebar class="sidebar" @toggleOpen="toggleSidebar" />
-        <MusicBar class="musicbar" />
+    <MusicBar class="musicbar" />
 
     <div class="d-flex main-content" :class="{ 'is-open': isSidebarOpen }">
       <transition name="slide-fade">
@@ -13,12 +13,12 @@
 </template>
 
 <script lang="ts">
-import MusicBar from '@/mainWindow/components/Musicbar.vue'
-import Sidebar from '@/mainWindow/components/Sidebar.vue'
-import TopBar from '@/mainWindow/components/TopBar.vue'
-import { Component } from 'vue-property-decorator'
-import ContextMenuMixin from '@/utils/mixins/ContextMenuMixin'
-import { mixins } from 'vue-class-component'
+import MusicBar from "@/mainWindow/components/Musicbar.vue";
+import Sidebar from "@/mainWindow/components/Sidebar.vue";
+import TopBar from "@/mainWindow/components/TopBar.vue";
+import { Component } from "vue-property-decorator";
+import ContextMenuMixin from "@/utils/mixins/ContextMenuMixin";
+import { mixins } from "vue-class-component";
 
 @Component({
   components: {
@@ -28,20 +28,19 @@ import { mixins } from 'vue-class-component'
   },
 })
 export default class DefaultLayout extends mixins(ContextMenuMixin) {
-  private refreshRouter: boolean = false
-  private isSidebarOpen: boolean = true
+  private refreshRouter: boolean = false;
+  private isSidebarOpen: boolean = true;
   mounted() {
     //TODO: Refresh Router on preference change
   }
 
   toggleSidebar(isOpen: boolean) {
-    this.isSidebarOpen = isOpen
+    this.isSidebarOpen = isOpen;
   }
 }
 </script>
 
 <style lang="sass" scoped>
-
 .musicbar
   position: fixed
   z-index: -1

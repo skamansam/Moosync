@@ -84,10 +84,10 @@ export default class MusicBar extends mixins(Colors) {
   width: 12px
   height: 12px
   border-radius: 50%
-  background:  var(--accent)
+  background: var(--accent)
 
 .slider::-ms-fill-upper
-  background-color:  var(--primary)
+  background-color: var(--primary)
 
 .volume-icon
   height: 22px

@@ -14,11 +14,11 @@
 </template>
 
 <script lang="ts">
-import { Playlist } from '@/models/playlists'
-import { Component } from 'vue-property-decorator'
-import CardView from '@/mainWindow/components/generic/CardView.vue'
-import { mixins } from 'vue-class-component'
-import RouterPushes from '@/utils/mixins/RouterPushes'
+import { Playlist } from "@/models/playlists";
+import { Component } from "vue-property-decorator";
+import CardView from "@/mainWindow/components/generic/CardView.vue";
+import { mixins } from "vue-class-component";
+import RouterPushes from "@/utils/mixins/RouterPushes";
 
 @Component({
   components: {
@@ -26,13 +26,13 @@ import RouterPushes from '@/utils/mixins/RouterPushes'
   },
 })
 export default class Albums extends mixins(RouterPushes) {
-  private playlists: Playlist[] = []
+  private playlists: Playlist[] = [];
   private async getPlaylists() {
-    this.playlists = await window.DBUtils.getAllPlaylists()
+    this.playlists = await window.DBUtils.getAllPlaylists();
   }
 
   mounted() {
-    this.getPlaylists()
+    this.getPlaylists();
   }
 }
 </script>

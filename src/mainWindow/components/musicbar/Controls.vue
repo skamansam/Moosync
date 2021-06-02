@@ -1,26 +1,40 @@
 <template>
   <b-row align-v="center" class="justify-content-center">
-    <b-col cols="auto" class="timestamp">{{ formatDuration(timestamp) }} / {{ formatDuration(duration) }}</b-col>
-    <b-col cols="auto" v-on:click="prevSong()"><LastTrack /></b-col>
-    <b-col cols="auto" v-on:click="toggleRepeat()"><Repeat /></b-col>
-    <b-col cols="auto" v-if="loading"><b-spinner label="Loading..."></b-spinner></b-col>
-    <b-col cols="auto" v-if="!loading" v-on:click="togglePlayerState()"><Play :play="playing" /></b-col>
-    <b-col cols="auto" v-on:click="nextSong()"><NextTrack /></b-col>
-    <b-col cols="auto" v-on:click="shuffle()"><Shuffle /></b-col>
+    <b-col cols="auto" class="timestamp"
+      >{{ formatDuration(timestamp) }} / {{ formatDuration(duration) }}</b-col
+    >
+    <b-col cols="auto" v-on:click="prevSong()">
+      <LastTrack />
+    </b-col>
+    <b-col cols="auto" v-on:click="toggleRepeat()">
+      <Repeat />
+    </b-col>
+    <b-col cols="auto" v-if="loading">
+      <b-spinner label="Loading..."></b-spinner>
+    </b-col>
+    <b-col cols="auto" v-if="!loading" v-on:click="togglePlayerState()">
+      <Play :play="playing" />
+    </b-col>
+    <b-col cols="auto" v-on:click="nextSong()">
+      <NextTrack />
+    </b-col>
+    <b-col cols="auto" v-on:click="shuffle()">
+      <Shuffle />
+    </b-col>
     <!-- <b-col cols="2" class="d-none d-xl-block"></b-col> -->
   </b-row>
 </template>
 
 <script lang="ts">
-import { Component, Prop } from 'vue-property-decorator'
-import LastTrack from '@/mainWindow/components/icons/LastTrack.vue'
-import NextTrack from '@/mainWindow/components/icons/NextTrack.vue'
-import Play from '@/mainWindow/components/icons/Play.vue'
-import Repeat from '@/mainWindow/components/icons/Repeat.vue'
-import Shuffle from '@/mainWindow/components/icons/Shuffle.vue'
-import { mixins } from 'vue-class-component'
-import PlayerControls from '@/utils/mixins/PlayerControls'
-import { vxm } from '@/mainWindow/store'
+import { Component, Prop } from "vue-property-decorator";
+import LastTrack from "@/mainWindow/components/icons/LastTrack.vue";
+import NextTrack from "@/mainWindow/components/icons/NextTrack.vue";
+import Play from "@/mainWindow/components/icons/Play.vue";
+import Repeat from "@/mainWindow/components/icons/Repeat.vue";
+import Shuffle from "@/mainWindow/components/icons/Shuffle.vue";
+import { mixins } from "vue-class-component";
+import PlayerControls from "@/utils/mixins/PlayerControls";
+import { vxm } from "@/mainWindow/store";
 
 @Component({
   components: {
@@ -33,33 +47,33 @@ import { vxm } from '@/mainWindow/store'
 })
 export default class MusicBar extends mixins(PlayerControls) {
   @Prop({ default: 0 })
-  private duration!: number
+  private duration!: number;
 
   @Prop({ default: 0 })
-  private timestamp!: number
+  private timestamp!: number;
 
   @Prop({ default: true })
-  private playing!: boolean
+  private playing!: boolean;
 
   @Prop({ default: false })
-  private loading!: boolean
+  private loading!: boolean;
 
   get repeat() {
-    return vxm.player.Repeat
+    return vxm.player.Repeat;
   }
 
   private toggleRepeat() {
-    vxm.player.repeat = !this.repeat
+    vxm.player.repeat = !this.repeat;
   }
 
   private formatDuration(n: number) {
-    let tmp = new Date(n * 1000).toISOString().substr(11, 8)
+    let tmp = new Date(n * 1000).toISOString().substr(11, 8);
 
-    if (tmp[0] == '0' && tmp[1] == '0') {
-      return tmp.substr(3)
+    if (tmp[0] == "0" && tmp[1] == "0") {
+      return tmp.substr(3);
     }
 
-    return tmp
+    return tmp;
   }
 }
 </script>
@@ -68,7 +82,7 @@ export default class MusicBar extends mixins(PlayerControls) {
 @import '@/sass/variables.sass'
 
 .timestamp
-  color:  var(--textSecondary)
+  color: var(--textSecondary)
   font-family: 'Proxima Nova'
   font-style: normal
   font-weight: normal
