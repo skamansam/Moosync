@@ -18,18 +18,24 @@
       <VolumeIcon />
     </div>
     <div>
-      <div class="expand-icon ml-auto" :class="{ open: sliderOpen }" @click="emitToggleSlider"><ExpandIcon /></div>
+      <div
+        class="expand-icon ml-auto"
+        :class="{ open: sliderOpen }"
+        @click="emitToggleSlider"
+      >
+        <ExpandIcon />
+      </div>
     </div>
   </div>
 </template>
 
 <script lang="ts">
-import { Component } from 'vue-property-decorator'
-import VolumeIcon from '@/mainWindow/components/icons/Volume.vue'
-import ExpandIcon from '@/mainWindow/components/icons/Expand.vue'
-import Colors from '@/utils/mixins/Colors'
-import { mixins } from 'vue-class-component'
-import { vxm } from '@/mainWindow/store'
+import { Component } from "vue-property-decorator";
+import VolumeIcon from "@/mainWindow/components/icons/Volume.vue";
+import ExpandIcon from "@/mainWindow/components/icons/Expand.vue";
+import Colors from "@/utils/mixins/Colors";
+import { mixins } from "vue-class-component";
+import { vxm } from "@/mainWindow/store";
 
 @Component({
   components: {
@@ -40,23 +46,23 @@ import { vxm } from '@/mainWindow/store'
 export default class MusicBar extends mixins(Colors) {
   // TODO: Load last used volume
 
-  private sliderOpen: boolean = false
+  private sliderOpen: boolean = false;
 
   get volume() {
-    return vxm.player.volume
+    return vxm.player.volume;
   }
 
   set volume(value: number) {
-    vxm.player.volume = value
+    vxm.player.volume = value;
   }
 
   private emitToggleSlider() {
-    this.sliderOpen = !this.sliderOpen
-    this.$emit('onToggleSlider', this.sliderOpen)
+    this.sliderOpen = !this.sliderOpen;
+    this.$emit("onToggleSlider", this.sliderOpen);
   }
 
   get ComputedGradient(): string {
-    return `linear-gradient(90deg, ${this.rootColors['--accent']} 0%, ${this.rootColors['--accent']} ${this.volume}%, ${this.rootColors['--lightPrimary']} 0%)`
+    return `linear-gradient(90deg, ${this.rootColors["--accent"]} 0%, ${this.rootColors["--accent"]} ${this.volume}%, ${this.rootColors["--textSecondary"]} 0%)`;
   }
 }
 </script>
