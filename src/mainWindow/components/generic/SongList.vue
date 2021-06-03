@@ -103,7 +103,6 @@ export default class SongList extends mixins(Colors) {
   table-layout: fixed
   margin-right: 10px
   min-width: 10px
-  overflow-y: hidden
 
 .custom-table > thead > tr > th
   background-color: var(--primary) !important
@@ -122,7 +121,6 @@ export default class SongList extends mixins(Colors) {
 .custom-table > tbody > tr > td , .custom-table > thead > tr > th > div
   white-space: nowrap
   text-overflow: ellipsis
-  overflow: hidden
   user-select: none
   font-family: 'Proxima Nova'
 
@@ -152,11 +150,19 @@ table.b-table > tfoot > tr > th[aria-sort="descending"]
 .custom-table-container
   transition: color .3s ease
   color: rgba(0, 0, 0, 0)
-  max-height: calc( 100vh - 6.5rem - 70px - 30px) !important
-  overflow-y: auto
+  max-height: calc(100% - 30px) !important
+  max-width: 100%
   overflow-x: hidden
   margin-bottom: 0 !important
 
 .custom-table-container > table
   width: 100%
+
+.custom-table-container
+  &::-webkit-scrollbar-thumb
+    background: var(--textPrimary)
+    border: 10px solid var(--primary)
+    width: 100px
+  &::-webkit-scrollbar-track
+    background: var(--primary) !important
 </style>
