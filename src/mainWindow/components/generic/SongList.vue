@@ -1,8 +1,8 @@
 <template>
-  <div class="d-flex h-100">
+  <div class="d-flex h-100 w-100">
     <b-table
       class="custom-table-container d-flex h-100"
-      table-class="custom-table"
+      table-class="custom-table w-100"
       :items="songList"
       :fields="fields"
       sticky-header
@@ -59,6 +59,14 @@ export default class SongList extends mixins(Colors) {
   mounted() {
     this.resizer = new Resizer(document);
     window.WindowUtils.setMainWindowResizeListener(this.rerenderTable);
+
+    var doit: NodeJS.Timeout;
+    window.onresize = () => {
+      this.rerenderTable();
+      clearTimeout(doit);
+      // Add grips only after there is no resizeing event for 100ms
+      doit = setTimeout(() => this.resizer.addGrips(), 100);
+    };
   }
 
   private onRowContext(item: Song, index: number, event: Event) {
@@ -84,9 +92,6 @@ export default class SongList extends mixins(Colors) {
   // For some reason table isn't rerendered on window size change through maximize and minimize functions
   private rerenderTable() {
     this.test = !this.test;
-    this.$nextTick().then(() => {
-      this.resizer.addGrips();
-    });
   }
 }
 </script>
@@ -123,6 +128,7 @@ export default class SongList extends mixins(Colors) {
   text-overflow: ellipsis
   user-select: none
   font-family: 'Proxima Nova'
+  overflow: hidden
 
 .custom-table > tbody > tr > td > div
   font-size: 16px
@@ -150,19 +156,19 @@ table.b-table > tfoot > tr > th[aria-sort="descending"]
 .custom-table-container
   transition: color .3s ease
   color: rgba(0, 0, 0, 0)
-  max-height: calc(100% - 30px) !important
+  max-height: calc(100% - 15px) !important
   max-width: 100%
   overflow-x: hidden
+  overflow-y: auto
   margin-bottom: 0 !important
 
 .custom-table-container > table
-  width: 100%
+  max-width: 100%
 
 .custom-table-container
   &::-webkit-scrollbar-thumb
     background: var(--textPrimary)
     border: 10px solid var(--primary)
-    width: 100px
   &::-webkit-scrollbar-track
     background: var(--primary) !important
 </style>

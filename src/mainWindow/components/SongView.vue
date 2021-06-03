@@ -1,7 +1,7 @@
 <template>
-  <b-container fluid class="song-container h-100 w-100">
+  <b-container fluid class="song-container h-100">
     <b-row align-v="center" class="w-100 no-gutters details-background">
-      <b-col class="w-100">
+      <b-col class>
         <SongDetails
           class="details-container"
           :currentTitle="currentSong ? currentSong.title : ''"
