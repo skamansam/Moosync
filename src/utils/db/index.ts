@@ -416,6 +416,11 @@ class SongDBInstance extends DBUtils {
       }
     })()
   }
+
+  public async removePlaylist(playlist_id: string) {
+    this.db.delete('playlist_bridge', { playlist: playlist_id })
+    this.db.delete('playlists', { playlist_id: playlist_id })
+  }
 }
 
 export const SongDB = new SongDBInstance()

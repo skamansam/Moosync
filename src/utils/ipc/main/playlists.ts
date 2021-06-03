@@ -27,6 +27,9 @@ export class PlaylistsChannel implements IpcChannelInterface {
       case PlaylistEvents.SAVE_COVER:
         this.saveCoverToFile(event, request)
         break
+      case PlaylistEvents.REMOVE_PLAYLIST:
+        this.removePlaylist(event, request)
+        break
     }
   }
 
@@ -79,6 +82,13 @@ export class PlaylistsChannel implements IpcChannelInterface {
       fs.writeFile(filePath, request.params.b64.replace(/^data:image\/png;base64,/, ""), 'base64', () => {
         event.reply(request.responseChannel, filePath)
       })
+    }
+  }
+
+  private removePlaylist(event: Electron.IpcMainEvent, request: IpcRequest) {
+    if (request.params.playlist_id) {
+      SongDB.removePlaylist(request.params.playlist_id).then(() => event.reply(request.responseChannel)
+      )
     }
   }
 }

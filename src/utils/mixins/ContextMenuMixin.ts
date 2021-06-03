@@ -8,6 +8,7 @@ import { mixins } from 'vue-class-component'
 import { YoutubeItem } from '@/models/youtube'
 import { toSong } from '@/models/youtube'
 import { vxm } from '@/mainWindow/store'
+import { Playlist } from '@/models/playlists'
 
 @Component
 export default class ContextMenuMixin extends mixins(PlayerControls) {
@@ -22,7 +23,7 @@ export default class ContextMenuMixin extends mixins(PlayerControls) {
   private populatePlaylistMenu(item: Song[], exclude?: string): MenuItem[] {
     let menu: MenuItem[] = [
       {
-        label: 'New Playlist',
+        label: 'Create Playlist',
         handler: () => {
           bus.$emit(EventBus.SHOW_NEW_PLAYLIST_MODAL, item)
         }
@@ -86,6 +87,20 @@ export default class ContextMenuMixin extends mixins(PlayerControls) {
         label: 'Add To Playlist',
         children: this.populatePlaylistMenu(toSong(...item)),
       },
+    ]
+    bus.$emit(EventBus.SHOW_CONTEXT, event, items)
+  }
+
+  public getPlaylistContextMenu(event: Event, playlist: Playlist, refreshCallback: () => void) {
+    console.log('here')
+    let items = [
+      {
+        label: 'Remove Playlist',
+        handler: () => {
+          window.DBUtils.removePlaylist(playlist.playlist_id)
+          refreshCallback()
+        },
+      }
     ]
     bus.$emit(EventBus.SHOW_CONTEXT, event, items)
   }

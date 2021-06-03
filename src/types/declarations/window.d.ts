@@ -22,6 +22,7 @@ interface DBUtils {
   getSinglePlaylist: (PlaylistID: string) => Promise<Song[]>
   createPlaylist: (name: string, desc: string, imgSrc: string) => Promise<string>
   addToPlaylist: (playlistID: string, ...songIDs: Song[]) => Promise<void>
+  removePlaylist: (playlistID: string) => Promise<void>
 }
 
 interface searchUtils {

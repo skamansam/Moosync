@@ -41,7 +41,7 @@ contextBridge.exposeInMainWorld('DBUtils', {
       type: PlaylistEvents.ADD_TO_PLAYLIST,
       params: { playlist_id: playlistID, song_ids: songIDs },
     }),
-
+  removePlaylist: (playlistID: string) => ipcRendererHolder.send(IpcEvents.PLAYLIST, { type: PlaylistEvents.REMOVE_PLAYLIST, params: { playlist_id: playlistID } }),
   getAllSongs: () => ipcRendererHolder.send(IpcEvents.SONG, { type: SongEvents.GET_ALL_SONGS }),
   storeSongs: (songs: Song[]) =>
     ipcRendererHolder.send(IpcEvents.SONG, { type: SongEvents.STORE_SONG, params: { songs: songs } }),

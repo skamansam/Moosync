@@ -63,6 +63,7 @@ export enum PlaylistEvents {
   GET_ALL_PLAYLISTS = 'getPlaylists',
   GET_PLAYLIST = 'getPlaylist',
   ADDED_PLAYLIST = 'addedPlaylist',
+  REMOVE_PLAYLIST = 'removePlaylist',
   SAVE_COVER = 'saveCover',
 }
 
