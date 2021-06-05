@@ -10,6 +10,7 @@ export enum IpcEvents {
   PREFERENCES = 'preferences',
   SEARCH = 'search',
   STORE = 'store',
+  SERVICE_PROVIDERS = 'serviceProviders',
 }
 
 export enum StoreEvents {
@@ -41,6 +42,8 @@ export enum WindowEvents {
   CLOSE_PREF = 'closePref',
   MAX_PREF = 'maxPref',
   MIN_PREF = 'minPref',
+  OPEN_URL_EXTERNAL = 'openUrlExternal',
+  LISTEN_OAUTH_EVENT = 'listenOauthEvent'
 }
 
 export enum AlbumEvents {
@@ -82,10 +85,15 @@ export enum SongEvents {
   IMAGE_EXISTS = 'imageExists',
 }
 
+export enum ServiceProviderEvents {
+  LOGIN = 'login'
+}
+
 export enum EventBus {
   UPDATE_AUDIO_TIME = 'timestamp-update',
   SONG_SELECTED = 'song-select',
   COVER_SELECTED = 'cover-select',
   SHOW_CONTEXT = 'show-context',
   SHOW_NEW_PLAYLIST_MODAL = 'show-new-playlist-modal',
+  SHOW_ADD_PLAYLIST_MODAL = 'show-add-playlist-modal',
 }

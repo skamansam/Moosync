@@ -5,15 +5,25 @@ import installExtension, { VUEJS_DEVTOOLS } from 'electron-devtools-installer'
 
 import { createProtocol } from 'vue-cli-plugin-electron-builder/lib'
 import { loadPreferences } from '@/utils/db/preferences'
-import path from 'path'
+import path, { resolve } from 'path'
 import { registerIpcChannels } from '@/utils/ipc/main' // Import for side effects
 import 'threads/register'
+import { OAuthHandler } from '@/utils/oauth/handler';
+import EventEmitter from 'events';
 
 const isDevelopment = process.env.NODE_ENV !== 'production'
 export var mainWindow: BrowserWindow
+export var oauthHandler = new OAuthHandler()
+export var oauthEventEmitter = new EventEmitter()
+
+// Since in development mode, it is valid to have multiple processes open,
+// quit the app if it is supposed to be used for oauth purposes only
+if (isDevelopment && process.argv.findIndex((arg) => arg.startsWith('com.moosync')) !== -1) {
+  app.quit()
+}
 
 // Scheme must be registered before the app is ready
-protocol.registerSchemesAsPrivileged([{ scheme: 'app', privileges: { secure: true, standard: true } }])
+protocol.registerSchemesAsPrivileged([{ scheme: 'com.moosync', privileges: { secure: true, standard: true } }])
 protocol.registerSchemesAsPrivileged([{ scheme: 'media', privileges: { corsEnabled: true, supportFetchAPI: true } }])
 
 let isQuitting = false
@@ -70,7 +80,7 @@ export async function createPreferenceWindow() {
     if (!process.env.IS_TEST) win.webContents.openDevTools()
   } else {
     // Load the index.html when not in development
-    win.loadURL('app://./preferenceWindow.html')
+    win.loadURL('com.moosync://./preferenceWindow.html')
   }
   win.removeMenu()
   return win
@@ -148,18 +158,6 @@ async function createWindow() {
   return win
 }
 
-if (!isDevelopment) {
-  if (!app.requestSingleInstanceLock()) {
-    app.quit()
-  }
-  app.on('second-instance', () => {
-    if (mainWindow && !mainWindow.isFocused()) {
-      if (tray && !tray.isDestroyed()) tray.destroy()
-      mainWindow.show()
-    }
-  })
-}
-
 // Quit when all windows are closed.
 app.on('window-all-closed', () => {
   // On macOS it is common for applications and their menu bar
@@ -183,6 +181,8 @@ app.on('before-quit', function () {
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
 app.on('ready', async () => {
+  registerIpcChannels()
+
   if (isDevelopment && !process.env.IS_TEST) {
     // Install Vue Devtools
     try {
@@ -203,7 +203,7 @@ app.on('ready', async () => {
   })
 
   interceptHttp()
-  createProtocol('app')
+  createProtocol('com.moosync')
   nativeTheme.themeSource = 'dark'
   await loadPreferences()
   mainWindow = await createWindow()
@@ -224,4 +224,40 @@ if (isDevelopment) {
   }
 }
 
-registerIpcChannels()
+app.on('open-url', function (event, data) {
+  event.preventDefault();
+  oauthHandler.handleEvents(data)
+});
+
+if (isDevelopment && process.platform === 'win32') {
+  // Set the path of electron.exe and your app.
+  // These two additional parameters are only available on windows.
+  // Setting this is required to get this working in dev mode.
+  app.setAsDefaultProtocolClient('com.moosync', process.execPath, [
+    resolve(process.argv[1])
+  ]);
+} else {
+  app.setAsDefaultProtocolClient('com.moosync');
+}
+
+if (!app.requestSingleInstanceLock()) {
+  if (!isDevelopment)
+    app.quit()
+}
+
+app.on('second-instance', (event, argv) => {
+  if (process.platform !== 'darwin') {
+    let arg = argv.find((arg) => arg.startsWith('com.moosync'))
+    if (arg) {
+      app.focus()
+      oauthHandler.handleEvents(arg)
+    }
+  }
+
+  if (!isDevelopment) {
+    if (mainWindow && !mainWindow.isFocused()) {
+      if (tray && !tray.isDestroyed()) tray.destroy()
+      mainWindow.show()
+    }
+  }
+})

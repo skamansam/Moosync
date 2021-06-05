@@ -22,4 +22,8 @@ export class IpcRendererHolder {
   public on<T>(channel: string, callback: (...args: T[]) => void) {
     this.ipcRenderer.on(channel, (_, ...args: any[]) => callback(...args))
   }
+
+  public removeAllListener<T>(channel: string) {
+    this.ipcRenderer.removeAllListeners(channel)
+  }
 }

@@ -25,6 +25,10 @@ interface DBUtils {
   removePlaylist: (playlistID: string) => Promise<void>
 }
 
+interface providerUtils {
+  login: () => Promise<void>
+}
+
 interface searchUtils {
   searchCompact: (term: string) => Promise<SearchResult>
   searchAll: (term: string) => Promise<SearchResult>
@@ -61,6 +65,9 @@ interface windowUtils {
   openFileBrowser: () => Promise<Electron.OpenDialogReturnValue>
   toggleDevTools: () => Promise<void>
   setMainWindowResizeListener: (callback: () => void) => void
+  openExternal: (url: string) => Promise<void>
+  registerOAuthCallback: (callback: (data: string) => void) => void
+  deregisterOAuthCallback: () => void
 }
 
 declare global {
@@ -70,6 +77,7 @@ declare global {
     FileUtils: fileUtils
     PreferenceUtils: preferenceUtils
     WindowUtils: windowUtils
+    ProviderUtils: providerUtils
     Store: store
   }
 }

@@ -1,4 +1,4 @@
-import { BrowserWindow, dialog } from 'electron'
+import { BrowserWindow, dialog, shell } from 'electron'
 import { IpcChannelInterface, IpcRequest } from '.'
 import { IpcEvents, WindowEvents } from './constants'
 import { createPreferenceWindow, mainWindow } from '@/background'
@@ -34,6 +34,9 @@ export class BrowserWindowChannel implements IpcChannelInterface {
         break
       case WindowEvents.MIN_MAIN:
         this.minMainWindow(event, request)
+        break
+      case WindowEvents.OPEN_URL_EXTERNAL:
+        this.openUrl(event, request)
         break
     }
   }
@@ -117,5 +120,10 @@ export class BrowserWindowChannel implements IpcChannelInterface {
       mainWindow.minimize()
     }
     event.reply(request.responseChannel)
+  }
+
+  private openUrl(event: Electron.IpcMainEvent, request: IpcRequest) {
+    if (request.params.url)
+      shell.openExternal(request.params.url).then(() => event.reply(request.responseChannel))
   }
 }

@@ -42,8 +42,16 @@ export default class Albums extends mixins(RouterPushes, ContextMenuMixin) {
     this.allPlaylists = await window.DBUtils.getAllPlaylists();
   }
 
+  private contextHandler = (event: Event) => this.getGeneralPlaylistMenu(event);
+
   mounted() {
     this.getPlaylists();
+
+    window.addEventListener("contextmenu", this.contextHandler);
+  }
+
+  destroyed() {
+    window.removeEventListener("contextmenu", this.contextHandler);
   }
 
   private refreshCallback() {

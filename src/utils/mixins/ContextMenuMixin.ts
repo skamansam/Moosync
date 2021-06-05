@@ -92,13 +92,24 @@ export default class ContextMenuMixin extends mixins(PlayerControls) {
   }
 
   public getPlaylistContextMenu(event: Event, playlist: Playlist, refreshCallback: () => void) {
-    console.log('here')
     let items = [
       {
         label: 'Remove Playlist',
         handler: () => {
           window.DBUtils.removePlaylist(playlist.playlist_id)
           refreshCallback()
+        },
+      }
+    ]
+    bus.$emit(EventBus.SHOW_CONTEXT, event, items)
+  }
+
+  public getGeneralPlaylistMenu(event: Event) {
+    let items = [
+      {
+        label: 'Add Playlist from URL',
+        handler: () => {
+          bus.$emit(EventBus.SHOW_ADD_PLAYLIST_MODAL)
         },
       }
     ]

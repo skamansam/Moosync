@@ -29,9 +29,11 @@ module.exports = {
   },
   pluginOptions: {
     electronBuilder: {
+      customFileProtocol: 'com.moosync://./',
       builderOptions: {
         publish: ['github'],
         asarUnpack: ['*.worker.js'],
+
       },
       nodeIntegration: false,
       disableMainProcessTypescript: false,

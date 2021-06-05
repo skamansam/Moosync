@@ -1,0 +1,108 @@
+<template>
+  <b-modal
+    class="playlist-modal"
+    centered
+    size="lg"
+    :id="id"
+    :ref="id"
+    hide-footer
+    hide-header
+  >
+    <div class="modal-content-container">
+      <b-container fluid class="p-0">
+        <b-row no-gutters class="d-flex">
+          <Record v-if="forceEmptyImg" class="playlist-cover" />
+          <b-col class="playlist-details">
+            <div class="d-flex">
+              <b-input
+                v-model="title"
+                id="playlist-title"
+                class="playlist-title"
+                placeholder="Playlist Name..."
+                onkeypress="this.style.width = this.value.length + 'ch';"
+              />
+            </div>
+          </b-col>
+        </b-row>
+      </b-container>
+      <b-button class="create-button" @click="createPlaylist">Create</b-button>
+    </div>
+  </b-modal>
+</template>
+
+<script lang="ts">
+import { EventBus } from "@/utils/ipc/main/constants";
+import { Component, Prop } from "vue-property-decorator";
+import Colors from "@/utils/mixins/Colors";
+import { mixins } from "vue-class-component";
+import { bus } from "@/mainWindow/main";
+import { vxm } from "@/mainWindow/store";
+import Record from "@/mainWindow/components/icons/Record.vue";
+import { Song } from "@/models/songs";
+@Component({
+  components: {
+    Record,
+  },
+})
+export default class NewPlaylistModal extends mixins(Colors) {
+  @Prop({ default: "PlaylistFromURL" })
+  private id!: string;
+
+  private title: string =
+    "https://www.youtube.com/playlist?list=PLO0BbVUKhznedJgQf90LTU7VX-f3U13Af";
+  private forceEmptyImg: boolean = false;
+
+  private showing: boolean = false;
+
+  private isDuplicatePlaylistName(): boolean {
+    for (const playlist of Object.values(vxm.playlist.playlists)) {
+      if (this.title === playlist) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  private async createPlaylist() {
+    // this.ytFetcher.fetch(this.title);
+  }
+
+  private handleImageError() {
+    this.forceEmptyImg = true;
+  }
+
+  private async addToPlaylist(playlist_id: string, songs: Song[]) {
+    window.DBUtils.addToPlaylist(playlist_id, ...songs);
+  }
+
+  mounted() {
+    bus.$on(EventBus.SHOW_ADD_PLAYLIST_MODAL, () => {
+      if (!this.showing) {
+        this.forceEmptyImg = false;
+        this.$bvModal.show(this.id);
+      }
+    });
+  }
+}
+</script>
+
+<style lang="sass" scoped>
+.topbar-container
+  background: var(--primary)
+  height: 70px
+  padding-left: calc(261px + 30px + 7.5px)
+
+.modal-content-container
+  margin: 35px 35px 35px 35px
+
+.create-button
+  font-family: 'Proxima Nova'
+  font-size: 16px
+  color: var(--textInverse)
+  background-color: var(--accent)
+  border-radius: 6px
+  float: right
+  margin-bottom: 20px
+  margin-top: 15px
+  border: 0
+</style>

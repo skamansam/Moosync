@@ -11,6 +11,7 @@ import {
   ScannerEvents,
   SearchEvents,
   SongEvents,
+  ServiceProviderEvents,
 } from '@/utils/ipc/main/constants'
 import { Song } from './models/songs'
 import { Preferences } from './utils/db/constants'
@@ -58,6 +59,10 @@ contextBridge.exposeInMainWorld('PreferenceUtils', {
     }),
 })
 
+contextBridge.exposeInMainWorld('ProviderUtils', {
+  login: () => ipcRendererHolder.send(IpcEvents.SERVICE_PROVIDERS, { type: ServiceProviderEvents.LOGIN }),
+})
+
 contextBridge.exposeInMainWorld('Store', {
   get: (key: string) => ipcRendererHolder.send(IpcEvents.STORE, { type: StoreEvents.GET_DATA, params: { key: key } }),
   set: (key: string, value: any) =>
@@ -100,4 +105,7 @@ contextBridge.exposeInMainWorld('WindowUtils', {
   maxMainWindow: () => ipcRendererHolder.send(IpcEvents.BROWSER_WINDOWS, { type: WindowEvents.MAX_MAIN }),
   openFileBrowser: () => ipcRendererHolder.send(IpcEvents.BROWSER_WINDOWS, { type: WindowEvents.OPEN_FILE_BROWSER }),
   toggleDevTools: () => ipcRendererHolder.send(IpcEvents.BROWSER_WINDOWS, { type: WindowEvents.TOGGLE_DEV_TOOLS }),
+  openExternal: (url: string) => ipcRendererHolder.send(IpcEvents.BROWSER_WINDOWS, { type: WindowEvents.OPEN_URL_EXTERNAL, params: { url: url } }),
+  registerOAuthCallback: (callback: (data: string) => void) => ipcRendererHolder.on(WindowEvents.LISTEN_OAUTH_EVENT, callback),
+  deregisterOAuthCallback: () => ipcRendererHolder.removeAllListener(WindowEvents.LISTEN_OAUTH_EVENT)
 })
