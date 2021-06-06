@@ -12,9 +12,9 @@
           <Rooms id="account" class="accounts-icon" />
           <b-popover :target="`account`" placement="bottom" triggers="focus">
             <div>
-              <b-button @click="loginYoutube">{{
-                youtubeName ? youtubeName : "YT Login"
-              }}</b-button>
+              <b-button @click="loginYoutube">
+                {{ youtubeName ? youtubeName : "YT Login" }}
+              </b-button>
             </div>
           </b-popover>
         </b-col>

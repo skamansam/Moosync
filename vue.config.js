@@ -1,6 +1,8 @@
 const webpack = require('webpack');
 const VuetifyLoaderPlugin = require('vuetify-loader/lib/plugin')
 const ThreadsPlugin = require('threads-plugin')
+const dotenv = require('dotenv').config({ path: __dirname + '/config.env' });
+
 // const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 
 module.exports = {
@@ -20,7 +22,8 @@ module.exports = {
   configureWebpack: {
     plugins: [
       new webpack.DefinePlugin({
-        'process.browser': 'true'
+        'process.browser': 'true',
+        'process.env.YoutubeClientID': JSON.stringify(dotenv.parsed['YOUTUBECLIENTID'])
       }),
       new VuetifyLoaderPlugin(),
     ],

@@ -106,8 +106,9 @@ export class AuthFlow {
       default:
         return {
           openIdConnectUrl: "https://accounts.google.com",
-          clientId:
-            "YOUR-CLIENT-ID",
+          // clientId:
+          //   "802830583043-er2mb5d1itikopg766g8kri8tfl8tlpt.apps.googleusercontent.com",
+          clientId: process.env.YoutubeClientID!,
           redirectUri: "com.moosync:ytoauth2callback/",
           scope: "https://www.googleapis.com/auth/youtube.readonly",
           keytarService: 'MoosyncYoutubeRefreshToken'
