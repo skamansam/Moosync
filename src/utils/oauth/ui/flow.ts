@@ -20,9 +20,6 @@ import {
   AuthorizationRequestHandler
 } from "@openid/appauth/built/authorization_request_handler";
 import { AuthorizationServiceConfiguration } from "@openid/appauth/built/authorization_service_configuration";
-import { NodeCrypto } from '@openid/appauth/built/node_support/';
-// import { NodeBasedHandler } from "@openid/appauth/built/node_support/node_request_handler";
-import { NodeRequestor } from "@openid/appauth/built/node_support/node_requestor";
 import {
   GRANT_TYPE_AUTHORIZATION_CODE,
   GRANT_TYPE_REFRESH_TOKEN,
@@ -39,22 +36,17 @@ import EventEmitter from 'events';
 
 import { StringMap } from "@openid/appauth/built/types";
 import { AuthFlowRequestHandler } from './AuthFlowRequestHandler';
+import { WebCrypto } from "./crypto_utils";
+import { NodeRequestor } from '@openid/appauth/built/node_support/node_requestor';
 
 export class AuthStateEmitter extends EventEmitter {
   static ON_TOKEN_RESPONSE = "on_token_response";
 }
 
-/* the Node.js based HTTP client. */
+type config = { openIdConnectUrl: string, clientId: string, redirectUri: string, scope: string, keytarService: string }
+type oauthType = 'youtube'
+
 const requestor = new NodeRequestor();
-
-/* an example open id connect provider */
-const openIdConnectUrl = "https://accounts.google.com";
-
-/* example client configuration */
-const clientId =
-  "CLIENT-ID";
-const redirectUri = "com.moosync:ytoauth2callback/";
-const scope = "openid";
 
 export class AuthFlow {
   private notifier: AuthorizationNotifier;
@@ -68,7 +60,13 @@ export class AuthFlow {
   private refreshToken: string | undefined;
   private accessTokenResponse: TokenResponse | undefined;
 
-  constructor() {
+  private config: config
+
+  private fetchedToken: Promise<void>
+
+  constructor(type: oauthType) {
+    this.config = this.generateConfig(type)
+
     this.notifier = new AuthorizationNotifier();
     this.authStateEmitter = new AuthStateEmitter();
 
@@ -81,6 +79,11 @@ export class AuthFlow {
 
     // set a listener to listen for authorization responses
     // make refresh and access token requests.
+
+    this.fetchedToken = new Promise<void>(resolve => {
+      this.fetchRefreshToken().then(resolve)
+    })
+
     this.notifier.setAuthorizationListener((request, response) => {
       if (response) {
         let codeVerifier: string | undefined;
@@ -97,19 +100,42 @@ export class AuthFlow {
     });
   }
 
-  fetchServiceConfiguration(): Promise<void> {
-    return AuthorizationServiceConfiguration.fetchFromIssuer(
-      openIdConnectUrl,
-      requestor
-    ).then(response => {
-      console.log(response)
-      this.configuration = response;
-    });
+  private generateConfig(type: oauthType): config {
+    switch (type) {
+      case 'youtube':
+      default:
+        return {
+          openIdConnectUrl: "https://accounts.google.com",
+          clientId:
+            "YOUR-CLIENT-ID",
+          redirectUri: "com.moosync:ytoauth2callback/",
+          scope: "https://www.googleapis.com/auth/youtube.readonly",
+          keytarService: 'MoosyncYoutubeRefreshToken'
+        }
+    }
   }
 
-  makeAuthorizationRequest(username?: string) {
+  private async fetchRefreshToken() {
+    this.refreshToken = (await window.Store.getSecure(this.config.keytarService)) ?? undefined
+  }
+
+  private async storeRefreshToken() {
+    if (this.refreshToken)
+      return window.Store.setSecure(this.config.keytarService, this.refreshToken)
+  }
+
+  private async fetchServiceConfiguration() {
+    let configuration = await AuthorizationServiceConfiguration.fetchFromIssuer(
+      this.config.openIdConnectUrl,
+      requestor)
+    return configuration
+  }
+
+  public async makeAuthorizationRequest(username?: string) {
+    if (!this.fetchedToken) throw new Error('service not yet initialized')
+
     if (!this.configuration) {
-      return;
+      this.configuration = await this.fetchServiceConfiguration()
     }
 
     const extras: StringMap = { prompt: "consent", access_type: "offline" };
@@ -119,12 +145,12 @@ export class AuthFlow {
 
     // create a request
     const request = new AuthorizationRequest({
-      client_id: clientId,
-      redirect_uri: redirectUri,
-      scope: scope,
+      client_id: this.config.clientId,
+      redirect_uri: this.config.redirectUri,
+      scope: this.config.scope,
       response_type: AuthorizationRequest.RESPONSE_TYPE_CODE,
       extras: extras
-    }, new NodeCrypto());
+    }, new WebCrypto());
 
 
     this.authorizationHandler.performAuthorizationRequest(
@@ -134,6 +160,8 @@ export class AuthFlow {
   }
 
   private makeRefreshTokenRequest(code: string, codeVerifier: string | undefined): Promise<void> {
+    if (!this.fetchedToken) throw new Error('service not yet initialized')
+
     if (!this.configuration) {
       return Promise.resolve();
     }
@@ -146,8 +174,8 @@ export class AuthFlow {
 
     // use the code to make the token request.
     let request = new TokenRequest({
-      client_id: clientId,
-      redirect_uri: redirectUri,
+      client_id: this.config.clientId,
+      redirect_uri: this.config.redirectUri,
       grant_type: GRANT_TYPE_AUTHORIZATION_CODE,
       code: code,
       extras: extras
@@ -160,7 +188,7 @@ export class AuthFlow {
         this.accessTokenResponse = response;
         return response;
       })
-      .then(() => { });
+      .then(() => this.storeRefreshToken());
   }
 
   loggedIn(): boolean {
@@ -172,20 +200,27 @@ export class AuthFlow {
     this.accessTokenResponse = undefined;
   }
 
-  performWithFreshTokens(): Promise<string> {
+  public async hasValidRefreshToken() {
+    await this.fetchedToken
+    return !!this.refreshToken
+  }
+
+  async performWithFreshTokens(): Promise<string> {
+    if (!this.fetchedToken) return Promise.reject("Service not initialized");
+
     if (!this.configuration) {
-      return Promise.reject("Unknown service configuration");
+      this.configuration = await this.fetchServiceConfiguration()
     }
     if (!this.refreshToken) {
       return Promise.resolve("Missing refreshToken.");
     }
     if (this.accessTokenResponse && this.accessTokenResponse.isValid()) {
-      // do nothing
-      return Promise.resolve(this.accessTokenResponse.accessToken);
+      return this.accessTokenResponse.accessToken;
     }
+
     let request = new TokenRequest({
-      client_id: clientId,
-      redirect_uri: redirectUri,
+      client_id: this.config.clientId,
+      redirect_uri: this.config.redirectUri,
       grant_type: GRANT_TYPE_REFRESH_TOKEN,
       refresh_token: this.refreshToken,
     });

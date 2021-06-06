@@ -16,6 +16,8 @@ export enum IpcEvents {
 export enum StoreEvents {
   SET_DATA = 'setData',
   GET_DATA = 'getData',
+  SET_SECURE = 'setSecure',
+  GET_SECURE = 'getSecure'
 }
 
 export enum SearchEvents {

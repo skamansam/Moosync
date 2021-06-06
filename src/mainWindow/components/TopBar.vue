@@ -12,7 +12,9 @@
           <Rooms id="account" class="accounts-icon" />
           <b-popover :target="`account`" placement="bottom" triggers="focus">
             <div>
-              <b-button @click="loginYoutube">YT Login</b-button>
+              <b-button @click="loginYoutube">{{
+                youtubeName ? youtubeName : "YT Login"
+              }}</b-button>
             </div>
           </b-popover>
         </b-col>
@@ -28,7 +30,7 @@ import Colors from "@/utils/mixins/Colors";
 import { mixins } from "vue-class-component";
 import { Component } from "vue-property-decorator";
 import Rooms from "@/mainWindow/components/icons/Rooms.vue";
-import { AuthFlow, AuthStateEmitter } from "@/utils/oauth/flow";
+import { Youtube } from "@/utils/providers/youtube";
 
 @Component({
   components: {
@@ -38,22 +40,28 @@ import { AuthFlow, AuthStateEmitter } from "@/utils/oauth/flow";
   },
 })
 export default class TopBar extends mixins(Colors) {
-  private authFlow: AuthFlow = new AuthFlow();
+  private youtube = new Youtube();
+  private youtubeName = "";
+
+  mounted() {
+    this.getUserDetails();
+  }
+
+  private getUserDetails() {
+    this.youtube
+      .getUserDetails()
+      .then((resp) => {
+        if (resp && resp.items.length > 0) {
+          console.log(resp);
+          this.youtubeName = resp.items[0].snippet!.title;
+        }
+      })
+      .catch((err) => console.log(err));
+  }
 
   private async loginYoutube() {
-    this.authFlow.authStateEmitter.on(AuthStateEmitter.ON_TOKEN_RESPONSE, () => {
-      console.log("got resp");
-    });
-
-    // await window.ProviderUtils.login();
-    if (!this.authFlow.loggedIn()) {
-      return this.authFlow
-        .fetchServiceConfiguration()
-        .then(() => this.authFlow.makeAuthorizationRequest());
-    } else {
-      console.log("logged in");
-      return Promise.resolve();
-    }
+    await this.youtube.login();
+    this.getUserDetails();
   }
 }
 </script>

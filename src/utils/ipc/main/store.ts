@@ -2,6 +2,8 @@ import { IpcEvents } from './constants'
 import { IpcChannelInterface, IpcRequest } from '.'
 import { StoreEvents } from '@/utils/ipc/main/constants'
 import { store } from '@/utils/db/preferences'
+import keytar from 'keytar'
+import os from 'os'
 
 export class StoreChannel implements IpcChannelInterface {
   name = IpcEvents.STORE
@@ -12,6 +14,12 @@ export class StoreChannel implements IpcChannelInterface {
         break
       case StoreEvents.GET_DATA:
         this.getData(event, request)
+        break
+      case StoreEvents.SET_SECURE:
+        this.setKeytar(event, request)
+        break
+      case StoreEvents.GET_SECURE:
+        this.getKeytar(event, request)
         break
     }
   }
@@ -25,5 +33,19 @@ export class StoreChannel implements IpcChannelInterface {
 
   private getData(event: Electron.IpcMainEvent, request: IpcRequest) {
     event.reply(request.responseChannel, store.get(request.params.key))
+  }
+
+  private async setKeytar(event: Electron.IpcMainEvent, request: IpcRequest) {
+    if (request.params.token && request.params.service) {
+      await keytar.setPassword(request.params.service, os.userInfo().username, request.params.token)
+      event.reply(request.responseChannel)
+    }
+  }
+
+  private async getKeytar(event: Electron.IpcMainEvent, request: IpcRequest) {
+    if (request.params.service) {
+      let token = await keytar.getPassword(request.params.service, os.userInfo().username)
+      event.reply(request.responseChannel, token)
+    }
   }
 }

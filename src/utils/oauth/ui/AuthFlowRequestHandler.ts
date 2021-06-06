@@ -1,10 +1,9 @@
 import { AuthorizationError, AuthorizationRequest, AuthorizationRequestHandler, AuthorizationRequestResponse, AuthorizationResponse, AuthorizationServiceConfiguration, BasicQueryStringUtils, QueryStringUtils } from "@openid/appauth";
-import { NodeCrypto } from "./crypto_utils";
+import { WebCrypto } from "./crypto_utils";
 import { Crypto } from '@openid/appauth'
 import EventEmitter from 'events';
 
 class ServerEventsEmitter extends EventEmitter {
-  static ON_UNABLE_TO_START = 'unable_to_start';
   static ON_AUTHORIZATION_RESPONSE = 'authorization_response';
 }
 
@@ -13,7 +12,7 @@ export class AuthFlowRequestHandler extends AuthorizationRequestHandler {
 
   constructor(
     utils: QueryStringUtils = new BasicQueryStringUtils(),
-    crypto: Crypto = new NodeCrypto()) {
+    crypto: Crypto = new WebCrypto()) {
     super(utils, crypto);
   }
 
@@ -52,10 +51,7 @@ export class AuthFlowRequestHandler extends AuthorizationRequestHandler {
       emitter.emit(ServerEventsEmitter.ON_AUTHORIZATION_RESPONSE, completeResponse);
     });
 
-    this.authorizationPromise = new Promise<AuthorizationRequestResponse>((resolve, reject) => {
-      emitter.once(ServerEventsEmitter.ON_UNABLE_TO_START, () => {
-        reject(`Something happened`);
-      });
+    this.authorizationPromise = new Promise<AuthorizationRequestResponse>((resolve) => {
       emitter.once(ServerEventsEmitter.ON_AUTHORIZATION_RESPONSE, (result: any) => {
         window.WindowUtils.deregisterOAuthCallback()
         // resolve pending promise

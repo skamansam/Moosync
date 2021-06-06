@@ -8,7 +8,7 @@ import { loadPreferences } from '@/utils/db/preferences'
 import path, { resolve } from 'path'
 import { registerIpcChannels } from '@/utils/ipc/main' // Import for side effects
 import 'threads/register'
-import { OAuthHandler } from '@/utils/oauth/handler';
+import { OAuthHandler } from '@/utils/oauth/main/handler';
 import EventEmitter from 'events';
 
 const isDevelopment = process.env.NODE_ENV !== 'production'
@@ -249,7 +249,6 @@ app.on('second-instance', (event, argv) => {
   if (process.platform !== 'darwin') {
     let arg = argv.find((arg) => arg.startsWith('com.moosync'))
     if (arg) {
-      app.focus()
       oauthHandler.handleEvents(arg)
     }
   }

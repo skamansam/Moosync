@@ -1,6 +1,6 @@
 import { bufferToString, urlSafe, Crypto } from '@openid/appauth';
 
-export class NodeCrypto implements Crypto {
+export class WebCrypto implements Crypto {
   generateRandom(size: number): string {
     const bytes = window.crypto.getRandomValues(new Uint32Array(size));
     return bufferToString(new Uint8Array(bytes.buffer));
