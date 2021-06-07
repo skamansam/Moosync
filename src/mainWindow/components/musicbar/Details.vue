@@ -53,6 +53,7 @@ export default class MusicBar extends mixins(Colors, ImageLoader) {
   min-width: 56px
   margin-right: 15px
   border-radius: 10px
+  object-fit: cover
 
 .text
   text-align: left

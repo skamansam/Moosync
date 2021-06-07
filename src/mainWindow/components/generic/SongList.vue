@@ -17,71 +17,76 @@
     >
       <template #cell(index)="data">{{ data.index + 1 }}</template>
 
-      <template #cell(album)="data">{{
-        data.item.album.album_name ? data.item.album.album_name : "-"
-      }}</template>
+      <template #cell(album)="data">{{ getAlbumName(data.item) }}</template>
 
-      <template #cell(artists)="data">{{
-        data.item.artists.length != 0 ? data.item.artists.join(", ") : "-"
-      }}</template>
+      <template #cell(artists)="data">
+        {{
+        data.item.artists ? data.item.artists.join(", ") : "-"
+        }}
+      </template>
     </b-table>
   </div>
 </template>
 
 <script lang="ts">
-import { Song } from "@/models/songs";
-import Colors from "@/utils/mixins/Colors";
-import { Resizer } from "@/utils/ui/resizer";
-import { mixins } from "vue-class-component";
-import { Component, Prop } from "vue-property-decorator";
+import { Song } from '@/models/songs'
+import Colors from '@/utils/mixins/Colors'
+import { Resizer } from '@/utils/ui/resizer'
+import { mixins } from 'vue-class-component'
+import { Component, Prop } from 'vue-property-decorator'
 
 @Component({})
 export default class SongList extends mixins(Colors) {
-  private test: boolean = false;
-  private lastSelect: string = "";
-  private resizer!: Resizer;
-  private selected: Song[] = [];
+  private test: boolean = false
+  private lastSelect: string = ''
+  private resizer!: Resizer
+  private selected: Song[] = []
 
   @Prop({ default: [] })
-  private songList!: Song[];
+  private songList!: Song[]
 
   @Prop({ default: {} })
-  private extrafields!: [{ key: string }];
+  private extrafields!: [{ key: string }]
 
-  private fields: [
-    { key: string; label?: string; tdClass?: string; thClass?: string }
-  ] = [{ key: "index", label: "Sr. No", tdClass: "index-no-td", thClass: "index-no-th" }];
+  private fields: [{ key: string; label?: string; tdClass?: string; thClass?: string }] = [
+    { key: 'index', label: 'Sr. No', tdClass: 'index-no-td', thClass: 'index-no-th' },
+  ]
+
+  private getAlbumName(data: Song) {
+    if (data.album && data.album.album_name) return data.album.album_name
+    return '-'
+  }
 
   created() {
-    this.fields.push(...this.extrafields);
+    this.fields.push(...this.extrafields)
   }
 
   mounted() {
-    this.resizer = new Resizer(document);
-    window.WindowUtils.setMainWindowResizeListener(this.rerenderTable);
+    this.resizer = new Resizer(document)
+    window.WindowUtils.setMainWindowResizeListener(this.rerenderTable)
 
-    var doit: NodeJS.Timeout;
+    var doit: NodeJS.Timeout
     window.onresize = () => {
-      this.rerenderTable();
-      clearTimeout(doit);
+      this.rerenderTable()
+      clearTimeout(doit)
       // Add grips only after there is no resizeing event for 100ms
-      doit = setTimeout(() => this.resizer.addGrips(), 100);
-    };
+      doit = setTimeout(() => this.resizer.addGrips(), 100)
+    }
   }
 
   private onRowContext(item: Song, index: number, event: Event) {
-    this.$emit("onRowContext", event, this.selected.length > 1 ? this.selected : [item]);
+    this.$emit('onRowContext', event, this.selected.length > 1 ? this.selected : [item])
   }
 
   private onRowDoubleClicked(item: Song) {
-    this.$emit("onRowDoubleClicked", item);
+    this.$emit('onRowDoubleClicked', item)
   }
 
   private onRowSelected(items: Song[]) {
-    this.selected = items;
+    this.selected = items
     if (items[items.length - 1] && items[items.length - 1]._id !== this.lastSelect) {
-      this.lastSelect = items[items.length - 1]._id!;
-      this.$emit("onRowSelected", items);
+      this.lastSelect = items[items.length - 1]._id!
+      this.$emit('onRowSelected', items)
     }
   }
 
@@ -91,7 +96,7 @@ export default class SongList extends mixins(Colors) {
 
   // For some reason table isn't rerendered on window size change through maximize and minimize functions
   private rerenderTable() {
-    this.test = !this.test;
+    this.test = !this.test
   }
 }
 </script>

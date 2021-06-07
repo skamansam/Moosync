@@ -4,7 +4,7 @@
       <b-col cols="2" class="d-flex h-100 image-container">
         <b-img
           v-if="ImgSrc && !forceEmptyImg"
-          class="image h-100"
+          class="image h-100 w-100"
           :src="ImgSrc"
           @error="handleImageError"
         />
@@ -49,7 +49,7 @@ export default class SongDetails extends mixins(Colors, ImageLoader) {
 
 .image
   border-radius: 25px
-  // max-width: 100%
+  object-fit: cover
 
 .image-container
   max-width: 170px
