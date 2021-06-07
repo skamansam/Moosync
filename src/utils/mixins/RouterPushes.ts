@@ -43,8 +43,9 @@ export default class PlayerControls extends Vue {
     this.$router.push({
       name: 'playlists-id',
       params: {
-        playlist_id: playlist.playlist_id!,
+        playlist_id: playlist.playlist_id,
         playlist_name: playlist.playlist_name!,
+        isYoutubePlaylist: playlist.playlist_id.startsWith('youtube-').toString()
       },
     })
   }

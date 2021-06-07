@@ -4,7 +4,8 @@
 export enum ApiResources {
   CHANNELS = 'channels',
   PLAYLISTS = 'playlists',
-  PLAYLIST_ITEMS = 'playlistItems'
+  PLAYLIST_ITEMS = 'playlistItems',
+  VIDEO_DETAILS = 'videos'
 }
 
 export type ChannelRequest = {
@@ -18,14 +19,25 @@ export type PlaylistRequest = {
   params: {
     part: ['id', 'snippet'?]
     mine: true
+    maxResults?: number
+    pageToken?: string | undefined
   }
 }
 
 export type PlaylistItemsRequest = {
   params: {
     part: ['id', 'snippet'?]
-    maxResults: Number
-    playlistId: String
+    maxResults: number
+    playlistId: String,
+    pageToken?: string | undefined
+  }
+}
+
+export type VideoDetailsRequest = {
+  params: {
+    part: ['contentDetails', 'snippet']
+    id: string[]
+    maxResults: number
   }
 }
 
@@ -35,10 +47,12 @@ export type SearchObject<T extends ApiResources> = T extends ApiResources.CHANNE
   ? PlaylistRequest
   : T extends ApiResources.PLAYLIST_ITEMS
   ? PlaylistItemsRequest
+  : T extends ApiResources.VIDEO_DETAILS
+  ? VideoDetailsRequest
   : undefined
 
 
-declare namespace Thumbnails {
+export namespace Thumbnails {
   export interface ThumbDefault {
     url: string;
     width: number;
@@ -82,7 +96,7 @@ export interface PageInfo {
   totalResults: number;
   resultsPerPage: number;
 }
-declare namespace PlaylistItems {
+export namespace PlaylistItems {
   export interface ResourceId {
     kind: string;
     videoId: string;
@@ -102,7 +116,7 @@ declare namespace PlaylistItems {
     videoOwnerChannelId: string;
   }
 
-  export interface PlaylistDetails {
+  export interface Items {
     kind: string;
     etag: string;
     id: string;
@@ -112,14 +126,15 @@ declare namespace PlaylistItems {
   export interface PlaylistItems {
     kind: string;
     etag: string;
-    nextPageToken: string;
-    items: PlaylistDetails[];
+    nextPageToken?: string,
+    prevPageToken?: string,
+    items: Items[];
     pageInfo: PageInfo;
   }
 
 }
 
-declare namespace UserPlaylists {
+export namespace UserPlaylists {
 
   export interface Localized {
     title: string;
@@ -146,18 +161,19 @@ declare namespace UserPlaylists {
   export interface UserPlaylists {
     kind: string;
     etag: string;
-    nextPageToken: string;
+    nextPageToken?: string;
+    prevPageToken?: string,
     pageInfo: PageInfo;
     items: Item[];
   }
 }
+export interface Localized {
+  title: string;
+  description: string;
+}
 
-declare namespace ChannelInfo {
+export namespace ChannelInfo {
 
-  export interface Localized {
-    title: string;
-    description: string;
-  }
 
   export interface Snippet {
     title: string;
@@ -182,10 +198,65 @@ declare namespace ChannelInfo {
   }
 }
 
+export namespace VideoDetails {
+
+  export interface RegionRestriction {
+    allowed: string[];
+  }
+
+  export interface ContentRating {
+  }
+
+  export interface ContentDetails {
+    duration: string;
+    dimension: string;
+    definition: string;
+    caption: string;
+    licensedContent: boolean;
+    regionRestriction: RegionRestriction;
+    contentRating: ContentRating;
+    projection: string;
+  }
+
+  export interface Item {
+    kind: string;
+    etag: string;
+    id: string;
+    contentDetails: ContentDetails;
+    snippet: Snippet
+  }
+
+  export interface Snippet {
+    publishedAt: Date;
+    channelId: string;
+    title: string;
+    description: string;
+    thumbnails: Thumbnails.Thumbnails;
+    channelTitle: string;
+    tags: string[];
+    categoryId: string;
+    liveBroadcastContent: string;
+    localized: Localized;
+  }
+
+  export interface VideoDetails {
+    kind: string,
+    etag: string,
+    nextPageToken?: string,
+    prevPageToken?: string,
+    items: Item[],
+    pageInfo: PageInfo,
+  }
+}
+
+
+
 export type ResponseType<T extends ApiResources> = T extends ApiResources.CHANNELS
   ? ChannelInfo.ChannelInfo
   : T extends ApiResources.PLAYLISTS
   ? UserPlaylists.UserPlaylists
   : T extends ApiResources.PLAYLIST_ITEMS
   ? PlaylistItems.PlaylistItems
+  : T extends ApiResources.VIDEO_DETAILS
+  ? VideoDetails.VideoDetails
   : undefined

@@ -2,13 +2,7 @@
   <b-container fluid class="album-container">
     <b-row class="title">Playlists</b-row>
     <b-row class="d-flex">
-      <b-col
-        col
-        xl="2"
-        md="3"
-        v-for="playlist in allPlaylists"
-        :key="playlist.playlist_id"
-      >
+      <b-col col xl="2" md="3" v-for="playlist in allPlaylists" :key="playlist.playlist_id">
         <CardView
           :title="playlist.playlist_name"
           :imgSrc="playlist.playlist_coverPath"
@@ -23,13 +17,13 @@
 </template>
 
 <script lang="ts">
-import { Playlist } from "@/models/playlists";
-import { Component } from "vue-property-decorator";
-import CardView from "@/mainWindow/components/generic/CardView.vue";
-import { mixins } from "vue-class-component";
-import RouterPushes from "@/utils/mixins/RouterPushes";
-import ContextMenuMixin from "@/utils/mixins/ContextMenuMixin";
-import { vxm } from "@/mainWindow/store";
+import { Playlist } from '@/models/playlists'
+import { Component } from 'vue-property-decorator'
+import CardView from '@/mainWindow/components/generic/CardView.vue'
+import { mixins } from 'vue-class-component'
+import RouterPushes from '@/utils/mixins/RouterPushes'
+import ContextMenuMixin from '@/utils/mixins/ContextMenuMixin'
+import { vxm } from '@/mainWindow/store'
 
 @Component({
   components: {
@@ -37,26 +31,29 @@ import { vxm } from "@/mainWindow/store";
   },
 })
 export default class Albums extends mixins(RouterPushes, ContextMenuMixin) {
-  private allPlaylists: Playlist[] = [];
+  private allPlaylists: Playlist[] = []
   private async getPlaylists() {
-    this.allPlaylists = await window.DBUtils.getAllPlaylists();
+    let localPlaylists = await window.DBUtils.getAllPlaylists()
+    let ytPlaylists = await vxm.youtube.youtubeProvider.getUserPlaylists()
+
+    this.allPlaylists.push(...localPlaylists, ...ytPlaylists)
   }
 
-  private contextHandler = (event: Event) => this.getGeneralPlaylistMenu(event);
+  private contextHandler = (event: Event) => this.getGeneralPlaylistMenu(event)
 
   mounted() {
-    this.getPlaylists();
+    this.getPlaylists()
 
-    window.addEventListener("contextmenu", this.contextHandler);
+    window.addEventListener('contextmenu', this.contextHandler)
   }
 
   destroyed() {
-    window.removeEventListener("contextmenu", this.contextHandler);
+    window.removeEventListener('contextmenu', this.contextHandler)
   }
 
   private refreshCallback() {
-    this.getPlaylists();
-    vxm.playlist.updated = true;
+    this.getPlaylists()
+    vxm.playlist.updated = true
   }
 }
 </script>

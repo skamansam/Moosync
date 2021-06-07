@@ -8,167 +8,168 @@
 </template>
 
 <script lang="ts">
-import { Song } from "@/models/songs";
-import { PlayerState, PlayerType } from "@/mainWindow/store/playerState";
-import { Component, Prop, Ref, Watch } from "vue-property-decorator";
-import YTPlayer from "yt-player";
-import Colors from "@/utils/mixins/Colors";
-import { mixins } from "vue-class-component";
-import { Player } from "@/utils/players/player";
-import { YoutubePlayer } from "@/utils/players/youtube";
-import { LocalPlayer } from "@/utils/players/local";
-import SyncMixin from "@/utils/mixins/SyncMixin";
-import { vxm } from "../store";
+import { Song } from '@/models/songs'
+import { PlayerState, PlayerType } from '@/mainWindow/store/playerState'
+import { Component, Prop, Ref, Watch } from 'vue-property-decorator'
+import YTPlayer from 'yt-player'
+import Colors from '@/utils/mixins/Colors'
+import { mixins } from 'vue-class-component'
+import { Player } from '@/utils/players/player'
+import { YoutubePlayer } from '@/utils/players/youtube'
+import { LocalPlayer } from '@/utils/players/local'
+import SyncMixin from '@/utils/mixins/SyncMixin'
+import { vxm } from '../store'
 
 @Component({})
 export default class AudioStream extends mixins(Colors, SyncMixin) {
-  @Ref("audio") audioElement!: ExtendedHtmlAudioElement;
+  @Ref('audio') audioElement!: ExtendedHtmlAudioElement
 
-  @Prop({ default: "" })
-  roomID!: string;
+  @Prop({ default: '' })
+  roomID!: string
 
   @Prop({ default: 0 })
-  forceSeek!: number;
+  forceSeek!: number
 
   @Prop({ default: PlayerState.STOPPED })
-  playerState!: PlayerState;
+  playerState!: PlayerState
 
   @Prop({ default: null })
-  currentSong!: Song | null;
+  currentSong!: Song | null
 
-  private activePlayer!: Player;
-  private ytPlayer!: YoutubePlayer;
-  private localPlayer!: LocalPlayer;
+  private activePlayer!: Player
+  private ytPlayer!: YoutubePlayer
+  private localPlayer!: LocalPlayer
 
-  private isFirst: boolean = true;
+  private isFirst: boolean = true
 
   get SongRepeat() {
-    return vxm.player.Repeat;
+    return vxm.player.Repeat
   }
 
   get volume() {
-    return vxm.player.volume;
+    return vxm.player.volume
   }
 
-  @Watch("playerState")
+  @Watch('playerState')
   onPlayerStateChanged(newState: PlayerState) {
-    this.handleActivePlayerState(newState);
-    this.emitPlayerState(newState);
+    this.handleActivePlayerState(newState)
+    this.emitPlayerState(newState)
   }
 
   private onPlayerTypeChanged(newType: PlayerType) {
-    this.activePlayer.stop();
-    this.activePlayer.removeAllListeners();
+    this.activePlayer.stop()
+    this.activePlayer.removeAllListeners()
+
     switch (newType) {
       case PlayerType.LOCAL:
-        this.activePlayer = this.localPlayer;
-        break;
+        this.activePlayer = this.localPlayer
+        break
       case PlayerType.YOUTUBE:
-        this.activePlayer = this.ytPlayer;
-        break;
+        this.activePlayer = this.ytPlayer
+        break
     }
-    this.registerPlayerListeners();
+    this.registerPlayerListeners()
   }
 
-  @Watch("currentSong")
+  @Watch('currentSong')
   onSongChanged(newSong: Song | null) {
-    if (newSong) this.loadAudio(newSong, false);
+    if (newSong) this.loadAudio(newSong, false)
   }
 
   onVolumeChanged(newValue: number) {
-    this.activePlayer.volume = newValue;
+    this.activePlayer.volume = newValue
   }
 
-  @Watch("forceSeek") onSeek(newValue: number) {
-    this.activePlayer.currentTime = newValue;
-    this.remoteSeek(newValue);
+  @Watch('forceSeek') onSeek(newValue: number) {
+    this.activePlayer.currentTime = newValue
+    this.remoteSeek(newValue)
   }
 
   mounted() {
-    this.setupPlayers();
-    this.setupSync();
-    this.registerListeners();
+    this.setupPlayers()
+    this.setupSync()
+    this.registerListeners()
 
-    if (this.currentSong) this.loadAudio(this.currentSong, true);
+    if (this.currentSong) this.loadAudio(this.currentSong, true)
   }
 
   private setupPlayers() {
-    this.ytPlayer = new YoutubePlayer(new YTPlayer("#yt-player"));
-    this.localPlayer = new LocalPlayer(this.audioElement);
-    this.activePlayer = this.localPlayer;
+    this.ytPlayer = new YoutubePlayer(new YTPlayer('#yt-player'))
+    this.localPlayer = new LocalPlayer(this.audioElement)
+    this.activePlayer = this.localPlayer
   }
 
   private setupSync() {
-    this.setSongSrcCallback = (src: string) => this.activePlayer.load(src);
-    this.onSeekCallback = (time: number) => (this.activePlayer.currentTime = time);
+    this.setSongSrcCallback = (src: string) => this.activePlayer.load(src)
+    this.onSeekCallback = (time: number) => (this.activePlayer.currentTime = time)
   }
 
   private registerRoomListeners() {
-    this.$root.$on("join-room", (data: string) => this.joinRoom(data));
-    this.$root.$on("create-room", () => this.createRoom());
+    this.$root.$on('join-room', (data: string) => this.joinRoom(data))
+    this.$root.$on('create-room', () => this.createRoom())
   }
 
   private onSongEnded() {
     if (this.SongRepeat) {
-      this.activePlayer.currentTime = 0;
-      this.activePlayer.play();
+      this.activePlayer.currentTime = 0
+      this.activePlayer.play()
     } else {
-      vxm.player.nextSong();
+      vxm.player.nextSong()
     }
   }
 
   private registerPlayerListeners() {
-    this.activePlayer.onEnded = () => this.onSongEnded();
-    this.activePlayer.onTimeUpdate = (time) => this.$emit("onTimeUpdate", time);
+    this.activePlayer.onEnded = () => this.onSongEnded()
+    this.activePlayer.onTimeUpdate = (time) => this.$emit('onTimeUpdate', time)
 
-    vxm.player.$watch("volume", this.onVolumeChanged);
+    vxm.player.$watch('volume', this.onVolumeChanged)
   }
 
   private registerListeners() {
-    this.registerPlayerListeners();
-    this.registerRoomListeners();
+    this.registerPlayerListeners()
+    this.registerRoomListeners()
   }
 
   private handleFirstPlayback(loadedState: boolean) {
     if (this.isFirst && !loadedState) {
-      vxm.player.state = PlayerState.PLAYING;
-      this.isFirst = false;
+      vxm.player.state = PlayerState.PLAYING
+      this.isFirst = false
     }
 
-    if (loadedState) this.isFirst = false;
+    if (loadedState) this.isFirst = false
     if (vxm.player.state == PlayerState.LOADING) {
-      vxm.player.state = PlayerState.PAUSED;
+      vxm.player.state = PlayerState.PAUSED
     }
-    this.handleActivePlayerState(vxm.player.playerState);
+    this.handleActivePlayerState(vxm.player.playerState)
   }
 
   private loadAudio(song: Song, loadedState: boolean) {
     // vxm.player.state = PlayerState.PLAYING
-    if (song.type === "LOCAL") {
-      this.onPlayerTypeChanged(PlayerType.LOCAL);
+    if (song.type === 'LOCAL') {
+      this.onPlayerTypeChanged(PlayerType.LOCAL)
     } else {
-      this.onPlayerTypeChanged(PlayerType.YOUTUBE);
+      this.onPlayerTypeChanged(PlayerType.YOUTUBE)
     }
 
-    if (song.path) this.activePlayer.load("media://" + song.path);
-    else if (song.url) this.activePlayer.load(song.url);
+    if (song.path) this.activePlayer.load('media://' + song.path)
+    else if (song.url) this.activePlayer.load(song.url)
 
-    this.activePlayer.volume = this.volume;
+    this.activePlayer.volume = this.volume
 
-    if (this.handleBroadcasterAudioLoad(song)) return;
+    if (this.handleBroadcasterAudioLoad(song)) return
 
-    this.handleFirstPlayback(loadedState);
+    this.handleFirstPlayback(loadedState)
   }
 
   private async handleActivePlayerState(newState: PlayerState) {
     switch (newState) {
       case PlayerState.PLAYING:
-        return this.activePlayer.play();
+        return this.activePlayer.play()
       case PlayerState.PAUSED:
       case PlayerState.LOADING:
-        return this.activePlayer.pause();
+        return this.activePlayer.pause()
       case PlayerState.STOPPED:
-        return this.activePlayer.stop();
+        return this.activePlayer.stop()
     }
   }
 }

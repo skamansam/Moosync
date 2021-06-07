@@ -18,13 +18,14 @@
 </template>
 
 <script lang="ts">
-import { Component, Prop } from "vue-property-decorator";
-import SongView from "@/mainWindow/components/SongView.vue";
-import { Song } from "@/models/songs";
+import { Component, Prop } from 'vue-property-decorator'
+import SongView from '@/mainWindow/components/SongView.vue'
+import { Song } from '@/models/songs'
 
-import { mixins } from "vue-class-component";
-import ContextMenuMixin from "@/utils/mixins/ContextMenuMixin";
-import { Playlist } from "@/models/playlists";
+import { mixins } from 'vue-class-component'
+import ContextMenuMixin from '@/utils/mixins/ContextMenuMixin'
+import { Playlist } from '@/models/playlists'
+import { vxm } from '@/mainWindow/store'
 
 @Component({
   components: {
@@ -32,24 +33,31 @@ import { Playlist } from "@/models/playlists";
   },
 })
 export default class SinglePlaylistView extends mixins(ContextMenuMixin) {
-  private playlist: Playlist | null = null;
-  private songList: Song[] = [];
+  private playlist: Playlist | null = null
+  private songList: Song[] = []
 
-  @Prop({ default: "" })
-  private playlist_id!: string;
+  @Prop({ default: '' })
+  private playlist_id!: string
 
-  @Prop({ default: "" })
-  private playlist_name!: string;
+  @Prop({ default: '' })
+  private playlist_name!: string
 
-  @Prop({ default: "" })
-  private playlist_coverPath!: string;
+  @Prop({ default: '' })
+  private playlist_coverPath!: string
+
+  @Prop({ default: false })
+  private isYoutubePlaylist!: string
 
   mounted() {
-    this.fetchPlaylist();
+    this.fetchPlaylist()
   }
 
   private async fetchPlaylist() {
-    this.songList = await window.DBUtils.getSinglePlaylist(this.playlist_id);
+    if (this.isYoutubePlaylist === 'true') {
+      this.songList = await vxm.youtube.youtubeProvider.getPlaylistContent(this.playlist_id.replace('youtube-', ''))
+    } else {
+      this.songList = await window.DBUtils.getSinglePlaylist(this.playlist_id)
+    }
   }
 }
 </script>

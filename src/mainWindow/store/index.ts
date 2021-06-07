@@ -6,6 +6,7 @@ import { PlayerStore } from './playerState'
 import { PlaylistStore } from '@/mainWindow/store/playlists'
 import { SyncStore } from '@/mainWindow/store/syncState'
 import { createPersist } from '@/utils/store/persist'
+import { ProviderStore } from '@/mainWindow/store/providers';
 
 Vue.use(Vuex)
 
@@ -17,6 +18,8 @@ export const store = new Vuex.Store({
     ...extractVuexModule(PlayerStore),
     ...extractVuexModule(PlaylistStore),
     ...extractVuexModule(SyncStore),
+    ...extractVuexModule(ProviderStore),
+
   },
   plugins: [createPersist(paths)],
 })
@@ -26,4 +29,5 @@ export const vxm = {
   player: createProxy(store, PlayerStore),
   playlist: createProxy(store, PlaylistStore),
   sync: createProxy(store, SyncStore),
+  youtube: createProxy(store, ProviderStore),
 }
