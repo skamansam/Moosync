@@ -189,7 +189,7 @@ export class SyncHolder {
   }
 
   private handleCoverChannel(channel: RTCDataChannel) {
-    let fragmentReceiver = new FragmentReceiver(this.onRemoteCoverCallback)
+    const fragmentReceiver = new FragmentReceiver(this.onRemoteCoverCallback)
 
     channel.onmessage = (event) => {
       fragmentReceiver.receive(event.data)
@@ -197,7 +197,7 @@ export class SyncHolder {
   }
 
   private handleStreamChannel(channel: RTCDataChannel) {
-    let fragmentReceiver = new FragmentReceiver(this.onRemoteStreamCallback)
+    const fragmentReceiver = new FragmentReceiver(this.onRemoteStreamCallback)
 
     channel.onmessage = (event) => {
       fragmentReceiver.receive(event.data)
@@ -283,7 +283,7 @@ export class SyncHolder {
 
   private onDataChannel(id: string, peer: RTCPeerConnection) {
     peer.ondatachannel = (event) => {
-      let channel = event.channel
+      const channel = event.channel
       if (channel.label === 'cover-channel') {
         this.handleCoverChannel(channel)
         this.setCoverChannel(id, channel)
@@ -540,7 +540,7 @@ export class SyncHolder {
    */
   private sendCover(id: string, cover?: ArrayBuffer) {
     if (cover) {
-      let fragmentSender = new FragmentSender(cover, this.peerConnection[id].coverChannel!)
+      const fragmentSender = new FragmentSender(cover, this.peerConnection[id].coverChannel!)
       fragmentSender.send()
     }
   }
@@ -566,7 +566,7 @@ export class SyncHolder {
    * @returns song with paths removed
    */
   private stripSong(song: Song): Song {
-    let tmp: Song = JSON.parse(JSON.stringify(song))
+    const tmp: Song = JSON.parse(JSON.stringify(song))
     delete tmp.path
     if (tmp.album && tmp.album.album_coverPath) {
       // If the image is hosted somewhere then surely the client on the other end can load it... right?
@@ -605,7 +605,7 @@ export class SyncHolder {
 
   private makePeer(id: string): RTCPeerConnection {
     // Creates new peer
-    let peer = new RTCPeerConnection({ iceServers: [this.STUN, this.TURN] })
+    const peer = new RTCPeerConnection({ iceServers: [this.STUN, this.TURN] })
 
     // Report changes to connection state
     this.listenPeerConnected(id, peer)
@@ -630,8 +630,8 @@ export class SyncHolder {
   }
 
   private makeDataChannel(id: string, peer: RTCPeerConnection) {
-    let coverChannel = peer.createDataChannel('cover-channel')
-    let streamChannel = peer.createDataChannel('stream-channel')
+    const coverChannel = peer.createDataChannel('cover-channel')
+    const streamChannel = peer.createDataChannel('stream-channel')
 
     this.handleCoverChannel(coverChannel)
     this.handleStreamChannel(streamChannel)
@@ -660,7 +660,7 @@ export class SyncHolder {
   }
 
   private setupInitiator(id: string) {
-    let peer = this.makePeer(id)
+    const peer = this.makePeer(id)
     this.listenSignalingState(id, peer)
     this.makeDataChannel(id, peer)
 

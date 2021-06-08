@@ -48,7 +48,7 @@ export class SyncStore extends VuexModule.With({ namespaced: 'sync' }) {
   @mutation
   prioritize(index: number) {
     if (index < this.prefetch.length) {
-      let item = this.prefetch[index]
+      const item = this.prefetch[index]
       this.prefetch.splice(index, 1)
       this.prefetch.unshift(item)
     }

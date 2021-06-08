@@ -46,9 +46,9 @@ export class Resizer {
 
   private calculateColumnWidth(pos: number) {
     if (this.resizer.thElm) {
-      let movement = this.resizer.ogWidth! + (pos - this.resizer.startOffset!)
+      const movement = this.resizer.ogWidth! + (pos - this.resizer.startOffset!)
       if (movement > 0 && this.resizer.thNext) {
-        let movementNext = this.resizer.nextOgWidth! - (pos - this.resizer.startOffset!)
+        const movementNext = this.resizer.nextOgWidth! - (pos - this.resizer.startOffset!)
         if (movementNext > 0) {
           this.resizer.thNext.style.width = movementNext + 'px'
           this.resizer.thElm.style.width = movement + 'px'
@@ -60,7 +60,7 @@ export class Resizer {
   private cutPx = (str: any) => +str.replace('px', '')
 
   private getTableGrip(mousedown: (e: MouseEvent) => void): HTMLDivElement {
-    var grip = document.createElement('div')
+    const grip = document.createElement('div')
     grip.innerHTML = '&nbsp;'
     grip.style.top = '0'
     grip.style.right = '0'
@@ -75,14 +75,14 @@ export class Resizer {
   }
 
   public addGrips() {
-    let elements = this.document.querySelectorAll('table th')
+    const elements = this.document.querySelectorAll('table th')
 
     Array.prototype.forEach.call(elements, (th, i) => {
       //TODO: Save widths
       th.style.width = th.offsetWidth + 'px'
 
       if (i < 3) {
-        let grip = this.getTableGrip((e: MouseEvent) => this.setResizeElements(elements, i, th, e.pageX))
+        const grip = this.getTableGrip((e: MouseEvent) => this.setResizeElements(elements, i, th, e.pageX))
         th.appendChild(grip)
       }
     })

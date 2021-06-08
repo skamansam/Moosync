@@ -21,7 +21,7 @@ export default class ContextMenuMixin extends mixins(PlayerControls) {
   }
 
   private populatePlaylistMenu(item: Song[], exclude?: string): MenuItem[] {
-    let menu: MenuItem[] = [
+    const menu: MenuItem[] = [
       {
         label: 'Create Playlist',
         handler: () => {
@@ -44,7 +44,7 @@ export default class ContextMenuMixin extends mixins(PlayerControls) {
   }
 
   public getSongContextMenu(exclude: string | undefined, event: Event, ...item: Song[]) {
-    let items = [
+    const items = [
       {
         label: 'Play Now',
         handler: () => {
@@ -66,7 +66,7 @@ export default class ContextMenuMixin extends mixins(PlayerControls) {
   }
 
   public getYoutubeContextMenu(event: Event, ...item: YoutubeItem[]) {
-    let items = [
+    const items = [
       {
         label: 'Play Now',
         handler: () => {
@@ -92,7 +92,7 @@ export default class ContextMenuMixin extends mixins(PlayerControls) {
   }
 
   public getPlaylistContextMenu(event: Event, playlist: Playlist, refreshCallback: () => void) {
-    let items = [
+    const items = [
       {
         label: 'Remove Playlist',
         handler: () => {
@@ -105,7 +105,7 @@ export default class ContextMenuMixin extends mixins(PlayerControls) {
   }
 
   public getGeneralPlaylistMenu(event: Event) {
-    let items = [
+    const items = [
       {
         label: 'Add Playlist from URL',
         handler: () => {

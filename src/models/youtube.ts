@@ -10,7 +10,7 @@ export interface YoutubeItem {
 }
 
 export function toSong(...item: YoutubeItem[]): Song[] {
-  let songs: Song[] = []
+  const songs: Song[] = []
   for (const s of item) {
     songs.push({
       _id: v4(),

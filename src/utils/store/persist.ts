@@ -21,9 +21,9 @@ function reducer(state: Object, paths: string[]) {
 }
 
 async function setInitialState(store: Store<any>) {
-  let savedState = await window.Store.get('persisted')
+  const savedState = await window.Store.get('persisted')
   if (savedState) {
-    let parsed = JSON.parse(savedState)
+    const parsed = JSON.parse(savedState)
     store.replaceState(
       merge(store.state, parsed, {
         arrayMerge: (_, saved) => saved,

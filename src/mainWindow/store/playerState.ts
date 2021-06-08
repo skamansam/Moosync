@@ -60,7 +60,7 @@ class Queue {
 
   public pop(): Song | null {
     if (this.index > 0) {
-      let id = this.order.pop()
+      const id = this.order.pop()
       return this.data[id!]
     }
     return null
@@ -69,8 +69,8 @@ class Queue {
   // https://stackoverflow.com/a/12646864
   private randomizeArray() {
     for (let i: number = this.order.length - 1; i > 0; i--) {
-      var j = Math.floor(Math.random() * (i + 1))
-      var temp = this.order[i]
+      const j = Math.floor(Math.random() * (i + 1))
+      const temp = this.order[i]
       this.order[i] = this.order[j]
       this.order[j] = temp
     }

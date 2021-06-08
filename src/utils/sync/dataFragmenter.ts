@@ -51,7 +51,7 @@ export class FragmentSender {
 
   public send() {
     if (this.data) {
-      let header = JSON.stringify({ type: 'byteLength', message: this.byteLength })
+      const header = JSON.stringify({ type: 'byteLength', message: this.byteLength })
       this.channel!.send(header)
       this.channel!.bufferedAmountLowThreshold = chunkLimit - 1
       this.channel!.onbufferedamountlow = () => {
@@ -78,22 +78,19 @@ export class FragmentReceiver {
   }
 
   public receive(data: ArrayBuffer) {
-    switch (typeof data) {
-      case 'string':
-        var tmp = JSON.parse(data) as fragmentedData
-        switch (tmp.type) {
-          case 'end':
-            // TODO: End using byteLength instead
-            this.endTransfer()
-            break
-          case 'byteLength':
-            this.byteLength = tmp.message
-            break
-        }
-        break
-      case 'object':
-        this.file.push(data)
-        break
+    if (typeof data === 'string') {
+      const tmp = JSON.parse(data) as fragmentedData
+      switch (tmp.type) {
+        case 'end':
+          // TODO: End using byteLength instead
+          this.endTransfer()
+          break
+        case 'byteLength':
+          this.byteLength = tmp.message
+          break
+      }
+    } else {
+      this.file.push(data)
     }
   }
 }

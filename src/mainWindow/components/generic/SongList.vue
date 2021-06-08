@@ -63,7 +63,7 @@ export default class SongList extends mixins(Colors) {
     this.resizer = new Resizer(document)
     window.WindowUtils.setMainWindowResizeListener(this.rerenderTable)
 
-    var doit: NodeJS.Timeout
+    var doit: ReturnType<typeof setTimeout>
     window.onresize = () => {
       this.rerenderTable()
       clearTimeout(doit)

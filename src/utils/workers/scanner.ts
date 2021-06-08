@@ -41,9 +41,9 @@ async function processFile(stat: stats): Promise<Song> {
 }
 
 async function getInfo(data: mm.IAudioMetadata, stats: stats): Promise<Song> {
-  let artists: string[] = []
+  const artists: string[] = []
   if (data.common.artists) {
-    for (let a of data.common.artists) {
+    for (const a of data.common.artists) {
       artists.push(...a.split(/[,&]+/))
     }
   }
@@ -80,9 +80,9 @@ async function getInfo(data: mm.IAudioMetadata, stats: stats): Promise<Song> {
 async function start(paths: musicPaths, observer: SubscriptionObserver<any>) {
   const promises: Promise<void>[] = []
   // await this.destructiveScan()
-  for (let i in paths) {
+  for (const i in paths) {
     if (fs.existsSync(paths[i].path)) {
-      let files = fs.readdirSync(paths[i].path)
+      const files = fs.readdirSync(paths[i].path)
       files.forEach((file) => {
         if (audioPatterns.exec(path.extname(file)) !== null) {
           const filePath = path.join(paths[i].path, file)
@@ -99,8 +99,8 @@ async function start(paths: musicPaths, observer: SubscriptionObserver<any>) {
 
 async function generateChecksum(file: string): Promise<string> {
   return new Promise((resolve) => {
-    var hash = crypto.createHash('md5')
-    var fileStream = fs.createReadStream(file, { highWaterMark: 256 * 1024 })
+    const hash = crypto.createHash('md5')
+    const fileStream = fs.createReadStream(file, { highWaterMark: 256 * 1024 })
     fileStream.on('data', (data) => {
       hash.update(data)
     })

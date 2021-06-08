@@ -126,7 +126,7 @@ export class AuthFlow {
   }
 
   private async fetchServiceConfiguration() {
-    let configuration = await AuthorizationServiceConfiguration.fetchFromIssuer(
+    const configuration = await AuthorizationServiceConfiguration.fetchFromIssuer(
       this.config.openIdConnectUrl,
       requestor)
     return configuration
@@ -174,7 +174,7 @@ export class AuthFlow {
     }
 
     // use the code to make the token request.
-    let request = new TokenRequest({
+    const request = new TokenRequest({
       client_id: this.config.clientId,
       redirect_uri: this.config.redirectUri,
       grant_type: GRANT_TYPE_AUTHORIZATION_CODE,
@@ -219,7 +219,7 @@ export class AuthFlow {
       return this.accessTokenResponse.accessToken
     }
 
-    let request = new TokenRequest({
+    const request = new TokenRequest({
       client_id: this.config.clientId,
       redirect_uri: this.config.redirectUri,
       grant_type: GRANT_TYPE_REFRESH_TOKEN,

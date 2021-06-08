@@ -86,8 +86,8 @@ export default class SyncMixin extends mixins(ModelHelper) {
 
   private setRemoteCover(event: Blob) {
     if (this.isSyncing && vxm.sync.currentSongDets) {
-      let reader = new FileReader()
-      let songID = vxm.sync.currentSongDets._id!
+      const reader = new FileReader()
+      const songID = vxm.sync.currentSongDets._id!
       reader.onload = async () => {
         if (reader.readyState == 2) {
           const buffer = Buffer.from(reader.result as ArrayBuffer)
@@ -103,14 +103,14 @@ export default class SyncMixin extends mixins(ModelHelper) {
     const song = vxm.sync.localQueue.find((song) => song._id == songID)
     if (song && this.isAlbumCoverExists(song)) {
       const resp = await fetch('media://' + song!.album!.album_coverPath)
-      let buf = await resp.arrayBuffer()
+      const buf = await resp.arrayBuffer()
       return buf
     }
     return null
   }
 
   private saveRemoteStream(event: Blob) {
-    let reader = new FileReader()
+    const reader = new FileReader()
     reader.onload = async () => {
       if (reader.readyState == 2) {
         const buffer = Buffer.from(reader.result as ArrayBuffer)
@@ -129,7 +129,7 @@ export default class SyncMixin extends mixins(ModelHelper) {
     const song = vxm.sync.localQueue.find((song) => song._id === songID)
     if (song) {
       const resp = await fetch('media://' + song.path!)
-      let buf = await resp.arrayBuffer()
+      const buf = await resp.arrayBuffer()
       return buf
     }
     return null

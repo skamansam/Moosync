@@ -22,7 +22,7 @@ export class PreferenceStore extends VuexModule {
 
   @mutation
   togglePath(args: { path: string, value: boolean }) {
-    let index = this.preferences.musicPaths.findIndex((x) => x.path === args.path)
+    const index = this.preferences.musicPaths.findIndex((x) => x.path === args.path)
     if (index !== -1) {
       this.preferences.musicPaths[index].enabled = args.value
     }
@@ -35,7 +35,7 @@ export class PreferenceStore extends VuexModule {
 
   @mutation
   addPaths(...paths: string[]) {
-    for (let p of paths) {
+    for (const p of paths) {
       this.preferences.musicPaths.push({ path: p, enabled: true })
     }
   }

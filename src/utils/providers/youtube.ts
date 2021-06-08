@@ -11,7 +11,7 @@ export class Youtube {
 
   public async login() {
     if (!this.auth.loggedIn()) {
-      let validRefreshToken = await this.auth.hasValidRefreshToken()
+      const validRefreshToken = await this.auth.hasValidRefreshToken()
       if (validRefreshToken) {
         await this.auth.performWithFreshTokens()
         return
@@ -28,7 +28,7 @@ export class Youtube {
         url.searchParams.append(p, (search.params as any)[p])
     }
 
-    let accessToken = await this.auth.performWithFreshTokens()
+    const accessToken = await this.auth.performWithFreshTokens()
 
     const resp = await fetch(url.toString(), {
       headers: new Headers({ 'Authorization': `Bearer ${accessToken}` }),
@@ -36,12 +36,12 @@ export class Youtube {
       cache: 'no-cache'
     })
 
-    let json = await resp.json()
+    const json = await resp.json()
     return json
   }
 
   public async getUserDetails() {
-    let validRefreshToken = await this.auth.hasValidRefreshToken()
+    const validRefreshToken = await this.auth.hasValidRefreshToken()
     if (this.auth.loggedIn() || validRefreshToken) {
       return this.populateRequest(ApiResources.CHANNELS, {
         params: {
@@ -53,7 +53,7 @@ export class Youtube {
   }
 
   private async parsePlaylists(items: UserPlaylists.Item[]): Promise<Playlist[]> {
-    let playlists: Playlist[] = []
+    const playlists: Playlist[] = []
     if (items.length > 0) {
       for (const p of items) {
         if (p.snippet)
@@ -69,13 +69,13 @@ export class Youtube {
   }
 
   public async getUserPlaylists() {
-    let validRefreshToken = await this.auth.hasValidRefreshToken()
+    const validRefreshToken = await this.auth.hasValidRefreshToken()
     if (this.auth.loggedIn() || validRefreshToken) {
       let nextPageToken: string | undefined
-      let parsed: UserPlaylists.Item[] = []
+      const parsed: UserPlaylists.Item[] = []
       do {
 
-        let resp = await this.populateRequest(ApiResources.PLAYLISTS, {
+        const resp = await this.populateRequest(ApiResources.PLAYLISTS, {
           params: {
             part: ['id', 'snippet'],
             mine: true,
@@ -92,22 +92,22 @@ export class Youtube {
   }
 
   private async parsePlaylistItems(items: PlaylistItems.Items[]): Promise<Song[]> {
-    let songs: Song[] = []
+    const songs: Song[] = []
     if (items.length > 0) {
-      let ids = items.map(s => s.snippet!.resourceId.videoId)
-      let details = await this.getVideoDetails(...ids)
+      const ids = items.map(s => s.snippet!.resourceId.videoId)
+      const details = await this.getVideoDetails(...ids)
       songs.push(...details)
     }
     return songs
   }
 
   public async getPlaylistContent(id: string) {
-    let validRefreshToken = await this.auth.hasValidRefreshToken()
+    const validRefreshToken = await this.auth.hasValidRefreshToken()
     if (this.auth.loggedIn() || validRefreshToken) {
       let nextPageToken: string | undefined
-      let parsed: PlaylistItems.Items[] = []
+      const parsed: PlaylistItems.Items[] = []
       do {
-        let resp = await this.populateRequest(ApiResources.PLAYLIST_ITEMS, {
+        const resp = await this.populateRequest(ApiResources.PLAYLIST_ITEMS, {
           params: {
             part: ['id', 'snippet'],
             playlistId: id,
@@ -124,7 +124,7 @@ export class Youtube {
   }
 
   private async parseVideo(items: VideoDetails.Item[]) {
-    let songs: Song[] = []
+    const songs: Song[] = []
     for (const v of items) {
       if (songs.findIndex((value) => value._id === v.id) === -1)
         songs.push({
@@ -145,13 +145,13 @@ export class Youtube {
   }
 
   public async getVideoDetails(...id: string[]) {
-    let validRefreshToken = await this.auth.hasValidRefreshToken()
+    const validRefreshToken = await this.auth.hasValidRefreshToken()
     if (this.auth.loggedIn() || validRefreshToken) {
-      let parsed: VideoDetails.Item[] = []
+      const parsed: VideoDetails.Item[] = []
       const totalPages = (id.length / 50) + 1
       let curPage = 0
       while (curPage <= totalPages) {
-        let resp = await this.populateRequest(ApiResources.VIDEO_DETAILS, {
+        const resp = await this.populateRequest(ApiResources.VIDEO_DETAILS, {
           params: {
             part: ['contentDetails', 'snippet'],
             id: [...id.slice(curPage * 50, curPage * 50 + 50)],
