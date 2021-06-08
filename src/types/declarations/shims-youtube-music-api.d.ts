@@ -29,7 +29,7 @@ declare module 'youtube-music-api' {
   }
   export default class YoutubeMusicApi {
     // constructor()
-    initalize(): Promise<{ locale: string; logged_in: string }>
+    initalize(): Promise<{ locale: string, logged_in: string }>
     getSearchSuggestions(query: string): string[]
     search(query: string, categoryName: string, _pageLimit?: number): Promise<SearchResult>
 

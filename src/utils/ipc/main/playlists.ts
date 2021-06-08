@@ -5,8 +5,8 @@ import { getDisabledPaths, loadPreferences } from '@/utils/db/preferences'
 import { SongDB } from '@/utils/db'
 import { app } from 'electron'
 import path from 'path'
-import fs from 'fs';
-import { v4 } from 'uuid';
+import fs from 'fs'
+import { v4 } from 'uuid'
 
 export class PlaylistsChannel implements IpcChannelInterface {
   name = IpcEvents.PLAYLIST
@@ -79,7 +79,7 @@ export class PlaylistsChannel implements IpcChannelInterface {
       } else {
         fs.mkdirSync(cacheDir)
       }
-      fs.writeFile(filePath, request.params.b64.replace(/^data:image\/png;base64,/, ""), 'base64', () => {
+      fs.writeFile(filePath, request.params.b64.replace(/^data:image\/pngbase64,/, ""), 'base64', () => {
         event.reply(request.responseChannel, filePath)
       })
     }

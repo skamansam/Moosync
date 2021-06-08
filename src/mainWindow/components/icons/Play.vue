@@ -1,11 +1,5 @@
 <template>
-  <svg
-    width="41"
-    height="42"
-    viewBox="0 0 41 42"
-    fill="none"
-    xmlns="http://www.w3.org/2000/svg"
-  >
+  <svg width="41" height="42" viewBox="0 0 41 42" fill="none" xmlns="http://www.w3.org/2000/svg">
     <transition name="fade">
       <g v-if="play">
         <path d="M16 13L16 28" stroke="#65CB88" stroke-width="3" />
@@ -26,13 +20,13 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
-import { Component, Prop } from "vue-property-decorator";
+import Vue from 'vue'
+import { Component, Prop } from 'vue-property-decorator'
 
 @Component({})
 export default class PLayButton extends Vue {
   @Prop({ default: true })
-  private play!: Boolean;
+  private play!: Boolean
 }
 </script>
 

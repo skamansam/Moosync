@@ -10,7 +10,7 @@ export enum IpcEvents {
   PREFERENCES = 'preferences',
   SEARCH = 'search',
   STORE = 'store',
-  SERVICE_PROVIDERS = 'serviceProviders',
+  SERVICE_PROVIDERS = 'serviceProviders'
 }
 
 export enum StoreEvents {
@@ -23,13 +23,13 @@ export enum StoreEvents {
 export enum SearchEvents {
   SEARCH_SONGS_COMPACT = 'searchCompact',
   SEARCH_ALL = 'searchAll',
-  SEARCH_YT = 'searchYT',
+  SEARCH_YT = 'searchYT'
 }
 
 export enum PreferenceEvents {
   SAVE_PREFERENCES = 'savePreferences',
   LOAD_PREFERENCES = 'loadPreferences',
-  PREFERENCE_REFRESH = 'preferenceRefresh',
+  PREFERENCE_REFRESH = 'preferenceRefresh'
 }
 
 export enum WindowEvents {
@@ -50,16 +50,16 @@ export enum WindowEvents {
 
 export enum AlbumEvents {
   GET_ALL_ALBUMS = 'getAlbums',
-  GET_ALBUM = 'getAlbum',
+  GET_ALBUM = 'getAlbum'
 }
 
 export enum GenreEvents {
   GET_ALL_GENRE = 'getAllGenre',
-  GET_GENRE = 'getGenre',
+  GET_GENRE = 'getGenre'
 }
 
 export enum ScannerEvents {
-  SCAN_MUSIC = 'scanMusic',
+  SCAN_MUSIC = 'scanMusic'
 }
 
 export enum PlaylistEvents {
@@ -69,12 +69,12 @@ export enum PlaylistEvents {
   GET_PLAYLIST = 'getPlaylist',
   ADDED_PLAYLIST = 'addedPlaylist',
   REMOVE_PLAYLIST = 'removePlaylist',
-  SAVE_COVER = 'saveCover',
+  SAVE_COVER = 'saveCover'
 }
 
 export enum ArtistEvents {
   GET_ALL_ARTISTS = 'getArtists',
-  GET_ARTIST = 'getArtist',
+  GET_ARTIST = 'getArtist'
 }
 
 export enum SongEvents {
@@ -84,7 +84,7 @@ export enum SongEvents {
   SAVE_AUDIO_TO_FILE = 'saveAudioToFile',
   SAVE_IMAGE_TO_FILE = 'saveImageToFile',
   AUDIO_EXISTS = 'fileExists',
-  IMAGE_EXISTS = 'imageExists',
+  IMAGE_EXISTS = 'imageExists'
 }
 
 export enum ServiceProviderEvents {
@@ -97,5 +97,5 @@ export enum EventBus {
   COVER_SELECTED = 'cover-select',
   SHOW_CONTEXT = 'show-context',
   SHOW_NEW_PLAYLIST_MODAL = 'show-new-playlist-modal',
-  SHOW_ADD_PLAYLIST_MODAL = 'show-add-playlist-modal',
+  SHOW_ADD_PLAYLIST_MODAL = 'show-add-playlist-modal'
 }

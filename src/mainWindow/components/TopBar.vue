@@ -13,7 +13,7 @@
           <b-popover :target="`account`" placement="bottom" triggers="focus">
             <div>
               <b-button @click="loginYoutube">
-                {{ youtubeName ? youtubeName : "YT Login" }}
+                {{ youtubeName ? youtubeName : 'YT Login' }}
               </b-button>
             </div>
           </b-popover>
@@ -24,27 +24,27 @@
 </template>
 
 <script lang="ts">
-import Navigation from "@/mainWindow/components/topbar/Navigation.vue";
-import Search from "@/mainWindow/components/topbar/Search.vue";
-import Colors from "@/utils/mixins/Colors";
-import { mixins } from "vue-class-component";
-import { Component } from "vue-property-decorator";
-import Rooms from "@/mainWindow/components/icons/Rooms.vue";
-import { Youtube } from "@/utils/providers/youtube";
+import Navigation from '@/mainWindow/components/topbar/Navigation.vue'
+import Search from '@/mainWindow/components/topbar/Search.vue'
+import Colors from '@/utils/mixins/Colors'
+import { mixins } from 'vue-class-component'
+import { Component } from 'vue-property-decorator'
+import Rooms from '@/mainWindow/components/icons/Rooms.vue'
+import { Youtube } from '@/utils/providers/youtube'
 
 @Component({
   components: {
     Search,
     Navigation,
-    Rooms,
-  },
+    Rooms
+  }
 })
 export default class TopBar extends mixins(Colors) {
-  private youtube = new Youtube();
-  private youtubeName = "";
+  private youtube = new Youtube()
+  private youtubeName = ''
 
   mounted() {
-    this.getUserDetails();
+    this.getUserDetails()
   }
 
   private getUserDetails() {
@@ -52,16 +52,16 @@ export default class TopBar extends mixins(Colors) {
       .getUserDetails()
       .then((resp) => {
         if (resp && resp.items.length > 0) {
-          console.log(resp);
-          this.youtubeName = resp.items[0].snippet!.title;
+          console.log(resp)
+          this.youtubeName = resp.items[0].snippet!.title
         }
       })
-      .catch((err) => console.log(err));
+      .catch((err) => console.log(err))
   }
 
   private async loginYoutube() {
-    await this.youtube.login();
-    this.getUserDetails();
+    await this.youtube.login()
+    this.getUserDetails()
   }
 }
 </script>

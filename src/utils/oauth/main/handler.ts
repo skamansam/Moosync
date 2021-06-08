@@ -1,5 +1,5 @@
-import { mainWindow } from '@/background';
-import { WindowEvents } from "../../ipc/main/constants";
+import { mainWindow } from '@/background'
+import { WindowEvents } from "../../ipc/main/constants"
 
 export class OAuthHandler {
   public handleEvents(data: string) {

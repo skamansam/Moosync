@@ -54,14 +54,14 @@ class SongDBInstance extends DBUtils {
   public async removeSong(song_id: string) {
     this.db.transaction((song_id: string) => {
       // Selecting multiple times to also count occurrence
-      let album_ids: { count: number; album: string } = this.db.queryFirstRow(
+      let album_ids: { count: number, album: string } = this.db.queryFirstRow(
         'SELECT count(id) as count, album FROM album_bridge WHERE album = (SELECT album FROM album_bridge WHERE song = ?)',
         song_id
-      ) as { count: number; album: string }
-      let artist_ids: { count: number; artist: string } = this.db.queryFirstRow(
+      ) as { count: number, album: string }
+      let artist_ids: { count: number, artist: string } = this.db.queryFirstRow(
         'SELECT count(id) as count, artist FROM artists_bridge WHERE artist = (SELECT artist FROM artists_bridge WHERE song = ?)',
         song_id
-      ) as { count: number; artist: string }
+      ) as { count: number, artist: string }
 
       this.db.delete('artists_bridge', { song: song_id })
       this.db.delete('album_bridge', { song: song_id })
@@ -124,7 +124,7 @@ class SongDBInstance extends DBUtils {
     return this.db.query(`SELECT * FROM allsongs WHERE size = ?`, size)
   }
 
-  public async getInfoByID(id: string): Promise<{ path: string; inode: string; deviceno: string }[]> {
+  public async getInfoByID(id: string): Promise<{ path: string, inode: string, deviceno: string }[]> {
     return this.db.query(`SELECT path, inode, deviceno FROM allsongs WHERE _id = ?`, id)
   }
 

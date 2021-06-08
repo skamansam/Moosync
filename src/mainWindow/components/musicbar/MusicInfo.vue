@@ -9,13 +9,7 @@
       </b-col>
       <b-col cols="5" align-self="center" class="queue-container d-flex no-gutters h-100">
         <div>
-          <RecycleScroller
-            class="scroller"
-            :items="queueOrder"
-            :item-size="82"
-            key-field="_id"
-            :direction="'vertical'"
-          >
+          <RecycleScroller class="scroller" :items="queueOrder" :item-size="82" key-field="_id" :direction="'vertical'">
             <template v-slot="{ item, index }">
               <SingleSearchResult
                 :set="(song = getQueueItem(item))"
@@ -36,28 +30,28 @@
 </template>
 
 <script lang="ts">
-import Colors from "@/utils/mixins/Colors";
-import { mixins } from "vue-class-component";
-import { Component } from "vue-property-decorator";
-import Record from "@/mainWindow/components/icons/Record.vue";
-import ImageLoader from "@/utils/mixins/ImageLoader";
-import SingleSearchResult from "@/mainWindow/components/generic/SingleSearchResult.vue";
-import ModelHelper from "@/utils/mixins/ModelHelper";
-import { vxm } from "@/mainWindow/store";
+import Colors from '@/utils/mixins/Colors'
+import { mixins } from 'vue-class-component'
+import { Component } from 'vue-property-decorator'
+import Record from '@/mainWindow/components/icons/Record.vue'
+import ImageLoader from '@/utils/mixins/ImageLoader'
+import SingleSearchResult from '@/mainWindow/components/generic/SingleSearchResult.vue'
+import ModelHelper from '@/utils/mixins/ModelHelper'
+import { vxm } from '@/mainWindow/store'
 
 @Component({
   components: {
     Record,
-    SingleSearchResult,
-  },
+    SingleSearchResult
+  }
 })
 export default class MusicInfo extends mixins(Colors, ImageLoader, ModelHelper) {
   get queueOrder() {
-    return vxm.player.queue.order;
+    return vxm.player.queue.order
   }
 
   private getQueueItem(id: string) {
-    return vxm.player.queue.data[id];
+    return vxm.player.queue.data[id]
   }
 }
 </script>

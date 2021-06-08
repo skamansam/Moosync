@@ -257,7 +257,7 @@ export class SyncHolder {
         const fragmentSender = new FragmentSender(stream, channel, () => this.onDataSentHandler(id))
         fragmentSender.send()
       } catch (e) {
-        console.log(e);
+        console.log(e)
       }
       return
     }

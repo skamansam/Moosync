@@ -22,7 +22,7 @@ import { mixins } from 'vue-class-component'
 import { Component, Prop } from 'vue-property-decorator'
 
 @Component({
-  components: {},
+  components: {}
 })
 export default class SongDetails extends mixins(Colors, ImageLoader) {
   @Prop({ default: '' })

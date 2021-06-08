@@ -1,4 +1,4 @@
-export type musicPaths = { path: string; enabled: boolean }[]
+export type musicPaths = { path: string, enabled: boolean }[]
 export interface Preferences {
   musicPaths: musicPaths
 }

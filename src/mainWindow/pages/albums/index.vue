@@ -3,42 +3,38 @@
     <b-row class="title">Albums</b-row>
     <b-row class="d-flex">
       <b-col col xl="2" md="3" v-for="album in filteredAlbumList" :key="album.album_id">
-        <CardView
-          :title="album.album_name"
-          :imgSrc="album.album_coverPath"
-          @click.native="gotoAlbum(album)"
-        />
+        <CardView :title="album.album_name" :imgSrc="album.album_coverPath" @click.native="gotoAlbum(album)" />
       </b-col>
     </b-row>
   </b-container>
 </template>
 
 <script lang="ts">
-import CardView from "@/mainWindow/components/generic/CardView.vue";
-import { Album } from "@/models/albums";
-import { mixins } from "vue-class-component";
-import { Component } from "vue-property-decorator";
-import RouterPushes from "@/utils/mixins/RouterPushes";
+import CardView from '@/mainWindow/components/generic/CardView.vue'
+import { Album } from '@/models/albums'
+import { mixins } from 'vue-class-component'
+import { Component } from 'vue-property-decorator'
+import RouterPushes from '@/utils/mixins/RouterPushes'
 
 @Component({
   components: {
-    CardView,
-  },
+    CardView
+  }
 })
 export default class Albums extends mixins(RouterPushes) {
-  private albumList: Album[] = [];
+  private albumList: Album[] = []
   private async getAlbums() {
-    this.albumList = await window.DBUtils.getAllAlbums();
+    this.albumList = await window.DBUtils.getAllAlbums()
   }
 
   get filteredAlbumList() {
     return this.albumList.filter((x) => {
-      return x.album_name !== null;
-    });
+      return x.album_name !== null
+    })
   }
 
   mounted() {
-    this.getAlbums();
+    this.getAlbums()
   }
 }
 </script>

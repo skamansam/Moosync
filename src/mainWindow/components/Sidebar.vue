@@ -56,65 +56,65 @@
 </template>
 
 <script lang="ts">
-import Rooms from "@/mainWindow/components/icons/Rooms.vue";
-import Toggle from "@/mainWindow/components/icons/Toggle.vue";
-import Tabs from "@/mainWindow/components/sidebar/Tabs.vue";
-import Gears from "@/mainWindow/components/icons/Gears.vue";
-import { PeerMode } from "@/mainWindow/store/syncState";
-import { Component } from "vue-property-decorator";
-import Colors from "@/utils/mixins/Colors";
-import { mixins } from "vue-class-component";
-import { vxm } from "../store";
+import Rooms from '@/mainWindow/components/icons/Rooms.vue'
+import Toggle from '@/mainWindow/components/icons/Toggle.vue'
+import Tabs from '@/mainWindow/components/sidebar/Tabs.vue'
+import Gears from '@/mainWindow/components/icons/Gears.vue'
+import { PeerMode } from '@/mainWindow/store/syncState'
+import { Component } from 'vue-property-decorator'
+import Colors from '@/utils/mixins/Colors'
+import { mixins } from 'vue-class-component'
+import { vxm } from '../store'
 
 @Component({
   components: {
     Toggle,
     Rooms,
     Tabs,
-    Gears,
-  },
+    Gears
+  }
 })
 export default class Sidebar extends mixins(Colors) {
-  private roomInput: String = "";
-  private isOpen: boolean = true;
-  private showRoomsButton: boolean = true;
+  private roomInput: String = ''
+  private isOpen: boolean = true
+  private showRoomsButton: boolean = true
 
   get roomID() {
-    return vxm.sync.roomID;
+    return vxm.sync.roomID
   }
 
   private toggleOpen() {
-    this.isOpen = !this.isOpen;
+    this.isOpen = !this.isOpen
 
     // Delay showing of rooms button since it makes the toggle button smaller while sidebar size is transitioning
-    if (!this.showRoomsButton) setTimeout(() => (this.showRoomsButton = true), 100);
-    else this.showRoomsButton = false;
+    if (!this.showRoomsButton) setTimeout(() => (this.showRoomsButton = true), 100)
+    else this.showRoomsButton = false
 
-    this.$emit("toggleOpen", this.isOpen);
+    this.$emit('toggleOpen', this.isOpen)
   }
 
   public formatter(value: string) {
-    return value.toUpperCase();
+    return value.toUpperCase()
   }
 
   private setWatcher() {
-    vxm.sync.setMode(PeerMode.WATCHER);
+    vxm.sync.setMode(PeerMode.WATCHER)
   }
 
   private setBroadcaster() {
-    vxm.sync.setMode(PeerMode.BROADCASTER);
+    vxm.sync.setMode(PeerMode.BROADCASTER)
   }
 
   private joinRoom() {
-    this.$root.$emit("join-room", this.roomInput);
+    this.$root.$emit('join-room', this.roomInput)
   }
 
   private createRoom() {
-    this.$root.$emit("create-room");
+    this.$root.$emit('create-room')
   }
 
   private openSettings() {
-    window.WindowUtils.openPreferenceWindow();
+    window.WindowUtils.openPreferenceWindow()
   }
 }
 </script>

@@ -54,82 +54,82 @@ export type SearchObject<T extends ApiResources> = T extends ApiResources.CHANNE
 
 export namespace Thumbnails {
   export interface ThumbDefault {
-    url: string;
-    width: number;
-    height: number;
+    url: string
+    width: number
+    height: number
   }
 
   export interface ThumbMedium {
-    url: string;
-    width: number;
-    height: number;
+    url: string
+    width: number
+    height: number
   }
 
   export interface ThumbHigh {
-    url: string;
-    width: number;
-    height: number;
+    url: string
+    width: number
+    height: number
   }
 
   export interface ThumbStandard {
-    url: string;
-    width: number;
-    height: number;
+    url: string
+    width: number
+    height: number
   }
 
   export interface ThumbMaxres {
-    url: string;
-    width: number;
-    height: number;
+    url: string
+    width: number
+    height: number
   }
 
   export interface Thumbnails {
-    default: ThumbDefault;
-    medium: ThumbMedium;
-    high: ThumbHigh;
-    standard: ThumbStandard;
-    maxres: ThumbMaxres;
+    default: ThumbDefault
+    medium: ThumbMedium
+    high: ThumbHigh
+    standard: ThumbStandard
+    maxres: ThumbMaxres
   }
 }
 
 export interface PageInfo {
-  totalResults: number;
-  resultsPerPage: number;
+  totalResults: number
+  resultsPerPage: number
 }
 export namespace PlaylistItems {
   export interface ResourceId {
-    kind: string;
-    videoId: string;
+    kind: string
+    videoId: string
   }
 
   export interface Snippet {
-    publishedAt: Date;
-    channelId: string;
-    title: string;
-    description: string;
-    thumbnails: Thumbnails.Thumbnails;
-    channelTitle: string;
-    playlistId: string;
-    position: number;
-    resourceId: ResourceId;
-    videoOwnerChannelTitle: string;
-    videoOwnerChannelId: string;
+    publishedAt: Date
+    channelId: string
+    title: string
+    description: string
+    thumbnails: Thumbnails.Thumbnails
+    channelTitle: string
+    playlistId: string
+    position: number
+    resourceId: ResourceId
+    videoOwnerChannelTitle: string
+    videoOwnerChannelId: string
   }
 
   export interface Items {
-    kind: string;
-    etag: string;
-    id: string;
-    snippet?: Snippet;
+    kind: string
+    etag: string
+    id: string
+    snippet?: Snippet
   }
 
   export interface PlaylistItems {
-    kind: string;
-    etag: string;
+    kind: string
+    etag: string
     nextPageToken?: string,
     prevPageToken?: string,
-    items: Items[];
-    pageInfo: PageInfo;
+    items: Items[]
+    pageInfo: PageInfo
   }
 
 }
@@ -137,106 +137,106 @@ export namespace PlaylistItems {
 export namespace UserPlaylists {
 
   export interface Localized {
-    title: string;
-    description: string;
+    title: string
+    description: string
   }
 
   export interface Snippet {
-    publishedAt: Date;
-    channelId: string;
-    title: string;
-    description: string;
-    thumbnails: Thumbnails.Thumbnails;
-    channelTitle: string;
-    localized: Localized;
+    publishedAt: Date
+    channelId: string
+    title: string
+    description: string
+    thumbnails: Thumbnails.Thumbnails
+    channelTitle: string
+    localized: Localized
   }
 
   export interface Item {
-    kind: string;
-    etag: string;
-    id: string;
-    snippet?: Snippet;
+    kind: string
+    etag: string
+    id: string
+    snippet?: Snippet
   }
 
   export interface UserPlaylists {
-    kind: string;
-    etag: string;
-    nextPageToken?: string;
+    kind: string
+    etag: string
+    nextPageToken?: string
     prevPageToken?: string,
-    pageInfo: PageInfo;
-    items: Item[];
+    pageInfo: PageInfo
+    items: Item[]
   }
 }
 export interface Localized {
-  title: string;
-  description: string;
+  title: string
+  description: string
 }
 
 export namespace ChannelInfo {
 
 
   export interface Snippet {
-    title: string;
-    description: string;
-    publishedAt: Date;
-    thumbnails: Thumbnails.Thumbnails;
-    localized: Localized;
+    title: string
+    description: string
+    publishedAt: Date
+    thumbnails: Thumbnails.Thumbnails
+    localized: Localized
   }
 
   export interface Item {
-    kind: string;
-    etag: string;
-    id: string;
-    snippet?: Snippet;
+    kind: string
+    etag: string
+    id: string
+    snippet?: Snippet
   }
 
   export interface ChannelInfo {
-    kind: string;
-    etag: string;
-    pageInfo: PageInfo;
-    items: Item[];
+    kind: string
+    etag: string
+    pageInfo: PageInfo
+    items: Item[]
   }
 }
 
 export namespace VideoDetails {
 
   export interface RegionRestriction {
-    allowed: string[];
+    allowed: string[]
   }
 
   export interface ContentRating {
   }
 
   export interface ContentDetails {
-    duration: string;
-    dimension: string;
-    definition: string;
-    caption: string;
-    licensedContent: boolean;
-    regionRestriction: RegionRestriction;
-    contentRating: ContentRating;
-    projection: string;
+    duration: string
+    dimension: string
+    definition: string
+    caption: string
+    licensedContent: boolean
+    regionRestriction: RegionRestriction
+    contentRating: ContentRating
+    projection: string
   }
 
   export interface Item {
-    kind: string;
-    etag: string;
-    id: string;
-    contentDetails: ContentDetails;
+    kind: string
+    etag: string
+    id: string
+    contentDetails: ContentDetails
     snippet: Snippet
   }
 
   export interface Snippet {
-    publishedAt: Date;
-    channelId: string;
-    title: string;
-    description: string;
-    thumbnails: Thumbnails.Thumbnails;
-    channelTitle: string;
-    tags: string[];
-    categoryId: string;
-    liveBroadcastContent: string;
-    localized: Localized;
+    publishedAt: Date
+    channelId: string
+    title: string
+    description: string
+    thumbnails: Thumbnails.Thumbnails
+    channelTitle: string
+    tags: string[]
+    categoryId: string
+    liveBroadcastContent: string
+    localized: Localized
   }
 
   export interface VideoDetails {

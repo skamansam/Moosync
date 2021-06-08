@@ -7,9 +7,7 @@
           :title="playlist.playlist_name"
           :imgSrc="playlist.playlist_coverPath"
           @click.native="gotoPlaylist(playlist)"
-          @contextmenu.native="
-            getPlaylistContextMenu(arguments[0], playlist, refreshCallback)
-          "
+          @contextmenu.native="getPlaylistContextMenu(arguments[0], playlist, refreshCallback)"
         />
       </b-col>
     </b-row>
@@ -27,8 +25,8 @@ import { vxm } from '@/mainWindow/store'
 
 @Component({
   components: {
-    CardView,
-  },
+    CardView
+  }
 })
 export default class Albums extends mixins(RouterPushes, ContextMenuMixin) {
   private allPlaylists: Playlist[] = []

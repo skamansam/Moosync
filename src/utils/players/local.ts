@@ -1,8 +1,8 @@
 import { Player } from './player'
 export class LocalPlayer extends Player {
-  playerInstance: ExtendedHtmlAudioElement
+  playerInstance: HTMLAudioElement
 
-  constructor(playerInstance: ExtendedHtmlAudioElement) {
+  constructor(playerInstance: HTMLAudioElement) {
     super()
     this.playerInstance = playerInstance
     this.playerInstance.load()

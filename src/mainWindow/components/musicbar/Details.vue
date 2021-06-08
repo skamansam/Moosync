@@ -12,34 +12,32 @@
     <Record v-if="!ImgSrc || forceEmptyImg" class="coverimg" />
     <div class="text-container">
       <div class="text song-title text-truncate">{{ title }}</div>
-      <div class="text song-subtitle text-truncate">
-        {{ artists ? artists.join(", ") : "-" }}
-      </div>
+      <div class="text song-subtitle text-truncate">{{ artists ? artists.join(', ') : '-' }}</div>
     </div>
   </div>
 </template>
 
 <script lang="ts">
-import Colors from "@/utils/mixins/Colors";
-import { mixins } from "vue-class-component";
-import { Component, Prop } from "vue-property-decorator";
-import Record from "@/mainWindow/components/icons/Record.vue";
-import ImageLoader from "@/utils/mixins/ImageLoader";
+import Colors from '@/utils/mixins/Colors'
+import { mixins } from 'vue-class-component'
+import { Component, Prop } from 'vue-property-decorator'
+import Record from '@/mainWindow/components/icons/Record.vue'
+import ImageLoader from '@/utils/mixins/ImageLoader'
 
 @Component({
   components: {
-    Record,
-  },
+    Record
+  }
 })
 export default class MusicBar extends mixins(Colors, ImageLoader) {
-  @Prop({ default: "-" })
-  title!: string;
+  @Prop({ default: '-' })
+  title!: string
 
   @Prop({ default: () => [] })
-  artists!: string[];
+  artists!: string[]
 
   private handleImageError() {
-    this.forceEmptyImg = true;
+    this.forceEmptyImg = true
   }
 }
 </script>

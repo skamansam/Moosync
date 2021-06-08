@@ -1,13 +1,5 @@
 <template>
-  <b-modal
-    class="playlist-modal"
-    centered
-    size="lg"
-    :id="id"
-    :ref="id"
-    hide-footer
-    hide-header
-  >
+  <b-modal class="playlist-modal" centered size="lg" :id="id" :ref="id" hide-footer hide-header>
     <div class="modal-content-container">
       <b-container fluid class="p-0">
         <b-row no-gutters class="d-flex">
@@ -28,12 +20,10 @@
                 class="playlist-title"
                 maxlength="20"
                 placeholder="Playlist Name..."
-                onkeypress="this.style.width = this.value.length + 'ch';"
+                onkeypress="this.style.width = this.value.length + 'ch'"
               />
             </div>
-            <p class="songs-count">
-              {{ songCount }} {{ songCount == 1 ? "Song" : "Songs" }}
-            </p>
+            <p class="songs-count">{{ songCount }} {{ songCount == 1 ? 'Song' : 'Songs' }}</p>
           </b-col>
         </b-row>
         <b-row no-gutters>
@@ -53,165 +43,154 @@
 </template>
 
 <script lang="ts">
-import { EventBus } from "@/utils/ipc/main/constants";
-import { Component, Prop, Ref } from "vue-property-decorator";
-import Colors from "@/utils/mixins/Colors";
-import { mixins } from "vue-class-component";
-import { bus } from "@/mainWindow/main";
-import { vxm } from "@/mainWindow/store";
-import Record from "@/mainWindow/components/icons/Record.vue";
-import { Song } from "@/models/songs";
+import { EventBus } from '@/utils/ipc/main/constants'
+import { Component, Prop, Ref } from 'vue-property-decorator'
+import Colors from '@/utils/mixins/Colors'
+import { mixins } from 'vue-class-component'
+import { bus } from '@/mainWindow/main'
+import { vxm } from '@/mainWindow/store'
+import Record from '@/mainWindow/components/icons/Record.vue'
+import { Song } from '@/models/songs'
 
 @Component({
   components: {
-    Record,
-  },
+    Record
+  }
 })
 export default class NewPlaylistModal extends mixins(Colors) {
-  @Prop({ default: "NewPlaylistModal" })
-  private id!: string;
+  @Prop({ default: 'NewPlaylistModal' })
+  private id!: string
 
-  private title: string = "New Playlist";
-  private desc: string = "";
+  private title: string = 'New Playlist'
+  private desc: string = ''
 
-  private songs: Song[] = [];
-  private songCount: number = 0;
+  private songs: Song[] = []
+  private songCount: number = 0
 
-  private forceEmptyImg: boolean = true;
+  private forceEmptyImg: boolean = true
 
-  private showing: boolean = false;
+  private showing: boolean = false
 
-  @Ref("canvas") private canvas!: HTMLCanvasElement;
+  @Ref('canvas') private canvas!: HTMLCanvasElement
 
   private isDuplicatePlaylistName(): boolean {
     for (const playlist of Object.values(vxm.playlist.playlists)) {
       if (this.title === playlist) {
-        return true;
+        return true
       }
     }
-    return false;
+    return false
   }
 
   private async createPlaylist() {
-    const data = this.canvas.toDataURL("image/png");
-    let path = await window.FileUtils.savePlaylistCover(data);
+    const data = this.canvas.toDataURL('image/png')
+    let path = await window.FileUtils.savePlaylistCover(data)
 
-    let playlist_id = await window.DBUtils.createPlaylist(this.title, this.desc, path);
-    this.addToPlaylist(playlist_id, this.songs);
+    let playlist_id = await window.DBUtils.createPlaylist(this.title, this.desc, path)
+    this.addToPlaylist(playlist_id, this.songs)
 
-    this.$bvModal.hide(this.id);
-    vxm.playlist.updated = true;
+    this.$bvModal.hide(this.id)
+    vxm.playlist.updated = true
   }
 
   private handleImageError() {
-    this.forceEmptyImg = true;
+    this.forceEmptyImg = true
   }
 
   private getValidImages() {
-    let mergableImages: string[] = [];
+    let mergableImages: string[] = []
     for (const song of this.songs) {
-      if (song.album && song.album.album_coverPath)
-        mergableImages.push(song.album.album_coverPath);
+      if (song.album && song.album.album_coverPath) mergableImages.push(song.album.album_coverPath)
     }
-    return mergableImages.slice(0, 4);
+    return mergableImages.slice(0, 4)
   }
 
-  private createImage(
-    src: string,
-    quad: number,
-    len: number,
-    ctx: CanvasRenderingContext2D
-  ) {
-    let img = new Image();
-    img.src = "media://" + src;
-    img.onload = () => this.drawImage(quad, len, ctx, img);
+  private createImage(src: string, quad: number, len: number, ctx: CanvasRenderingContext2D) {
+    let img = new Image()
+    img.src = 'media://' + src
+    img.onload = () => this.drawImage(quad, len, ctx, img)
   }
 
   private isExpandedImage(quad: number, len: number) {
     if (len === 3) {
-      return quad === 1;
+      return quad === 1
     }
 
-    if (len < 3) return true;
+    if (len < 3) return true
 
-    return false;
+    return false
   }
 
   private getImageSize(quad: number, len: number) {
-    return this.isExpandedImage(quad, len) ? 800 : 400;
+    return this.isExpandedImage(quad, len) ? 800 : 400
   }
 
-  private drawImage(
-    quad: number,
-    len: number,
-    ctx: CanvasRenderingContext2D,
-    img: HTMLImageElement
-  ) {
-    let size = this.getImageSize(quad, len);
+  private drawImage(quad: number, len: number, ctx: CanvasRenderingContext2D, img: HTMLImageElement) {
+    let size = this.getImageSize(quad, len)
     switch (quad) {
       case 0:
-        ctx.drawImage(img, 0, 0, size, size);
-        break;
+        ctx.drawImage(img, 0, 0, size, size)
+        break
       case 1:
-        ctx.drawImage(img, 400, 0, size, size);
-        break;
+        ctx.drawImage(img, 400, 0, size, size)
+        break
       case 2:
-        ctx.drawImage(img, 0, 400, size, size);
-        break;
+        ctx.drawImage(img, 0, 400, size, size)
+        break
       case 3:
-        ctx.drawImage(img, 400, 400, size, size);
-        break;
+        ctx.drawImage(img, 400, 400, size, size)
+        break
     }
   }
 
   private drawWholeImage(ctx: CanvasRenderingContext2D, src: string) {
-    let img = new Image();
-    img.src = "media://" + src;
-    img.onload = () => ctx.drawImage(img, 0, 0, 800, 800);
+    let img = new Image()
+    img.src = 'media://' + src
+    img.onload = () => ctx.drawImage(img, 0, 0, 800, 800)
   }
 
   private mergeImages() {
-    let mergableImages = this.getValidImages();
+    let mergableImages = this.getValidImages()
     if (mergableImages.length === 0) {
-      this.forceEmptyImg = true;
+      this.forceEmptyImg = true
     } else {
-      console.log(this.canvas);
+      console.log(this.canvas)
       if (this.canvas) {
-        let ctx = this.canvas.getContext("2d");
-        ctx!.clearRect(0, 0, this.canvas.width, this.canvas.height);
+        let ctx = this.canvas.getContext('2d')
+        ctx!.clearRect(0, 0, this.canvas.width, this.canvas.height)
         for (let i = 0; i < mergableImages.length; i++)
-          this.createImage(mergableImages[i], i, mergableImages.length, ctx!);
+          this.createImage(mergableImages[i], i, mergableImages.length, ctx!)
       }
     }
   }
 
   private computeImgSrc(value: string): string {
-    if (!value.startsWith("http")) return `media://${value}`;
-    return value;
+    if (!value.startsWith('http')) return `media://${value}`
+    return value
   }
 
   private async addToPlaylist(playlist_id: string, songs: Song[]) {
-    window.DBUtils.addToPlaylist(playlist_id, ...songs);
+    window.DBUtils.addToPlaylist(playlist_id, ...songs)
   }
 
   mounted() {
     bus.$on(EventBus.SHOW_NEW_PLAYLIST_MODAL, (songs: Song[]) => {
       if (!this.showing) {
-        this.songs = songs;
-        this.songCount = songs.length;
-        this.forceEmptyImg = false;
-        this.desc = "";
-        this.title = "New Playlist";
+        this.songs = songs
+        this.songCount = songs.length
+        this.forceEmptyImg = false
+        this.desc = ''
+        this.title = 'New Playlist'
 
-        this.$nextTick(() => this.mergeImages());
+        this.$nextTick(() => this.mergeImages())
 
         for (let i = 1; this.isDuplicatePlaylistName(); i++) {
-          this.title = `New Playlist ${i}`;
+          this.title = `New Playlist ${i}`
         }
 
-        this.$bvModal.show(this.id);
+        this.$bvModal.show(this.id)
       }
-    });
+    })
   }
 }
 </script>

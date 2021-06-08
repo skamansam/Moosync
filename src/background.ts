@@ -8,8 +8,8 @@ import { loadPreferences } from '@/utils/db/preferences'
 import path, { resolve } from 'path'
 import { registerIpcChannels } from '@/utils/ipc/main' // Import for side effects
 import 'threads/register'
-import { OAuthHandler } from '@/utils/oauth/main/handler';
-import EventEmitter from 'events';
+import { OAuthHandler } from '@/utils/oauth/main/handler'
+import EventEmitter from 'events'
 
 const isDevelopment = process.env.NODE_ENV !== 'production'
 export var mainWindow: BrowserWindow
@@ -225,9 +225,9 @@ if (isDevelopment) {
 }
 
 app.on('open-url', function (event, data) {
-  event.preventDefault();
+  event.preventDefault()
   oauthHandler.handleEvents(data)
-});
+})
 
 if (isDevelopment && process.platform === 'win32') {
   // Set the path of electron.exe and your app.
@@ -235,9 +235,9 @@ if (isDevelopment && process.platform === 'win32') {
   // Setting this is required to get this working in dev mode.
   app.setAsDefaultProtocolClient('com.moosync', process.execPath, [
     resolve(process.argv[1])
-  ]);
+  ])
 } else {
-  app.setAsDefaultProtocolClient('com.moosync');
+  app.setAsDefaultProtocolClient('com.moosync')
 }
 
 if (!app.requestSingleInstanceLock()) {

@@ -50,18 +50,18 @@
 </template>
 
 <script lang="ts">
-import AudioStream from "@/mainWindow/components/AudioStream.vue";
-import Controls from "@/mainWindow/components/musicbar/Controls.vue";
-import Details from "@/mainWindow/components/musicbar/Details.vue";
-import ExtraControls from "@/mainWindow/components/musicbar/ExtraControls.vue";
-import MusicInfo from "@/mainWindow/components/musicbar/MusicInfo.vue";
+import AudioStream from '@/mainWindow/components/AudioStream.vue'
+import Controls from '@/mainWindow/components/musicbar/Controls.vue'
+import Details from '@/mainWindow/components/musicbar/Details.vue'
+import ExtraControls from '@/mainWindow/components/musicbar/ExtraControls.vue'
+import MusicInfo from '@/mainWindow/components/musicbar/MusicInfo.vue'
 
-import { Component } from "vue-property-decorator";
-import { PlayerState } from "@/mainWindow/store/playerState";
-import Colors from "@/utils/mixins/Colors";
-import { mixins } from "vue-class-component";
-import ModelHelper from "@/utils/mixins/ModelHelper";
-import { vxm } from "../store";
+import { Component } from 'vue-property-decorator'
+import { PlayerState } from '@/mainWindow/store/playerState'
+import Colors from '@/utils/mixins/Colors'
+import { mixins } from 'vue-class-component'
+import ModelHelper from '@/utils/mixins/ModelHelper'
+import { vxm } from '../store'
 
 @Component({
   components: {
@@ -69,45 +69,45 @@ import { vxm } from "../store";
     Controls,
     ExtraControls,
     AudioStream,
-    MusicInfo,
-  },
+    MusicInfo
+  }
 })
 export default class MusicBar extends mixins(Colors, ModelHelper) {
-  private timestamp: number = 0;
-  private forceSeek: number = 0;
-  private PlayerState = PlayerState;
-  private sliderPosition: boolean = false;
+  private timestamp: number = 0
+  private forceSeek: number = 0
+  private PlayerState = PlayerState
+  private sliderPosition: boolean = false
 
   private updateTimestmp(value: number) {
-    this.forceSeek = value;
+    this.forceSeek = value
   }
 
   get currentSong() {
-    return vxm.sync.currentSongDets ?? vxm.player.currentSong;
+    return vxm.sync.currentSongDets ?? vxm.player.currentSong
   }
 
   get remoteCover() {
-    return vxm.sync.currentCover;
+    return vxm.sync.currentCover
   }
 
   get playerState() {
-    return vxm.player.playerState;
+    return vxm.player.playerState
   }
 
   get cover() {
-    return this.remoteCover ? this.remoteCover : this.getImg(this.currentSong);
+    return this.remoteCover ? this.remoteCover : this.getImg(this.currentSong)
   }
 
   get waiting() {
-    return vxm.player.playerState == PlayerState.LOADING;
+    return vxm.player.playerState == PlayerState.LOADING
   }
 
   private toggleSlider(position: boolean) {
-    this.sliderPosition = position;
+    this.sliderPosition = position
   }
 
   private updateTimestamp(timestamp: number) {
-    this.timestamp = timestamp;
+    this.timestamp = timestamp
   }
 }
 </script>

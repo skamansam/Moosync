@@ -1,9 +1,6 @@
 <template>
   <div class="h-100 d-flex align-items-center search-container">
-    <div
-      class="w-100 searchbar-container"
-      :class="showSearchResults ? 'half-border' : 'full-border'"
-    >
+    <div class="w-100 searchbar-container" :class="showSearchResults ? 'half-border' : 'full-border'">
       <Search class="search-icon" />
       <b-form-input
         class="searchbar"
@@ -18,10 +15,7 @@
         @keyup.enter="openSearchPage"
       />
     </div>
-    <div
-      class="search-results d-flex"
-      :class="showSearchResults ? 'search-visible' : 'search-invisible'"
-    >
+    <div class="search-results d-flex" :class="showSearchResults ? 'search-visible' : 'search-invisible'">
       <div v-if="results && results.songs.length !== 0" class="w-100">
         <RecycleScroller
           class="scroller"
@@ -42,66 +36,64 @@
           />
         </RecycleScroller>
       </div>
-      <div class="w-100 text-center" v-if="results && results.songs.length == 0">
-        No Results found
-      </div>
+      <div class="w-100 text-center" v-if="results && results.songs.length == 0">No Results found</div>
     </div>
   </div>
 </template>
 
 <script lang="ts">
-import { Component } from "vue-property-decorator";
-import Search from "@/mainWindow/components/icons/Search.vue";
-import { SearchResult } from "@/models/searchResult";
-import SingleSearchResult from "@/mainWindow/components/generic/SingleSearchResult.vue";
-import Colors from "@/utils/mixins/Colors";
-import { mixins } from "vue-class-component";
-import PlayerControls from "@/utils/mixins/PlayerControls";
+import { Component } from 'vue-property-decorator'
+import Search from '@/mainWindow/components/icons/Search.vue'
+import { SearchResult } from '@/models/searchResult'
+import SingleSearchResult from '@/mainWindow/components/generic/SingleSearchResult.vue'
+import Colors from '@/utils/mixins/Colors'
+import { mixins } from 'vue-class-component'
+import PlayerControls from '@/utils/mixins/PlayerControls'
 
 @Component({
   components: {
     Search,
-    SingleSearchResult,
-  },
+    SingleSearchResult
+  }
 })
 export default class Sidebar extends mixins(Colors, PlayerControls) {
-  private showSearchResults: boolean = false;
-  private results: SearchResult | null = null;
-  private inputText: string = "";
+  private showSearchResults: boolean = false
+  private results: SearchResult | null = null
+  private inputText: string = ''
 
   private handleInputFocus(event: FocusEvent) {
     switch (event.type) {
-      case "blur":
-        this.showSearchResults = false;
-        break;
-      case "focus":
-        this.showSearchResults = this.results ? true : false;
-        break;
+      case 'blur':
+        this.showSearchResults = false
+        break
+      case 'focus':
+        this.showSearchResults = this.results ? true : false
+        break
     }
   }
 
   private handleClick(index: any) {
-    this.playTop(this.results!.songs![index]);
+    this.playTop(this.results!.songs![index])
   }
 
   private openSearchPage() {
     this.$router
       .push({
-        name: "search",
+        name: 'search',
         query: {
-          search_term: this.inputText,
-        },
+          search_term: this.inputText
+        }
       })
-      .catch(() => {});
-    this.showSearchResults = false;
+      .catch(() => {})
+    this.showSearchResults = false
   }
   private async onTextChange(value: string) {
     if (value) {
-      this.showSearchResults = true;
-      this.results = await window.SearchUtils.searchCompact(value);
+      this.showSearchResults = true
+      this.results = await window.SearchUtils.searchCompact(value)
     } else {
-      this.showSearchResults = false;
-      this.results = null;
+      this.showSearchResults = false
+      this.results = null
     }
   }
 }

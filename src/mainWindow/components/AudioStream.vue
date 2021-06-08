@@ -22,7 +22,7 @@ import { vxm } from '../store'
 
 @Component({})
 export default class AudioStream extends mixins(Colors, SyncMixin) {
-  @Ref('audio') audioElement!: ExtendedHtmlAudioElement
+  @Ref('audio') audioElement!: HTMLAudioElement
 
   @Prop({ default: '' })
   roomID!: string

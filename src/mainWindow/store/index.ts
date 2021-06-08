@@ -6,7 +6,7 @@ import { PlayerStore } from './playerState'
 import { PlaylistStore } from '@/mainWindow/store/playlists'
 import { SyncStore } from '@/mainWindow/store/syncState'
 import { createPersist } from '@/utils/store/persist'
-import { ProviderStore } from '@/mainWindow/store/providers';
+import { ProviderStore } from '@/mainWindow/store/providers'
 
 Vue.use(Vuex)
 

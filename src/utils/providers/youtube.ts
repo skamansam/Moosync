@@ -1,9 +1,9 @@
-import { AuthFlow, AuthStateEmitter } from '@/utils/oauth/ui/flow';
-import { once } from 'events';
-import { ApiResources, SearchObject, ResponseType, UserPlaylists, PlaylistItems, VideoDetails } from './responses';
-import { Playlist } from '@/models/playlists';
-import { Song } from '@/models/songs';
-import moment from 'moment';
+import { AuthFlow, AuthStateEmitter } from '@/utils/oauth/ui/flow'
+import { once } from 'events'
+import { ApiResources, SearchObject, ResponseType, UserPlaylists, PlaylistItems, VideoDetails } from './responses'
+import { Playlist } from '@/models/playlists'
+import { Song } from '@/models/songs'
+import moment from 'moment'
 
 const BASE_URL = 'https://youtube.googleapis.com/youtube/v3/'
 export class Youtube {
@@ -16,7 +16,7 @@ export class Youtube {
         await this.auth.performWithFreshTokens()
         return
       }
-      this.auth.makeAuthorizationRequest();
+      this.auth.makeAuthorizationRequest()
       return once(this.auth.authStateEmitter, AuthStateEmitter.ON_TOKEN_RESPONSE)
     }
   }

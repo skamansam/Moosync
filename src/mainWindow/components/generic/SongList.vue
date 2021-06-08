@@ -20,9 +20,7 @@
       <template #cell(album)="data">{{ getAlbumName(data.item) }}</template>
 
       <template #cell(artists)="data">
-        {{
-        data.item.artists ? data.item.artists.join(", ") : "-"
-        }}
+        {{ data.item.artists ? data.item.artists.join(', ') : '-' }}
       </template>
     </b-table>
   </div>
@@ -49,7 +47,7 @@ export default class SongList extends mixins(Colors) {
   private extrafields!: [{ key: string }]
 
   private fields: [{ key: string; label?: string; tdClass?: string; thClass?: string }] = [
-    { key: 'index', label: 'Sr. No', tdClass: 'index-no-td', thClass: 'index-no-th' },
+    { key: 'index', label: 'Sr. No', tdClass: 'index-no-td', thClass: 'index-no-th' }
   ]
 
   private getAlbumName(data: Song) {

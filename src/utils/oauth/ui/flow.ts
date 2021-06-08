@@ -1,7 +1,7 @@
 /*
  * Copyright 2017 Google Inc.
  *
- * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * Licensed under the Apache License, Version 2.0 (the "License") you may not
  * use this file except in compliance with the License. You may obtain a copy of
  * the License at
  *
@@ -14,51 +14,51 @@
  * the License.
  */
 
-import { AuthorizationRequest } from "@openid/appauth/built/authorization_request";
+import { AuthorizationRequest } from "@openid/appauth/built/authorization_request"
 import {
   AuthorizationNotifier,
   AuthorizationRequestHandler
-} from "@openid/appauth/built/authorization_request_handler";
-import { AuthorizationServiceConfiguration } from "@openid/appauth/built/authorization_service_configuration";
+} from "@openid/appauth/built/authorization_request_handler"
+import { AuthorizationServiceConfiguration } from "@openid/appauth/built/authorization_service_configuration"
 import {
   GRANT_TYPE_AUTHORIZATION_CODE,
   GRANT_TYPE_REFRESH_TOKEN,
   TokenRequest
-} from "@openid/appauth/built/token_request";
+} from "@openid/appauth/built/token_request"
 import {
   BaseTokenRequestHandler,
   TokenRequestHandler
-} from "@openid/appauth/built/token_request_handler";
+} from "@openid/appauth/built/token_request_handler"
 import {
   TokenResponse
-} from "@openid/appauth/built/token_response";
-import EventEmitter from 'events';
+} from "@openid/appauth/built/token_response"
+import EventEmitter from 'events'
 
-import { StringMap } from "@openid/appauth/built/types";
-import { AuthFlowRequestHandler } from './AuthFlowRequestHandler';
-import { WebCrypto } from "./crypto_utils";
-import { NodeRequestor } from '@openid/appauth/built/node_support/node_requestor';
+import { StringMap } from "@openid/appauth/built/types"
+import { AuthFlowRequestHandler } from './AuthFlowRequestHandler'
+import { WebCrypto } from "./crypto_utils"
+import { NodeRequestor } from '@openid/appauth/built/node_support/node_requestor'
 
 export class AuthStateEmitter extends EventEmitter {
-  static ON_TOKEN_RESPONSE = "on_token_response";
+  static ON_TOKEN_RESPONSE = "on_token_response"
 }
 
 type config = { openIdConnectUrl: string, clientId: string, redirectUri: string, scope: string, keytarService: string }
 type oauthType = 'youtube'
 
-const requestor = new NodeRequestor();
+const requestor = new NodeRequestor()
 
 export class AuthFlow {
-  private notifier: AuthorizationNotifier;
-  private authorizationHandler: AuthorizationRequestHandler;
-  private tokenHandler: TokenRequestHandler;
-  readonly authStateEmitter: AuthStateEmitter;
+  private notifier: AuthorizationNotifier
+  private authorizationHandler: AuthorizationRequestHandler
+  private tokenHandler: TokenRequestHandler
+  readonly authStateEmitter: AuthStateEmitter
 
   // state
-  private configuration: AuthorizationServiceConfiguration | undefined;
+  private configuration: AuthorizationServiceConfiguration | undefined
 
-  private refreshToken: string | undefined;
-  private accessTokenResponse: TokenResponse | undefined;
+  private refreshToken: string | undefined
+  private accessTokenResponse: TokenResponse | undefined
 
   private config: config
 
@@ -67,15 +67,15 @@ export class AuthFlow {
   constructor(type: oauthType) {
     this.config = this.generateConfig(type)
 
-    this.notifier = new AuthorizationNotifier();
-    this.authStateEmitter = new AuthStateEmitter();
+    this.notifier = new AuthorizationNotifier()
+    this.authStateEmitter = new AuthStateEmitter()
 
-    this.authorizationHandler = new AuthFlowRequestHandler();
+    this.authorizationHandler = new AuthFlowRequestHandler()
 
-    this.tokenHandler = new BaseTokenRequestHandler(requestor);
+    this.tokenHandler = new BaseTokenRequestHandler(requestor)
     // set notifier to deliver responses
 
-    this.authorizationHandler.setAuthorizationNotifier(this.notifier);
+    this.authorizationHandler.setAuthorizationNotifier(this.notifier)
 
     // set a listener to listen for authorization responses
     // make refresh and access token requests.
@@ -86,18 +86,18 @@ export class AuthFlow {
 
     this.notifier.setAuthorizationListener((request, response) => {
       if (response) {
-        let codeVerifier: string | undefined;
+        let codeVerifier: string | undefined
         if (request.internal && request.internal.code_verifier) {
-          codeVerifier = request.internal.code_verifier;
+          codeVerifier = request.internal.code_verifier
         }
 
         this.makeRefreshTokenRequest(response.code, codeVerifier)
           .then(() => this.performWithFreshTokens())
           .then(() => {
-            this.authStateEmitter.emit(AuthStateEmitter.ON_TOKEN_RESPONSE);
-          });
+            this.authStateEmitter.emit(AuthStateEmitter.ON_TOKEN_RESPONSE)
+          })
       }
-    });
+    })
   }
 
   private generateConfig(type: oauthType): config {
@@ -139,9 +139,9 @@ export class AuthFlow {
       this.configuration = await this.fetchServiceConfiguration()
     }
 
-    const extras: StringMap = { prompt: "consent", access_type: "offline" };
+    const extras: StringMap = { prompt: "consent", access_type: "offline" }
     if (username) {
-      extras["login_hint"] = username;
+      extras["login_hint"] = username
     }
 
     // create a request
@@ -151,26 +151,26 @@ export class AuthFlow {
       scope: this.config.scope,
       response_type: AuthorizationRequest.RESPONSE_TYPE_CODE,
       extras: extras
-    }, new WebCrypto());
+    }, new WebCrypto())
 
 
     this.authorizationHandler.performAuthorizationRequest(
       this.configuration,
       request
-    );
+    )
   }
 
   private makeRefreshTokenRequest(code: string, codeVerifier: string | undefined): Promise<void> {
     if (!this.fetchedToken) throw new Error('service not yet initialized')
 
     if (!this.configuration) {
-      return Promise.resolve();
+      return Promise.resolve()
     }
 
-    const extras: StringMap = {};
+    const extras: StringMap = {}
 
     if (codeVerifier) {
-      extras.code_verifier = codeVerifier;
+      extras.code_verifier = codeVerifier
     }
 
     // use the code to make the token request.
@@ -180,25 +180,25 @@ export class AuthFlow {
       grant_type: GRANT_TYPE_AUTHORIZATION_CODE,
       code: code,
       extras: extras
-    });
+    })
 
     return this.tokenHandler
       .performTokenRequest(this.configuration, request)
       .then(response => {
-        this.refreshToken = response.refreshToken;
-        this.accessTokenResponse = response;
-        return response;
+        this.refreshToken = response.refreshToken
+        this.accessTokenResponse = response
+        return response
       })
-      .then(() => this.storeRefreshToken());
+      .then(() => this.storeRefreshToken())
   }
 
   loggedIn(): boolean {
-    return !!this.accessTokenResponse && this.accessTokenResponse.isValid();
+    return !!this.accessTokenResponse && this.accessTokenResponse.isValid()
   }
 
   signOut() {
     // forget all cached token state
-    this.accessTokenResponse = undefined;
+    this.accessTokenResponse = undefined
   }
 
   public async hasValidRefreshToken() {
@@ -207,16 +207,16 @@ export class AuthFlow {
   }
 
   async performWithFreshTokens(): Promise<string> {
-    if (!this.fetchedToken) return Promise.reject("Service not initialized");
+    if (!this.fetchedToken) return Promise.reject("Service not initialized")
 
     if (!this.configuration) {
       this.configuration = await this.fetchServiceConfiguration()
     }
     if (!this.refreshToken) {
-      return Promise.resolve("Missing refreshToken.");
+      return Promise.resolve("Missing refreshToken.")
     }
     if (this.accessTokenResponse && this.accessTokenResponse.isValid()) {
-      return this.accessTokenResponse.accessToken;
+      return this.accessTokenResponse.accessToken
     }
 
     let request = new TokenRequest({
@@ -224,13 +224,13 @@ export class AuthFlow {
       redirect_uri: this.config.redirectUri,
       grant_type: GRANT_TYPE_REFRESH_TOKEN,
       refresh_token: this.refreshToken,
-    });
+    })
 
     return this.tokenHandler
       .performTokenRequest(this.configuration, request)
       .then(response => {
-        this.accessTokenResponse = response;
-        return response.accessToken;
-      });
+        this.accessTokenResponse = response
+        return response.accessToken
+      })
   }
 }
