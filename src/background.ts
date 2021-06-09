@@ -12,9 +12,9 @@ import { OAuthHandler } from '@/utils/oauth/main/handler'
 import EventEmitter from 'events'
 
 const isDevelopment = process.env.NODE_ENV !== 'production'
-export var mainWindow: BrowserWindow
-export var oauthHandler = new OAuthHandler()
-export var oauthEventEmitter = new EventEmitter()
+export let mainWindow: BrowserWindow
+export const oauthHandler = new OAuthHandler()
+export const oauthEventEmitter = new EventEmitter()
 
 // Since in development mode, it is valid to have multiple processes open,
 // quit the app if it is supposed to be used for oauth purposes only
@@ -247,7 +247,7 @@ if (!app.requestSingleInstanceLock()) {
 
 app.on('second-instance', (event, argv) => {
   if (process.platform !== 'darwin') {
-    let arg = argv.find((arg) => arg.startsWith('com.moosync'))
+    const arg = argv.find((arg) => arg.startsWith('com.moosync'))
     if (arg) {
       oauthHandler.handleEvents(arg)
     }

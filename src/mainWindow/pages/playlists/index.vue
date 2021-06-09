@@ -31,8 +31,9 @@ import { vxm } from '@/mainWindow/store'
 export default class Albums extends mixins(RouterPushes, ContextMenuMixin) {
   private allPlaylists: Playlist[] = []
   private async getPlaylists() {
+    console.log('here')
     let localPlaylists = await window.DBUtils.getAllPlaylists()
-    let ytPlaylists = await vxm.youtube.youtubeProvider.getUserPlaylists()
+    let ytPlaylists = await vxm.providers.youtubeProvider.getUserPlaylists()
 
     this.allPlaylists.push(...localPlaylists, ...ytPlaylists)
   }

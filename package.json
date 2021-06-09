@@ -15,6 +15,7 @@
   "main": "background.js",
   "dependencies": {
     "@googleapis/oauth2": "^0.2.0",
+    "@material/ripple": "^11.0.0",
     "@openid/appauth": "^1.3.1",
     "@types/better-sqlite3": "^5.4.1",
     "@types/node": "^15.12.2",

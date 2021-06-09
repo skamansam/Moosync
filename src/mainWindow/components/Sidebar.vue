@@ -47,11 +47,6 @@
         <Tabs :isOpen="isOpen" />
       </div>
     </template>
-    <template #footer>
-      <div class="footer">
-        <Gears @click.native="openSettings" />
-      </div>
-    </template>
   </b-sidebar>
 </template>
 
@@ -111,10 +106,6 @@ export default class Sidebar extends mixins(Colors) {
 
   private createRoom() {
     this.$root.$emit('create-room')
-  }
-
-  private openSettings() {
-    window.WindowUtils.openPreferenceWindow()
   }
 }
 </script>

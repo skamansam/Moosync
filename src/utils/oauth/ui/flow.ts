@@ -198,7 +198,9 @@ export class AuthFlow {
 
   signOut() {
     // forget all cached token state
+    window.Store.removeSecure(this.config.keytarService)
     this.accessTokenResponse = undefined
+    this.refreshToken = undefined
   }
 
   public async hasValidRefreshToken() {

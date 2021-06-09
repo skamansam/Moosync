@@ -9,6 +9,10 @@ const BASE_URL = 'https://youtube.googleapis.com/youtube/v3/'
 export class Youtube {
   private auth = new AuthFlow('youtube')
 
+  public get loggedIn() {
+    return this.auth.loggedIn()
+  }
+
   public async login() {
     if (!this.auth.loggedIn()) {
       const validRefreshToken = await this.auth.hasValidRefreshToken()
@@ -19,6 +23,10 @@ export class Youtube {
       this.auth.makeAuthorizationRequest()
       return once(this.auth.authStateEmitter, AuthStateEmitter.ON_TOKEN_RESPONSE)
     }
+  }
+
+  public async signOut() {
+    this.auth.signOut()
   }
 
   private async populateRequest<K extends ApiResources>(resource: K, search: SearchObject<K>): Promise<ResponseType<K>> {
@@ -140,7 +148,6 @@ export class Youtube {
           type: 'YOUTUBE'
         })
     }
-
     return songs
   }
 

@@ -54,6 +54,7 @@ interface store {
   set: (key: string, value: string) => Promise<void>
   getSecure: (key: string) => Promise<string | null>
   setSecure: (key: string, value: string) => Promise<void>
+  removeSecure: (key: string) => Promise<void>
 }
 
 interface windowUtils {

@@ -17,7 +17,8 @@ export enum StoreEvents {
   SET_DATA = 'setData',
   GET_DATA = 'getData',
   SET_SECURE = 'setSecure',
-  GET_SECURE = 'getSecure'
+  GET_SECURE = 'getSecure',
+  REMOVE_SECURE = 'removeSecure'
 }
 
 export enum SearchEvents {

@@ -29,5 +29,5 @@ export const vxm = {
   player: createProxy(store, PlayerStore),
   playlist: createProxy(store, PlaylistStore),
   sync: createProxy(store, SyncStore),
-  youtube: createProxy(store, ProviderStore),
+  providers: createProxy(store, ProviderStore),
 }
