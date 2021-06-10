@@ -68,7 +68,6 @@ export class AuthFlowRequestHandler extends AuthorizationRequestHandler {
       return Promise.reject(
         'No pending authorization request. Call performAuthorizationRequest() ?')
     }
-
     return this.authorizationPromise
   }
 }

@@ -31,7 +31,7 @@ class SongDBInstance extends DBUtils {
      ============================= */
 
   public async getAllSongs(exclude?: string[]): Promise<Song[]> {
-    let marshaled: marshaledSong[] = this.db.query(
+    const marshaled: marshaledSong[] = this.db.query(
       `SELECT *, ${this.addGroupConcatClause()} FROM allsongs
       ${this.addLeftJoinClause(undefined, 'allsongs')}
       ${this.addExcludeWhereClause(true, exclude)} GROUP BY allsongs._id`
@@ -40,10 +40,10 @@ class SongDBInstance extends DBUtils {
   }
 
   public async store(newDoc: Song): Promise<void> {
-    let artistID = newDoc.artists ? this.storeArtists(...newDoc.artists) : []
-    let albumID = newDoc.album ? this.storeAlbum(newDoc.album) : ''
-    let genreID = this.storeGenre(newDoc.genre)
-    let marshaledSong = this.marshalSong(newDoc)
+    const artistID = newDoc.artists ? this.storeArtists(...newDoc.artists) : []
+    const albumID = newDoc.album ? this.storeAlbum(newDoc.album) : ''
+    const genreID = this.storeGenre(newDoc.genre)
+    const marshaledSong = this.marshalSong(newDoc)
     this.db.insert('allsongs', marshaledSong)
     this.storeArtistBridge(artistID, marshaledSong._id)
     this.storeGenreBridge(genreID, marshaledSong._id)
@@ -54,11 +54,11 @@ class SongDBInstance extends DBUtils {
   public async removeSong(song_id: string) {
     this.db.transaction((song_id: string) => {
       // Selecting multiple times to also count occurrence
-      let album_ids: { count: number, album: string } = this.db.queryFirstRow(
+      const album_ids: { count: number, album: string } = this.db.queryFirstRow(
         'SELECT count(id) as count, album FROM album_bridge WHERE album = (SELECT album FROM album_bridge WHERE song = ?)',
         song_id
       ) as { count: number, album: string }
-      let artist_ids: { count: number, artist: string } = this.db.queryFirstRow(
+      const artist_ids: { count: number, artist: string } = this.db.queryFirstRow(
         'SELECT count(id) as count, artist FROM artists_bridge WHERE artist = (SELECT artist FROM artists_bridge WHERE song = ?)',
         song_id
       ) as { count: number, artist: string }
@@ -73,19 +73,19 @@ class SongDBInstance extends DBUtils {
         this.getAlbumByID(album_ids.album).then((album) => {
           if (album!.album_coverPath) fsP.unlink(album!.album_coverPath)
           this.db.delete('albums', { album_id: album_ids.album })
-        })
+        }).catch((err) => console.log(err))
       }
       if (artist_ids.count == 1) {
         this.getArtistsByID(artist_ids.artist).then((artist) => {
           if (artist!.artist_coverPath) fsP.unlink(artist!.artist_coverPath)
           this.db.delete('artists', { artist_id: artist_ids.artist })
-        })
+        }).catch((err) => console.log(err))
       }
     })(song_id)
   }
 
   public async searchSongsCompact(term: string, exclude?: string[]): Promise<SearchResult> {
-    let songs: marshaledSong[] = this.db.query(
+    const songs: marshaledSong[] = this.db.query(
       `SELECT *, ${this.addGroupConcatClause()} FROM allsongs 
       ${this.addLeftJoinClause(undefined, 'allsongs')}
         WHERE allsongs.path LIKE ? 
@@ -100,16 +100,16 @@ class SongDBInstance extends DBUtils {
   }
 
   public async searchAll(term: string, exclude?: string[]): Promise<SearchResult> {
-    let songs: marshaledSong[] = this.db.query(
+    const songs: marshaledSong[] = this.db.query(
       `SELECT *, ${this.addGroupConcatClause()} FROM allsongs 
       ${this.addLeftJoinClause(undefined, 'allsongs')} 
       WHERE allsongs.path LIKE ? ${this.addExcludeWhereClause(false, exclude)} 
       GROUP BY allsongs._id`,
       `%${term}%`
     )
-    let albums: Album[] = this.getMetaCommon(term, 'albums', 'album_bridge', 'album', exclude) as Album[]
-    let artists: artists[] = this.getMetaCommon(term, 'artists', 'artists_bridge', 'artist', exclude) as artists[]
-    let genre: Genre[] = this.getMetaCommon(term, 'genre', 'genre_bridge', 'genre', exclude) as Genre[]
+    const albums: Album[] = this.getMetaCommon(term, 'albums', 'album_bridge', 'album', exclude) as Album[]
+    const artists: artists[] = this.getMetaCommon(term, 'artists', 'artists_bridge', 'artist', exclude) as artists[]
+    const genre: Genre[] = this.getMetaCommon(term, 'genre', 'genre_bridge', 'genre', exclude) as Genre[]
 
     return { songs: this.batchUnmarshal(songs), albums: albums, artists: artists, genres: genre }
   }
@@ -151,7 +151,7 @@ class SongDBInstance extends DBUtils {
   }
 
   public async getAlbumSongs(id: string, exclude?: string[]): Promise<Song[]> {
-    let marshaled: marshaledSong[] = this.db.query(
+    const marshaled: marshaledSong[] = this.db.query(
       `SELECT *, ${this.addGroupConcatClause()} FROM album_bridge
       ${this.addLeftJoinClause('album_bridge', 'album')} 
       WHERE album_bridge.album = ? 
@@ -187,7 +187,7 @@ class SongDBInstance extends DBUtils {
 
   public updateSongCountAlbum() {
     this.db.transaction(() => {
-      for (let row of this.db.query(`SELECT album_id FROM albums`)) {
+      for (const row of this.db.query(`SELECT album_id FROM albums`)) {
         this.db.run(
           `UPDATE albums SET album_song_count = (SELECT count(id) FROM album_bridge WHERE album = ?) WHERE album_id = ?`,
           (row as Album).album_id,
@@ -216,7 +216,7 @@ class SongDBInstance extends DBUtils {
   }
 
   public async getGenreSongs(id: string, exclude?: string[]) {
-    let marshaled: marshaledSong[] = this.db.query(
+    const marshaled: marshaledSong[] = this.db.query(
       `SELECT *, ${this.addGroupConcatClause()} FROM genre_bridge 
       ${this.addLeftJoinClause('genre_bridge', 'genre')}
       WHERE genre_bridge.genre = ? 
@@ -228,7 +228,7 @@ class SongDBInstance extends DBUtils {
 
   public updateSongCountGenre() {
     this.db.transaction(() => {
-      for (let row of this.db.query(`SELECT genre_id FROM genre`)) {
+      for (const row of this.db.query(`SELECT genre_id FROM genre`)) {
         this.db.run(
           `UPDATE genre SET genre_song_count = (SELECT count(id) FROM genre_bridge WHERE genre = ?) WHERE genre_id = ?`,
           (row as Genre).genre_id,
@@ -239,13 +239,13 @@ class SongDBInstance extends DBUtils {
   }
 
   private storeGenre(genre?: string[]) {
-    let genreID: string[] = []
+    const genreID: string[] = []
     if (genre) {
-      for (let a of genre) {
-        let id = this.db.queryFirstCell(`SELECT genre_id FROM genre WHERE genre_name = ? COLLATE NOCASE`, a)
+      for (const a of genre) {
+        const id = this.db.queryFirstCell(`SELECT genre_id FROM genre WHERE genre_name = ? COLLATE NOCASE`, a)
         if (id) genreID.push(id)
         else {
-          let id = v4()
+          const id = v4()
           this.db.insert('genre', { genre_id: id, genre_name: a })
           genreID.push(id)
         }
@@ -255,7 +255,7 @@ class SongDBInstance extends DBUtils {
   }
 
   private storeGenreBridge(genreID: string[], songID: string) {
-    for (let i of genreID) {
+    for (const i of genreID) {
       this.db.insert('genre_bridge', { song: songID, genre: i })
     }
   }
@@ -283,7 +283,7 @@ class SongDBInstance extends DBUtils {
   }
 
   public async getArtistSongs(id: string, exclude?: string[]): Promise<Song[]> {
-    let marshaled: marshaledSong[] = this.db.query(
+    const marshaled: marshaledSong[] = this.db.query(
       `SELECT *, ${this.addGroupConcatClause()} FROM artists_bridge 
       ${this.addLeftJoinClause('artists_bridge', 'artists')}  
       WHERE artists_bridge.artist = ? 
@@ -307,12 +307,12 @@ class SongDBInstance extends DBUtils {
   }
 
   private storeArtists(...artists: string[]): string[] {
-    let artistID: string[] = []
-    for (let a of artists) {
-      let id = this.db.queryFirstCell(`SELECT artist_id FROM artists WHERE artist_name = ? COLLATE NOCASE`, a.trim())
+    const artistID: string[] = []
+    for (const a of artists) {
+      const id = this.db.queryFirstCell(`SELECT artist_id FROM artists WHERE artist_name = ? COLLATE NOCASE`, a.trim())
       if (id) artistID.push(id)
       else {
-        let id = v4()
+        const id = v4()
         this.db.insert('artists', { artist_id: id, artist_name: a.trim() })
         artistID.push(id)
       }
@@ -321,7 +321,7 @@ class SongDBInstance extends DBUtils {
   }
 
   private storeArtistBridge(artistID: string[], songID: string) {
-    for (let i of artistID) {
+    for (const i of artistID) {
       this.db.insert('artists_bridge', { song: songID, artist: i })
     }
   }
@@ -335,7 +335,7 @@ class SongDBInstance extends DBUtils {
 
   public updateSongCountArtists() {
     this.db.transaction(() => {
-      for (let row of this.db.query(`SELECT artist_id FROM artists`)) {
+      for (const row of this.db.query(`SELECT artist_id FROM artists`)) {
         this.db.run(
           `UPDATE artists SET artist_song_count = (SELECT count(id) FROM artists_bridge WHERE artist = ?) WHERE artist_id = ?`,
           (row as artists).artist_id,
@@ -350,7 +350,7 @@ class SongDBInstance extends DBUtils {
      ============================= */
 
   public async getPlaylistSongs(id: string, exclude?: string[]) {
-    let marshaled: marshaledSong[] = this.db.query(
+    const marshaled: marshaledSong[] = this.db.query(
       `SELECT *, ${this.addGroupConcatClause()} FROM playlist_bridge 
       ${this.addLeftJoinClause('playlist_bridge')} 
       WHERE playlist_bridge.playlist = ? 
@@ -382,9 +382,9 @@ class SongDBInstance extends DBUtils {
   }
 
   public async addToPlaylist(playlist_id: string, ...songs: Song[]) {
-    let coverExists = this.isPlaylistCoverExists(playlist_id)
+    const coverExists = this.isPlaylistCoverExists(playlist_id)
     this.db.transaction((songs: Song[]) => {
-      for (let s of songs) {
+      for (const s of songs) {
         if (!coverExists) {
           if (s.album && s.album.album_coverPath) {
             this.updatePlaylistCoverPath(playlist_id, s.album.album_coverPath)
@@ -398,7 +398,7 @@ class SongDBInstance extends DBUtils {
 
   public async removeFromPlaylist(playlist: string, ...songs: string[]) {
     this.db.transaction((songs: string[]) => {
-      for (let s in songs) {
+      for (const s in songs) {
         this.db.delete('playlist_bridge', { playlist: playlist, song: s })
       }
     })(songs)
@@ -407,7 +407,7 @@ class SongDBInstance extends DBUtils {
 
   public updateSongCountPlaylists() {
     this.db.transaction(() => {
-      for (let row of this.db.query(`SELECT playlist_id FROM playlists`)) {
+      for (const row of this.db.query(`SELECT playlist_id FROM playlists`)) {
         this.db.run(
           `UPDATE playlists SET playlist_song_count = (SELECT count(id) FROM playlist_bridge WHERE playlist = ?) WHERE playlist_id = ?`,
           (row as Playlist).playlist_id,

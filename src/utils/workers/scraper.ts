@@ -46,15 +46,15 @@ async function queryMbid(name: string) {
 }
 
 async function getAndUpdateMBID(a: artists): Promise<artists | undefined> {
-  let data = await queryMbid(a.artist_name!)
+  const data = await queryMbid(a.artist_name!)
   if (data.data && data.data.artists.length > 0 && data.data.artists[0].id) {
     return { artist_id: a.artist_id, artist_mbid: data.data.artists[0].id }
   }
 }
 
 export function fetchMBID(artists: artists[], observer: SubscriptionObserver<artists | undefined>) {
-  let promises: Promise<void>[] = []
-  for (let a of artists) {
+  const promises: Promise<void>[] = []
+  for (const a of artists) {
     if (!a.artist_mbid) {
       promises.push(getAndUpdateMBID(a).then((updated) => observer.next(updated)))
     }
@@ -68,9 +68,9 @@ async function queryArtistUrls(id: string) {
 
 async function fetchImagesRemote(a: artists, coverPath: string) {
   if (a.artist_mbid) {
-    let data = await queryArtistUrls(a.artist_mbid)
+    const data = await queryArtistUrls(a.artist_mbid)
     if (data.data.relations) {
-      for (let r of data.data.relations) {
+      for (const r of data.data.relations) {
         if (r.type == 'image') {
           return downloadImage(r.url.resource, coverPath)
         }
@@ -78,23 +78,23 @@ async function fetchImagesRemote(a: artists, coverPath: string) {
     }
 
     try {
-      let url = await fetchFanartTv(a.artist_mbid)
+      const url = await fetchFanartTv(a.artist_mbid)
       if (url) return downloadImage(url, coverPath)
     } catch (e) {
       console.log('Fanart.tv not found')
     }
   }
   if (a.artist_name) {
-    let url = await fetchTheAudioDB(a.artist_name)
+    const url = await fetchTheAudioDB(a.artist_name)
     if (url) return downloadImage(url, coverPath)
   }
 }
 
 async function fetchTheAudioDB(artist_name: string) {
   try {
-    let data = await axios.get(`https://theaudiodb.com/api/v1/json/1/search.php?s=${artist_name.replace(' ', '%20')}`)
+    const data = await axios.get(`https://theaudiodb.com/api/v1/json/1/search.php?s=${artist_name.replace(' ', '%20')}`)
     if (data.data && data.data.artists && data.data.artists.length > 0) {
-      for (let art in data.data.artists[0]) {
+      for (const art in data.data.artists[0]) {
         if (art.includes('strArtistThumb') || art.includes('strArtistFanart')) {
           if (data.data.artists[0][art]) {
             return data.data.artists[0][art]
@@ -108,23 +108,23 @@ async function fetchTheAudioDB(artist_name: string) {
 }
 
 async function fetchFanartTv(mbid: string): Promise<string | undefined> {
-  let data = await axios.get(`http://webservice.fanart.tv/v3/music/${mbid}?api_key=68746a37e506c5fe70c80e13dc84d8b2`)
+  const data = await axios.get(`http://webservice.fanart.tv/v3/music/${mbid}?api_key=68746a37e506c5fe70c80e13dc84d8b2`)
   if (data.data) {
     return data.data.artistthumb ? data.data.artistthumb[0].url : undefined
   }
 }
 
 async function followWikimediaRedirects(fileName: string): Promise<string | undefined> {
-  let data = (
+  const data = (
     await axios.get(`https://commons.wikimedia.org/w/api.php?action=query&redirects=1&titles=${fileName}&format=json`)
   ).data.query
   let filename = ''
-  for (let i in data.pages) {
+  for (const i in data.pages) {
     filename = data.pages[i].title.replace('File:', '').replace(/\s+/g, '_')
     break
   }
   if (filename) {
-    var md5 = createHash('md5').update(filename).digest('hex')
+    const md5 = createHash('md5').update(filename).digest('hex')
     return `https://upload.wikimedia.org/wikipedia/commons/${md5[0]}/${md5[0] + md5[1]}/${filename}`
   }
 
@@ -132,7 +132,7 @@ async function followWikimediaRedirects(fileName: string): Promise<string | unde
 }
 
 async function parseScrapeUrl(url: string) {
-  let parsed = new URL(url)
+  const parsed = new URL(url)
   switch (parsed.hostname) {
     case 'commons.wikimedia.org':
       return followWikimediaRedirects(url.substring(url.lastIndexOf('/') + 1))
@@ -141,11 +141,11 @@ async function parseScrapeUrl(url: string) {
 }
 
 async function downloadImage(url: string, coverPath: string) {
-  let parsed = await parseScrapeUrl(url)
+  const parsed = await parseScrapeUrl(url)
   if (parsed) {
-    let data = await axios.get(parsed, { responseType: 'arraybuffer' })
+    const data = await axios.get(parsed, { responseType: 'arraybuffer' })
     if (data.data) {
-      let cover = path.join(coverPath, `${v4()}.jpg`)
+      const cover = path.join(coverPath, `${v4()}.jpg`)
       await writeBuffer(data.data, cover)
       return cover
     }
@@ -158,8 +158,8 @@ async function queryArtwork(a: artists, coverPath: string) {
 }
 
 export async function fetchArtworks(artists: artists[], coverPath: string, observer: SubscriptionObserver<artists>) {
-  let promises: Promise<void>[] = []
-  for (let a of artists) {
+  const promises: Promise<void>[] = []
+  for (const a of artists) {
     if (!a.artist_coverPath) {
       promises.push(
         queryArtwork(a, coverPath).then((result) => observer.next({ artist_id: a.artist_id, artist_coverPath: result }))

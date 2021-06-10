@@ -16,6 +16,6 @@ async function getCover(filePath: string): Promise<Buffer | undefined> {
 }
 
 async function writeBuffer(songPath: string, coverPath: string) {
-  let buffer = await getCover(songPath)
+  const buffer = await getCover(songPath)
   if (buffer) return (await Jimp.read(buffer)).cover(800, 800).quality(80).writeAsync(coverPath)
 }

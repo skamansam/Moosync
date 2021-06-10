@@ -44,7 +44,7 @@ export class SongsChannel implements IpcChannelInterface {
   }
 
   private removeSongs(event: Electron.IpcMainEvent, request: IpcRequest) {
-    let promises: Promise<void>[] = []
+    const promises: Promise<void>[] = []
     if (request.params.songs) {
       const songs = request.params.songs as Song[]
       for (const s of songs) {
@@ -59,7 +59,7 @@ export class SongsChannel implements IpcChannelInterface {
   }
 
   private storeSongs(event: Electron.IpcMainEvent, request: IpcRequest) {
-    let promises: Promise<void>[] = []
+    const promises: Promise<void>[] = []
     if (request.params.songs) {
       const songs = request.params.songs as Song[]
       for (const s of songs) {
@@ -109,16 +109,16 @@ export class SongsChannel implements IpcChannelInterface {
 
   private fileExists(event: Electron.IpcMainEvent, request: IpcRequest, type: 'audio' | 'image') {
     if (request.params.path) {
+      let filePath: string
       switch (type) {
         case 'audio':
-          var filePath = path.join(app.getPath('cache'), app.getName(), 'audioCache', request.params.path)
-          event.reply(request.responseChannel, fs.existsSync(filePath) ? filePath : null)
+          filePath = path.join(app.getPath('cache'), app.getName(), 'audioCache', request.params.path)
           break
         case 'image':
-          var filePath = path.join(app.getPath('cache'), app.getName(), '.thumbnails', request.params.path)
-          event.reply(request.responseChannel, fs.existsSync(filePath) ? filePath : null)
+          filePath = path.join(app.getPath('cache'), app.getName(), '.thumbnails', request.params.path)
           break
       }
+      event.reply(request.responseChannel, fs.existsSync(filePath) ? filePath : undefined)
     }
   }
 }

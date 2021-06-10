@@ -6,7 +6,7 @@ import Store from 'electron-store'
 export const store = new Store()
 
 export async function savePreferences(prefs: Preferences) {
-  let jsonStr = JSON.stringify(prefs)
+  const jsonStr = JSON.stringify(prefs)
   store.set('prefs', jsonStr)
 
   // Notify the mainwindow of preference changes
@@ -14,14 +14,14 @@ export async function savePreferences(prefs: Preferences) {
 }
 
 export async function loadPreferences() {
-  let tmp = store.get('prefs')
+  const tmp = store.get('prefs')
   if (tmp) return JSON.parse(tmp as string)
   return defaultPreferences
 }
 
 export function getDisabledPaths(paths: musicPaths): string[] {
-  let disablePaths = []
-  for (let p of paths) {
+  const disablePaths = []
+  for (const p of paths) {
     if (!p.enabled) disablePaths.push(p.path)
   }
   return disablePaths

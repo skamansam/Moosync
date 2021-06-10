@@ -9,8 +9,8 @@ class YTScraper {
     this.YTMusic.initalize()
   }
   public async searchTerm(term: string): Promise<YoutubeItem[]> {
-    let results = await this.YTMusic.search(term, 'song')
-    let final: YoutubeItem[] = []
+    const results = await this.YTMusic.search(term, 'song')
+    const final: YoutubeItem[] = []
     results.content.forEach((item) => {
       final.push({
         _id: item.videoId,

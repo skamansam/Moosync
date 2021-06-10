@@ -79,7 +79,7 @@ export class ScannerChannel implements IpcChannelInterface {
 
   private fetchArtworks(allArtists: artists[], fetch: (artist: artists[], path: string) => ObservablePromise<artists>) {
     return new Promise((resolve, reject) => {
-      fetch(allArtists, path.join(app.getPath('appData'), app.getName(), 'cache', 'thumbs')).subscribe(
+      fetch(allArtists, path.join(app.getPath('appData'), app.getName(), '.thumbnails')).subscribe(
         this.updateArtwork,
         (err) => reject(err),
         () => resolve(undefined)

@@ -78,8 +78,8 @@ export class DBUtils {
   }
 
   protected batchUnmarshal(marshaled: marshaledSong[]) {
-    let unmarshaled: Song[] = []
-    for (let m of marshaled) {
+    const unmarshaled: Song[] = []
+    for (const m of marshaled) {
       unmarshaled.push(this.unMarshalSong(m))
     }
     return unmarshaled
