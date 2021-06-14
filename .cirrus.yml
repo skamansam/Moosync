@@ -24,7 +24,7 @@ windows_task:
   node_modules_cache:
     folder: node_modules
     fingerprint_script: type yarn.lock
-  install_script: choco install -y nodejs yarn python visualcpp-build-tools windows-sdk-10.0 visualstudio2017-workload-nodebuildtools
+  install_script: choco install -y nodejs yarn python visualcpp-build-tools windows-sdk-10.1
   build_script:
     - refreshenv
     - npm config set msvs_version 2017
