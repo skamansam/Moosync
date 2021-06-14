@@ -1,0 +1,1 @@
+echo YOUTUBECLIENTID=$API_URL >> config.env
