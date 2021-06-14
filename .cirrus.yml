@@ -16,3 +16,20 @@ mac_linux_task:
   environment:
     GH_TOKEN: ENCRYPTED[1ac94c5ed2bfdc350487c348f6084d4fe2bfb7686174040835b82526ae5def5c88cf844c31005eae618cdcffe4dc409f]
     YOUTUBECLIENTID: ENCRYPTED[bc5553108e4d239739413525ec9f13f2d8c33b1a1f7d3d9f658f7b17746fce3d76b00d79a26b0d2552f6ad3dbf78a7ef]
+
+windows_task:
+  windows_container:
+    image: cirrusci/windowsservercore:2019
+    os_version: '2019'
+  node_modules_cache:
+    folder: node_modules
+    fingerprint_script: type yarn.lock
+  install_script: choco install -y nodejs yarn
+  build_script:
+    - refreshenv
+    - yarn install
+    - yarn postinstall
+    - yarn electron:build
+  environment:
+    GH_TOKEN: ENCRYPTED[1ac94c5ed2bfdc350487c348f6084d4fe2bfb7686174040835b82526ae5def5c88cf844c31005eae618cdcffe4dc409f]
+    YOUTUBECLIENTID: ENCRYPTED[bc5553108e4d239739413525ec9f13f2d8c33b1a1f7d3d9f658f7b17746fce3d76b00d79a26b0d2552f6ad3dbf78a7ef]
