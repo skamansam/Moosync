@@ -79,7 +79,6 @@ export default class TopBar extends mixins(Colors) {
       .getUserDetails()
       .then((resp) => {
         if (resp && resp.items.length > 0) {
-          console.log(resp)
           this.youtubeName = resp.items[0].snippet!.title
           this.loggedInYoutube = true
         }

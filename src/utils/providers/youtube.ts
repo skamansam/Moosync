@@ -4,10 +4,34 @@ import { ApiResources, SearchObject, ResponseType, UserPlaylists, PlaylistItems,
 import { Playlist } from '@/models/playlists'
 import { Song } from '@/models/songs'
 import moment from 'moment'
+import { setupCache } from 'axios-cache-adapter'
+import qs from 'qs'
+import localforage from 'localforage'
+import axios from 'axios';
 
 const BASE_URL = 'https://youtube.googleapis.com/youtube/v3/'
+
+const forageStore = localforage.createInstance({
+  driver: [
+    localforage.INDEXEDDB,
+  ],
+  name: 'yt-cache'
+})
+
+const cache = setupCache({
+  maxAge: 15 * 60 * 1000,
+  store: forageStore,
+  exclude: { query: false }
+})
+
 export class Youtube {
   private auth = new AuthFlow('youtube')
+
+  private api = axios.create({
+    adapter: cache.adapter,
+    baseURL: BASE_URL,
+    paramsSerializer: (params) => qs.stringify(params, { arrayFormat: 'repeat' })
+  })
 
   public get loggedIn() {
     return this.auth.loggedIn()
@@ -30,22 +54,14 @@ export class Youtube {
   }
 
   private async populateRequest<K extends ApiResources>(resource: K, search: SearchObject<K>): Promise<ResponseType<K>> {
-    const url = new URL(resource, BASE_URL)
-    for (const p in search.params) {
-      if ((search.params as any)[p])
-        url.searchParams.append(p, (search.params as any)[p])
-    }
-
     const accessToken = await this.auth.performWithFreshTokens()
-
-    const resp = await fetch(url.toString(), {
-      headers: new Headers({ 'Authorization': `Bearer ${accessToken}` }),
+    const resp = await this.api(resource, {
+      params: search.params,
       method: 'GET',
-      cache: 'no-cache'
+      headers: { 'Authorization': `Bearer ${accessToken}` },
     })
 
-    const json = await resp.json()
-    return json
+    return resp.data
   }
 
   public async getUserDetails() {
@@ -94,7 +110,6 @@ export class Youtube {
         parsed.push(...resp.items)
       } while (nextPageToken)
       return this.parsePlaylists(parsed)
-
     }
     return []
   }
@@ -155,7 +170,7 @@ export class Youtube {
     const validRefreshToken = await this.auth.hasValidRefreshToken()
     if (this.auth.loggedIn() || validRefreshToken) {
       const parsed: VideoDetails.Item[] = []
-      const totalPages = (id.length / 50) + 1
+      const totalPages = ((id.length / 50))
       let curPage = 0
       while (curPage <= totalPages) {
         const resp = await this.populateRequest(ApiResources.VIDEO_DETAILS, {
