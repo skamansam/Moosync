@@ -11,7 +11,7 @@ mac_linux_task:
     folder: node_modules
     fingerprint_script: cat yarn.lock
     populate_script: yarn install
-  build_script: chmod +x setup_env.sh && setup_env.sh && yarn postinstall && yarn electron:build
+  build_script: chmod +x setup_env.sh && . setup_env.sh && yarn postinstall && yarn electron:build
 
   environment:
     GH_TOKEN: ENCRYPTED[1ac94c5ed2bfdc350487c348f6084d4fe2bfb7686174040835b82526ae5def5c88cf844c31005eae618cdcffe4dc409f]
