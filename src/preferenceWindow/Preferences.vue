@@ -1,8 +1,11 @@
 <template>
   <div id="app" :style="rootColors">
     <Titlebar windowType="preference-window" />
-    <div class="content">
-      <router-view></router-view>
+    <Sidebar />
+    <div class="main-content">
+      <transition name="slide-fade">
+        <router-view></router-view>
+      </transition>
     </div>
     <div class="footer-buttons">
       <b-button v-on:click="closeWindow">Close</b-button>
@@ -16,47 +19,33 @@ import Vue from 'vue'
 import { Component } from 'vue-property-decorator'
 import Titlebar from '@/commonComponents/Titlebar.vue'
 import { vxm } from '@/preferenceWindow/store'
+import { mixins } from 'vue-class-component'
+import ThemeHandler from '@/utils/mixins/ThemeHandler'
+import Sidebar from '@/preferenceWindow/components/Sidebar.vue'
 
 @Component({
   components: {
-    Titlebar
+    Titlebar,
+    Sidebar
   }
 })
-export default class App extends Vue {
+export default class App extends mixins(ThemeHandler) {
   created() {
     this.loadPreferences()
   }
 
-  private root = document.documentElement
-  get rootColors() {
-    return vxm.themes.colors
-  }
-
-  private setDefaultTheme() {
-    if (!vxm.themes.colors['--primary'])
-      vxm.themes.colors = {
-        '--primary': '#212121',
-        '--secondary': '#282828',
-        '--tertiary': '#202730',
-        '--lightPrimary': '#404040',
-        '--darkPrimary': '#202224',
-        '--textPrimary': '#ffffff',
-        '--textPrimaryTransparent': '#ffffff03',
-        '--textSecondary': '#565656',
-        '--accent': '#65CB88',
-        '--divider': 'rgba(79, 79, 79, 0.67)'
-      }
-  }
-
-  private registerThemeListeners() {
-    vxm.themes.$watch('colors', (newColors: { [key: string]: string }) => {
-      this.root.style.setProperty('--primary', newColors['--primary'])
-    })
-  }
-
   mounted() {
-    this.registerThemeListeners()
-    this.setDefaultTheme()
+    this.registerDevTools()
+  }
+
+  private registerDevTools() {
+    document.addEventListener('keydown', function (e) {
+      if (e.code === 'F12') {
+        window.WindowUtils.toggleDevTools()
+      } else if (e.code === 'F5') {
+        location.reload()
+      }
+    })
   }
 
   private loadPreferences() {
@@ -70,9 +59,11 @@ export default class App extends Vue {
   }
 
   private async writePreferences() {
-    await window.PreferenceUtils.save(vxm.preferences.preferences)
-    if (vxm.preferences.pathsChanged) {
-      Vue.nextTick(() => window.FileUtils.scan())
+    if (vxm.preferences.preferences) {
+      await window.PreferenceUtils.save(vxm.preferences.preferences)
+      if (vxm.preferences.pathsChanged) {
+        Vue.nextTick(() => window.FileUtils.scan())
+      }
     }
   }
 }
@@ -80,7 +71,7 @@ export default class App extends Vue {
 
 <style>
 #app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
+  font-family: 'Proxima Nova';
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
@@ -96,14 +87,47 @@ body {
   color: var(--textPrimary) !important;
 }
 
-.content {
-  margin: 0 2rem 0 2rem;
-  max-height: calc(100% - 32px);
-}
-
 .footer-buttons {
   position: absolute;
   bottom: 0;
   right: 0;
 }
+</style>
+
+<style lang="sass">
+.slide-fade-enter-active
+  transition: all .3s ease
+
+.slide-fade-leave-active
+  transition: all .2s ease
+.slide-fade-enter, .slide-fade-leave-to
+  transform: translateY(100px)
+  opacity: 0
+
+*::-webkit-scrollbar,
+*::-webkit-scrollbar-thumb
+  width: 26px
+  border-radius: 13px
+  background-clip: padding-box
+  border: 10px solid transparent
+
+*::-webkit-scrollbar-thumb
+  box-shadow: inset 0 0 0 10px
+
+*::-webkit-scrollbar-track
+  background: var(--primary)
+</style>
+
+<style lang="sass" scoped>
+.main-content
+  position: absolute
+  left: calc(261px + 30px)
+  height: calc(100% - (6rem + 30px) - 70px + 16px)
+  top: calc(70px + 18px + 4px)
+  right: 0
+  bottom: calc(6rem + 30px)
+  overflow-y: scroll
+  overflow-x: hidden
+  z-index: -4
+  transition: 0.2s
 </style>

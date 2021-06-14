@@ -1,9 +1,17 @@
-import { Preferences, defaultPreferences, musicPaths } from './constants'
+import { Preferences, musicPaths } from './constants'
 
 import { preferencesChanged } from '../ipc/main/preferences'
 import Store from 'electron-store'
+import { app } from 'electron'
+import path from 'path'
 
 export const store = new Store()
+
+export const defaultPreferences: Preferences = {
+  musicPaths: [],
+  thumbnailPath: path.join(app.getPath('appData'), app.getName(), '.thumbnails'),
+  artworkPath: path.join(app.getPath('appData'), app.getName(), '.thumbnails'),
+}
 
 export async function savePreferences(prefs: Preferences) {
   const jsonStr = JSON.stringify(prefs)
@@ -13,9 +21,27 @@ export async function savePreferences(prefs: Preferences) {
   preferencesChanged()
 }
 
-export async function loadPreferences() {
+function validatePrefs(prefs: Preferences): Preferences {
+  if (!prefs.musicPaths) {
+    prefs.musicPaths = defaultPreferences.musicPaths
+  }
+
+  if (!prefs.thumbnailPath) {
+    prefs.thumbnailPath = defaultPreferences.thumbnailPath
+  }
+
+  if (!prefs.artworkPath) {
+    prefs.artworkPath = defaultPreferences.artworkPath
+  }
+
+  return prefs
+}
+
+export async function loadPreferences(): Promise<Preferences> {
   const tmp = store.get('prefs')
-  if (tmp) return JSON.parse(tmp as string)
+  if (tmp) {
+    return validatePrefs(JSON.parse(tmp as string))
+  }
   return defaultPreferences
 }
 

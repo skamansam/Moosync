@@ -77,9 +77,10 @@ export class ScannerChannel implements IpcChannelInterface {
     }
   }
 
-  private fetchArtworks(allArtists: artists[], fetch: (artist: artists[], path: string) => ObservablePromise<artists>) {
+  private async fetchArtworks(allArtists: artists[], fetch: (artist: artists[], path: string) => ObservablePromise<artists>) {
+    const artworkPath = (await loadPreferences()).artworkPath
     return new Promise((resolve, reject) => {
-      fetch(allArtists, path.join(app.getPath('appData'), app.getName(), '.thumbnails')).subscribe(
+      fetch(allArtists, artworkPath).subscribe(
         this.updateArtwork,
         (err) => reject(err),
         () => resolve(undefined)
@@ -89,11 +90,12 @@ export class ScannerChannel implements IpcChannelInterface {
 
   private async extractCovers(cover: (songPath: string, coverPath: string) => ObservablePromise<void>) {
     const songs = await SongDB.getAllSongs()
+    const thumbPath = (await loadPreferences()).thumbnailPath
     for (const s of songs) {
       if (s.album && s.album.album_name) {
         const existingAlbum = await SongDB.getAlbumByName(s.album.album_name)
         if (!existingAlbum!.album_coverPath) {
-          const coverPath = path.join(path.dirname(s.path!), existingAlbum!.album_id + '.jpg')
+          const coverPath = path.join(thumbPath, existingAlbum!.album_id + '.jpg')
           cover(s.path!, coverPath)
           await SongDB.updateAlbum({ album_id: existingAlbum!.album_id, album_coverPath: coverPath })
         }

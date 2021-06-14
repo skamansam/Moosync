@@ -1,5 +1,5 @@
 import Router from 'vue-router'
-import Scanner from '@/preferenceWindow/components/Scanner.vue'
+import Scanner from '@/preferenceWindow/components/pages/Paths.vue'
 import Vue from 'vue'
 
 Vue.use(Router)
@@ -7,11 +7,26 @@ Vue.use(Router)
 const routes = [
   {
     path: '/',
-    redirect: { name: 'scanner' },
+    redirect: { name: 'paths' },
   },
   {
-    name: 'scanner',
-    path: '/scanner',
+    name: 'paths',
+    path: '/paths',
+    component: Scanner,
+  },
+  {
+    name: 'cache',
+    path: '/cache',
+    component: Scanner,
+  },
+  {
+    name: 'interface',
+    path: '/interface',
+    component: Scanner,
+  },
+  {
+    name: 'system',
+    path: '/system',
     component: Scanner,
   },
 ]

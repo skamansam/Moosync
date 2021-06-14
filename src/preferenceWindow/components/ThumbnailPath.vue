@@ -1,0 +1,84 @@
+<template>
+  <b-container fluid class="path-container w-100">
+    <b-row no-gutters>
+      <b-col cols="auto" align-self="center" class="title d-flex">
+        <div>Generated Thumbnail Path</div>
+        <div class="ml-3">
+          <Tooltip tooltipId="song-directories-tooltip" text="Directory where generated thumbnails are stored" />
+        </div>
+      </b-col>
+    </b-row>
+    <b-row no-gutters class="background w-100 mt-4 d-flex">
+      <b-row no-gutters class="mt-3 item w-100">
+        <b-col cols="auto" align-self="center" class="ml-4 folder-icon">
+          <svg
+            @click="openFileBrowser"
+            width="26"
+            height="20"
+            viewBox="0 0 26 20"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M24.96 3.4878H13.2925L9.48025 0.0670731C9.43174 0.0244748 9.36794 0.000534441 9.3015 0H1.04C0.46475 0 0 0.435976 0 0.97561V19.0244C0 19.564 0.46475 20 1.04 20H24.96C25.5352 20 26 19.564 26 19.0244V4.46341C26 3.92378 25.5352 3.4878 24.96 3.4878Z"
+              fill="white"
+            />
+          </svg>
+        </b-col>
+        <b-col cols="auto" align-self="center" class="ml-3 justify-content-start">
+          <div class="item-text text-truncate">{{ thumbnailPath }}</div>
+        </b-col>
+      </b-row>
+    </b-row>
+  </b-container>
+</template>
+
+<script lang="ts">
+import { Component, Prop, Vue } from 'vue-property-decorator'
+import Tooltip from '@/commonComponents/Tooltip.vue'
+import { vxm } from '@/preferenceWindow/store'
+@Component({
+  components: {
+    Tooltip
+  }
+})
+export default class ThumbnailPath extends Vue {
+  get thumbnailPath() {
+    if (vxm.preferences.preferences) return vxm.preferences.preferences.thumbnailPath
+    return ''
+  }
+
+  private openFileBrowser() {
+    window.WindowUtils.openFileBrowser().then((data) => {
+      if (!data.canceled) {
+        vxm.preferences.setThumbnailPath(data.filePaths[0])
+      }
+    })
+  }
+}
+</script>
+
+<style lang="sass" scoped>
+.title
+  font-size: 26px
+
+.background
+  align-content: flex-start
+  background-color: var(--tertiary)
+  height: 65px
+  overflow: hidden
+
+.item
+  height: 35px
+  flex-wrap: nowrap
+
+.item-text
+  font-size: 18px
+  color: var(--textSecondary)
+  min-width: 0
+  text-align: left
+
+.folder-icon
+  &:hover
+    cursor: pointer
+</style>

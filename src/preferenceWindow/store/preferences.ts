@@ -1,5 +1,5 @@
-import { Preferences, defaultPreferences } from '@/utils/db/constants'
-import { createModule, mutation } from 'vuex-class-component'
+import { Preferences } from '@/utils/db/constants'
+import { createModule, mutation, action } from 'vuex-class-component';
 
 export enum PeerMode {
   WATCHER,
@@ -12,7 +12,7 @@ const VuexModule = createModule({
 })
 
 export class PreferenceStore extends VuexModule {
-  preferences: Preferences = defaultPreferences
+  preferences: Preferences | null = null
   pathsChanged: boolean = false
 
   @mutation
@@ -22,9 +22,25 @@ export class PreferenceStore extends VuexModule {
 
   @mutation
   togglePath(args: { path: string, value: boolean }) {
-    const index = this.preferences.musicPaths.findIndex((x) => x.path === args.path)
-    if (index !== -1) {
-      this.preferences.musicPaths[index].enabled = args.value
+    if (this.preferences) {
+      const index = this.preferences.musicPaths.findIndex((x) => x.path === args.path)
+      if (index !== -1) {
+        this.preferences.musicPaths[index].enabled = args.value
+      }
+    }
+  }
+
+  @mutation
+  setThumbnailPath(path: string) {
+    if (this.preferences) {
+      this.preferences.thumbnailPath = path
+    }
+  }
+
+  @mutation
+  setArtworkPath(path: string) {
+    if (this.preferences) {
+      this.preferences.artworkPath = path
     }
   }
 
@@ -35,16 +51,20 @@ export class PreferenceStore extends VuexModule {
 
   @mutation
   addPaths(...paths: string[]) {
-    for (const p of paths) {
-      this.preferences.musicPaths.push({ path: p, enabled: true })
+    if (this.preferences) {
+      for (const p of paths) {
+        this.preferences.musicPaths.push({ path: p, enabled: true })
+      }
     }
   }
 
   @mutation
   removePath(path: string) {
-    this.preferences.musicPaths.splice(
-      this.preferences.musicPaths.findIndex((x) => x.path === path),
-      1
-    )
+    if (this.preferences) {
+      this.preferences.musicPaths.splice(
+        this.preferences.musicPaths.findIndex((x) => x.path === path),
+        1
+      )
+    }
   }
 }

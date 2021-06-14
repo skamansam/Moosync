@@ -13,7 +13,7 @@ export default class ThemeHandler extends Vue {
     vxm.themes.colors = {
       '--primary': '#212121',
       '--secondary': '#282828',
-      '--tertiary': '#202730',
+      '--tertiary': '#151515',
       '--textPrimary': '#ffffff',
       '--textSecondary': '#565656',
       '--textInverse': '#000000',
