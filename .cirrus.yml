@@ -2,37 +2,44 @@ mac_linux_task:
   matrix:
     - container:
         image: node:latest
+      node_modules_cache:
+        folder: node_modules
+        fingerprint_script: cat yarn.lock
+        populate_script: yarn install
+      build_script: chmod +x setup_env.sh && . setup_env.sh && yarn postinstall && yarn electron:build
+      deb_artifacts:
+        path: dist_electron/*.deb
+      appimg_artifacts:
+        path: dist_electron/*.AppImage
+      snap_artifacts:
+        path: dist_electron/*.snap
 
     - macos_instance:
         image: big-sur-base
       dep_script: brew install node && npm install --global yarn
+      node_modules_cache:
+        folder: node_modules
+        fingerprint_script: cat yarn.lock
+        populate_script: yarn install
+      build_script: chmod +x setup_env.sh && . setup_env.sh && yarn postinstall && yarn electron:build
+      dmg_artifacts:
+        path: dist_electron/*.dmg
 
-  node_modules_cache:
-    folder: node_modules
-    fingerprint_script: cat yarn.lock
-    populate_script: yarn install
-  build_script: chmod +x setup_env.sh && . setup_env.sh && yarn postinstall && yarn electron:build
+    - windows_container:
+        image: cirrusci/windowsservercore:visualstudio2019
+        os_version: '2019'
+      dep_script: choco install -y nodejs yarn python visualcpp-build-tools
+      node_modules_cache:
+        folder: node_modules
+        fingerprint_script: type yarn.lock
+        populate_script: yarn install
+      build_script:
+        - refreshenv
+        - setup_env.bat
+        - yarn postinstall && yarn electron:build
+      exe_artifacts:
+        path: dist_electron/*.exe
 
-  environment:
-    GH_TOKEN: ENCRYPTED[1ac94c5ed2bfdc350487c348f6084d4fe2bfb7686174040835b82526ae5def5c88cf844c31005eae618cdcffe4dc409f]
-    YOUTUBECLIENTID: ENCRYPTED[bc5553108e4d239739413525ec9f13f2d8c33b1a1f7d3d9f658f7b17746fce3d76b00d79a26b0d2552f6ad3dbf78a7ef]
-    SPOTIFYCLIENTID: ENCRYPTED[47377f00524229de2b16d2254c91e301d2e46b25e182e81b036c57e04bcbd33a19222c15dfb299357fa7a75bc631d357]
-    SPOTIFYCLIENTSECRET: ENCRYPTED[9339784b5184913ecb2758c48ef831f07d8f0214319ff25ed1e51de3141d8e72c61327c59de5f40deb52af8c06e73734]
-
-windows_task:
-  windows_container:
-    image: cirrusci/windowsservercore:visualstudio2019
-    os_version: '2019'
-  node_modules_cache:
-    folder: node_modules
-    fingerprint_script: type yarn.lock
-  install_script: choco install -y nodejs yarn python visualcpp-build-tools
-  build_script:
-    - refreshenv
-    - setup_env.bat
-    - yarn install
-    - yarn postinstall
-    - yarn electron:build
   environment:
     GH_TOKEN: ENCRYPTED[1ac94c5ed2bfdc350487c348f6084d4fe2bfb7686174040835b82526ae5def5c88cf844c31005eae618cdcffe4dc409f]
     YOUTUBECLIENTID: ENCRYPTED[bc5553108e4d239739413525ec9f13f2d8c33b1a1f7d3d9f658f7b17746fce3d76b00d79a26b0d2552f6ad3dbf78a7ef]
