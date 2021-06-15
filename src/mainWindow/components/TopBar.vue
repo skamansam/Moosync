@@ -15,10 +15,18 @@
               <IconButton
                 @click.native="handleYoutubeClick"
                 bgColor="#E62017"
-                :title="youtubeName ? youtubeName : 'Login'"
-                :hoverText="loggedInYoutube ? 'Sign Out' : undefined"
+                :title="youtubeName ? youtubeName : 'Connect'"
+                :hoverText="loggedInYoutube ? 'Sign Out' : 'Youtube'"
               >
                 <template slot="icon"> <YoutubeIcon /> </template>
+              </IconButton>
+              <IconButton
+                @click.native="handleSpotifyClick"
+                bgColor="#1ED760"
+                :title="spotifyName ? spotifyName : 'Connect'"
+                :hoverText="loggedInSpotify ? 'Sign Out' : 'Spotify'"
+              >
+                <template slot="icon"> <SpotifyIcon /> </template>
               </IconButton>
               <IconButton bgColor="#737373" title="Settings" @click.native="openSettings">
                 <template slot="icon"> <GearIcon /> </template>
@@ -41,6 +49,7 @@ import Person from '@/mainWindow/components/icons/Person.vue'
 import { Youtube } from '@/utils/providers/youtube'
 import IconButton from '@/mainWindow/components/generic/IconButton.vue'
 import YoutubeIcon from '@/mainWindow/components/icons/Youtube.vue'
+import SpotifyIcon from '@/mainWindow/components/icons/Spotify.vue'
 import GearIcon from '@/mainWindow/components/icons/Gears.vue'
 import { vxm } from '../store'
 
@@ -51,6 +60,7 @@ import { vxm } from '../store'
     Person,
     IconButton,
     YoutubeIcon,
+    SpotifyIcon,
     GearIcon
   }
 })
@@ -58,12 +68,51 @@ export default class TopBar extends mixins(Colors) {
   private youtubeName = ''
   private loggedInYoutube = false
 
+  private spotifyName = ''
+  private loggedInSpotify = false
+
   mounted() {
-    this.getUserDetails()
+    this.getUserDetailsYoutube()
+    this.getUserDetailsSpotify()
   }
 
   get youtube() {
     return vxm.providers.youtubeProvider
+  }
+
+  get spotify() {
+    return vxm.providers.spotifyProvider
+  }
+
+  private handleSpotifyClick() {
+    if (!this.loggedInSpotify) {
+      this.loginSpotify()
+      return
+    }
+    this.signOutSpotify()
+  }
+
+  private async loginSpotify() {
+    await this.spotify.login()
+    this.getUserDetailsSpotify()
+  }
+
+  private async signOutSpotify() {
+    await this.spotify.signOut()
+    this.spotifyName = ''
+    this.loggedInSpotify = false
+  }
+
+  private getUserDetailsSpotify() {
+    this.spotify
+      .getUserDetails()
+      .then((name) => {
+        if (name) {
+          this.spotifyName = name
+          this.loggedInSpotify = true
+        }
+      })
+      .catch((err) => console.log(err))
   }
 
   private handleYoutubeClick() {
@@ -74,12 +123,12 @@ export default class TopBar extends mixins(Colors) {
     this.signOutYoutube()
   }
 
-  private getUserDetails() {
+  private getUserDetailsYoutube() {
     this.youtube
       .getUserDetails()
-      .then((resp) => {
-        if (resp && resp.items.length > 0) {
-          this.youtubeName = resp.items[0].snippet!.title
+      .then((name) => {
+        if (name) {
+          this.youtubeName = name
           this.loggedInYoutube = true
         }
       })
@@ -88,7 +137,7 @@ export default class TopBar extends mixins(Colors) {
 
   private async loginYoutube() {
     await this.youtube.login()
-    this.getUserDetails()
+    this.getUserDetailsYoutube()
   }
 
   private async signOutYoutube() {

@@ -45,7 +45,8 @@ export default class PlayerControls extends Vue {
       params: {
         playlist_id: playlist.playlist_id,
         playlist_name: playlist.playlist_name!,
-        isYoutubePlaylist: playlist.playlist_id.startsWith('youtube-').toString()
+        isYoutubePlaylist: playlist.playlist_id.startsWith('youtube-').toString(),
+        isSpotifyPlaylist: playlist.playlist_id.startsWith('spotify-').toString(),
       },
     })
   }

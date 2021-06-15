@@ -43,6 +43,7 @@ export class AuthFlowRequestHandler extends AuthorizationRequestHandler {
       } else {
         authorizationResponse = new AuthorizationResponse({ code: code!, state: state! })
       }
+
       const completeResponse = {
         request,
         response: authorizationResponse,
@@ -52,10 +53,10 @@ export class AuthFlowRequestHandler extends AuthorizationRequestHandler {
     })
 
     this.authorizationPromise = new Promise<AuthorizationRequestResponse>((resolve) => {
-      emitter.once(ServerEventsEmitter.ON_AUTHORIZATION_RESPONSE, (result: any) => {
+      emitter.once(ServerEventsEmitter.ON_AUTHORIZATION_RESPONSE, (result: AuthorizationRequestResponse) => {
         window.WindowUtils.deregisterOAuthCallback()
         // resolve pending promise
-        resolve(result as AuthorizationRequestResponse)
+        resolve(result)
         // complete authorization flow
         this.completeAuthorizationRequestIfPossible()
       })

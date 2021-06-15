@@ -33,8 +33,9 @@ export default class Albums extends mixins(RouterPushes, ContextMenuMixin) {
   private async getPlaylists() {
     let localPlaylists = await window.DBUtils.getAllPlaylists()
     let ytPlaylists = await vxm.providers.youtubeProvider.getUserPlaylists()
+    let spotifyPlaylists = await vxm.providers.spotifyProvider.getUserPlaylists()
 
-    this.allPlaylists.push(...localPlaylists, ...ytPlaylists)
+    this.allPlaylists.push(...localPlaylists, ...ytPlaylists, ...spotifyPlaylists)
   }
 
   private contextHandler = (event: Event) => this.getGeneralPlaylistMenu(event)

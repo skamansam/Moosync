@@ -1,6 +1,6 @@
 import { AuthFlow, AuthStateEmitter } from '@/utils/oauth/ui/flow'
 import { once } from 'events'
-import { ApiResources, SearchObject, ResponseType, UserPlaylists, PlaylistItems, VideoDetails } from './responses'
+import { ApiResources, SearchObject, ResponseType, UserPlaylists, PlaylistItems, VideoDetails } from './responsesYoutube'
 import { Playlist } from '@/models/playlists'
 import { Song } from '@/models/songs'
 import moment from 'moment'
@@ -8,23 +8,11 @@ import { setupCache } from 'axios-cache-adapter'
 import qs from 'qs'
 import localforage from 'localforage'
 import axios from 'axios';
+import { GenericProvider } from '@/utils/providers/genericProvider';
+import { cache } from '@/utils/providers/genericProvider';
 
 const BASE_URL = 'https://youtube.googleapis.com/youtube/v3/'
-
-const forageStore = localforage.createInstance({
-  driver: [
-    localforage.INDEXEDDB,
-  ],
-  name: 'yt-cache'
-})
-
-const cache = setupCache({
-  maxAge: 15 * 60 * 1000,
-  store: forageStore,
-  exclude: { query: false }
-})
-
-export class Youtube {
+export class Youtube extends GenericProvider {
   private auth = new AuthFlow('youtube')
 
   private api = axios.create({
@@ -38,7 +26,7 @@ export class Youtube {
   }
 
   public async login() {
-    if (!this.auth.loggedIn()) {
+    if (!this.loggedIn) {
       const validRefreshToken = await this.auth.hasValidRefreshToken()
       if (validRefreshToken) {
         await this.auth.performWithFreshTokens()
@@ -64,15 +52,16 @@ export class Youtube {
     return resp.data
   }
 
-  public async getUserDetails() {
+  public async getUserDetails(): Promise<string | undefined> {
     const validRefreshToken = await this.auth.hasValidRefreshToken()
     if (this.auth.loggedIn() || validRefreshToken) {
-      return this.populateRequest(ApiResources.CHANNELS, {
+      const resp = await this.populateRequest(ApiResources.CHANNELS, {
         params: {
           part: ['id', 'snippet'],
           mine: true,
         }
       })
+      return resp.items[0].snippet!.title
     }
   }
 
@@ -118,7 +107,7 @@ export class Youtube {
     const songs: Song[] = []
     if (items.length > 0) {
       const ids = items.map(s => s.snippet!.resourceId.videoId)
-      const details = await this.getVideoDetails(...ids)
+      const details = await this.getSongDetails(...ids)
       songs.push(...details)
     }
     return songs
@@ -166,7 +155,7 @@ export class Youtube {
     return songs
   }
 
-  public async getVideoDetails(...id: string[]) {
+  public async getSongDetails(...id: string[]) {
     const validRefreshToken = await this.auth.hasValidRefreshToken()
     if (this.auth.loggedIn() || validRefreshToken) {
       const parsed: VideoDetails.Item[] = []

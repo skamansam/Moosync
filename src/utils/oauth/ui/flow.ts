@@ -38,13 +38,15 @@ import { StringMap } from "@openid/appauth/built/types"
 import { AuthFlowRequestHandler } from './AuthFlowRequestHandler'
 import { WebCrypto } from "./crypto_utils"
 import { NodeRequestor } from '@openid/appauth/built/node_support/node_requestor'
+import { SpotifyTokenRequestHandler } from './tokenHandler';
 
 export class AuthStateEmitter extends EventEmitter {
   static ON_TOKEN_RESPONSE = "on_token_response"
 }
 
-type config = { openIdConnectUrl: string, clientId: string, redirectUri: string, scope: string, keytarService: string }
-type oauthType = 'youtube'
+type oauthType = 'youtube' | 'spotify'
+type config = { type: oauthType, openIdConnectUrl: string, clientId: string, redirectUri: string, scope: string, keytarService: string }
+
 
 const requestor = new NodeRequestor()
 
@@ -72,9 +74,13 @@ export class AuthFlow {
 
     this.authorizationHandler = new AuthFlowRequestHandler()
 
-    this.tokenHandler = new BaseTokenRequestHandler(requestor)
-    // set notifier to deliver responses
+    if (type === 'spotify') {
+      this.tokenHandler = new SpotifyTokenRequestHandler(requestor)
+    } else {
+      this.tokenHandler = new BaseTokenRequestHandler(requestor)
+    }
 
+    // set notifier to deliver responses
     this.authorizationHandler.setAuthorizationNotifier(this.notifier)
 
     // set a listener to listen for authorization responses
@@ -106,12 +112,20 @@ export class AuthFlow {
       default:
         return {
           openIdConnectUrl: "https://accounts.google.com",
-          // clientId:
-          //   "802830583043-er2mb5d1itikopg766g8kri8tfl8tlpt.apps.googleusercontent.com",
           clientId: process.env.YoutubeClientID!,
           redirectUri: "com.moosync:ytoauth2callback/",
           scope: "https://www.googleapis.com/auth/youtube.readonly",
-          keytarService: 'MoosyncYoutubeRefreshToken'
+          keytarService: 'MoosyncYoutubeRefreshToken',
+          type: 'youtube'
+        }
+      case 'spotify':
+        return {
+          openIdConnectUrl: 'https://accounts.spotify.com/authorize',
+          clientId: process.env.SpotifyClientID!,
+          redirectUri: "com.moosync://spotifyoauthcallback",
+          scope: "playlist-read-private",
+          keytarService: 'MoosyncSpotifyRefreshToken',
+          type: 'spotify'
         }
     }
   }
@@ -126,6 +140,13 @@ export class AuthFlow {
   }
 
   private async fetchServiceConfiguration() {
+    if (this.config.type === 'spotify') {
+      return new AuthorizationServiceConfiguration({
+        authorization_endpoint: this.config.openIdConnectUrl,
+        token_endpoint: 'https://accounts.spotify.com/api/token',
+        revocation_endpoint: this.config.openIdConnectUrl
+      })
+    }
     const configuration = await AuthorizationServiceConfiguration.fetchFromIssuer(
       this.config.openIdConnectUrl,
       requestor)
@@ -155,7 +176,7 @@ export class AuthFlow {
 
 
     this.authorizationHandler.performAuthorizationRequest(
-      this.configuration,
+      this.configuration!,
       request
     )
   }

@@ -1,6 +1,7 @@
 import { Song } from '@/models/songs'
 
 import { action, mutation } from 'vuex-class-component'
+import { vxm } from '.'
 import { VuexModule } from './module'
 
 export enum AudioType {
@@ -120,6 +121,15 @@ export class PlayerStore extends VuexModule.With({ namespaced: 'player' }) {
   }
 
   @action async loadSong(song: Song | null) {
+    if (song && song.type === 'SPOTIFY') {
+      const ytItem = await vxm.providers.spotifyProvider.spotifyToYoutube(song)
+      if (ytItem) {
+        song.url = ytItem._id
+        song.duration = ytItem.duration
+      } else {
+        throw new Error('Could not convert song')
+      }
+    }
     this.currentSong = song
   }
 

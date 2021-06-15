@@ -1,6 +1,7 @@
 import { Song } from '@/models/songs'
+import { vxm } from '@/mainWindow/store';
 import { prefetchData } from '@/utils/sync/syncHandler'
-import { mutation } from 'vuex-class-component'
+import { mutation, action } from 'vuex-class-component';
 import { VuexModule } from './module'
 
 export enum PeerMode {
@@ -85,8 +86,15 @@ export class SyncStore extends VuexModule.With({ namespaced: 'sync' }) {
     else this.queueIndex = value
   }
 
-  @mutation
-  addToLocalQueue(value: Song) {
-    this.localQueue.push(value)
+  @action
+  async addToLocalQueue(song: Song) {
+    const ytItem = await vxm.providers.spotifyProvider.spotifyToYoutube(song)
+    if (ytItem) {
+      song.url = ytItem._id
+      song.duration = ytItem.duration
+    } else {
+      throw new Error('Could not convert song')
+    }
+    this.localQueue.push(song)
   }
 }

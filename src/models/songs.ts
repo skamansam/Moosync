@@ -20,7 +20,7 @@ export interface Song {
   inode?: string
   deviceno?: string
   url?: string
-  type: 'LOCAL' | 'YOUTUBE'
+  type: 'LOCAL' | 'YOUTUBE' | 'SPOTIFY'
 }
 
 export interface marshaledSong {
@@ -49,7 +49,7 @@ export interface marshaledSong {
   inode?: string
   deviceno?: string
   url?: string
-  type: 'LOCAL' | 'YOUTUBE'
+  type: 'LOCAL' | 'YOUTUBE' | 'SPOTIFY'
 }
 
 export interface stats {

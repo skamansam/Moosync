@@ -1,5 +1,3 @@
-
-
 // These are only the resources used 
 export enum ApiResources {
   CHANNELS = 'channels',

@@ -15,7 +15,6 @@
 <script lang="ts">
 import { Component } from 'vue-property-decorator'
 import Vue from 'vue'
-import { vxm } from '@/preferenceWindow/store'
 import PathSelector from '../PathSelector.vue'
 import ThumbnailPath from '../ThumbnailPath.vue'
 import ArtworkPath from '@/preferenceWindow/components/ArtworkPath.vue'

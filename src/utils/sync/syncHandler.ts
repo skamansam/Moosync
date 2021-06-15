@@ -10,7 +10,7 @@ export interface prefetchData {
   album: string
   artist: string
   sender: string
-  type: "LOCAL" | "YOUTUBE"
+  type: 'LOCAL' | 'YOUTUBE' | 'SPOTIFY'
 }
 
 enum peerConnectionState {

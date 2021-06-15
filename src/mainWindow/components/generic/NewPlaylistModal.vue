@@ -154,7 +154,6 @@ export default class NewPlaylistModal extends mixins(Colors) {
     if (mergableImages.length === 0) {
       this.forceEmptyImg = true
     } else {
-      console.log(this.canvas)
       if (this.canvas) {
         let ctx = this.canvas.getContext('2d')
         ctx!.clearRect(0, 0, this.canvas.width, this.canvas.height)

@@ -23,8 +23,12 @@ module.exports = {
     plugins: [
       new webpack.DefinePlugin({
         'process.browser': 'true',
-        'process.env.YoutubeClientID': JSON.stringify(dotenv.parsed['YOUTUBECLIENTID'])
+        'process.env.YoutubeClientID': JSON.stringify(dotenv.parsed['YOUTUBECLIENTID']),
+        'process.env.SpotifyClientID': JSON.stringify(dotenv.parsed['SPOTIFYCLIENTID']),
+        'process.env.SpotifyClientSecret': JSON.stringify(dotenv.parsed['SPOTIFYCLIENTSECRET'])
+
       }),
+
       new VuetifyLoaderPlugin(),
     ],
     externals: ['better-sqlite3', 'youtube-music-api'],
