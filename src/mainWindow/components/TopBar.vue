@@ -8,7 +8,7 @@
         <b-col cols="auto" class="my-auto">
           <Navigation />
         </b-col>
-        <b-col col md="auto" xl="2" align-self="center">
+        <b-col col md="auto" align-self="center">
           <Person id="account" class="accounts-icon" />
           <b-popover :target="`account`" placement="bottom" triggers="focus" custom-class="accounts-popover">
             <div class="buttons">
