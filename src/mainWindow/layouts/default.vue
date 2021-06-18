@@ -91,6 +91,7 @@ export default class DefaultLayout extends mixins(ContextMenuMixin) {
   border-radius: 13px
   background-clip: padding-box
   border: 10px solid transparent
+  min-height: 50px
 
 *::-webkit-scrollbar-thumb
   box-shadow: inset 0 0 0 10px

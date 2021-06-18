@@ -172,6 +172,8 @@ table.b-table > tfoot > tr > th[aria-sort="descending"]
   &::-webkit-scrollbar-thumb
     background: var(--textPrimary)
     border: 10px solid var(--primary)
+    min-height: 50px
+
   &::-webkit-scrollbar-track
     background: var(--primary) !important
 </style>

@@ -8,7 +8,7 @@
     <b-row>
       <div>{{ artist_name }}</div>
     </b-row>
-    <b-row>
+    <b-row class="h-100">
       <SongView :songList="songList" @onRowContext="getSongContextMenu(undefined, arguments[0], ...arguments[1])" />
     </b-row>
   </b-container>
