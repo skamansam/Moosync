@@ -125,19 +125,31 @@ export class Spotify extends GenericProvider {
     if (this.auth.loggedIn() || validRefreshToken) {
 
       // Return directly from cache
-      let content = await this.getCachePlaylistContent(id)
+      const content = await this.getCachePlaylistContent(id)
       if (content) {
         return content;
       }
 
-      const resp = await this.populateRequest(ApiResources.PLAYLIST_ITEMS, {
-        params: {
-          playlist_id: id
+      let nextOffset: number = 0
+      let isNext = false
+      const limit = 100
+      const parsed: Song[] = []
+      do {
+        const resp = await this.populateRequest(ApiResources.PLAYLIST_ITEMS, {
+          params: {
+            playlist_id: id,
+            limit: limit,
+            offset: nextOffset
+          }
+        })
+        parsed.push(...(await this.parsePlaylistItems(resp.items)))
+        isNext = !!resp.next
+        if (resp.next) {
+          nextOffset += limit
         }
-      })
-      content = await this.parsePlaylistItems(resp.items)
-      this.setCachePlaylistContent(id, content)
-      return content;
+      } while (isNext)
+      this.setCachePlaylistContent(id, parsed)
+      return parsed;
     }
     return []
   }

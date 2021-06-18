@@ -20,6 +20,8 @@ export type PlaylistRequest = {
 export type PlaylistItemsRequest = {
   params: {
     playlist_id: string
+    limit?: number
+    offset?: number
   }
 }
 
@@ -217,9 +219,9 @@ export namespace PlaylistItems {
     href: string;
     items: Item[];
     limit: number;
-    next?: string;
+    next: string | null;
     offset: number;
-    previous?: string;
+    previous: string | null;
     total: number;
   }
 }

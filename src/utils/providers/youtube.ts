@@ -73,7 +73,7 @@ export class Youtube extends GenericProvider {
           playlists.push({
             playlist_id: `youtube-${p.id}`,
             playlist_name: p.snippet.title,
-            playlist_coverPath: p.snippet.thumbnails.maxres.url,
+            playlist_coverPath: (p.snippet.thumbnails.maxres ?? p.snippet.thumbnails.high ?? p.snippet.thumbnails.default).url,
             playlist_song_count: -1
           })
       }
