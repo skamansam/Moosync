@@ -8,7 +8,22 @@
           :imgSrc="playlist.playlist_coverPath"
           @click.native="gotoPlaylist(playlist)"
           @contextmenu.native="getPlaylistContextMenu(arguments[0], playlist, refreshCallback)"
-        />
+        >
+          <template slot="icon">
+            <SpotifyIcon
+              v-if="playlist.playlist_id.startsWith('spotify-')"
+              color="#07C330"
+              :dropShadow="true"
+              :filled="true"
+            />
+            <YoutubeIcon
+              v-if="playlist.playlist_id.startsWith('youtube-')"
+              color="#E62017"
+              :dropShadow="true"
+              :filled="true"
+            />
+          </template>
+        </CardView>
       </b-col>
     </b-row>
   </b-container>
@@ -22,10 +37,14 @@ import { mixins } from 'vue-class-component'
 import RouterPushes from '@/utils/mixins/RouterPushes'
 import ContextMenuMixin from '@/utils/mixins/ContextMenuMixin'
 import { vxm } from '@/mainWindow/store'
+import SpotifyIcon from '@/mainWindow/components/icons/Spotify.vue'
+import YoutubeIcon from '@/mainWindow/components/icons/Youtube.vue'
 
 @Component({
   components: {
-    CardView
+    CardView,
+    SpotifyIcon,
+    YoutubeIcon
   }
 })
 export default class Albums extends mixins(RouterPushes, ContextMenuMixin) {
@@ -34,7 +53,6 @@ export default class Albums extends mixins(RouterPushes, ContextMenuMixin) {
     let localPlaylists = await window.DBUtils.getAllPlaylists()
     let ytPlaylists = await vxm.providers.youtubeProvider.getUserPlaylists()
     let spotifyPlaylists = await vxm.providers.spotifyProvider.getUserPlaylists()
-
     this.allPlaylists.push(...localPlaylists, ...ytPlaylists, ...spotifyPlaylists)
   }
 

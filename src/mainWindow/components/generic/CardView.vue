@@ -2,6 +2,9 @@
   <div>
     <div class="card mb-2">
       <div class="card-img-top">
+        <div class="icon-container">
+          <slot name="icon" />
+        </div>
         <div class="embed-responsive embed-responsive-1by1">
           <div class="embed-responsive-item">
             <img :src="ImgSrc" alt="Album Art" class="img-fluid w-100 h-100" />
@@ -61,4 +64,13 @@ img
 
 .card
   background-color: transparent
+
+.icon-container
+  z-index: 1
+  position: absolute
+  top: 10px
+  left: 10px
+  svg
+    width: 24px
+    height: 24px
 </style>
