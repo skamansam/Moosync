@@ -1,6 +1,6 @@
 <template>
   <div class="w-100">
-    <SongView :songList="songList" @onRowContext="getSongContextMenu(undefined, arguments[0], ...arguments[1])" />
+    <SongView :songList="songList" @onRowContext="getSongMenu(arguments[0], arguments[1], undefined)" />
   </div>
 </template>
 
@@ -11,7 +11,7 @@ import SongView from '@/mainWindow/components/SongView.vue'
 import { Song } from '@/models/songs'
 
 import { mixins } from 'vue-class-component'
-import ContextMenuMixin from '@/utils/mixins/ContextMenuMixin'
+import ContextMenuMixin, { ContextTypes } from '@/utils/mixins/ContextMenuMixin'
 import { vxm } from '@/mainWindow/store'
 
 @Component({
@@ -33,6 +33,10 @@ export default class AllSongs extends mixins(ContextMenuMixin) {
 
   private async requestSongs() {
     this.songList = await window.DBUtils.getAllSongs()
+  }
+
+  private getSongMenu(event: Event, songs: Song[], exclude: string | undefined) {
+    this.getContextMenu(event, { type: ContextTypes.SONGS, args: { songs: songs, exclude: exclude } })
   }
 }
 </script>

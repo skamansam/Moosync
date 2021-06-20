@@ -56,7 +56,7 @@ export class DBUtils {
 
   protected marshalSong(song: Song): marshaledSong {
     return {
-      _id: v4(),
+      _id: song._id ? song._id : v4(),
       path: song.path,
       size: song.size,
       title: song.title,

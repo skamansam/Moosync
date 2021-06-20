@@ -1,7 +1,7 @@
 <template>
   <div>
     <div class="card mb-2">
-      <div class="card-img-top">
+      <div class="card-img-top" @contextmenu="emitContext">
         <div class="icon-container">
           <slot name="icon" />
         </div>
@@ -12,7 +12,7 @@
         </div>
       </div>
       <div class="card-body">
-        <p>{{ title }}</p>
+        <p :id="id" @contextmenu="emitContext">{{ title }}</p>
       </div>
     </div>
   </div>
@@ -33,6 +33,13 @@ export default class SongDetails extends mixins(Colors, ImageLoader) {
 
   @Prop({ default: '' })
   private subtitle!: string
+
+  @Prop({ default: '' })
+  private id!: string
+
+  private emitContext(event: Event) {
+    this.$emit('CardContextMenu', event)
+  }
 }
 </script>
 

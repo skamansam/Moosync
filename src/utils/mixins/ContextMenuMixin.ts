@@ -10,6 +10,42 @@ import { toSong } from '@/models/youtube'
 import { vxm } from '@/mainWindow/store'
 import { Playlist } from '@/models/playlists'
 
+export enum ContextTypes {
+  SONGS = 'songsMenu',
+  YOUTUBE = 'youtubeMenu',
+  PLAYLIST = 'playlistMenu',
+  GENERAL_PLAYLIST = 'generalPlaylistMenu',
+  PLAYLIST_CONTENT = 'playlistContentContextMenu'
+}
+
+export type ContextMenuArgs = {
+  type: ContextTypes.SONGS
+  args: {
+    exclude: string | undefined
+    songs: Song[]
+  }
+} | {
+  type: ContextTypes.YOUTUBE
+  args: {
+    ytItems: YoutubeItem[]
+  }
+} | {
+  type: ContextTypes.PLAYLIST
+  args: {
+    playlist: Playlist
+    refreshCallback: () => void
+  }
+} |
+{
+  type: ContextTypes.GENERAL_PLAYLIST
+} | {
+  type: ContextTypes.PLAYLIST_CONTENT,
+  args: {
+    isRemote: boolean,
+    songs: Song[]
+  }
+}
+
 @Component
 export default class ContextMenuMixin extends mixins(PlayerControls) {
   get playlists() {
@@ -43,7 +79,7 @@ export default class ContextMenuMixin extends mixins(PlayerControls) {
     return menu
   }
 
-  public getSongContextMenu(exclude: string | undefined, event: Event, ...item: Song[]) {
+  private getSongContextMenu(exclude: string | undefined, ...item: Song[]) {
     const items = [
       {
         label: 'Play Now',
@@ -62,10 +98,10 @@ export default class ContextMenuMixin extends mixins(PlayerControls) {
         children: this.populatePlaylistMenu(item, exclude),
       },
     ]
-    bus.$emit(EventBus.SHOW_CONTEXT, event, items)
+    return items
   }
 
-  public getYoutubeContextMenu(event: Event, ...item: YoutubeItem[]) {
+  private getYoutubeContextMenu(...item: YoutubeItem[]) {
     const items = [
       {
         label: 'Play Now',
@@ -88,10 +124,10 @@ export default class ContextMenuMixin extends mixins(PlayerControls) {
         children: this.populatePlaylistMenu(toSong(...item)),
       },
     ]
-    bus.$emit(EventBus.SHOW_CONTEXT, event, items)
+    return items
   }
 
-  public getPlaylistContextMenu(event: Event, playlist: Playlist, refreshCallback: () => void) {
+  private getPlaylistContextMenu(playlist: Playlist, refreshCallback: () => void) {
     const items = [
       {
         label: 'Remove Playlist',
@@ -101,10 +137,21 @@ export default class ContextMenuMixin extends mixins(PlayerControls) {
         },
       }
     ]
-    bus.$emit(EventBus.SHOW_CONTEXT, event, items)
+    return items
   }
 
-  public getGeneralPlaylistMenu(event: Event) {
+  private getPlaylistContentContextMenu(isRemote: boolean, ...item: Song[]) {
+    const items = this.getSongContextMenu(undefined, ...item)
+    if (isRemote) {
+      items.push({
+        label: 'Add Song to Library',
+        handler: () => window.DBUtils.storeSongs(item),
+      })
+    }
+    return items
+  }
+
+  private getGeneralPlaylistMenu() {
     const items = [
       {
         label: 'Add Playlist from URL',
@@ -113,6 +160,32 @@ export default class ContextMenuMixin extends mixins(PlayerControls) {
         },
       }
     ]
+    return items
+  }
+
+  public getContextMenu(event: Event, options: ContextMenuArgs) {
+    let items: { label: string, handler?: () => void }[] = []
+    switch (options.type) {
+      case ContextTypes.SONGS:
+        items = this.getSongContextMenu(options.args.exclude, ...options.args.songs)
+        break
+      case ContextTypes.YOUTUBE:
+        items = this.getYoutubeContextMenu(...options.args.ytItems)
+        break
+      case ContextTypes.PLAYLIST:
+        items = this.getPlaylistContextMenu(options.args.playlist, options.args.refreshCallback)
+        break
+      case ContextTypes.GENERAL_PLAYLIST:
+        items = this.getGeneralPlaylistMenu()
+        break
+      case ContextTypes.PLAYLIST_CONTENT:
+        items = this.getPlaylistContentContextMenu(options.args.isRemote, ...options.args.songs)
+        break
+    }
+    this.emitMenu(event, items)
+  }
+
+  private emitMenu(event: Event, items: { label: string, handler?: () => void }[]) {
     bus.$emit(EventBus.SHOW_CONTEXT, event, items)
   }
 }

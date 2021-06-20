@@ -9,7 +9,7 @@
       <div>{{ playlist_name }}</div>
     </b-row>
     <b-row class="h-100">
-      <SongView :songList="songList" @onRowContext="getSongContextMenu(undefined, arguments[0], ...arguments[1])" />
+      <SongView :songList="songList" @onRowContext="getSongMenu(arguments[0], arguments[1], undefined)" />
     </b-row>
   </b-container>
 </template>
@@ -20,7 +20,7 @@ import SongView from '@/mainWindow/components/SongView.vue'
 import { Song } from '@/models/songs'
 
 import { mixins } from 'vue-class-component'
-import ContextMenuMixin from '@/utils/mixins/ContextMenuMixin'
+import ContextMenuMixin, { ContextTypes } from '@/utils/mixins/ContextMenuMixin'
 import { Playlist } from '@/models/playlists'
 import { vxm } from '@/mainWindow/store'
 
@@ -60,6 +60,13 @@ export default class SinglePlaylistView extends mixins(ContextMenuMixin) {
     } else {
       this.songList = await window.DBUtils.getSinglePlaylist(this.playlist_id)
     }
+  }
+
+  private getSongMenu(event: Event, songs: Song[], exclude: string | undefined) {
+    this.getContextMenu(event, {
+      type: ContextTypes.PLAYLIST_CONTENT,
+      args: { songs: songs, isRemote: this.isYoutubePlaylist === 'true' || this.isSpotifyPlaylist === 'true' }
+    })
   }
 }
 </script>

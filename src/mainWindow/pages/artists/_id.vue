@@ -9,7 +9,7 @@
       <div>{{ artist_name }}</div>
     </b-row>
     <b-row class="h-100">
-      <SongView :songList="songList" @onRowContext="getSongContextMenu(undefined, arguments[0], ...arguments[1])" />
+      <SongView :songList="songList" @onRowContext="getSongMenu(arguments[0], arguments[1], undefined)" />
     </b-row>
   </b-container>
 </template>
@@ -20,7 +20,7 @@ import SongView from '@/mainWindow/components/SongView.vue'
 import { Song } from '@/models/songs'
 
 import { mixins } from 'vue-class-component'
-import ContextMenuMixin from '@/utils/mixins/ContextMenuMixin'
+import ContextMenuMixin, { ContextTypes } from '@/utils/mixins/ContextMenuMixin'
 import { artists } from '@/models/artists'
 
 @Component({
@@ -47,6 +47,10 @@ export default class SingleArtistView extends mixins(ContextMenuMixin) {
 
   private async fetchArtist() {
     this.songList = await window.DBUtils.getSingleArtist(this.artist_id)
+  }
+
+  private getSongMenu(event: Event, songs: Song[], exclude: string | undefined) {
+    this.getContextMenu(event, { type: ContextTypes.SONGS, args: { songs: songs, exclude: exclude } })
   }
 }
 </script>

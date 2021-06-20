@@ -47,7 +47,7 @@ import { Song } from '@/models/songs'
 import { mixins } from 'vue-class-component'
 import RouterPushes from '@/utils/mixins/RouterPushes'
 import { toSong, YoutubeItem } from '@/models/youtube'
-import ContextMenuMixin from '@/utils/mixins/ContextMenuMixin'
+import ContextMenuMixin, { ContextTypes } from '@/utils/mixins/ContextMenuMixin'
 
 @Component({
   components: {
@@ -210,7 +210,7 @@ export default class SearchPage extends mixins(RouterPushes, ContextMenuMixin) {
   private contextMenuHandler(tab: string, event: Event, item: any) {
     switch (tab) {
       case 'Youtube':
-        this.getYoutubeContextMenu(event, item as YoutubeItem)
+        this.getContextMenu(event, { type: ContextTypes.YOUTUBE, args: { ytItems: [item as YoutubeItem] } })
     }
   }
 
