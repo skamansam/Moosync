@@ -1,4 +1,3 @@
-import { YoutubeItem } from '@/utils/models/youtube'
 import YoutubeMusicApi from 'youtube-music-api'
 
 class YTScraper {

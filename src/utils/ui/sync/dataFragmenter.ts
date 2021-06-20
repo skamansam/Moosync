@@ -1,9 +1,5 @@
 const chunkLimit = 16384
 
-interface fragmentedData {
-  type: string
-  message: any
-}
 
 export class FragmentSender {
   private data: any

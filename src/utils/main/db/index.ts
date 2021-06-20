@@ -1,11 +1,4 @@
-import { Song, marshaledSong } from '@/utils/models/songs'
-
-import { Album } from '../../models/albums'
 import { DBUtils } from './utils'
-import { Genre } from '@/utils/models/genre'
-import { Playlist } from '../../models/playlists'
-import { SearchResult } from '../../models/searchResult'
-import { artists } from '@/utils/models/artists'
 import { v4 } from 'uuid'
 import { promises as fsP } from 'fs'
 

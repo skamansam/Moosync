@@ -1,4 +1,3 @@
-import { Song } from '@/utils/models/songs'
 import { Component, Vue } from 'vue-property-decorator'
 
 @Component

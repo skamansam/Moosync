@@ -1,7 +1,5 @@
 import { Component, Vue } from 'vue-property-decorator'
-import { PlayerState } from '../../../mainWindow/store/playerState'
 
-import { Song } from '../../models/songs'
 import { PeerMode } from '@/mainWindow/store/syncState'
 import { vxm } from '@/mainWindow/store'
 
@@ -44,11 +42,11 @@ export default class PlayerControls extends Vue {
   }
 
   public play() {
-    vxm.player.state = PlayerState.PLAYING
+    vxm.player.state = 'PLAYING'
   }
 
   public pause() {
-    vxm.player.state = PlayerState.PAUSED
+    vxm.player.state = 'PAUSED'
   }
 
   public shuffle() {
@@ -56,14 +54,14 @@ export default class PlayerControls extends Vue {
   }
 
   public togglePlayerState() {
-    if (this.playerState == PlayerState.PAUSED || this.playerState == PlayerState.STOPPED) {
-      vxm.player.state = PlayerState.PLAYING
+    if (this.playerState == 'PAUSED' || this.playerState == 'STOPPED') {
+      vxm.player.state = 'PLAYING'
     } else {
-      vxm.player.state = PlayerState.PAUSED
+      vxm.player.state = 'PAUSED'
     }
   }
 
   public stop() {
-    vxm.player.state = PlayerState.STOPPED
+    vxm.player.state = 'STOPPED'
   }
 }

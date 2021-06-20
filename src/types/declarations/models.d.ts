@@ -1,5 +1,44 @@
-import { Album } from '@/utils/models/albums'
-export interface Song {
+interface Album {
+  album_id?: string
+  album_name?: string
+  album_coverPath?: string
+  album_song_count?: number
+  album_artist?: string
+  year?: number
+}
+
+interface artists {
+  artist_id: string
+  artist_name?: string
+  artist_mbid?: string
+  artist_coverPath?: string
+  artist_song_count?: number
+}
+
+interface Genre {
+  genre_id: string
+  genre_name: string
+  genre_song_count: number
+}
+
+interface Playlist {
+  playlist_id: string
+  playlist_name: string
+  playlist_coverPath: string | undefined
+  playlist_songs?: Song[]
+  playlist_song_count: number
+}
+
+interface SearchResult {
+  songs?: Song[]
+  albums?: Album[]
+  artists?: artists[]
+  genres?: Genre[]
+  playlists?: Playlist[]
+  youtube?: YoutubeItem[]
+}
+
+interface Song {
   _id?: string
   path?: string
   size?: number
@@ -23,7 +62,7 @@ export interface Song {
   type: 'LOCAL' | 'YOUTUBE' | 'SPOTIFY'
 }
 
-export interface marshaledSong {
+interface marshaledSong {
   _id: string
   path?: string
   size?: number
@@ -52,7 +91,7 @@ export interface marshaledSong {
   type: 'LOCAL' | 'YOUTUBE' | 'SPOTIFY'
 }
 
-export interface stats {
+interface stats {
   path: string
   size: number
   inode: string
@@ -60,7 +99,19 @@ export interface stats {
   hash?: string
 }
 
-export interface image {
+interface image {
   path: string
   data: Buffer
 }
+
+interface YoutubeItem {
+  _id: string
+  yt_title: string
+  yt_album?: string
+  yt_artist?: string
+  yt_coverImage?: string
+  duration: number
+}
+
+
+

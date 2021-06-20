@@ -1,25 +1,8 @@
-import { Song } from '@/utils/models/songs'
 
 import { action, mutation } from 'vuex-class-component'
 import { vxm } from '.'
 import { VuexModule } from './module'
 
-export enum AudioType {
-  STREAMING,
-  LOCAL,
-}
-
-export enum PlayerState {
-  PLAYING,
-  PAUSED,
-  STOPPED,
-  LOADING,
-}
-
-export enum PlayerType {
-  LOCAL,
-  YOUTUBE,
-}
 
 class Queue {
   data: { [id: string]: Song } = {}
@@ -87,7 +70,7 @@ class Queue {
 }
 
 export class PlayerStore extends VuexModule.With({ namespaced: 'player' }) {
-  public state: PlayerState = PlayerState.PAUSED
+  public state: PlayerState = 'PAUSED'
   public currentSong: Song | null = null
   private songQueue = new Queue()
   public repeat: boolean = false

@@ -2,49 +2,10 @@ import { Component } from 'vue-property-decorator'
 import { EventBus } from '@/utils/main/ipc/constants'
 import { MenuItem } from 'vue-context-menu-popup'
 import PlayerControls from '@/utils/ui/mixins/PlayerControls'
-import { Song } from '@/utils/models/songs'
 import { bus } from '@/mainWindow/main'
 import { mixins } from 'vue-class-component'
-import { YoutubeItem } from '@/utils/models/youtube'
 import { toSong } from '@/utils/models/youtube'
 import { vxm } from '@/mainWindow/store'
-import { Playlist } from '@/utils/models/playlists'
-
-export enum ContextTypes {
-  SONGS = 'songsMenu',
-  YOUTUBE = 'youtubeMenu',
-  PLAYLIST = 'playlistMenu',
-  GENERAL_PLAYLIST = 'generalPlaylistMenu',
-  PLAYLIST_CONTENT = 'playlistContentContextMenu'
-}
-
-export type ContextMenuArgs = {
-  type: ContextTypes.SONGS
-  args: {
-    exclude: string | undefined
-    songs: Song[]
-  }
-} | {
-  type: ContextTypes.YOUTUBE
-  args: {
-    ytItems: YoutubeItem[]
-  }
-} | {
-  type: ContextTypes.PLAYLIST
-  args: {
-    playlist: Playlist
-    refreshCallback: () => void
-  }
-} |
-{
-  type: ContextTypes.GENERAL_PLAYLIST
-} | {
-  type: ContextTypes.PLAYLIST_CONTENT,
-  args: {
-    isRemote: boolean,
-    songs: Song[]
-  }
-}
 
 @Component
 export default class ContextMenuMixin extends mixins(PlayerControls) {
@@ -166,19 +127,19 @@ export default class ContextMenuMixin extends mixins(PlayerControls) {
   public getContextMenu(event: Event, options: ContextMenuArgs) {
     let items: { label: string, handler?: () => void }[] = []
     switch (options.type) {
-      case ContextTypes.SONGS:
+      case 'SONGS':
         items = this.getSongContextMenu(options.args.exclude, ...options.args.songs)
         break
-      case ContextTypes.YOUTUBE:
+      case 'YOUTUBE':
         items = this.getYoutubeContextMenu(...options.args.ytItems)
         break
-      case ContextTypes.PLAYLIST:
+      case 'PLAYLIST':
         items = this.getPlaylistContextMenu(options.args.playlist, options.args.refreshCallback)
         break
-      case ContextTypes.GENERAL_PLAYLIST:
+      case 'GENERAL_PLAYLIST':
         items = this.getGeneralPlaylistMenu()
         break
-      case ContextTypes.PLAYLIST_CONTENT:
+      case 'PLAYLIST_CONTENT':
         items = this.getPlaylistContentContextMenu(options.args.isRemote, ...options.args.songs)
         break
     }

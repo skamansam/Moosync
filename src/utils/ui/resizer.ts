@@ -1,13 +1,5 @@
-interface ResizerElements {
-  thElm: HTMLElement | undefined
-  thNext: HTMLElement | undefined
-  startOffset: number | undefined
-  ogWidth: number | undefined
-  nextOgWidth: number | undefined
-}
-
 export class Resizer {
-  private resizer: ResizerElements = {
+  private resizer: TableResizerElements = {
     thElm: undefined,
     thNext: undefined,
     startOffset: undefined,

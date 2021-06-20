@@ -27,13 +27,4 @@ export function registerIpcChannels() {
   ipcChannels.forEach((channel) => ipcMain.on(channel.name, (event, request) => channel.handle(event, request)))
 }
 
-export interface IpcRequest {
-  type: string
-  responseChannel?: string
-  params?: any
-}
 
-export interface IpcChannelInterface {
-  name: string
-  handle(event: IpcMainEvent, request: IpcRequest): void
-}

@@ -1,9 +1,7 @@
-import { IpcChannelInterface, IpcRequest } from '.'
 import { IpcEvents, SongEvents } from './constants'
 
 import { SongDB } from '../db'
 import { getDisabledPaths, loadPreferences } from '@/utils/main/db/preferences'
-import { Song } from '@/utils/models/songs'
 import fs from 'fs'
 import path from 'path'
 import { app } from 'electron'

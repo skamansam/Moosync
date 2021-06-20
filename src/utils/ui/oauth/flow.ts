@@ -44,10 +44,6 @@ export class AuthStateEmitter extends EventEmitter {
   static ON_TOKEN_RESPONSE = "on_token_response"
 }
 
-type oauthType = 'youtube' | 'spotify'
-type config = { type: oauthType, openIdConnectUrl: string, clientId: string, redirectUri: string, scope: string, keytarService: string }
-
-
 const requestor = new NodeRequestor()
 
 export class AuthFlow {

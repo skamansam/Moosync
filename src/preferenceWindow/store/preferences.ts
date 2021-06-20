@@ -1,4 +1,3 @@
-import { Preferences } from '@/utils/main/db/constants'
 import { createModule, mutation, action } from 'vuex-class-component';
 
 export enum PeerMode {

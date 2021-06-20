@@ -1,7 +1,5 @@
 import { bus } from '@/mainWindow/main'
-import { PlayerState } from '@/mainWindow/store/playerState'
 import { PeerMode } from '@/mainWindow/store/syncState'
-import { Song } from '@/utils/models/songs'
 import { Component } from 'vue-property-decorator'
 import { SyncHolder } from '../sync/syncHandler'
 import { mixins } from 'vue-class-component'
@@ -73,7 +71,7 @@ export default class SyncMixin extends mixins(ModelHelper) {
     if (this.isSyncing && this.peerHolder.socketID !== from && event._id) {
       this.isRemoteTrackChange = true
       vxm.sync.setSong(event)
-      vxm.player.state = PlayerState.LOADING
+      vxm.player.state = 'LOADING'
     }
 
     if (this.isYoutube(event)) {
@@ -239,7 +237,7 @@ export default class SyncMixin extends mixins(ModelHelper) {
         return true
       }
 
-      vxm.player.state = PlayerState.LOADING
+      vxm.player.state = 'LOADING'
       vxm.sync.setCover('')
       this.peerHolder.PlaySong(song)
 

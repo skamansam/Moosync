@@ -22,7 +22,7 @@ declare module 'youtube-music-api' {
       thumbnails: Thumbnails[]
       params: string
     }[]
-    coninuation: {
+    continuation: {
       clickTrackingParams: string
       continuation: string
     }

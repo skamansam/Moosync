@@ -1,9 +1,8 @@
-import { Preferences, musicPaths } from './constants'
-
 import { preferencesChanged } from '@/utils/main/ipc/preferences'
 import Store from 'electron-store'
 import { app } from 'electron'
 import path from 'path'
+// import { Preferences, musicPaths } from '@/types/declarations/preferences'
 
 export const store = new Store()
 

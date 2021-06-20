@@ -10,7 +10,6 @@
 </template>
 
 <script lang="ts">
-import { artists } from '@/utils/models/artists'
 import { Component } from 'vue-property-decorator'
 import CardView from '@/mainWindow/components/generic/CardView.vue'
 import { mixins } from 'vue-class-component'

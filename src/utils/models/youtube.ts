@@ -1,13 +1,5 @@
-import { Song } from '@/utils/models/songs'
 import { v4 } from 'uuid'
-export interface YoutubeItem {
-  _id: string
-  yt_title: string
-  yt_album?: string
-  yt_artist?: string
-  yt_coverImage?: string
-  duration: number
-}
+
 
 export function toSong(...item: YoutubeItem[]): Song[] {
   const songs: Song[] = []

@@ -1,18 +1,21 @@
 import { AuthFlow, AuthStateEmitter } from '@/utils/ui/oauth/flow'
 import { once } from 'events'
-import { ApiResources, SearchObject, ResponseType, UserPlaylists, PlaylistItems, VideoDetails } from './responsesYoutube'
-import { Playlist } from '@/utils/models/playlists'
-import { Song } from '@/utils/models/songs'
 import moment from 'moment'
-import { setupCache } from 'axios-cache-adapter'
 import qs from 'qs'
-import localforage from 'localforage'
 import axios from 'axios';
 import { GenericProvider } from '@/utils/ui/providers/genericProvider';
 import { cache } from '@/utils/ui/providers/genericProvider';
 
 const BASE_URL = 'https://youtube.googleapis.com/youtube/v3/'
-export class Youtube extends GenericProvider {
+
+enum ApiResources {
+  CHANNELS = 'channels',
+  PLAYLISTS = 'playlists',
+  PLAYLIST_ITEMS = 'playlistItems',
+  VIDEO_DETAILS = 'videos'
+}
+
+export class YoutubeProvider extends GenericProvider {
   private auth = new AuthFlow('youtube')
 
   private api = axios.create({
@@ -41,7 +44,7 @@ export class Youtube extends GenericProvider {
     this.auth.signOut()
   }
 
-  private async populateRequest<K extends ApiResources>(resource: K, search: SearchObject<K>): Promise<ResponseType<K>> {
+  private async populateRequest<K extends ApiResources>(resource: K, search: YoutubeResponses.SearchObject<K>): Promise<YoutubeResponses.ResponseType<K>> {
     const accessToken = await this.auth.performWithFreshTokens()
     const resp = await this.api(resource, {
       params: search.params,
@@ -65,7 +68,7 @@ export class Youtube extends GenericProvider {
     }
   }
 
-  private async parsePlaylists(items: UserPlaylists.Item[]): Promise<Playlist[]> {
+  private async parsePlaylists(items: YoutubeResponses.UserPlaylists.Item[]): Promise<Playlist[]> {
     const playlists: Playlist[] = []
     if (items.length > 0) {
       for (const p of items) {
@@ -85,7 +88,7 @@ export class Youtube extends GenericProvider {
     const validRefreshToken = await this.auth.hasValidRefreshToken()
     if (this.auth.loggedIn() || validRefreshToken) {
       let nextPageToken: string | undefined
-      const parsed: UserPlaylists.Item[] = []
+      const parsed: YoutubeResponses.UserPlaylists.Item[] = []
       do {
 
         const resp = await this.populateRequest(ApiResources.PLAYLISTS, {
@@ -103,7 +106,7 @@ export class Youtube extends GenericProvider {
     return []
   }
 
-  private async parsePlaylistItems(items: PlaylistItems.Items[]): Promise<Song[]> {
+  private async parsePlaylistItems(items: YoutubeResponses.PlaylistItems.Items[]): Promise<Song[]> {
     const songs: Song[] = []
     if (items.length > 0) {
       const ids = items.map(s => s.snippet!.resourceId.videoId)
@@ -117,7 +120,7 @@ export class Youtube extends GenericProvider {
     const validRefreshToken = await this.auth.hasValidRefreshToken()
     if (this.auth.loggedIn() || validRefreshToken) {
       let nextPageToken: string | undefined
-      const parsed: PlaylistItems.Items[] = []
+      const parsed: YoutubeResponses.PlaylistItems.Items[] = []
       do {
         const resp = await this.populateRequest(ApiResources.PLAYLIST_ITEMS, {
           params: {
@@ -135,7 +138,7 @@ export class Youtube extends GenericProvider {
     return []
   }
 
-  private async parseVideo(items: VideoDetails.Item[]) {
+  private async parseVideo(items: YoutubeResponses.VideoDetails.Item[]) {
     const songs: Song[] = []
     for (const v of items) {
       if (songs.findIndex((value) => value._id === v.id) === -1)
@@ -158,7 +161,7 @@ export class Youtube extends GenericProvider {
   public async getSongDetails(...id: string[]) {
     const validRefreshToken = await this.auth.hasValidRefreshToken()
     if (this.auth.loggedIn() || validRefreshToken) {
-      const parsed: VideoDetails.Item[] = []
+      const parsed: YoutubeResponses.VideoDetails.Item[] = []
       const totalPages = ((id.length / 50))
       let curPage = 0
       while (curPage <= totalPages) {

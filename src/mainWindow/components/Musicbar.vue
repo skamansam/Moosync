@@ -57,7 +57,6 @@ import ExtraControls from '@/mainWindow/components/musicbar/ExtraControls.vue'
 import MusicInfo from '@/mainWindow/components/musicbar/MusicInfo.vue'
 
 import { Component } from 'vue-property-decorator'
-import { PlayerState } from '@/mainWindow/store/playerState'
 import Colors from '@/utils/ui/mixins/Colors'
 import { mixins } from 'vue-class-component'
 import ModelHelper from '@/utils/ui/mixins/ModelHelper'
@@ -75,7 +74,7 @@ import { vxm } from '../store'
 export default class MusicBar extends mixins(Colors, ModelHelper) {
   private timestamp: number = 0
   private forceSeek: number = 0
-  private PlayerState = PlayerState
+  private PlayerState: PlayerState = 'PAUSED'
   private sliderPosition: boolean = false
 
   private updateTimestmp(value: number) {
@@ -99,7 +98,7 @@ export default class MusicBar extends mixins(Colors, ModelHelper) {
   }
 
   get waiting() {
-    return vxm.player.playerState == PlayerState.LOADING
+    return vxm.player.playerState == 'LOADING'
   }
 
   private toggleSlider(position: boolean) {

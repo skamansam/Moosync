@@ -1,5 +1,4 @@
 import { GenreEvents, IpcEvents } from './constants'
-import { IpcChannelInterface, IpcRequest } from '.'
 import { getDisabledPaths, loadPreferences } from '@/utils/main/db/preferences'
 
 import { SongDB } from '@/utils/main/db'

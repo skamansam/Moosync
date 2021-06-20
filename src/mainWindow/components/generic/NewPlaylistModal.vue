@@ -50,7 +50,6 @@ import { mixins } from 'vue-class-component'
 import { bus } from '@/mainWindow/main'
 import { vxm } from '@/mainWindow/store'
 import Record from '@/mainWindow/components/icons/Record.vue'
-import { Song } from '@/utils/models/songs'
 
 @Component({
   components: {

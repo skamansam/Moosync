@@ -6,7 +6,6 @@ import { Playlist } from '@/utils/models/playlists'
 
 import { YoutubeItem } from '@/utils/models/youtube'
 import { SearchResult } from '@/utils/models/searchResult'
-import { Preferences } from '@/utils/main/db/constants'
 
 interface DBUtils {
   getAllSongs: () => Promise<Song[]>

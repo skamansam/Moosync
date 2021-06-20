@@ -1,10 +1,5 @@
 import { Component, Vue } from 'vue-property-decorator'
 
-import { Album } from '@/utils/models/albums'
-import { Genre } from '@/utils/models/genre'
-import { Playlist } from '@/utils/models/playlists'
-import { artists } from '@/utils/models/artists'
-
 @Component
 export default class PlayerControls extends Vue {
   public gotoAlbum(album: Album) {

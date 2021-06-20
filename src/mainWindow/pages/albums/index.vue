@@ -11,7 +11,6 @@
 
 <script lang="ts">
 import CardView from '@/mainWindow/components/generic/CardView.vue'
-import { Album } from '@/utils/models/albums'
 import { mixins } from 'vue-class-component'
 import { Component } from 'vue-property-decorator'
 import RouterPushes from '@/utils/ui/mixins/RouterPushes'

@@ -1,5 +1,4 @@
 import { BrowserWindow, dialog, shell } from 'electron'
-import { IpcChannelInterface, IpcRequest } from '.'
 import { IpcEvents, WindowEvents } from './constants'
 import { createPreferenceWindow, mainWindow } from '@/background'
 

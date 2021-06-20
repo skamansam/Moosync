@@ -17,11 +17,9 @@
 <script lang="ts">
 import { Component, Prop } from 'vue-property-decorator'
 import SongView from '@/mainWindow/components/SongView.vue'
-import { Song } from '@/utils/models/songs'
 
 import { mixins } from 'vue-class-component'
-import ContextMenuMixin, { ContextTypes } from '@/utils/ui/mixins/ContextMenuMixin'
-import { artists } from '@/utils/models/artists'
+import ContextMenuMixin from '@/utils/ui/mixins/ContextMenuMixin'
 
 @Component({
   components: {
@@ -50,7 +48,7 @@ export default class SingleArtistView extends mixins(ContextMenuMixin) {
   }
 
   private getSongMenu(event: Event, songs: Song[], exclude: string | undefined) {
-    this.getContextMenu(event, { type: ContextTypes.SONGS, args: { songs: songs, exclude: exclude } })
+    this.getContextMenu(event, { type: 'SONGS', args: { songs: songs, exclude: exclude } })
   }
 }
 </script>

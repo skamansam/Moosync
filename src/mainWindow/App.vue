@@ -11,7 +11,6 @@
 </template>
 
 <script lang="ts">
-import { playlistInfo } from '@/mainWindow/store/playlists'
 import { Component } from 'vue-property-decorator'
 import Titlebar from '@/commonComponents/Titlebar.vue'
 import { mixins } from 'vue-class-component'

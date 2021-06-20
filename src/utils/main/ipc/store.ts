@@ -1,5 +1,4 @@
 import { IpcEvents } from './constants'
-import { IpcChannelInterface, IpcRequest } from '.'
 import { StoreEvents } from '@/utils/main/ipc/constants'
 import { store } from '@/utils/main/db/preferences'
 import keytar from 'keytar'

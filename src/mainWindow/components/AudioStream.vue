@@ -8,8 +8,6 @@
 </template>
 
 <script lang="ts">
-import { Song } from '@/utils/models/songs'
-import { PlayerState, PlayerType } from '@/mainWindow/store/playerState'
 import { Component, Prop, Ref, Watch } from 'vue-property-decorator'
 import YTPlayer from 'yt-player'
 import Colors from '@/utils/ui/mixins/Colors'
@@ -30,7 +28,7 @@ export default class AudioStream extends mixins(Colors, SyncMixin) {
   @Prop({ default: 0 })
   forceSeek!: number
 
-  @Prop({ default: PlayerState.STOPPED })
+  @Prop({ default: 'STOPPED' })
   playerState!: PlayerState
 
   @Prop({ default: null })
@@ -61,10 +59,10 @@ export default class AudioStream extends mixins(Colors, SyncMixin) {
     this.activePlayer.removeAllListeners()
 
     switch (newType) {
-      case PlayerType.LOCAL:
+      case 'LOCAL':
         this.activePlayer = this.localPlayer
         break
-      case PlayerType.YOUTUBE:
+      case 'YOUTUBE':
         this.activePlayer = this.ytPlayer
         break
     }
@@ -132,13 +130,13 @@ export default class AudioStream extends mixins(Colors, SyncMixin) {
 
   private handleFirstPlayback(loadedState: boolean) {
     if (this.isFirst && !loadedState) {
-      vxm.player.state = PlayerState.PLAYING
+      vxm.player.state = 'PLAYING'
       this.isFirst = false
     }
 
     if (loadedState) this.isFirst = false
-    if (vxm.player.state == PlayerState.LOADING) {
-      vxm.player.state = PlayerState.PAUSED
+    if (vxm.player.state == 'LOADING') {
+      vxm.player.state = 'PAUSED'
     }
     this.handleActivePlayerState(vxm.player.playerState)
   }
@@ -146,9 +144,9 @@ export default class AudioStream extends mixins(Colors, SyncMixin) {
   private loadAudio(song: Song, loadedState: boolean) {
     // vxm.player.state = PlayerState.PLAYING
     if (song.type === 'LOCAL') {
-      this.onPlayerTypeChanged(PlayerType.LOCAL)
+      this.onPlayerTypeChanged('LOCAL')
     } else {
-      this.onPlayerTypeChanged(PlayerType.YOUTUBE)
+      this.onPlayerTypeChanged('YOUTUBE')
     }
 
     if (song.path) this.activePlayer.load('media://' + song.path)
@@ -163,12 +161,12 @@ export default class AudioStream extends mixins(Colors, SyncMixin) {
 
   private async handleActivePlayerState(newState: PlayerState) {
     switch (newState) {
-      case PlayerState.PLAYING:
+      case 'PLAYING':
         return this.activePlayer.play()
-      case PlayerState.PAUSED:
-      case PlayerState.LOADING:
+      case 'PAUSED':
+      case 'LOADING':
         return this.activePlayer.pause()
-      case PlayerState.STOPPED:
+      case 'STOPPED':
         return this.activePlayer.stop()
     }
   }

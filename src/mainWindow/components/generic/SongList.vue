@@ -27,7 +27,6 @@
 </template>
 
 <script lang="ts">
-import { Song } from '@/utils/models/songs'
 import Colors from '@/utils/ui/mixins/Colors'
 import { Resizer } from '@/utils/ui/resizer'
 import { mixins } from 'vue-class-component'

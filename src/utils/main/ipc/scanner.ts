@@ -1,18 +1,12 @@
 import { IpcEvents, ScannerEvents } from './constants'
 
-import { IpcChannelInterface } from '.'
-import { IpcRequest } from './index'
 import { app, IpcMainEvent } from 'electron'
 import { spawn, Worker } from 'threads'
 import { loadPreferences } from '@/utils/main/db/preferences'
 import { SongDB } from '@/utils/main/db/index'
-import { Song } from '@/utils/models/songs'
 import path from 'path'
 import { ObservablePromise } from 'threads/dist/observable-promise'
 
-import { artists } from '@/utils/models/artists'
-import { Preferences } from '@/utils/main/db/constants'
-import { musicPaths } from '@/utils/main/db/constants'
 import fs from 'fs'
 
 enum scanning {

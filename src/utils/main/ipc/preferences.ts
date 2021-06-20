@@ -1,4 +1,3 @@
-import { IpcChannelInterface, IpcRequest } from '.'
 import { IpcEvents, PreferenceEvents } from './constants'
 import { loadPreferences, savePreferences } from '../db/preferences'
 

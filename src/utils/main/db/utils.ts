@@ -1,5 +1,4 @@
 import DB, { BetterSqlite3Helper } from 'better-sqlite3-helper'
-import { Song, marshaledSong } from '@/utils/models/songs'
 
 import { app } from 'electron'
 import { migrations } from './migrations'

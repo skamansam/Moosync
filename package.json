@@ -113,7 +113,8 @@
     },
     "rules": {
       "no-unused-vars": "off",
-      "semi": "off"
+      "semi": "off",
+      "no-undef": "off"
     }
   },
   "browserslist": [

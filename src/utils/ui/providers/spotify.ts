@@ -1,18 +1,20 @@
 import { AuthFlow, AuthStateEmitter } from '@/utils/ui/oauth/flow'
 import { once } from 'events'
-import { ApiResources, SearchObject, ResponseType } from './responsesSpotify'
-import { Playlist } from '@/utils/models/playlists'
-import { Song } from '@/utils/models/songs'
 import qs from 'qs'
-import axios, { AxiosResponse } from 'axios';
+import axios from 'axios';
 import { GenericProvider, cache } from '@/utils/ui/providers/genericProvider';
-import { UserPlaylists } from './responsesSpotify'
-import { PlaylistItemsRequest, PlaylistItems } from '@/utils/ui/providers/responsesSpotify';
 import { forageStore } from './genericProvider';
 
 const BASE_URL = 'https://api.spotify.com/v1/'
 
-export class Spotify extends GenericProvider {
+enum ApiResources {
+  USER_DETAILS = 'me',
+  PLAYLISTS = 'me/playlists',
+  PLAYLIST_ITEMS = 'playlists/{playlist_id}/tracks',
+  VIDEO_DETAILS = 'videos'
+}
+
+export class SpotifyProvider extends GenericProvider {
   private auth = new AuthFlow('spotify')
 
   private api = axios.create({
@@ -41,13 +43,13 @@ export class Spotify extends GenericProvider {
     this.auth.signOut()
   }
 
-  private async populateRequest<K extends ApiResources>(resource: K, search: SearchObject<K>): Promise<ResponseType<K>> {
+  private async populateRequest<K extends ApiResources>(resource: K, search: SpotifyResponses.SearchObject<K>): Promise<SpotifyResponses.ResponseType<K>> {
     const accessToken = await this.auth.performWithFreshTokens()
 
     let url: string = resource
 
     if (resource === ApiResources.PLAYLIST_ITEMS) {
-      url = resource.replace('{playlist_id}', (search as PlaylistItemsRequest).params.playlist_id)
+      url = resource.replace('{playlist_id}', (search as SpotifyResponses.PlaylistItemsRequest).params.playlist_id)
     }
 
     const resp = await this.api(url, {
@@ -70,7 +72,7 @@ export class Spotify extends GenericProvider {
     }
   }
 
-  private parsePlaylists(items: UserPlaylists.Item[]) {
+  private parsePlaylists(items: SpotifyResponses.UserPlaylists.Item[]) {
     const parsed: Playlist[] = []
     for (const i of items) {
       parsed.push({
@@ -101,7 +103,7 @@ export class Spotify extends GenericProvider {
       return ytItem[0]
   }
 
-  private async parsePlaylistItems(items: PlaylistItems.Item[]) {
+  private async parsePlaylistItems(items: SpotifyResponses.PlaylistItems.Item[]) {
     const parsed: Song[] = []
     for (const i of items) {
       if (!i.is_local && parsed.findIndex((val) => val._id === i.track.id) === -1)

@@ -2,16 +2,6 @@ import { FragmentReceiver, FragmentSender } from './dataFragmenter'
 import { ManagerOptions, Socket, io } from 'socket.io-client'
 
 import { PeerMode } from '@/mainWindow/store/syncState'
-import { Song } from '@/utils/models/songs'
-import { PlayerState } from '@/mainWindow/store/playerState'
-
-export interface prefetchData {
-  _id: string
-  album: string
-  artist: string
-  sender: string
-  type: 'LOCAL' | 'YOUTUBE' | 'SPOTIFY'
-}
 
 enum peerConnectionState {
   CONNECTED,
@@ -411,7 +401,7 @@ export class SyncHolder {
   private listenAllReady() {
     this.socketConnection.on('allReady', () => {
       this.onAllReadyCallback ? this.onAllReadyCallback() : null
-      this.onPlayerStateChangeCallback ? this.onPlayerStateChangeCallback(PlayerState.PLAYING) : null
+      this.onPlayerStateChangeCallback ? this.onPlayerStateChangeCallback('PLAYING') : null
     })
   }
 
@@ -425,7 +415,7 @@ export class SyncHolder {
       this.socketConnection.emit('allReady')
       this.readyPeers = []
       this.isListeningReady = false
-      this.onPlayerStateChangeCallback ? this.onPlayerStateChangeCallback(PlayerState.PLAYING) : null
+      this.onPlayerStateChangeCallback ? this.onPlayerStateChangeCallback('PLAYING') : null
       this.onAllReadyCallback ? this.onAllReadyCallback() : null
     }
   }
@@ -647,7 +637,7 @@ export class SyncHolder {
 
   private onUserJoined() {
     this.socketConnection.on('userJoined', (id: string) => {
-      this.playerStateHandler ? this.playerStateHandler(PlayerState.LOADING) : null
+      this.playerStateHandler ? this.playerStateHandler('LOADING') : null
       this.setupInitiator(id)
       this.requestReadyStatus()
     })

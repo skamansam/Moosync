@@ -2,12 +2,9 @@ import { expose } from 'threads'
 
 import { Observable, SubscriptionObserver } from 'observable-fns'
 import fs, { promises as fsP } from 'fs'
-import { musicPaths } from '@/utils/main/db/constants'
 import path from 'path'
-import { stats } from '@/utils/models/songs'
 import crypto from 'crypto'
 import * as mm from 'music-metadata'
-import { Song } from '@/utils/models/songs'
 import { v4 } from 'uuid'
 
 const audioPatterns = new RegExp('.flac|.mp3|.ogg|.m4a|.webm|.wav|.wv', 'i')

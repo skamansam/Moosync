@@ -1,4 +1,3 @@
-import { IpcRequest } from '@/utils/main/ipc'
 import { IpcRenderer } from 'electron'
 import { v4 } from 'uuid';
 

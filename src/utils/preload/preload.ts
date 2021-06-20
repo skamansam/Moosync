@@ -13,8 +13,6 @@ import {
   SongEvents,
   ServiceProviderEvents,
 } from '@/utils/main/ipc/constants'
-import { Song } from '@/utils/models/songs'
-import { Preferences } from '@/utils/main/db/constants'
 import { StoreEvents } from '@/utils/main/ipc/constants'
 
 const ipcRendererHolder = new IpcRendererHolder(ipcRenderer)

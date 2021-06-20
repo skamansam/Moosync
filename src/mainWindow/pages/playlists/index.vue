@@ -31,12 +31,11 @@
 </template>
 
 <script lang="ts">
-import { Playlist } from '@/utils/models/playlists'
 import { Component } from 'vue-property-decorator'
 import CardView from '@/mainWindow/components/generic/CardView.vue'
 import { mixins } from 'vue-class-component'
 import RouterPushes from '@/utils/ui/mixins/RouterPushes'
-import ContextMenuMixin, { ContextTypes } from '@/utils/ui/mixins/ContextMenuMixin'
+import ContextMenuMixin from '@/utils/ui/mixins/ContextMenuMixin'
 import { vxm } from '@/mainWindow/store'
 import SpotifyIcon from '@/mainWindow/components/icons/Spotify.vue'
 import YoutubeIcon from '@/mainWindow/components/icons/Youtube.vue'
@@ -59,7 +58,7 @@ export default class Albums extends mixins(RouterPushes, ContextMenuMixin) {
 
   private contextHandler(event: MouseEvent) {
     if ((event.target as HTMLElement).localName !== 'img' && !(event.target as HTMLElement).id) {
-      this.getContextMenu(event, { type: ContextTypes.GENERAL_PLAYLIST })
+      this.getContextMenu(event, { type: 'GENERAL_PLAYLIST' })
     }
   }
 
@@ -80,7 +79,7 @@ export default class Albums extends mixins(RouterPushes, ContextMenuMixin) {
 
   private getPlaylistMenu(event: Event, playlist: Playlist) {
     this.getContextMenu(event, {
-      type: ContextTypes.PLAYLIST,
+      type: 'PLAYLIST',
       args: { playlist: playlist, refreshCallback: this.refreshCallback }
     })
   }

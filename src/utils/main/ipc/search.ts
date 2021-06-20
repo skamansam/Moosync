@@ -1,4 +1,3 @@
-import { IpcChannelInterface, IpcRequest } from '.'
 import { IpcEvents, SearchEvents } from './constants'
 import { getDisabledPaths, loadPreferences } from '@/utils/main/db/preferences'
 
