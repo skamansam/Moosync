@@ -31,12 +31,12 @@
 </template>
 
 <script lang="ts">
-import { Playlist } from '@/models/playlists'
+import { Playlist } from '@/utils/models/playlists'
 import { Component } from 'vue-property-decorator'
 import CardView from '@/mainWindow/components/generic/CardView.vue'
 import { mixins } from 'vue-class-component'
-import RouterPushes from '@/utils/mixins/RouterPushes'
-import ContextMenuMixin, { ContextTypes } from '@/utils/mixins/ContextMenuMixin'
+import RouterPushes from '@/utils/ui/mixins/RouterPushes'
+import ContextMenuMixin, { ContextTypes } from '@/utils/ui/mixins/ContextMenuMixin'
 import { vxm } from '@/mainWindow/store'
 import SpotifyIcon from '@/mainWindow/components/icons/Spotify.vue'
 import YoutubeIcon from '@/mainWindow/components/icons/Youtube.vue'

@@ -36,7 +36,7 @@ import Genre from '@/mainWindow/components/icons/Genre.vue'
 import Albums from '@/mainWindow/components/icons/Albums.vue'
 import Toggle from '@/mainWindow/components/icons/Toggle.vue'
 import Rooms from '@/mainWindow/components/icons/Rooms.vue'
-import Colors from '@/utils/mixins/Colors'
+import Colors from '@/utils/ui/mixins/Colors'
 import { mixins } from 'vue-class-component'
 
 @Component({

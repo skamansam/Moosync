@@ -43,14 +43,14 @@
 </template>
 
 <script lang="ts">
-import { EventBus } from '@/utils/ipc/main/constants'
+import { EventBus } from '@/utils/main/ipc/constants'
 import { Component, Prop, Ref } from 'vue-property-decorator'
-import Colors from '@/utils/mixins/Colors'
+import Colors from '@/utils/ui/mixins/Colors'
 import { mixins } from 'vue-class-component'
 import { bus } from '@/mainWindow/main'
 import { vxm } from '@/mainWindow/store'
 import Record from '@/mainWindow/components/icons/Record.vue'
-import { Song } from '@/models/songs'
+import { Song } from '@/utils/models/songs'
 
 @Component({
   components: {

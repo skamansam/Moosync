@@ -6,7 +6,7 @@
 import { Component } from 'vue-property-decorator'
 import Vue from 'vue'
 import { bus } from '@/mainWindow/main'
-import { EventBus } from '@/utils/ipc/main/constants'
+import { EventBus } from '@/utils/main/ipc/constants'
 import 'vue-context-menu-popup/dist/vue-context-menu-popup.css'
 import { MenuItem } from 'electron'
 import ContextMenu from 'vue-context-menu-popup'

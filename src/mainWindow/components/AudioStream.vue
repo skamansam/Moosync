@@ -8,16 +8,16 @@
 </template>
 
 <script lang="ts">
-import { Song } from '@/models/songs'
+import { Song } from '@/utils/models/songs'
 import { PlayerState, PlayerType } from '@/mainWindow/store/playerState'
 import { Component, Prop, Ref, Watch } from 'vue-property-decorator'
 import YTPlayer from 'yt-player'
-import Colors from '@/utils/mixins/Colors'
+import Colors from '@/utils/ui/mixins/Colors'
 import { mixins } from 'vue-class-component'
-import { Player } from '@/utils/players/player'
-import { YoutubePlayer } from '@/utils/players/youtube'
-import { LocalPlayer } from '@/utils/players/local'
-import SyncMixin from '@/utils/mixins/SyncMixin'
+import { Player } from '@/utils/ui/players/player'
+import { YoutubePlayer } from '@/utils/ui/players/youtube'
+import { LocalPlayer } from '@/utils/ui/players/local'
+import SyncMixin from '@/utils/ui/mixins/SyncMixin'
 import { vxm } from '../store'
 
 @Component({})

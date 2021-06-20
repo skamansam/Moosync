@@ -30,13 +30,13 @@
 </template>
 
 <script lang="ts">
-import Colors from '@/utils/mixins/Colors'
+import Colors from '@/utils/ui/mixins/Colors'
 import { mixins } from 'vue-class-component'
 import { Component } from 'vue-property-decorator'
 import Record from '@/mainWindow/components/icons/Record.vue'
-import ImageLoader from '@/utils/mixins/ImageLoader'
+import ImageLoader from '@/utils/ui/mixins/ImageLoader'
 import SingleSearchResult from '@/mainWindow/components/generic/SingleSearchResult.vue'
-import ModelHelper from '@/utils/mixins/ModelHelper'
+import ModelHelper from '@/utils/ui/mixins/ModelHelper'
 import { vxm } from '@/mainWindow/store'
 
 @Component({

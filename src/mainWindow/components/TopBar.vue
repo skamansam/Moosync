@@ -42,11 +42,11 @@
 <script lang="ts">
 import Navigation from '@/mainWindow/components/topbar/Navigation.vue'
 import Search from '@/mainWindow/components/topbar/Search.vue'
-import Colors from '@/utils/mixins/Colors'
+import Colors from '@/utils/ui/mixins/Colors'
 import { mixins } from 'vue-class-component'
 import { Component } from 'vue-property-decorator'
 import Person from '@/mainWindow/components/icons/Person.vue'
-import { Youtube } from '@/utils/providers/youtube'
+import { Youtube } from '@/utils/ui/providers/youtube'
 import IconButton from '@/mainWindow/components/generic/IconButton.vue'
 import YoutubeIcon from '@/mainWindow/components/icons/Youtube.vue'
 import SpotifyIcon from '@/mainWindow/components/icons/Spotify.vue'

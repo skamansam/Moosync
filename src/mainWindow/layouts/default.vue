@@ -17,7 +17,7 @@ import MusicBar from '@/mainWindow/components/Musicbar.vue'
 import Sidebar from '@/mainWindow/components/Sidebar.vue'
 import TopBar from '@/mainWindow/components/TopBar.vue'
 import { Component } from 'vue-property-decorator'
-import ContextMenuMixin from '@/utils/mixins/ContextMenuMixin'
+import ContextMenuMixin from '@/utils/ui/mixins/ContextMenuMixin'
 import { mixins } from 'vue-class-component'
 
 @Component({

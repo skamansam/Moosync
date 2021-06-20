@@ -11,10 +11,10 @@
 
 <script lang="ts">
 import CardView from '@/mainWindow/components/generic/CardView.vue'
-import { Album } from '@/models/albums'
+import { Album } from '@/utils/models/albums'
 import { mixins } from 'vue-class-component'
 import { Component } from 'vue-property-decorator'
-import RouterPushes from '@/utils/mixins/RouterPushes'
+import RouterPushes from '@/utils/ui/mixins/RouterPushes'
 
 @Component({
   components: {

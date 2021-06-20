@@ -17,8 +17,8 @@
 </template>
 
 <script lang="ts">
-import Colors from '@/utils/mixins/Colors'
-import ImageLoader from '@/utils/mixins/ImageLoader'
+import Colors from '@/utils/ui/mixins/Colors'
+import ImageLoader from '@/utils/ui/mixins/ImageLoader'
 import { mixins } from 'vue-class-component'
 import { Component, Prop } from 'vue-property-decorator'
 import Youtube from '@/mainWindow/components/icons/Youtube.vue'

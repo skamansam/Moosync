@@ -30,7 +30,7 @@
 import { Component, Prop } from 'vue-property-decorator'
 import Play2 from '@/mainWindow/components/icons/Play2.vue'
 import { mixins } from 'vue-class-component'
-import PlayerControls from '@/utils/mixins/PlayerControls'
+import PlayerControls from '@/utils/ui/mixins/PlayerControls'
 
 @Component({
   components: {

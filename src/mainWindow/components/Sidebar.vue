@@ -57,7 +57,7 @@ import Tabs from '@/mainWindow/components/sidebar/Tabs.vue'
 import Gears from '@/mainWindow/components/icons/Gears.vue'
 import { PeerMode } from '@/mainWindow/store/syncState'
 import { Component } from 'vue-property-decorator'
-import Colors from '@/utils/mixins/Colors'
+import Colors from '@/utils/ui/mixins/Colors'
 import { mixins } from 'vue-class-component'
 import { vxm } from '../store'
 

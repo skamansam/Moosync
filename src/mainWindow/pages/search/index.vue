@@ -36,18 +36,18 @@
 </template>
 
 <script lang="ts">
-import { SearchResult } from '@/models/searchResult'
+import { SearchResult } from '@/utils/models/searchResult'
 import { Component, Watch } from 'vue-property-decorator'
 import SingleSearchResult from '@/mainWindow/components/generic/SingleSearchResult.vue'
-import { Album } from '@/models/albums'
-import { artists } from '@/models/artists'
-import { Genre } from '@/models/genre'
-import { Playlist } from '@/models/playlists'
-import { Song } from '@/models/songs'
+import { Album } from '@/utils/models/albums'
+import { artists } from '@/utils/models/artists'
+import { Genre } from '@/utils/models/genre'
+import { Playlist } from '@/utils/models/playlists'
+import { Song } from '@/utils/models/songs'
 import { mixins } from 'vue-class-component'
-import RouterPushes from '@/utils/mixins/RouterPushes'
-import { toSong, YoutubeItem } from '@/models/youtube'
-import ContextMenuMixin, { ContextTypes } from '@/utils/mixins/ContextMenuMixin'
+import RouterPushes from '@/utils/ui/mixins/RouterPushes'
+import { toSong, YoutubeItem } from '@/utils/models/youtube'
+import ContextMenuMixin, { ContextTypes } from '@/utils/ui/mixins/ContextMenuMixin'
 
 @Component({
   components: {

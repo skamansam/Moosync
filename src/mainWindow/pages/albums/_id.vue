@@ -17,11 +17,11 @@
 <script lang="ts">
 import { Component, Prop } from 'vue-property-decorator'
 import SongView from '@/mainWindow/components/SongView.vue'
-import { Album } from '@/models/albums'
-import { Song } from '@/models/songs'
+import { Album } from '@/utils/models/albums'
+import { Song } from '@/utils/models/songs'
 
 import { mixins } from 'vue-class-component'
-import ContextMenuMixin, { ContextTypes } from '@/utils/mixins/ContextMenuMixin'
+import ContextMenuMixin, { ContextTypes } from '@/utils/ui/mixins/ContextMenuMixin'
 import { vxm } from '@/mainWindow/store'
 
 @Component({

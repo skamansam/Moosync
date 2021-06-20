@@ -21,7 +21,7 @@
 <script lang="ts">
 import Tabs from '@/preferenceWindow/components/sidebar/Tabs.vue'
 import { Component } from 'vue-property-decorator'
-import Colors from '@/utils/mixins/Colors'
+import Colors from '@/utils/ui/mixins/Colors'
 import { mixins } from 'vue-class-component'
 
 @Component({

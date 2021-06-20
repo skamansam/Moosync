@@ -26,11 +26,11 @@
 import { Component, Prop } from 'vue-property-decorator'
 import SongList from '@/mainWindow/components/generic/SongList.vue'
 import SongDetails from '@/mainWindow/components/generic/SongDetails.vue'
-import { Song } from '@/models/songs'
-import Colors from '@/utils/mixins/Colors'
+import { Song } from '@/utils/models/songs'
+import Colors from '@/utils/ui/mixins/Colors'
 import { mixins } from 'vue-class-component'
-import PlayerControls from '@/utils/mixins/PlayerControls'
-import ModelHelper from '@/utils/mixins/ModelHelper'
+import PlayerControls from '@/utils/ui/mixins/PlayerControls'
+import ModelHelper from '@/utils/ui/mixins/ModelHelper'
 
 @Component({
   components: {

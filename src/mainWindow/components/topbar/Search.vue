@@ -44,11 +44,11 @@
 <script lang="ts">
 import { Component } from 'vue-property-decorator'
 import Search from '@/mainWindow/components/icons/Search.vue'
-import { SearchResult } from '@/models/searchResult'
+import { SearchResult } from '@/utils/models/searchResult'
 import SingleSearchResult from '@/mainWindow/components/generic/SingleSearchResult.vue'
-import Colors from '@/utils/mixins/Colors'
+import Colors from '@/utils/ui/mixins/Colors'
 import { mixins } from 'vue-class-component'
-import PlayerControls from '@/utils/mixins/PlayerControls'
+import PlayerControls from '@/utils/ui/mixins/PlayerControls'
 
 @Component({
   components: {

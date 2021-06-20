@@ -20,7 +20,7 @@ import { Component } from 'vue-property-decorator'
 import Titlebar from '@/commonComponents/Titlebar.vue'
 import { vxm } from '@/preferenceWindow/store'
 import { mixins } from 'vue-class-component'
-import ThemeHandler from '@/utils/mixins/ThemeHandler'
+import ThemeHandler from '@/utils/ui/mixins/ThemeHandler'
 import Sidebar from '@/preferenceWindow/components/Sidebar.vue'
 
 @Component({

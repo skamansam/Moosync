@@ -31,7 +31,7 @@ import Play from '@/mainWindow/components/icons/Play.vue'
 import Repeat from '@/mainWindow/components/icons/Repeat.vue'
 import Shuffle from '@/mainWindow/components/icons/Shuffle.vue'
 import { mixins } from 'vue-class-component'
-import PlayerControls from '@/utils/mixins/PlayerControls'
+import PlayerControls from '@/utils/ui/mixins/PlayerControls'
 import { vxm } from '@/mainWindow/store'
 
 @Component({

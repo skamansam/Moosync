@@ -26,9 +26,7 @@ module.exports = {
         'process.env.YoutubeClientID': JSON.stringify(dotenv.parsed['YOUTUBECLIENTID']),
         'process.env.SpotifyClientID': JSON.stringify(dotenv.parsed['SPOTIFYCLIENTID']),
         'process.env.SpotifyClientSecret': JSON.stringify(dotenv.parsed['SPOTIFYCLIENTSECRET'])
-
       }),
-
       new VuetifyLoaderPlugin(),
     ],
     externals: ['better-sqlite3', 'youtube-music-api'],
@@ -36,16 +34,16 @@ module.exports = {
   },
   pluginOptions: {
     electronBuilder: {
+      mainProcessWatch: ['src/utils/main'],
       customFileProtocol: 'com.moosync://./',
       builderOptions: {
         publish: ['github'],
         asarUnpack: ['*.worker.js'],
-
       },
       nodeIntegration: false,
       disableMainProcessTypescript: false,
       mainProcessTypeChecking: true,
-      preload: 'src/preload.ts',
+      preload: 'src/utils/preload/preload.ts',
       externals: [
         'better-sqlite3'
       ],

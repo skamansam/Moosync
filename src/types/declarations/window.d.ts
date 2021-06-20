@@ -1,12 +1,12 @@
-import { Song } from '@/models/songs'
-import { Album } from '@/models/albums'
-import { artists } from '@/models/artists'
-import { Genre } from '@/models/genre'
-import { Playlist } from '@/models/playlists'
+import { Song } from '@/utils/models/songs'
+import { Album } from '@/utils/models/albums'
+import { artists } from '@/utils/models/artists'
+import { Genre } from '@/utils/models/genre'
+import { Playlist } from '@/utils/models/playlists'
 
-import { YoutubeItem } from '@/models/youtube'
-import { SearchResult } from '@/models/searchResult'
-import { Preferences } from '@/utils/db/constants'
+import { YoutubeItem } from '@/utils/models/youtube'
+import { SearchResult } from '@/utils/models/searchResult'
+import { Preferences } from '@/utils/main/db/constants'
 
 interface DBUtils {
   getAllSongs: () => Promise<Song[]>

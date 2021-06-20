@@ -27,8 +27,8 @@
 </template>
 
 <script lang="ts">
-import { Song } from '@/models/songs'
-import Colors from '@/utils/mixins/Colors'
+import { Song } from '@/utils/models/songs'
+import Colors from '@/utils/ui/mixins/Colors'
 import { Resizer } from '@/utils/ui/resizer'
 import { mixins } from 'vue-class-component'
 import { Component, Prop } from 'vue-property-decorator'

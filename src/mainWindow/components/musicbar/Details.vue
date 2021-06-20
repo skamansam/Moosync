@@ -18,11 +18,11 @@
 </template>
 
 <script lang="ts">
-import Colors from '@/utils/mixins/Colors'
+import Colors from '@/utils/ui/mixins/Colors'
 import { mixins } from 'vue-class-component'
 import { Component, Prop } from 'vue-property-decorator'
 import Record from '@/mainWindow/components/icons/Record.vue'
-import ImageLoader from '@/utils/mixins/ImageLoader'
+import ImageLoader from '@/utils/ui/mixins/ImageLoader'
 
 @Component({
   components: {

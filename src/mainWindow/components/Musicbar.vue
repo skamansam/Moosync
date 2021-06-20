@@ -58,9 +58,9 @@ import MusicInfo from '@/mainWindow/components/musicbar/MusicInfo.vue'
 
 import { Component } from 'vue-property-decorator'
 import { PlayerState } from '@/mainWindow/store/playerState'
-import Colors from '@/utils/mixins/Colors'
+import Colors from '@/utils/ui/mixins/Colors'
 import { mixins } from 'vue-class-component'
-import ModelHelper from '@/utils/mixins/ModelHelper'
+import ModelHelper from '@/utils/ui/mixins/ModelHelper'
 import { vxm } from '../store'
 
 @Component({

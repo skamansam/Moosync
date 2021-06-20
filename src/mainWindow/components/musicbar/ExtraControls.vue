@@ -29,7 +29,7 @@
 import { Component } from 'vue-property-decorator'
 import VolumeIcon from '@/mainWindow/components/icons/Volume.vue'
 import ExpandIcon from '@/mainWindow/components/icons/Expand.vue'
-import Colors from '@/utils/mixins/Colors'
+import Colors from '@/utils/ui/mixins/Colors'
 import { mixins } from 'vue-class-component'
 import { vxm } from '@/mainWindow/store'
 

@@ -4,11 +4,11 @@ import { BrowserWindow, Menu, Tray, app, nativeTheme, protocol, session } from '
 import installExtension, { VUEJS_DEVTOOLS } from 'electron-devtools-installer'
 
 import { createProtocol } from 'vue-cli-plugin-electron-builder/lib'
-import { loadPreferences } from '@/utils/db/preferences'
+import { loadPreferences } from '@/utils/main/db/preferences'
 import path, { resolve } from 'path'
-import { registerIpcChannels } from '@/utils/ipc/main' // Import for side effects
+import { registerIpcChannels } from '@/utils/main/ipc' // Import for side effects
 import 'threads/register'
-import { OAuthHandler } from '@/utils/oauth/main/handler'
+import { OAuthHandler } from '@/utils/main/oauth/handler'
 import EventEmitter from 'events'
 
 const isDevelopment = process.env.NODE_ENV !== 'production'
@@ -42,7 +42,6 @@ function interceptHttp() {
       const filePath = path.join(__dirname, pathName)
 
       // deregister intercept after we handle index.js
-      // Re-register on page refresh
       if (request.url.includes('index.js')) {
         session.defaultSession.protocol.uninterceptProtocol('http')
       }

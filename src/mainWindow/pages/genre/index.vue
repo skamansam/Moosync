@@ -10,11 +10,11 @@
 </template>
 
 <script lang="ts">
-import { Genre } from '@/models/genre'
+import { Genre } from '@/utils/models/genre'
 import { Component } from 'vue-property-decorator'
 import CardView from '@/mainWindow/components/generic/CardView.vue'
 import { mixins } from 'vue-class-component'
-import RouterPushes from '@/utils/mixins/RouterPushes'
+import RouterPushes from '@/utils/ui/mixins/RouterPushes'
 
 @Component({
   components: {

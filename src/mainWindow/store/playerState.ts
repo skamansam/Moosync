@@ -1,4 +1,4 @@
-import { Song } from '@/models/songs'
+import { Song } from '@/utils/models/songs'
 
 import { action, mutation } from 'vuex-class-component'
 import { vxm } from '.'

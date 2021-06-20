@@ -1,6 +1,6 @@
-import { Song } from '@/models/songs'
+import { Song } from '@/utils/models/songs'
 import { vxm } from '@/mainWindow/store';
-import { prefetchData } from '@/utils/sync/syncHandler'
+import { prefetchData } from '@/utils/ui/sync/syncHandler'
 import { mutation, action } from 'vuex-class-component';
 import { VuexModule } from './module'
 
