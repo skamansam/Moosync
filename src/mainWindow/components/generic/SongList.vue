@@ -15,6 +15,7 @@
       @row-dblclicked="onRowDoubleClicked"
       @row-selected="onRowSelected"
       @row-contextmenu="onRowContext"
+      v-click-outside="clearSelection"
     >
       <template #cell(index)="data">{{ data.index + 1 }}</template>
 
@@ -55,6 +56,12 @@ export default class SongList extends mixins(Colors) {
     { key: 'index', label: 'Sr. No', tdClass: 'index-no-td', thClass: 'index-no-th' }
   ]
 
+  // Clear selection after table loses focus
+  private clearSelection() {
+    this.songListTable.clearSelected()
+    this.onRowSelected([])
+  }
+
   private getAlbumName(data: Song) {
     if (data.album && data.album.album_name) return data.album.album_name
     return '-'
@@ -75,12 +82,6 @@ export default class SongList extends mixins(Colors) {
       // Add grips only after there is no resizeing event for 100ms
       doit = setTimeout(() => this.resizer.addGrips(), 100)
     }
-
-    // Clear selection after table loses focus
-    this.songListTable.$el.firstElementChild!.addEventListener('focusout', () => {
-      this.songListTable.clearSelected()
-      this.onRowSelected([])
-    })
   }
 
   private onRowContext(item: Song, index: number, event: Event) {

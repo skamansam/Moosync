@@ -77,7 +77,7 @@ export class YoutubeProvider extends GenericProvider {
             playlist_id: `youtube-${p.id}`,
             playlist_name: p.snippet.title,
             playlist_coverPath: (p.snippet.thumbnails.maxres ?? p.snippet.thumbnails.high ?? p.snippet.thumbnails.default).url,
-            playlist_song_count: -1
+            playlist_song_count: p.contentDetails.itemCount
           })
       }
     }
@@ -93,7 +93,7 @@ export class YoutubeProvider extends GenericProvider {
 
         const resp = await this.populateRequest(ApiResources.PLAYLISTS, {
           params: {
-            part: ['id', 'snippet'],
+            part: ['id', 'contentDetails', 'snippet'],
             mine: true,
             maxResults: 50,
             pageToken: nextPageToken

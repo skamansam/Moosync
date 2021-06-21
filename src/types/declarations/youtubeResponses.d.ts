@@ -17,7 +17,7 @@ declare namespace YoutubeResponses {
 
   type PlaylistRequest = {
     params: {
-      part: ['id', 'snippet'?]
+      part: ['id', 'contentDetails', 'snippet'?]
       mine: true
       maxResults?: number
       pageToken?: string | undefined
@@ -150,11 +150,16 @@ declare namespace YoutubeResponses {
       localized: Localized
     }
 
+    interface contentDetails {
+      itemCount: number
+    }
+
     interface Item {
       kind: string
       etag: string
       id: string
       snippet?: Snippet
+      contentDetails: contentDetails
     }
 
     interface UserPlaylists {
@@ -165,6 +170,8 @@ declare namespace YoutubeResponses {
       pageInfo: PageInfo
       items: Item[]
     }
+
+
   }
   interface Localized {
     title: string
