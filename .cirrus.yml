@@ -32,7 +32,9 @@ mac_linux_task:
       node_modules_cache:
         folder: node_modules
         fingerprint_script: type yarn.lock
-        populate_script: yarn install
+        populate_script:
+          - refreshenv
+          - yarn install
       build_script:
         - refreshenv
         - setup_env.bat
