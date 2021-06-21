@@ -142,7 +142,7 @@ export default class AudioStream extends mixins(Colors, SyncMixin) {
   }
 
   private loadAudio(song: Song, loadedState: boolean) {
-    // vxm.player.state = PlayerState.PLAYING
+    // vxm.player.state = 'PLAYING'
     if (song.type === 'LOCAL') {
       this.onPlayerTypeChanged('LOCAL')
     } else {

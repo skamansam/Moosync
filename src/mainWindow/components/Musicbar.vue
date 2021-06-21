@@ -24,7 +24,7 @@
             </b-col>
             <b-col md="6" lg="auto" align-self="center" class="no-gutters">
               <Controls
-                :playing="playerState == PlayerState.PLAYING"
+                :playing="playerState == 'PLAYING'"
                 :duration="currentSong ? currentSong.duration : 0"
                 :timestamp="timestamp"
                 :loading="waiting"
