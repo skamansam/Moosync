@@ -26,7 +26,6 @@ import ContextMenuMixin from '@/utils/ui/mixins/ContextMenuMixin'
   }
 })
 export default class SingleAlbumView extends mixins(ContextMenuMixin) {
-  private genre: Genre | null = null
   private songList: Song[] = []
 
   @Prop({ default: '' })
@@ -38,16 +37,17 @@ export default class SingleAlbumView extends mixins(ContextMenuMixin) {
   @Prop({ default: '' })
   private genre_coverPath!: string
 
+  @Prop({ default: '' })
+  private genre_song_count!: string
+
   mounted() {
     this.fetchgenre()
   }
 
-  get defaultDetails(): SongDetailDefaults {
-    return {
-      defaultTitle: this.genre_name,
-      defaultSubtitle: this.genre ? this.genre.genre_song_count : 0,
-      defaultCover: this.genre_coverPath
-    }
+  private defaultDetails: SongDetailDefaults = {
+    defaultTitle: this.genre_name,
+    defaultSubtitle: this.genre_song_count,
+    defaultCover: this.genre_coverPath
   }
 
   private async fetchgenre() {

@@ -9,6 +9,7 @@ export default class PlayerControls extends Vue {
         album_id: album.album_id!,
         album_name: album.album_name!,
         album_coverPath: album.album_coverPath ? album.album_coverPath : '',
+        album_song_count: album.album_song_count!.toString()!,
       },
     })
   }
@@ -19,6 +20,7 @@ export default class PlayerControls extends Vue {
       params: {
         genre_id: genre.genre_id!,
         genre_name: genre.genre_name!,
+        genre_song_count: genre.genre_song_count.toString()!,
       },
     })
   }
@@ -29,6 +31,7 @@ export default class PlayerControls extends Vue {
       params: {
         artist_id: artist.artist_id!,
         artist_name: artist.artist_name!,
+        artist_song_count: artist.artist_song_count!.toString()!,
         artist_coverPath: artist.artist_coverPath ? artist.artist_coverPath : '',
       },
     })
@@ -41,6 +44,7 @@ export default class PlayerControls extends Vue {
         playlist_id: playlist.playlist_id,
         playlist_name: playlist.playlist_name!,
         playlist_coverPath: playlist.playlist_coverPath!,
+        playlist_song_count: playlist.playlist_song_count.toString()!,
         isYoutubePlaylist: playlist.playlist_id.startsWith('youtube-').toString(),
         isSpotifyPlaylist: playlist.playlist_id.startsWith('spotify-').toString(),
       },

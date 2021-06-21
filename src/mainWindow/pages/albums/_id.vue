@@ -39,16 +39,17 @@ export default class SingleAlbumView extends mixins(ContextMenuMixin) {
   @Prop({ default: '' })
   private album_coverPath!: string
 
+  @Prop({ default: '' })
+  private album_song_count!: string
+
   get playlists() {
     return vxm.playlist.playlists
   }
 
-  get defaultDetails(): SongDetailDefaults {
-    return {
-      defaultTitle: this.album_name,
-      defaultSubtitle: this.album ? this.album.album_song_count : 0,
-      defaultCover: this.album_coverPath
-    }
+  private defaultDetails: SongDetailDefaults = {
+    defaultTitle: this.album_name,
+    defaultSubtitle: this.album_song_count,
+    defaultCover: this.album_coverPath
   }
 
   mounted() {

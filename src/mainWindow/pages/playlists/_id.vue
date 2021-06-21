@@ -27,7 +27,6 @@ import { vxm } from '@/mainWindow/store'
   }
 })
 export default class SinglePlaylistView extends mixins(ContextMenuMixin) {
-  private playlist: Playlist | null = null
   private songList: Song[] = []
 
   @Prop({ default: '' })
@@ -39,6 +38,9 @@ export default class SinglePlaylistView extends mixins(ContextMenuMixin) {
   @Prop({ default: '' })
   private playlist_coverPath!: string
 
+  @Prop({ default: '' })
+  private playlist_song_count!: string
+
   @Prop({ default: false })
   private isYoutubePlaylist!: string
 
@@ -49,12 +51,10 @@ export default class SinglePlaylistView extends mixins(ContextMenuMixin) {
     this.fetchPlaylist()
   }
 
-  get defaultDetails(): SongDetailDefaults {
-    return {
-      defaultTitle: this.playlist_name,
-      defaultSubtitle: this.playlist ? this.playlist.playlist_song_count : 0,
-      defaultCover: this.playlist_coverPath
-    }
+  private defaultDetails = {
+    defaultTitle: this.playlist_name,
+    defaultSubtitle: this.playlist_song_count,
+    defaultCover: this.playlist_coverPath
   }
 
   private async fetchPlaylist() {

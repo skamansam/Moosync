@@ -26,7 +26,6 @@ import ContextMenuMixin from '@/utils/ui/mixins/ContextMenuMixin'
   }
 })
 export default class SingleArtistView extends mixins(ContextMenuMixin) {
-  private artist: artists | null = null
   private songList: Song[] = []
 
   @Prop({ default: '' })
@@ -38,15 +37,16 @@ export default class SingleArtistView extends mixins(ContextMenuMixin) {
   @Prop({ default: '' })
   private artist_coverPath!: string
 
+  @Prop({ default: '' })
+  private artist_song_count!: string
+
   mounted() {
     this.fetchArtist()
   }
-  get defaultDetails(): SongDetailDefaults {
-    return {
-      defaultTitle: this.artist_name,
-      defaultSubtitle: '',
-      defaultCover: this.artist_coverPath
-    }
+  private defaultDetails: SongDetailDefaults = {
+    defaultTitle: this.artist_name,
+    defaultSubtitle: this.artist_song_count,
+    defaultCover: this.artist_coverPath
   }
 
   private async fetchArtist() {
