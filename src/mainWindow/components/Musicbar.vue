@@ -12,6 +12,7 @@
           :duration="0.1"
           :tooltip="'none'"
           @change="updateTimestmp"
+          @error="errorHandler"
         />
         <b-container fluid class="d-flex bar-container">
           <b-row align-h="between" class="d-flex no-gutters w-100">
@@ -76,6 +77,10 @@ export default class MusicBar extends mixins(Colors, ModelHelper) {
   private forceSeek: number = 0
   private PlayerState: PlayerState = 'PAUSED'
   private sliderPosition: boolean = false
+
+  private errorHandler(e: Event) {
+    console.log(e)
+  }
 
   private updateTimestmp(value: number) {
     this.forceSeek = value
