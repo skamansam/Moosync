@@ -4,18 +4,13 @@
 }
 </route>
 <template>
-  <b-container fluid>
-    <b-row>
-      <div>{{ genre_name }}</div>
-    </b-row>
-    <b-row class="h-100">
-      <SongView
-        :defaultDetails="defaultDetails"
-        :songList="songList"
-        @onRowContext="getSongMenu(arguments[0], arguments[1], undefined)"
-      />
-    </b-row>
-  </b-container>
+  <div class="w-100">
+    <SongView
+      :defaultDetails="defaultDetails"
+      :songList="songList"
+      @onRowContext="getSongMenu(arguments[0], arguments[1], undefined)"
+    />
+  </div>
 </template>
 
 <script lang="ts">
