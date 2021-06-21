@@ -4,12 +4,12 @@
       fluid
       ref="cover"
       class="coverimg"
-      v-if="ImgSrc && !forceEmptyImg"
-      :src="ImgSrc"
+      v-if="getImgSrc(imgSrc) && !forceEmptyImg"
+      :src="getImgSrc(imgSrc)"
       alt="cover art"
       @error="handleImageError"
     />
-    <Record v-if="!ImgSrc || forceEmptyImg" class="coverimg" />
+    <Record v-if="!getImgSrc(imgSrc) || forceEmptyImg" class="coverimg" />
     <div class="text-container">
       <div class="text song-title text-truncate">{{ title }}</div>
       <div class="text song-subtitle text-truncate">{{ artists ? artists.join(', ') : '-' }}</div>
@@ -20,7 +20,7 @@
 <script lang="ts">
 import Colors from '@/utils/ui/mixins/Colors'
 import { mixins } from 'vue-class-component'
-import { Component, Prop } from 'vue-property-decorator'
+import { Component, Prop, Watch } from 'vue-property-decorator'
 import Record from '@/mainWindow/components/icons/Record.vue'
 import ImageLoader from '@/utils/ui/mixins/ImageLoader'
 
@@ -36,8 +36,17 @@ export default class MusicBar extends mixins(Colors, ImageLoader) {
   @Prop({ default: () => [] })
   artists!: string[]
 
+  @Prop({ default: '' })
+  private imgSrc!: string
+
+  private forceEmptyImg: boolean = false
+
   private handleImageError() {
     this.forceEmptyImg = true
+  }
+
+  @Watch('imgSrc') onImgSrcChange() {
+    this.forceEmptyImg = false
   }
 }
 </script>
@@ -70,3 +79,5 @@ export default class MusicBar extends mixins(Colors, ImageLoader) {
 .text-container
   width: calc( 100% - 56px - 15px )
 </style>
+
+function Watch(arg0: string) { throw new Error('Function not implemented.') }

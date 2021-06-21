@@ -1,6 +1,7 @@
 <template>
   <div class="d-flex h-100 w-100">
     <b-table
+      ref="songListTable"
       class="custom-table-container d-flex h-100"
       table-class="custom-table w-100"
       :items="songList"
@@ -29,8 +30,10 @@
 <script lang="ts">
 import Colors from '@/utils/ui/mixins/Colors'
 import { Resizer } from '@/utils/ui/resizer'
+import { BTable } from 'bootstrap-vue'
 import { mixins } from 'vue-class-component'
-import { Component, Prop } from 'vue-property-decorator'
+import { Component, Prop, Ref } from 'vue-property-decorator'
+import Vue from 'vue/types/umd'
 
 @Component({})
 export default class SongList extends mixins(Colors) {
@@ -44,6 +47,9 @@ export default class SongList extends mixins(Colors) {
 
   @Prop({ default: {} })
   private extrafields!: [{ key: string }]
+
+  @Ref('songListTable')
+  private songListTable!: BTable
 
   private fields: [{ key: string; label?: string; tdClass?: string; thClass?: string }] = [
     { key: 'index', label: 'Sr. No', tdClass: 'index-no-td', thClass: 'index-no-th' }
@@ -69,6 +75,12 @@ export default class SongList extends mixins(Colors) {
       // Add grips only after there is no resizeing event for 100ms
       doit = setTimeout(() => this.resizer.addGrips(), 100)
     }
+
+    // Clear selection after table loses focus
+    this.songListTable.$el.firstElementChild!.addEventListener('focusout', () => {
+      this.songListTable.clearSelected()
+      this.onRowSelected([])
+    })
   }
 
   private onRowContext(item: Song, index: number, event: Event) {
@@ -83,8 +95,8 @@ export default class SongList extends mixins(Colors) {
     this.selected = items
     if (items[items.length - 1] && items[items.length - 1]._id !== this.lastSelect) {
       this.lastSelect = items[items.length - 1]._id!
-      this.$emit('onRowSelected', items)
     }
+    this.$emit('onRowSelected', items)
   }
 
   private sortContent(): void {

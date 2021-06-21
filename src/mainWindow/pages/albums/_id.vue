@@ -9,7 +9,11 @@
       <div>{{ album_name }}</div>
     </b-row>
     <b-row class="h-100">
-      <SongView :songList="songList" @onRowContext="getSongMenu(arguments[0], arguments[1], undefined)" />
+      <SongView
+        :defaultDetails="defaultDetails"
+        :songList="songList"
+        @onRowContext="getSongMenu(arguments[0], arguments[1], undefined)"
+      />
     </b-row>
   </b-container>
 </template>
@@ -42,6 +46,14 @@ export default class SingleAlbumView extends mixins(ContextMenuMixin) {
 
   get playlists() {
     return vxm.playlist.playlists
+  }
+
+  get defaultDetails(): SongDetailDefaults {
+    return {
+      defaultTitle: this.album_name,
+      defaultSubtitle: this.album ? this.album.album_song_count : 0,
+      defaultCover: this.album_coverPath
+    }
   }
 
   mounted() {

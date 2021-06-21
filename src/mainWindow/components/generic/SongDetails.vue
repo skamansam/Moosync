@@ -2,12 +2,17 @@
   <b-container fluid class="w-100">
     <b-row class="d-flex h-100 no-gutters">
       <b-col cols="2" class="d-flex h-100 image-container">
-        <b-img v-if="ImgSrc && !forceEmptyImg" class="image h-100 w-100" :src="ImgSrc" @error="handleImageError" />
-        <Record v-if="!ImgSrc || forceEmptyImg" class="h-100 image" />
+        <b-img
+          v-if="(getImgSrc(imgSrc) || getImgSrc(defaultImgSrc)) && !forceEmptyImg"
+          class="image h-100 w-100"
+          :src="getImgSrc(imgSrc) ? getImgSrc(imgSrc) : getImgSrc(defaultImgSrc)"
+          @error="handleImageError"
+        />
+        <Record v-if="!getImgSrc(imgSrc) || forceEmptyImg" class="h-100 image" />
       </b-col>
       <b-col class="text-container text-truncate">
-        <div class="title text-truncate">{{ currentTitle }}</div>
-        <div class="subtitle text-truncate">{{ currentsubTitle }}</div>
+        <div class="title text-truncate">{{ currentTitle ? currentTitle : defaultTitle }}</div>
+        <div class="subtitle text-truncate">{{ currentsubTitle ? currentsubTitle : defaultsubTitle }}</div>
       </b-col>
     </b-row>
   </b-container>
@@ -16,7 +21,7 @@
 <script lang="ts">
 import Colors from '@/utils/ui/mixins/Colors'
 import { mixins } from 'vue-class-component'
-import { Component, Prop } from 'vue-property-decorator'
+import { Component, Prop, Watch } from 'vue-property-decorator'
 import Record from '@/mainWindow/components/icons/Record.vue'
 import ImageLoader from '@/utils/ui/mixins/ImageLoader'
 
@@ -32,9 +37,27 @@ export default class SongDetails extends mixins(Colors, ImageLoader) {
   @Prop({ default: '' })
   private currentsubTitle!: string
 
+  @Prop({ default: '' })
+  private imgSrc!: string
+
+  @Prop({ default: '' })
+  private defaultTitle!: string
+
+  @Prop({ default: '' })
+  private defaultsubTitle!: string
+
+  @Prop({ default: '' })
+  private defaultImgSrc!: string
+
   private handleImageError() {
     this.forceEmptyImg = true
   }
+
+  @Watch('imgSrc') onImgSrcChange() {
+    this.forceEmptyImg = false
+  }
+
+  public forceEmptyImg: boolean = false
 }
 </script>
 

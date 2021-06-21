@@ -7,6 +7,9 @@
           :currentTitle="currentSong ? currentSong.title : ''"
           :currentsubTitle="getAlbumName(currentSong)"
           :imgSrc="getImg(currentSong)"
+          :defaultTitle="defaultDetails.defaultTitle"
+          :defaultsubTitle="defaultDetails.defaultSubtitle"
+          :defaultImgSrc="defaultDetails.defaultCover"
         />
       </b-col>
     </b-row>
@@ -42,6 +45,13 @@ export default class AllSongs extends mixins(Colors, PlayerControls, ModelHelper
   private songList!: Song[]
 
   private currentSong: Song | null = null
+
+  @Prop({
+    default: () => {
+      return { defaultTitle: '', defaultSubtitle: '', defaultCover: '' }
+    }
+  })
+  private defaultDetails!: SongDetailDefaults
 
   private updateCoverDetails(items: Song[]) {
     if (items) this.currentSong = items[items.length - 1]

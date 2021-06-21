@@ -3,8 +3,8 @@
     <b-row align-h="around" class="d-flex w-100">
       <b-col cols="7" align-self="center" class="no-gutters w-100">
         <div class="h-100">
-          <b-img class="albumart w-100" v-if="ImgSrc" :src="ImgSrc" />
-          <Record class="albumart w-100" v-if="!ImgSrc" />
+          <b-img class="albumart w-100" v-if="getImgSrc(imgSrc)" :src="getImgSrc(imgSrc)" />
+          <Record class="albumart w-100" v-if="!getImgSrc(imgSrc)" />
         </div>
       </b-col>
       <b-col cols="5" align-self="center" class="queue-container d-flex no-gutters h-100">
@@ -32,7 +32,7 @@
 <script lang="ts">
 import Colors from '@/utils/ui/mixins/Colors'
 import { mixins } from 'vue-class-component'
-import { Component } from 'vue-property-decorator'
+import { Component, Prop, Watch } from 'vue-property-decorator'
 import Record from '@/mainWindow/components/icons/Record.vue'
 import ImageLoader from '@/utils/ui/mixins/ImageLoader'
 import SingleSearchResult from '@/mainWindow/components/generic/SingleSearchResult.vue'
@@ -52,6 +52,15 @@ export default class MusicInfo extends mixins(Colors, ImageLoader, ModelHelper) 
 
   private getQueueItem(id: string) {
     return vxm.player.queue.data[id]
+  }
+
+  @Prop({ default: '' })
+  private imgSrc!: string
+
+  private forceEmptyImg: boolean = false
+
+  @Watch('imgSrc') onImgSrcChange() {
+    this.forceEmptyImg = false
   }
 }
 </script>
@@ -79,3 +88,6 @@ export default class MusicInfo extends mixins(Colors, ImageLoader, ModelHelper) 
   &::-webkit-scrollbar-track
     margin: 0
 </style>
+
+function Prop(arg0: { default: string }) { throw new Error('Function not implemented.') } function Watch(arg0: string) {
+throw new Error('Function not implemented.') }

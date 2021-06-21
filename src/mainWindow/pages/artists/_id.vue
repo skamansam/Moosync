@@ -9,7 +9,11 @@
       <div>{{ artist_name }}</div>
     </b-row>
     <b-row class="h-100">
-      <SongView :songList="songList" @onRowContext="getSongMenu(arguments[0], arguments[1], undefined)" />
+      <SongView
+        :defaultDetails="defaultDetails"
+        :songList="songList"
+        @onRowContext="getSongMenu(arguments[0], arguments[1], undefined)"
+      />
     </b-row>
   </b-container>
 </template>
@@ -41,6 +45,13 @@ export default class SingleArtistView extends mixins(ContextMenuMixin) {
 
   mounted() {
     this.fetchArtist()
+  }
+  get defaultDetails(): SongDetailDefaults {
+    return {
+      defaultTitle: this.artist_name,
+      defaultSubtitle: '',
+      defaultCover: this.artist_coverPath
+    }
   }
 
   private async fetchArtist() {

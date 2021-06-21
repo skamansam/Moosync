@@ -7,7 +7,7 @@
         </div>
         <div class="embed-responsive embed-responsive-1by1">
           <div class="embed-responsive-item">
-            <img :src="ImgSrc" alt="Album Art" class="img-fluid w-100 h-100" />
+            <img :src="getImgSrc(imgSrc)" alt="Album Art" class="img-fluid w-100 h-100" />
           </div>
         </div>
       </div>
@@ -22,7 +22,7 @@
 import Colors from '@/utils/ui/mixins/Colors'
 import ImageLoader from '@/utils/ui/mixins/ImageLoader'
 import { mixins } from 'vue-class-component'
-import { Component, Prop } from 'vue-property-decorator'
+import { Component, Prop, Watch } from 'vue-property-decorator'
 
 @Component({
   components: {}
@@ -36,6 +36,15 @@ export default class SongDetails extends mixins(Colors, ImageLoader) {
 
   @Prop({ default: '' })
   private id!: string
+
+  @Prop({ default: '' })
+  private imgSrc!: string
+
+  private forceEmptyImg: boolean = false
+
+  @Watch('imgSrc') onImgSrcChange() {
+    this.forceEmptyImg = false
+  }
 
   private emitContext(event: Event) {
     this.$emit('CardContextMenu', event)

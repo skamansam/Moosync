@@ -9,7 +9,11 @@
       <div>{{ playlist_name }}</div>
     </b-row>
     <b-row class="h-100">
-      <SongView :songList="songList" @onRowContext="getSongMenu(arguments[0], arguments[1], undefined)" />
+      <SongView
+        :defaultDetails="defaultDetails"
+        :songList="songList"
+        @onRowContext="getSongMenu(arguments[0], arguments[1], undefined)"
+      />
     </b-row>
   </b-container>
 </template>
@@ -48,6 +52,14 @@ export default class SinglePlaylistView extends mixins(ContextMenuMixin) {
 
   mounted() {
     this.fetchPlaylist()
+  }
+
+  get defaultDetails(): SongDetailDefaults {
+    return {
+      defaultTitle: this.playlist_name,
+      defaultSubtitle: this.playlist ? this.playlist.playlist_song_count : 0,
+      defaultCover: this.playlist_coverPath
+    }
   }
 
   private async fetchPlaylist() {

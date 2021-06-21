@@ -9,7 +9,11 @@
       <div>{{ genre_name }}</div>
     </b-row>
     <b-row class="h-100">
-      <SongView :songList="songList" @onRowContext="getSongMenu(arguments[0], arguments[1], undefined)" />
+      <SongView
+        :defaultDetails="defaultDetails"
+        :songList="songList"
+        @onRowContext="getSongMenu(arguments[0], arguments[1], undefined)"
+      />
     </b-row>
   </b-container>
 </template>
@@ -41,6 +45,14 @@ export default class SingleAlbumView extends mixins(ContextMenuMixin) {
 
   mounted() {
     this.fetchgenre()
+  }
+
+  get defaultDetails(): SongDetailDefaults {
+    return {
+      defaultTitle: this.genre_name,
+      defaultSubtitle: this.genre ? this.genre.genre_song_count : 0,
+      defaultCover: this.genre_coverPath
+    }
   }
 
   private async fetchgenre() {
