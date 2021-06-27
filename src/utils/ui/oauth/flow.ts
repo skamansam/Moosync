@@ -39,6 +39,7 @@ import { AuthFlowRequestHandler } from './AuthFlowRequestHandler'
 import { WebCrypto } from "./crypto_utils"
 import { NodeRequestor } from '@openid/appauth/built/node_support/node_requestor'
 import { SpotifyTokenRequestHandler } from './tokenHandler';
+import { AppAuthError } from '@openid/appauth';
 
 export class AuthStateEmitter extends EventEmitter {
   static ON_TOKEN_RESPONSE = "on_token_response"
@@ -150,7 +151,7 @@ export class AuthFlow {
   }
 
   public async makeAuthorizationRequest(username?: string) {
-    if (!this.fetchedToken) throw new Error('service not yet initialized')
+    if (!this.fetchedToken) throw new AppAuthError('service not yet initialized')
 
     if (!this.configuration) {
       this.configuration = await this.fetchServiceConfiguration()
@@ -177,8 +178,8 @@ export class AuthFlow {
     )
   }
 
-  private makeRefreshTokenRequest(code: string, codeVerifier: string | undefined): Promise<void> {
-    if (!this.fetchedToken) throw new Error('service not yet initialized')
+  private async makeRefreshTokenRequest(code: string, codeVerifier: string | undefined): Promise<void> {
+    if (!this.fetchedToken) throw new AppAuthError('service not yet initialized')
 
     if (!this.configuration) {
       return Promise.resolve()
@@ -199,14 +200,15 @@ export class AuthFlow {
       extras: extras
     })
 
-    return this.tokenHandler
-      .performTokenRequest(this.configuration, request)
-      .then(response => {
-        this.refreshToken = response.refreshToken
-        this.accessTokenResponse = response
-        return response
-      })
-      .then(() => this.storeRefreshToken())
+    try {
+      const response = await this.tokenHandler.performTokenRequest(this.configuration, request)
+      this.refreshToken = response.refreshToken
+      this.accessTokenResponse = response
+      this.storeRefreshToken()
+    } catch (err) {
+      console.log(err)
+      this.signOut()
+    }
   }
 
   loggedIn(): boolean {
@@ -225,7 +227,7 @@ export class AuthFlow {
     return !!this.refreshToken
   }
 
-  async performWithFreshTokens(): Promise<string> {
+  async performWithFreshTokens(): Promise<string | undefined> {
     if (!this.fetchedToken) return Promise.reject("Service not initialized")
 
     if (!this.configuration) {
@@ -245,11 +247,13 @@ export class AuthFlow {
       refresh_token: this.refreshToken,
     })
 
-    return this.tokenHandler
-      .performTokenRequest(this.configuration, request)
-      .then(response => {
-        this.accessTokenResponse = response
-        return response.accessToken
-      })
+    try {
+      const response = await this.tokenHandler.performTokenRequest(this.configuration, request)
+      this.accessTokenResponse = response
+      return response.accessToken
+    } catch (err) {
+      console.log(err)
+      this.signOut()
+    }
   }
 }
