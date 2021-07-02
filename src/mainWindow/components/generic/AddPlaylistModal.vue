@@ -3,7 +3,7 @@
     <div class="modal-content-container">
       <b-container fluid class="p-0">
         <b-row no-gutters class="d-flex">
-          <Record v-if="forceEmptyImg" class="playlist-cover" />
+          <SongDefault v-if="forceEmptyImg" class="playlist-cover" />
           <b-col class="playlist-details">
             <div class="d-flex">
               <b-input
@@ -29,10 +29,10 @@ import Colors from '@/utils/ui/mixins/Colors'
 import { mixins } from 'vue-class-component'
 import { bus } from '@/mainWindow/main'
 import { vxm } from '@/mainWindow/store'
-import Record from '@/mainWindow/components/icons/Record.vue'
+import SongDefault from '@/mainWindow/components/icons/SongDefault.vue'
 @Component({
   components: {
-    Record
+    SongDefault
   }
 })
 export default class NewPlaylistModal extends mixins(Colors) {

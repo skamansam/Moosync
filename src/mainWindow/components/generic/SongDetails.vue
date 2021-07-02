@@ -8,7 +8,7 @@
           :src="getImgSrc(imgSrc) ? getImgSrc(imgSrc) : getImgSrc(defaultImgSrc)"
           @error="handleImageError"
         />
-        <Record v-if="!getImgSrc(imgSrc) || forceEmptyImg" class="h-100 image" />
+        <SongDefault v-if="!getImgSrc(imgSrc) || forceEmptyImg" class="h-100 image" />
       </b-col>
       <b-col class="text-container text-truncate">
         <div class="title text-truncate">{{ currentTitle ? currentTitle : defaultTitle }}</div>
@@ -29,7 +29,7 @@
 import Colors from '@/utils/ui/mixins/Colors'
 import { mixins } from 'vue-class-component'
 import { Component, Prop, Watch } from 'vue-property-decorator'
-import Record from '@/mainWindow/components/icons/Record.vue'
+import SongDefault from '@/mainWindow/components/icons/SongDefault.vue'
 import PlainPlay from '@/mainWindow/components/icons/PlainPlay.vue'
 import AddToLibrary from '@/mainWindow/components/icons/AddToLibrary.vue'
 import AddToQueue from '@/mainWindow/components/icons/AddToQueue.vue'
@@ -38,7 +38,7 @@ import ImageLoader from '@/utils/ui/mixins/ImageLoader'
 
 @Component({
   components: {
-    Record,
+    SongDefault,
     PlainPlay,
     AddToLibrary,
     AddToQueue

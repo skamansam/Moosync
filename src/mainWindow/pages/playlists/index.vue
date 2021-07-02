@@ -24,6 +24,10 @@
               :filled="true"
             />
           </template>
+
+          <template #defaultCover>
+            <PlaylistDefault />
+          </template>
         </CardView>
       </b-col>
     </b-row>
@@ -39,12 +43,14 @@ import ContextMenuMixin from '@/utils/ui/mixins/ContextMenuMixin'
 import { vxm } from '@/mainWindow/store'
 import SpotifyIcon from '@/mainWindow/components/icons/Spotify.vue'
 import YoutubeIcon from '@/mainWindow/components/icons/Youtube.vue'
+import PlaylistDefault from '@/mainWindow/components/icons/PlaylistDefault.vue'
 
 @Component({
   components: {
     CardView,
     SpotifyIcon,
-    YoutubeIcon
+    YoutubeIcon,
+    PlaylistDefault
   }
 })
 export default class Albums extends mixins(RouterPushes, ContextMenuMixin) {

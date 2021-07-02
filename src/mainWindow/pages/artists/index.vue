@@ -3,7 +3,9 @@
     <b-row class="title">Artists</b-row>
     <b-row class="d-flex">
       <b-col col xl="2" md="3" v-for="artist in artistList" :key="artist.artist_id">
-        <CardView :title="artist.artist_name" :imgSrc="artist.artist_coverPath" @click.native="gotoArtist(artist)" />
+        <CardView :title="artist.artist_name" :imgSrc="artist.artist_coverPath" @click.native="gotoArtist(artist)">
+          <template #defaultCover> <ArtistDefault /></template>
+        </CardView>
       </b-col>
     </b-row>
   </b-container>
@@ -14,10 +16,12 @@ import { Component } from 'vue-property-decorator'
 import CardView from '@/mainWindow/components/generic/CardView.vue'
 import { mixins } from 'vue-class-component'
 import RouterPushes from '@/utils/ui/mixins/RouterPushes'
+import ArtistDefault from '@/mainWindow/components/icons/ArtistDefault.vue'
 
 @Component({
   components: {
-    CardView
+    CardView,
+    ArtistDefault
   }
 })
 export default class Artists extends mixins(RouterPushes) {

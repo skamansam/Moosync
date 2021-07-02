@@ -9,7 +9,7 @@
       alt="cover art"
       @error="handleImageError"
     />
-    <Record v-if="!getImgSrc(imgSrc) || forceEmptyImg" class="coverimg" />
+    <SongDefault v-if="!getImgSrc(imgSrc) || forceEmptyImg" class="coverimg" />
     <div class="text-container">
       <div class="text song-title text-truncate">{{ title }}</div>
       <div class="text song-subtitle text-truncate">{{ artists ? artists.join(', ') : '-' }}</div>
@@ -21,12 +21,12 @@
 import Colors from '@/utils/ui/mixins/Colors'
 import { mixins } from 'vue-class-component'
 import { Component, Prop, Watch } from 'vue-property-decorator'
-import Record from '@/mainWindow/components/icons/Record.vue'
+import SongDefault from '@/mainWindow/components/icons/SongDefault.vue'
 import ImageLoader from '@/utils/ui/mixins/ImageLoader'
 
 @Component({
   components: {
-    Record
+    SongDefault
   }
 })
 export default class MusicBar extends mixins(Colors, ImageLoader) {

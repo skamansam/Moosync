@@ -4,7 +4,7 @@
       <b-col cols="7" align-self="center" class="no-gutters w-100">
         <div class="h-100">
           <b-img class="albumart w-100" v-if="getImgSrc(imgSrc)" :src="getImgSrc(imgSrc)" />
-          <Record class="albumart w-100" v-if="!getImgSrc(imgSrc)" />
+          <SongDefault class="albumart w-100" v-if="!getImgSrc(imgSrc)" />
         </div>
       </b-col>
       <b-col cols="5" align-self="center" class="queue-container d-flex no-gutters h-100">
@@ -33,7 +33,7 @@
 import Colors from '@/utils/ui/mixins/Colors'
 import { mixins } from 'vue-class-component'
 import { Component, Prop, Watch } from 'vue-property-decorator'
-import Record from '@/mainWindow/components/icons/Record.vue'
+import SongDefault from '@/mainWindow/components/icons/SongDefault.vue'
 import ImageLoader from '@/utils/ui/mixins/ImageLoader'
 import SingleSearchResult from '@/mainWindow/components/generic/SingleSearchResult.vue'
 import ModelHelper from '@/utils/ui/mixins/ModelHelper'
@@ -41,7 +41,7 @@ import { vxm } from '@/mainWindow/store'
 
 @Component({
   components: {
-    Record,
+    SongDefault,
     SingleSearchResult
   }
 })

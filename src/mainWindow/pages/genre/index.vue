@@ -1,6 +1,6 @@
 <template>
   <b-container fluid class="album-container">
-    <b-row class="title">genres</b-row>
+    <b-row class="title">Genres</b-row>
     <b-row class="d-flex">
       <b-col col xl="2" md="3" v-for="genre in genres" :key="genre.genre_id">
         <CardView :title="genre.genre_name" :imgSrc="genre.genre_coverPath" @click.native="gotoGenre(genre)" />

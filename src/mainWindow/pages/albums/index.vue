@@ -3,7 +3,11 @@
     <b-row class="title">Albums</b-row>
     <b-row class="d-flex">
       <b-col col xl="2" md="3" v-for="album in filteredAlbumList" :key="album.album_id">
-        <CardView :title="album.album_name" :imgSrc="album.album_coverPath" @click.native="gotoAlbum(album)" />
+        <CardView :title="album.album_name" :imgSrc="album.album_coverPath" @click.native="gotoAlbum(album)">
+          <template #defaultCover>
+            <AlbumDefault />
+          </template>
+        </CardView>
       </b-col>
     </b-row>
   </b-container>
@@ -14,10 +18,12 @@ import CardView from '@/mainWindow/components/generic/CardView.vue'
 import { mixins } from 'vue-class-component'
 import { Component } from 'vue-property-decorator'
 import RouterPushes from '@/utils/ui/mixins/RouterPushes'
+import AlbumDefault from '@/mainWindow/components/icons/AlbumDefault.vue'
 
 @Component({
   components: {
-    CardView
+    CardView,
+    AlbumDefault
   }
 })
 export default class Albums extends mixins(RouterPushes) {
