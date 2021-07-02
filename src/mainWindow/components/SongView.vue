@@ -6,10 +6,15 @@
           class="details-container"
           :currentTitle="currentSong ? currentSong.title : ''"
           :currentsubTitle="getAlbumName(currentSong)"
+          :currentSubSubTitle="defaultDetails.defaultSubSubtitle"
           :imgSrc="getImg(currentSong)"
           :defaultTitle="defaultDetails.defaultTitle"
           :defaultsubTitle="defaultDetails.defaultSubtitle"
           :defaultImgSrc="defaultDetails.defaultCover"
+          :buttonGroup="detailsButtonGroup"
+          @playAll="playAll"
+          @addToQueue="addToQueue"
+          @addToLibrary="addToLibrary"
         />
       </b-col>
     </b-row>
@@ -44,6 +49,9 @@ export default class AllSongs extends mixins(Colors, PlayerControls, ModelHelper
   @Prop({ default: () => [] })
   private songList!: Song[]
 
+  @Prop({ default: false })
+  private refreshKey!: boolean
+
   private currentSong: Song | null = null
 
   @Prop({
@@ -53,12 +61,34 @@ export default class AllSongs extends mixins(Colors, PlayerControls, ModelHelper
   })
   private defaultDetails!: SongDetailDefaults
 
+  @Prop({
+    default: () => {
+      return {
+        enableContainer: false,
+        enableLibraryStore: false
+      }
+    }
+  })
+  private detailsButtonGroup!: SongDetailButtons
+
   private updateCoverDetails(items: Song[]) {
     if (items) this.currentSong = items[items.length - 1]
   }
 
   private getSongContextMenu(event: Event, item: Song) {
     this.$emit('onRowContext', event, item)
+  }
+
+  private playAll() {
+    this.$emit('playAll')
+  }
+
+  private addToQueue() {
+    this.$emit('addToQueue')
+  }
+
+  private addToLibrary() {
+    this.$emit('addToLibrary')
   }
 }
 </script>

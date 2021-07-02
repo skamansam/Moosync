@@ -2,7 +2,7 @@
   <div class="d-flex h-100 w-100">
     <b-table
       ref="songListTable"
-      class="custom-table-container d-flex h-100"
+      class="custom-table-container"
       table-class="custom-table w-100"
       :items="songList"
       :fields="fields"
@@ -11,7 +11,7 @@
       selectable
       select-mode="range"
       primary-key="_id"
-      :key="test"
+      :key="refreshKey"
       @row-dblclicked="onRowDoubleClicked"
       @row-selected="onRowSelected"
       @row-contextmenu="onRowContext"
@@ -38,7 +38,9 @@ import Vue from 'vue/types/umd'
 
 @Component({})
 export default class SongList extends mixins(Colors) {
-  private test: boolean = false
+  @Prop({ default: false })
+  private refreshKey!: boolean
+
   private lastSelect: string = ''
   private resizer!: Resizer
   private selected: Song[] = []
@@ -58,7 +60,7 @@ export default class SongList extends mixins(Colors) {
 
   // Clear selection after table loses focus
   private clearSelection() {
-    this.songListTable.clearSelected()
+    this.songListTable?.clearSelected()
     this.onRowSelected([])
   }
 
@@ -106,7 +108,7 @@ export default class SongList extends mixins(Colors) {
 
   // For some reason table isn't rerendered on window size change through maximize and minimize functions
   private rerenderTable() {
-    this.test = !this.test
+    this.refreshKey = !this.refreshKey
   }
 }
 </script>
@@ -169,13 +171,15 @@ table.b-table > tfoot > tr > th[aria-sort="descending"]
   padding-right: 0px !important
 
 .custom-table-container
+  display: inline-block
   transition: color .3s ease
   color: rgba(0, 0, 0, 0)
   max-height: calc(100% - 15px) !important
   max-width: 100%
   overflow-x: hidden
-  overflow-y: auto
+  overflow-y: scroll
   margin-bottom: 0 !important
+  height: fit-content
 
 .custom-table-container > table
   max-width: 100%

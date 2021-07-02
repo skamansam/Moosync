@@ -1,6 +1,6 @@
 import { DBUtils } from './utils'
-import { v4 } from 'uuid'
 import { promises as fsP } from 'fs'
+import { v4 } from 'uuid'
 
 class SongDBInstance extends DBUtils {
   private getMetaCommon(
@@ -45,7 +45,7 @@ class SongDBInstance extends DBUtils {
   }
 
   public async removeSong(song_id: string) {
-    this.db.transaction((song_id: string) => {
+    this.db.transaction(async (song_id: string) => {
       // Selecting multiple times to also count occurrence
       const album_ids: { count: number, album: string } = this.db.queryFirstRow(
         'SELECT count(id) as count, album FROM album_bridge WHERE album = (SELECT album FROM album_bridge WHERE song = ?)',
@@ -62,18 +62,28 @@ class SongDBInstance extends DBUtils {
       this.db.delete('playlist_bridge', { song: song_id })
       this.db.delete('allsongs', { _id: song_id })
 
-      if (album_ids.count == 1) {
-        this.getAlbumByID(album_ids.album).then((album) => {
-          if (album!.album_coverPath) fsP.unlink(album!.album_coverPath)
-          this.db.delete('albums', { album_id: album_ids.album })
-        }).catch((err) => console.log(err))
+      try {
+        if (album_ids.count == 1) {
+          const album = await this.getAlbumByID(album_ids.album)
+          if (album?.album_coverPath) fsP.unlink(album.album_coverPath)
+        }
+
+      } catch (err) {
+        console.log(err)
       }
-      if (artist_ids.count == 1) {
-        this.getArtistsByID(artist_ids.artist).then((artist) => {
-          if (artist!.artist_coverPath) fsP.unlink(artist!.artist_coverPath)
-          this.db.delete('artists', { artist_id: artist_ids.artist })
-        }).catch((err) => console.log(err))
+
+      try {
+        if (artist_ids.count == 1) {
+          const artist = await this.getArtistsByID(artist_ids.artist)
+          if (artist?.artist_coverPath) fsP.unlink(artist.artist_coverPath)
+        }
+      } catch (err) {
+        console.log(err)
       }
+
+      this.db.delete('albums', { album_id: album_ids.album })
+      this.db.delete('artists', { artist_id: artist_ids.artist })
+
     })(song_id)
   }
 
@@ -167,6 +177,7 @@ class SongDBInstance extends DBUtils {
           album_id: id,
           album_name: album.album_name.trim(),
           album_coverPath: album.album_coverPath,
+          album_artist: album.album_artist,
           year: album.year,
         })
       }
@@ -323,7 +334,7 @@ class SongDBInstance extends DBUtils {
     return (this.db.queryFirstRow(
       `SELECT album_coverPath from albums WHERE album_id = (SELECT album FROM album_bridge WHERE song = (SELECT song FROM artists_bridge WHERE artist = ?))`,
       id
-    ) as marshaledSong).album_coverPath
+    ) as marshaledSong)?.album_coverPath
   }
 
   public updateSongCountArtists() {
@@ -379,7 +390,7 @@ class SongDBInstance extends DBUtils {
     this.db.transaction((songs: Song[]) => {
       for (const s of songs) {
         if (!coverExists) {
-          if (s.album && s.album.album_coverPath) {
+          if (s.album?.album_coverPath) {
             this.updatePlaylistCoverPath(playlist_id, s.album.album_coverPath)
           }
         }

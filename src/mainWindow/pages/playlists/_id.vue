@@ -8,7 +8,11 @@
     <SongView
       :defaultDetails="defaultDetails"
       :songList="songList"
+      :detailsButtonGroup="buttonGroups"
       @onRowContext="getSongMenu(arguments[0], arguments[1], undefined)"
+      @playAll="playPlaylist"
+      @addToQueue="addPlaylistToQueue"
+      @addToLibrary="addPlaylistToLibrary"
     />
   </div>
 </template>
@@ -20,6 +24,7 @@ import SongView from '@/mainWindow/components/SongView.vue'
 import { mixins } from 'vue-class-component'
 import ContextMenuMixin from '@/utils/ui/mixins/ContextMenuMixin'
 import { vxm } from '@/mainWindow/store'
+import { arrayDiff } from '@/utils/common'
 
 @Component({
   components: {
@@ -53,8 +58,16 @@ export default class SinglePlaylistView extends mixins(ContextMenuMixin) {
 
   private defaultDetails = {
     defaultTitle: this.playlist_name,
-    defaultSubtitle: this.playlist_song_count,
+    defaultSubtitle: `${this.playlist_song_count} Songs`,
+    defaultSubSubtitle: '',
     defaultCover: this.playlist_coverPath
+  }
+
+  get buttonGroups(): SongDetailButtons {
+    return {
+      enableContainer: true,
+      enableLibraryStore: true
+    }
   }
 
   private async fetchPlaylist() {
@@ -70,8 +83,24 @@ export default class SinglePlaylistView extends mixins(ContextMenuMixin) {
   private getSongMenu(event: Event, songs: Song[], exclude: string | undefined) {
     this.getContextMenu(event, {
       type: 'PLAYLIST_CONTENT',
-      args: { songs: songs, isRemote: this.isYoutubePlaylist === 'true' || this.isSpotifyPlaylist === 'true' }
+      args: {
+        songs: songs,
+        isRemote: this.isYoutubePlaylist === 'true' || this.isSpotifyPlaylist === 'true',
+        refreshCallback: () => (this.songList = arrayDiff(this.songList, songs))
+      }
     })
+  }
+
+  private playPlaylist() {
+    this.playTop(...this.songList)
+  }
+
+  private addPlaylistToQueue() {
+    this.queueSong(...this.songList)
+  }
+
+  private addPlaylistToLibrary() {
+    this.addSongsToLibrary(...this.songList)
   }
 }
 </script>

@@ -2,6 +2,7 @@ type ContextMenuArgs = {
   type: 'SONGS'
   args: {
     exclude: string | undefined
+    refreshCallback: () => void
     songs: Song[]
   }
 } | {
@@ -22,6 +23,7 @@ type ContextMenuArgs = {
   type: 'PLAYLIST_CONTENT',
   args: {
     isRemote: boolean,
+    refreshCallback: () => void
     songs: Song[]
   }
 }

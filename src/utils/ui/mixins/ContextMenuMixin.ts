@@ -2,13 +2,14 @@ import { Component } from 'vue-property-decorator'
 import { EventBus } from '@/utils/main/ipc/constants'
 import { MenuItem } from 'vue-context-menu-popup'
 import PlayerControls from '@/utils/ui/mixins/PlayerControls'
+import RemoteSong from '@/utils/ui/mixins/remoteSongMixin';
 import { bus } from '@/mainWindow/main'
 import { mixins } from 'vue-class-component'
 import { toSong } from '@/utils/models/youtube'
 import { vxm } from '@/mainWindow/store'
 
 @Component
-export default class ContextMenuMixin extends mixins(PlayerControls) {
+export default class ContextMenuMixin extends mixins(PlayerControls, RemoteSong) {
   get playlists() {
     return vxm.playlist.playlists
   }
@@ -40,7 +41,7 @@ export default class ContextMenuMixin extends mixins(PlayerControls) {
     return menu
   }
 
-  private getSongContextMenu(exclude: string | undefined, ...item: Song[]) {
+  private getSongContextMenu(exclude: string | undefined, refreshCallback: () => void, ...item: Song[]) {
     const items = [
       {
         label: 'Play Now',
@@ -53,6 +54,16 @@ export default class ContextMenuMixin extends mixins(PlayerControls) {
         handler: () => {
           this.queueSong(...item)
         },
+      },
+      {
+        label: 'Remove from Library',
+        handler: async () => {
+          try {
+            await window.DBUtils.removeSongs(item)
+          } catch (e) { console.log(e) }
+          console.log('calling refresh callback')
+          refreshCallback()
+        }
       },
       {
         label: 'Add To Playlist',
@@ -78,7 +89,7 @@ export default class ContextMenuMixin extends mixins(PlayerControls) {
       },
       {
         label: 'Add To Library',
-        handler: () => window.DBUtils.storeSongs(toSong(...item)),
+        handler: () => this.addYTItemsToLibrary(...item),
       },
       {
         label: 'Add To Playlist',
@@ -101,12 +112,12 @@ export default class ContextMenuMixin extends mixins(PlayerControls) {
     return items
   }
 
-  private getPlaylistContentContextMenu(isRemote: boolean, ...item: Song[]) {
-    const items = this.getSongContextMenu(undefined, ...item)
+  private getPlaylistContentContextMenu(isRemote: boolean, refreshCallback: () => void, ...item: Song[]) {
+    const items = this.getSongContextMenu(undefined, refreshCallback, ...item)
     if (isRemote) {
       items.push({
         label: 'Add Song to Library',
-        handler: () => window.DBUtils.storeSongs(item),
+        handler: () => this.addSongsToLibrary(...item),
       })
     }
     return items
@@ -128,7 +139,7 @@ export default class ContextMenuMixin extends mixins(PlayerControls) {
     let items: { label: string, handler?: () => void }[] = []
     switch (options.type) {
       case 'SONGS':
-        items = this.getSongContextMenu(options.args.exclude, ...options.args.songs)
+        items = this.getSongContextMenu(options.args.exclude, options.args.refreshCallback, ...options.args.songs)
         break
       case 'YOUTUBE':
         items = this.getYoutubeContextMenu(...options.args.ytItems)
@@ -140,7 +151,7 @@ export default class ContextMenuMixin extends mixins(PlayerControls) {
         items = this.getGeneralPlaylistMenu()
         break
       case 'PLAYLIST_CONTENT':
-        items = this.getPlaylistContentContextMenu(options.args.isRemote, ...options.args.songs)
+        items = this.getPlaylistContentContextMenu(options.args.isRemote, options.args.refreshCallback, ...options.args.songs)
         break
     }
     this.emitMenu(event, items)

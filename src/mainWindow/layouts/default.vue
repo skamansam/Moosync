@@ -43,15 +43,15 @@ export default class DefaultLayout extends mixins(ContextMenuMixin) {
 <style lang="sass" scoped>
 .musicbar
   position: fixed
-  z-index: -1
+  z-index: 4
 
 .sidebar
   position: relative
-  z-index: -2
+  z-index: 3
 
 .topbar
   position: fixed
-  z-index: -3
+  z-index: 2
   left: calc(70px + 30px + 7.5px)
   width: calc(100% - 70px - 30px - 7.5px)
   transition: 0.2s
@@ -66,10 +66,11 @@ export default class DefaultLayout extends mixins(ContextMenuMixin) {
   right: 0
   bottom: calc(6rem + 30px)
   height: calc(100% - (6rem + 30px) - 70px)
-  overflow-y: scroll
+  overflow-y: auto
   overflow-x: hidden
-  z-index: -4
+  z-index: 1
   transition: 0.2s
+  padding-right: 20px
   &.is-open
     left: calc(261px + 30px)
     height: calc(100% - (6rem + 30px) - 70px + 16px)

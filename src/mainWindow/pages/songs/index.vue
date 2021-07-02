@@ -11,6 +11,7 @@ import SongView from '@/mainWindow/components/SongView.vue'
 import { mixins } from 'vue-class-component'
 import ContextMenuMixin from '@/utils/ui/mixins/ContextMenuMixin'
 import { vxm } from '@/mainWindow/store'
+import { arrayDiff } from '@/utils/common'
 
 @Component({
   components: {
@@ -34,7 +35,14 @@ export default class AllSongs extends mixins(ContextMenuMixin) {
   }
 
   private getSongMenu(event: Event, songs: Song[], exclude: string | undefined) {
-    this.getContextMenu(event, { type: 'SONGS', args: { songs: songs, exclude: exclude } })
+    this.getContextMenu(event, {
+      type: 'SONGS',
+      args: {
+        songs: songs,
+        exclude: exclude,
+        refreshCallback: () => (this.songList = arrayDiff(this.songList, songs))
+      }
+    })
   }
 }
 </script>

@@ -8,7 +8,10 @@
     <SongView
       :defaultDetails="defaultDetails"
       :songList="songList"
+      :detailsButtonGroup="buttonGroups"
       @onRowContext="getSongMenu(arguments[0], arguments[1], undefined)"
+      @playAll="playArtist"
+      @addToQueue="addArtistToQueue"
     />
   </div>
 </template>
@@ -19,6 +22,7 @@ import SongView from '@/mainWindow/components/SongView.vue'
 
 import { mixins } from 'vue-class-component'
 import ContextMenuMixin from '@/utils/ui/mixins/ContextMenuMixin'
+import { arrayDiff } from '@/utils/common'
 
 @Component({
   components: {
@@ -46,8 +50,16 @@ export default class SingleAlbumView extends mixins(ContextMenuMixin) {
 
   private defaultDetails: SongDetailDefaults = {
     defaultTitle: this.genre_name,
-    defaultSubtitle: this.genre_song_count,
+    defaultSubtitle: `${this.genre_song_count} Songs`,
+    defaultSubSubtitle: '',
     defaultCover: this.genre_coverPath
+  }
+
+  get buttonGroups(): SongDetailButtons {
+    return {
+      enableContainer: true,
+      enableLibraryStore: false
+    }
   }
 
   private async fetchgenre() {
@@ -55,7 +67,14 @@ export default class SingleAlbumView extends mixins(ContextMenuMixin) {
   }
 
   private getSongMenu(event: Event, songs: Song[], exclude: string | undefined) {
-    this.getContextMenu(event, { type: 'SONGS', args: { songs: songs, exclude: exclude } })
+    this.getContextMenu(event, {
+      type: 'SONGS',
+      args: {
+        songs: songs,
+        exclude: exclude,
+        refreshCallback: () => (this.songList = arrayDiff(this.songList, songs))
+      }
+    })
   }
 }
 </script>

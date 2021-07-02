@@ -1,10 +1,11 @@
 import { AuthFlow, AuthStateEmitter } from '@/utils/ui/oauth/flow'
-import { once } from 'events'
-import moment from 'moment'
-import qs from 'qs'
-import axios from 'axios';
+
 import { GenericProvider } from '@/utils/ui/providers/genericProvider';
+import axios from 'axios';
 import { cache } from '@/utils/ui/providers/genericProvider';
+import moment from 'moment'
+import { once } from 'events'
+import qs from 'qs'
 
 const BASE_URL = 'https://youtube.googleapis.com/youtube/v3/'
 
@@ -147,6 +148,7 @@ export class YoutubeProvider extends GenericProvider {
           title: v.snippet.title,
           artists: [v.snippet.channelTitle],
           album: {
+            album_name: 'Misc',
             album_coverPath: (v.snippet.thumbnails.maxres ?? v.snippet.thumbnails.high ?? v.snippet.thumbnails.default).url
           },
           date: new Date(v.snippet.publishedAt).toISOString().slice(0, 10),

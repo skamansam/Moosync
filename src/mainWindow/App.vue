@@ -2,7 +2,7 @@
   <div id="app">
     <ContextMenu />
     <Titlebar />
-    <div>
+    <div class="appContainer">
       <router-view></router-view>
     </div>
     <NewPlaylistModal :id="'NewPlaylistModal'" />
@@ -101,5 +101,12 @@ export default class App extends mixins(ThemeHandler) {
 body {
   background-color: var(--primary) !important;
   color: var(--textPrimary) !important;
+  width: 100vw;
+  height: 100vh;
+}
+
+.appContainer {
+  width: 100%;
+  height: 100%;
 }
 </style>

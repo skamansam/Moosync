@@ -1,18 +1,19 @@
-import { contextBridge, ipcRenderer } from 'electron'
-import { IpcRendererHolder } from '@/utils/preload/ipc/index'
 import {
-  WindowEvents,
-  IpcEvents,
   AlbumEvents,
   ArtistEvents,
   GenreEvents,
+  IpcEvents,
   PlaylistEvents,
   PreferenceEvents,
   ScannerEvents,
   SearchEvents,
-  SongEvents,
   ServiceProviderEvents,
+  SongEvents,
+  WindowEvents,
 } from '@/utils/main/ipc/constants'
+import { contextBridge, ipcRenderer } from 'electron'
+
+import { IpcRendererHolder } from '@/utils/preload/ipc/index'
 import { StoreEvents } from '@/utils/main/ipc/constants'
 
 const ipcRendererHolder = new IpcRendererHolder(ipcRenderer)
@@ -44,7 +45,7 @@ contextBridge.exposeInMainWorld('DBUtils', {
   getAllSongs: () => ipcRendererHolder.send(IpcEvents.SONG, { type: SongEvents.GET_ALL_SONGS }),
   storeSongs: (songs: Song[]) =>
     ipcRendererHolder.send(IpcEvents.SONG, { type: SongEvents.STORE_SONG, params: { songs: songs } }),
-  removeSong: (songs: Song[]) =>
+  removeSongs: (songs: Song[]) =>
     ipcRendererHolder.send(IpcEvents.SONG, { type: SongEvents.REMOVE_SONG, params: { songs: songs } }),
 })
 

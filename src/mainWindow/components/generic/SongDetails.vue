@@ -13,6 +13,13 @@
       <b-col class="text-container text-truncate">
         <div class="title text-truncate">{{ currentTitle ? currentTitle : defaultTitle }}</div>
         <div class="subtitle text-truncate">{{ currentsubTitle ? currentsubTitle : defaultsubTitle }}</div>
+        <div class="subtitle text-truncate">{{ currentSubSubTitle ? currentSubSubTitle : '' }}</div>
+
+        <div v-if="buttonGroup.enableContainer" class="button-group d-flex">
+          <PlainPlay @click.native="playAll" />
+          <AddToQueue @click.native="addToQueue" />
+          <AddToLibrary @click.native="addToLibrary" v-if="buttonGroup.enableLibraryStore" />
+        </div>
       </b-col>
     </b-row>
   </b-container>
@@ -23,11 +30,18 @@ import Colors from '@/utils/ui/mixins/Colors'
 import { mixins } from 'vue-class-component'
 import { Component, Prop, Watch } from 'vue-property-decorator'
 import Record from '@/mainWindow/components/icons/Record.vue'
+import PlainPlay from '@/mainWindow/components/icons/PlainPlay.vue'
+import AddToLibrary from '@/mainWindow/components/icons/AddToLibrary.vue'
+import AddToQueue from '@/mainWindow/components/icons/AddToQueue.vue'
+
 import ImageLoader from '@/utils/ui/mixins/ImageLoader'
 
 @Component({
   components: {
-    Record
+    Record,
+    PlainPlay,
+    AddToLibrary,
+    AddToQueue
   }
 })
 export default class SongDetails extends mixins(Colors, ImageLoader) {
@@ -36,6 +50,9 @@ export default class SongDetails extends mixins(Colors, ImageLoader) {
 
   @Prop({ default: '' })
   private currentsubTitle!: string
+
+  @Prop({ default: '' })
+  private currentSubSubTitle!: string
 
   @Prop({ default: '' })
   private imgSrc!: string
@@ -49,6 +66,16 @@ export default class SongDetails extends mixins(Colors, ImageLoader) {
   @Prop({ default: '' })
   private defaultImgSrc!: string
 
+  @Prop({
+    default: () => {
+      return {
+        enableContainer: false,
+        enableLibraryStore: false
+      }
+    }
+  })
+  private buttonGroup!: SongDetailButtons
+
   private handleImageError() {
     this.forceEmptyImg = true
   }
@@ -58,6 +85,18 @@ export default class SongDetails extends mixins(Colors, ImageLoader) {
   }
 
   public forceEmptyImg: boolean = false
+
+  private playAll() {
+    this.$emit('playAll')
+  }
+
+  private addToQueue() {
+    this.$emit('addToQueue')
+  }
+
+  private addToLibrary() {
+    this.$emit('addToLibrary')
+  }
 }
 </script>
 
@@ -96,4 +135,10 @@ export default class SongDetails extends mixins(Colors, ImageLoader) {
   font-weight: 250
   text-align: left
   font-size: 14px
+
+.button-group
+  position: absolute
+  bottom: 0
+  svg
+    margin-right: 16px
 </style>
