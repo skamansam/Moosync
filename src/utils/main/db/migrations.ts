@@ -139,5 +139,13 @@ export const migrations = [
   ALTER TABLE playlists ADD playlist_desc TEXT;
 
   -- Down
+  `,
+
+  // 02-07-2021
+  `
+  -- Up
+  ALTER TABLE allsongs ADD song_coverPath TEXT
+
+  -- Down
   `
 ]

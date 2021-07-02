@@ -147,9 +147,9 @@ export class YoutubeProvider extends GenericProvider {
           _id: v.id,
           title: v.snippet.title,
           artists: [v.snippet.channelTitle],
+          song_coverPath: (v.snippet.thumbnails.maxres ?? v.snippet.thumbnails.high ?? v.snippet.thumbnails.default).url,
           album: {
             album_name: 'Misc',
-            album_coverPath: (v.snippet.thumbnails.maxres ?? v.snippet.thumbnails.high ?? v.snippet.thumbnails.default).url
           },
           date: new Date(v.snippet.publishedAt).toISOString().slice(0, 10),
           duration: moment.duration(v.contentDetails.duration).asSeconds(),

@@ -131,6 +131,10 @@ class SongDBInstance extends DBUtils {
     return this.db.query(`SELECT path, inode, deviceno FROM allsongs WHERE _id = ?`, id)
   }
 
+  public async updateSongCover(id: string, coverPath: string): Promise<void> {
+    this.db.update('allsongs', { song_coverPath: coverPath }, ['_id = ?', id])
+  }
+
   /* ============================= 
                 ALBUMS
      ============================= */

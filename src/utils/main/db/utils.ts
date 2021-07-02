@@ -27,6 +27,7 @@ export class DBUtils {
       path: dbSong.path,
       size: dbSong.size,
       title: dbSong.title,
+      song_coverPath: dbSong.song_coverPath,
       album: {
         album_id: dbSong.album_id,
         album_name: dbSong.album_name,
@@ -59,6 +60,7 @@ export class DBUtils {
       path: song.path,
       size: song.size,
       title: song.title,
+      song_coverPath: song.song_coverPath,
       date: song.date,
       year: song.year,
       lyrics: song.lyrics,

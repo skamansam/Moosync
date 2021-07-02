@@ -2,8 +2,8 @@ import { Component, Vue } from 'vue-property-decorator'
 
 @Component
 export default class ModelHelper extends Vue {
-  public isAlbumCoverExists(song: Song | null) {
-    return song && song.album && song.album.album_coverPath
+  public isCoverExists(song: Song | null) {
+    return song && (song.song_coverPath || (song.album && song.album.album_coverPath))
   }
 
   public isAlbumExists(song: Song | null) {
@@ -14,8 +14,10 @@ export default class ModelHelper extends Vue {
     return song && song.artists
   }
 
-  public getImg(song: Song | null): String {
-    return this.isAlbumExists(song) && song!.album!.album_coverPath ? song!.album!.album_coverPath : ''
+  public getImg(song: Song | null): string | undefined | null {
+    if (song)
+      return song.song_coverPath ?? (this.isAlbumExists(song) && song!.album!.album_coverPath)
+    return ''
   }
 
   public getAlbumName(song: Song | null): String {

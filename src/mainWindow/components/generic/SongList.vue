@@ -38,8 +38,7 @@ import Vue from 'vue/types/umd'
 
 @Component({})
 export default class SongList extends mixins(Colors) {
-  @Prop({ default: false })
-  private refreshKey!: boolean
+  private refreshKey: boolean = false
 
   private lastSelect: string = ''
   private resizer!: Resizer

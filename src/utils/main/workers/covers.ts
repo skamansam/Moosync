@@ -1,10 +1,11 @@
+import * as mm from 'music-metadata'
+
 import Jimp from 'jimp'
 import { expose } from 'threads'
-import * as mm from 'music-metadata'
 
 expose({
   async writeCover(songPath: string, coverPath: string) {
-    await writeBuffer(songPath, coverPath)
+    return writeBuffer(songPath, coverPath)
   },
 })
 

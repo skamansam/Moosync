@@ -43,6 +43,7 @@ interface Song {
   path?: string
   size?: number
   title: string
+  song_coverPath?: string
   album?: Album
   artists?: string[]
   date?: string
@@ -67,6 +68,7 @@ interface marshaledSong {
   path?: string
   size?: number
   title: string
+  song_coverPath?: string
   album_id?: string
   album_name?: string
   album_coverPath?: string

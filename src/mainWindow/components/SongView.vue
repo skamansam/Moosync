@@ -49,9 +49,6 @@ export default class AllSongs extends mixins(Colors, PlayerControls, ModelHelper
   @Prop({ default: () => [] })
   private songList!: Song[]
 
-  @Prop({ default: false })
-  private refreshKey!: boolean
-
   private currentSong: Song | null = null
 
   @Prop({

@@ -1,13 +1,12 @@
 import { IpcEvents, ScannerEvents } from './constants'
+import { IpcMainEvent, app } from 'electron'
+import { Worker, spawn } from 'threads'
 
-import { app, IpcMainEvent } from 'electron'
-import { spawn, Worker } from 'threads'
-import { loadPreferences } from '@/utils/main/db/preferences'
-import { SongDB } from '@/utils/main/db/index'
-import path from 'path'
 import { ObservablePromise } from 'threads/dist/observable-promise'
-
+import { SongDB } from '@/utils/main/db/index'
 import fs from 'fs'
+import { loadPreferences } from '@/utils/main/db/preferences'
+import path from 'path'
 
 enum scanning {
   UNDEFINED,
@@ -86,11 +85,14 @@ export class ScannerChannel implements IpcChannelInterface {
     const songs = await SongDB.getAllSongs()
     const thumbPath = (await loadPreferences()).thumbnailPath
     for (const s of songs) {
+      const coverPath = path.join(thumbPath, s._id! + '.jpg')
+      await cover(s.path!, coverPath)
+      await SongDB.updateSongCover(s._id!, coverPath)
+
       if (s.album && s.album.album_name) {
         const existingAlbum = await SongDB.getAlbumByName(s.album.album_name)
         if (!existingAlbum!.album_coverPath) {
-          const coverPath = path.join(thumbPath, existingAlbum!.album_id + '.jpg')
-          cover(s.path!, coverPath)
+
           await SongDB.updateAlbum({ album_id: existingAlbum!.album_id, album_coverPath: coverPath })
         }
       }
