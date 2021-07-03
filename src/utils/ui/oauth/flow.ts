@@ -14,32 +14,32 @@
  * the License.
  */
 
-import { AuthorizationRequest } from "@openid/appauth/built/authorization_request"
 import {
   AuthorizationNotifier,
   AuthorizationRequestHandler
 } from "@openid/appauth/built/authorization_request_handler"
-import { AuthorizationServiceConfiguration } from "@openid/appauth/built/authorization_service_configuration"
-import {
-  GRANT_TYPE_AUTHORIZATION_CODE,
-  GRANT_TYPE_REFRESH_TOKEN,
-  TokenRequest
-} from "@openid/appauth/built/token_request"
 import {
   BaseTokenRequestHandler,
   TokenRequestHandler
 } from "@openid/appauth/built/token_request_handler"
 import {
-  TokenResponse
-} from "@openid/appauth/built/token_response"
-import EventEmitter from 'events'
+  GRANT_TYPE_AUTHORIZATION_CODE,
+  GRANT_TYPE_REFRESH_TOKEN,
+  TokenRequest
+} from "@openid/appauth/built/token_request"
 
-import { StringMap } from "@openid/appauth/built/types"
+import { AppAuthError } from '@openid/appauth';
 import { AuthFlowRequestHandler } from './AuthFlowRequestHandler'
-import { WebCrypto } from "./crypto_utils"
+import { AuthorizationRequest } from "@openid/appauth/built/authorization_request"
+import { AuthorizationServiceConfiguration } from "@openid/appauth/built/authorization_service_configuration"
+import EventEmitter from 'events'
 import { NodeRequestor } from '@openid/appauth/built/node_support/node_requestor'
 import { SpotifyTokenRequestHandler } from './tokenHandler';
-import { AppAuthError } from '@openid/appauth';
+import { StringMap } from "@openid/appauth/built/types"
+import {
+  TokenResponse
+} from "@openid/appauth/built/token_response"
+import { WebCrypto } from "./crypto_utils"
 
 export class AuthStateEmitter extends EventEmitter {
   static ON_TOKEN_RESPONSE = "on_token_response"
@@ -206,7 +206,7 @@ export class AuthFlow {
       this.accessTokenResponse = response
       this.storeRefreshToken()
     } catch (err) {
-      console.log(err)
+      console.error(err)
       this.signOut()
     }
   }
@@ -252,7 +252,7 @@ export class AuthFlow {
       this.accessTokenResponse = response
       return response.accessToken
     } catch (err) {
-      console.log(err)
+      console.error(err)
       this.signOut()
     }
   }

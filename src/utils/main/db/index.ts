@@ -69,7 +69,7 @@ class SongDBInstance extends DBUtils {
         }
 
       } catch (err) {
-        console.log(err)
+        console.error(err)
       }
 
       try {
@@ -78,7 +78,7 @@ class SongDBInstance extends DBUtils {
           if (artist?.artist_coverPath) fsP.unlink(artist.artist_coverPath)
         }
       } catch (err) {
-        console.log(err)
+        console.error(err)
       }
 
       this.db.delete('albums', { album_id: album_ids.album })

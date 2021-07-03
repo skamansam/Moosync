@@ -3,8 +3,8 @@ import { getDisabledPaths, loadPreferences } from '@/utils/main/db/preferences'
 
 import { SongDB } from '@/utils/main/db'
 import { app } from 'electron'
-import path from 'path'
 import fs from 'fs'
+import path from 'path'
 import { v4 } from 'uuid'
 
 export class PlaylistsChannel implements IpcChannelInterface {
@@ -39,7 +39,7 @@ export class PlaylistsChannel implements IpcChannelInterface {
         .then((data) => {
           event.reply(request.responseChannel, data)
         })
-        .catch((e) => console.log(e))
+        .catch((e) => console.error(e))
     }
   }
 
@@ -48,7 +48,7 @@ export class PlaylistsChannel implements IpcChannelInterface {
       .then((data) => {
         event.reply(request.responseChannel, data)
       })
-      .catch((e) => console.log(e))
+      .catch((e) => console.error(e))
   }
 
   private createPlaylist(event: Electron.IpcMainEvent, request: IpcRequest) {
@@ -56,14 +56,14 @@ export class PlaylistsChannel implements IpcChannelInterface {
       .then((data) => {
         event.reply(request.responseChannel, data)
       })
-      .catch((e) => console.log(e))
+      .catch((e) => console.error(e))
   }
   private addToPlaylist(event: Electron.IpcMainEvent, request: IpcRequest) {
     SongDB.addToPlaylist(request.params.playlist_id, ...request.params.song_ids)
       .then((data) => {
         event.reply(request.responseChannel, data)
       })
-      .catch((e) => console.log(e))
+      .catch((e) => console.error(e))
   }
 
   private async saveCoverToFile(event: Electron.IpcMainEvent, request: IpcRequest) {

@@ -47,7 +47,6 @@ export default class SyncMixin extends mixins(ModelHelper) {
 
   private async checkAudio(event: Song) {
     const isAudioExists = await window.FileUtils.isAudioExists(event._id!)
-    console.log(event)
     if (isAudioExists) {
       if (vxm.sync.isReadyRequested) this.peerHolder.emitReady()
       this.setSongSrcCallback('media://' + isAudioExists)

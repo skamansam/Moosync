@@ -1,12 +1,13 @@
+import { Observable, SubscriptionObserver } from 'observable-fns'
+
+import Jimp from 'jimp'
 import axios from 'axios'
 import axiosRetry from 'axios-retry'
 import { createHash } from 'crypto'
+import { expose } from 'threads'
 import path from 'path'
 import rateLimit from 'axios-rate-limit'
 import { v4 } from 'uuid'
-import Jimp from 'jimp'
-import { expose } from 'threads'
-import { Observable, SubscriptionObserver } from 'observable-fns'
 
 expose({
   fetchMBID(artists: artists[]) {
@@ -80,7 +81,7 @@ async function fetchImagesRemote(a: artists, coverPath: string) {
       const url = await fetchFanartTv(a.artist_mbid)
       if (url) return downloadImage(url, coverPath)
     } catch (e) {
-      console.log('Fanart.tv not found')
+      console.info(`Fanart.tv not found for ${a.artist_name}`)
     }
   }
   if (a.artist_name) {
@@ -102,7 +103,7 @@ async function fetchTheAudioDB(artist_name: string) {
       }
     }
   } catch (e) {
-    console.log(e)
+    console.error(e)
   }
 }
 
@@ -173,6 +174,6 @@ async function writeBuffer(data: Buffer, path: string) {
     const jimp = await Jimp.read(data)
     jimp.cover(800, 800).quality(80).writeAsync(path)
   } catch (e) {
-    console.log(e)
+    console.error(e)
   }
 }

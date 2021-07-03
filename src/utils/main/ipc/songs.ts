@@ -1,10 +1,10 @@
 import { IpcEvents, SongEvents } from './constants'
+import { getDisabledPaths, loadPreferences } from '@/utils/main/db/preferences'
 
 import { SongDB } from '../db'
-import { getDisabledPaths, loadPreferences } from '@/utils/main/db/preferences'
+import { app } from 'electron'
 import fs from 'fs'
 import path from 'path'
-import { app } from 'electron'
 
 export class SongsChannel implements IpcChannelInterface {
   name = IpcEvents.SONG
@@ -38,7 +38,7 @@ export class SongsChannel implements IpcChannelInterface {
     const preferences = await loadPreferences()
     SongDB.getAllSongs(getDisabledPaths(preferences.musicPaths))
       .then((data) => event.reply(request.responseChannel, data))
-      .catch((e) => console.log(e))
+      .catch((e) => console.error(e))
   }
 
   private removeSongs(event: Electron.IpcMainEvent, request: IpcRequest) {
@@ -53,7 +53,7 @@ export class SongsChannel implements IpcChannelInterface {
       .then((data) => {
         event.reply(request.responseChannel, data)
       })
-      .catch((e) => console.log(e))
+      .catch((e) => console.error(e))
   }
 
   private storeSongs(event: Electron.IpcMainEvent, request: IpcRequest) {
@@ -68,7 +68,7 @@ export class SongsChannel implements IpcChannelInterface {
       .then((data) => {
         event.reply(request.responseChannel, data)
       })
-      .catch((e) => console.log(e))
+      .catch((e) => console.error(e))
   }
 
   private saveAudioToFile(event: Electron.IpcMainEvent, request: IpcRequest) {

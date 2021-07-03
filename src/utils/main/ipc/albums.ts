@@ -22,7 +22,7 @@ export class AlbumsChannel implements IpcChannelInterface {
       .then((data) => {
         event.reply(request.responseChannel, data)
       })
-      .catch((e) => console.log(e))
+      .catch((e) => console.error(e))
   }
 
   private async getSingleAlbum(event: Electron.IpcMainEvent, request: IpcRequest) {
@@ -32,7 +32,7 @@ export class AlbumsChannel implements IpcChannelInterface {
         .then((data) => {
           event.reply(request.responseChannel, data)
         })
-        .catch((e) => console.log(e))
+        .catch((e) => console.error(e))
     }
   }
 }

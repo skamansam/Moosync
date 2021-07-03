@@ -72,6 +72,11 @@ interface windowUtils {
   deregisterOAuthCallback: () => void
 }
 
+interface loggerUtils {
+  info: (message: any) => Promise<void>
+  error: (message: any) => Promise<void>
+}
+
 declare global {
   interface Window {
     DBUtils: DBUtils
@@ -81,5 +86,6 @@ declare global {
     WindowUtils: windowUtils
     ProviderUtils: providerUtils
     Store: store
+    LoggerUtils: loggerUtils
   }
 }

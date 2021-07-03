@@ -27,7 +27,7 @@ export class SearchChannel implements IpcChannelInterface {
         .then((data) => {
           event.reply(request.responseChannel, data)
         })
-        .catch((e) => console.log(e))
+        .catch((e) => console.error(e))
     }
   }
 
@@ -36,7 +36,7 @@ export class SearchChannel implements IpcChannelInterface {
       ytScraper
         .searchTerm(request.params.searchTerm)
         .then((data) => event.reply(request.responseChannel, data))
-        .catch((e) => console.log(e))
+        .catch((e) => console.error(e))
     }
   }
 
@@ -45,7 +45,7 @@ export class SearchChannel implements IpcChannelInterface {
       const preferences = await loadPreferences()
       SongDB.searchSongsCompact(request.params.searchTerm, getDisabledPaths(preferences.musicPaths))
         .then((data) => event.reply(request.responseChannel, data))
-        .catch((e) => console.log(e))
+        .catch((e) => console.error(e))
     }
   }
 }

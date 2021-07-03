@@ -60,8 +60,7 @@ export default class ContextMenuMixin extends mixins(PlayerControls, RemoteSong)
         handler: async () => {
           try {
             await window.DBUtils.removeSongs(item)
-          } catch (e) { console.log(e) }
-          console.log('calling refresh callback')
+          } catch (e) { console.error(e) }
           refreshCallback()
         }
       },

@@ -79,7 +79,7 @@ export default class MusicBar extends mixins(Colors, ModelHelper) {
   private sliderPosition: boolean = false
 
   private errorHandler(e: Event) {
-    console.log(e)
+    console.error(e)
   }
 
   private updateTimestmp(value: number) {

@@ -1,7 +1,7 @@
 import { IpcEvents, ScannerEvents } from './constants'
-import { IpcMainEvent, app } from 'electron'
 import { Worker, spawn } from 'threads'
 
+import { IpcMainEvent } from 'electron'
 import { ObservablePromise } from 'threads/dist/observable-promise'
 import { SongDB } from '@/utils/main/db/index'
 import fs from 'fs'
@@ -21,7 +21,7 @@ export class ScannerChannel implements IpcChannelInterface {
     switch (request.type) {
       case ScannerEvents.SCAN_MUSIC:
         if (this.scanStatus == scanning.SCANNING || this.scanStatus == scanning.QUEUED) {
-          console.log('scan queued')
+          console.info('scan queued')
           this.scanStatus = scanning.QUEUED
           return
         }
@@ -147,7 +147,7 @@ export class ScannerChannel implements IpcChannelInterface {
     event.reply(request.responseChannel, 'done')
 
     if (this.scanStatus == scanning.QUEUED) {
-      console.log('scannign again')
+      console.info('scanning again')
       this.scanAll(event, request)
     }
 
@@ -155,6 +155,6 @@ export class ScannerChannel implements IpcChannelInterface {
   }
 
   private ScanSongs(event: IpcMainEvent, request: IpcRequest) {
-    this.scanAll(event, request).catch((err) => console.log(err))
+    this.scanAll(event, request).catch((err) => console.error(err))
   }
 }

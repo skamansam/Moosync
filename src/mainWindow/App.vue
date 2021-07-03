@@ -32,10 +32,16 @@ const stun = require('stun')
   }
 })
 export default class App extends mixins(ThemeHandler) {
+  created() {
+    this.registerLogger()
+  }
+
   mounted() {
     this.watchPlaylistUpdates()
     this.populatePlaylists()
     this.registerDevTools()
+
+    console.info('test message from renderer')
 
     // this.testStun()
   }
@@ -77,6 +83,21 @@ export default class App extends mixins(ThemeHandler) {
       playlists[p.playlist_id] = p.playlist_name
     }
     vxm.playlist.playlists = playlists
+  }
+
+  private registerLogger() {
+    const preservedConsoleInfo = console.info
+    const preservedConsoleError = console.error
+
+    console.info = (...args: any[]) => {
+      preservedConsoleInfo.apply(console, args)
+      window.LoggerUtils.info(args)
+    }
+
+    console.error = (...args: any[]) => {
+      preservedConsoleError.apply(console, args)
+      window.LoggerUtils.error(args)
+    }
   }
 }
 </script>

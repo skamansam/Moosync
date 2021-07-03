@@ -111,7 +111,7 @@ export default class TopBar extends mixins(Colors) {
           this.loggedInSpotify = true
         }
       })
-      .catch((err) => console.log(err))
+      .catch((err) => console.error(err))
   }
 
   private handleYoutubeClick() {
@@ -131,7 +131,7 @@ export default class TopBar extends mixins(Colors) {
           this.loggedInYoutube = true
         }
       })
-      .catch((err) => console.log(err))
+      .catch((err) => console.error(err))
   }
 
   private async loginYoutube() {

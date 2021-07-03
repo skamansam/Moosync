@@ -22,7 +22,7 @@ export class ArtistsChannel implements IpcChannelInterface {
       .then((data) => {
         event.reply(request.responseChannel, data)
       })
-      .catch((e) => console.log(e))
+      .catch((e) => console.error(e))
   }
 
   private async getArtist(event: Electron.IpcMainEvent, request: IpcRequest) {
@@ -32,7 +32,7 @@ export class ArtistsChannel implements IpcChannelInterface {
         .then((data) => {
           event.reply(request.responseChannel, data)
         })
-        .catch((e) => console.log(e))
+        .catch((e) => console.error(e))
     }
   }
 }

@@ -1,15 +1,19 @@
 'use strict'
 
+import 'threads/register'
+
 import { BrowserWindow, Menu, Tray, app, nativeTheme, protocol, session } from 'electron'
 import installExtension, { VUEJS_DEVTOOLS } from 'electron-devtools-installer'
+import path, { resolve } from 'path'
 
+import EventEmitter from 'events'
+import { OAuthHandler } from '@/utils/main/oauth/handler'
 import { createProtocol } from 'vue-cli-plugin-electron-builder/lib'
 import { loadPreferences } from '@/utils/main/db/preferences'
-import path, { resolve } from 'path'
+import { logger } from './utils/main/logger/index';
 import { registerIpcChannels } from '@/utils/main/ipc' // Import for side effects
-import 'threads/register'
-import { OAuthHandler } from '@/utils/main/oauth/handler'
-import EventEmitter from 'events'
+
+overrideConsole()
 
 const isDevelopment = process.env.NODE_ENV !== 'production'
 export let mainWindow: BrowserWindow
@@ -49,7 +53,7 @@ function interceptHttp() {
       try {
         callback(filePath)
       } catch (e) {
-        console.log(e)
+        console.error(e)
       }
     })
   }
@@ -187,7 +191,7 @@ app.on('ready', async () => {
     try {
       await installExtension(VUEJS_DEVTOOLS)
     } catch (e) {
-      console.error('Vue Devtools failed to install:', e.toString())
+      console.error('Vue Devtools failed to install:', e)
     }
   }
   const protocolName = 'media'
@@ -259,3 +263,20 @@ app.on('second-instance', (event, argv) => {
     }
   }
 })
+
+function overrideConsole() {
+  const preservedConsoleInfo = console.info;
+  const preservedConsoleError = console.error;
+
+  console.info = (...args: any[]) => {
+    if (process.env.NODE_ENV !== 'production')
+      preservedConsoleInfo.apply(console, args);
+    logger.info(args.toString(), { label: 'Main' })
+  }
+
+  console.error = (...args: any[]) => {
+    if (process.env.NODE_ENV !== 'production')
+      preservedConsoleError.apply(console, args);
+    logger.error(args.toString(), { label: 'Main' })
+  }
+}

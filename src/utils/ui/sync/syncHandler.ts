@@ -174,7 +174,7 @@ export class SyncHolder {
   private handleSocketError() {
     // TODO: Display failure on UI
     this.socketConnection.on('connect_error', (error: Error) => {
-      console.log(error)
+      console.error(`Websocket failed to connect: ${error}`)
     })
   }
 
@@ -247,11 +247,11 @@ export class SyncHolder {
         const fragmentSender = new FragmentSender(stream, channel, () => this.onDataSentHandler(id))
         fragmentSender.send()
       } catch (e) {
-        console.log(e)
+        console.error(e)
       }
       return
     }
-    console.log('data channel', channel.label, 'is in state: ', this.peerConnection[id].streamChannel!.readyState)
+    console.info('data channel', channel.label, 'is in state: ', this.peerConnection[id].streamChannel!.readyState)
   }
 
   public PlaySong(song: Song) {

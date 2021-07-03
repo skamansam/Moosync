@@ -1,10 +1,11 @@
-import { expose } from 'threads'
+import * as mm from 'music-metadata'
 
 import { Observable, SubscriptionObserver } from 'observable-fns'
 import fs, { promises as fsP } from 'fs'
-import path from 'path'
+
 import crypto from 'crypto'
-import * as mm from 'music-metadata'
+import { expose } from 'threads'
+import path from 'path'
 import { v4 } from 'uuid'
 
 const audioPatterns = new RegExp('.flac|.mp3|.ogg|.m4a|.webm|.wav|.wv', 'i')
@@ -87,7 +88,7 @@ async function start(paths: musicPaths, observer: SubscriptionObserver<any>) {
         }
       })
     } else {
-      console.log('invalid directory: ' + paths[i])
+      console.error('invalid directory: ' + paths[i])
     }
   }
   await Promise.all(promises).then(() => observer.complete())

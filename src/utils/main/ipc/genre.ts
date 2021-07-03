@@ -22,7 +22,7 @@ export class GenreChannel implements IpcChannelInterface {
       .then((data) => {
         event.reply(request.responseChannel, data)
       })
-      .catch((e) => console.log(e))
+      .catch((e) => console.error(e))
   }
 
   private async getGenre(event: Electron.IpcMainEvent, request: IpcRequest) {
@@ -32,7 +32,7 @@ export class GenreChannel implements IpcChannelInterface {
         .then((data) => {
           event.reply(request.responseChannel, data)
         })
-        .catch((e) => console.log(e))
+        .catch((e) => console.error(e))
     }
   }
 }

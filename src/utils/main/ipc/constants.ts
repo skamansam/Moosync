@@ -10,7 +10,8 @@ export enum IpcEvents {
   PREFERENCES = 'preferences',
   SEARCH = 'search',
   STORE = 'store',
-  SERVICE_PROVIDERS = 'serviceProviders'
+  SERVICE_PROVIDERS = 'serviceProviders',
+  LOGGER = 'logger'
 }
 
 export enum StoreEvents {
@@ -86,6 +87,11 @@ export enum SongEvents {
   SAVE_IMAGE_TO_FILE = 'saveImageToFile',
   AUDIO_EXISTS = 'fileExists',
   IMAGE_EXISTS = 'imageExists'
+}
+
+export enum LoggerEvents {
+  INFO = 'info',
+  ERROR = 'error'
 }
 
 export enum ServiceProviderEvents {

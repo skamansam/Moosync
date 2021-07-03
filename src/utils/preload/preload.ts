@@ -14,6 +14,7 @@ import {
 import { contextBridge, ipcRenderer } from 'electron'
 
 import { IpcRendererHolder } from '@/utils/preload/ipc/index'
+import { LoggerEvents } from '@/utils/main/ipc/constants';
 import { StoreEvents } from '@/utils/main/ipc/constants'
 
 const ipcRendererHolder = new IpcRendererHolder(ipcRenderer)
@@ -110,4 +111,11 @@ contextBridge.exposeInMainWorld('WindowUtils', {
   openExternal: (url: string) => ipcRendererHolder.send(IpcEvents.BROWSER_WINDOWS, { type: WindowEvents.OPEN_URL_EXTERNAL, params: { url: url } }),
   registerOAuthCallback: (callback: (data: string) => void) => ipcRendererHolder.on(WindowEvents.LISTEN_OAUTH_EVENT, callback),
   deregisterOAuthCallback: () => ipcRendererHolder.removeAllListener(WindowEvents.LISTEN_OAUTH_EVENT)
+})
+
+contextBridge.exposeInMainWorld('LoggerUtils', {
+  info: (message: any) =>
+    ipcRendererHolder.send(IpcEvents.LOGGER, { type: LoggerEvents.INFO, params: { message: message } }),
+  error: (message: any) =>
+    ipcRendererHolder.send(IpcEvents.LOGGER, { type: LoggerEvents.ERROR, params: { message: message } })
 })

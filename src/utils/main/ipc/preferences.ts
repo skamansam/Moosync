@@ -19,7 +19,7 @@ export class PreferenceChannel implements IpcChannelInterface {
   private loadPreferences(event: Electron.IpcMainEvent, request: IpcRequest) {
     loadPreferences()
       .then((data) => event.reply(request.responseChannel, data))
-      .catch((e) => console.log(e))
+      .catch((e) => console.error(e))
   }
 
   private savePreferences(event: Electron.IpcMainEvent, request: IpcRequest) {
