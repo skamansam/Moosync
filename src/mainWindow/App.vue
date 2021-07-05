@@ -40,9 +40,6 @@ export default class App extends mixins(ThemeHandler) {
     this.watchPlaylistUpdates()
     this.populatePlaylists()
     this.registerDevTools()
-
-    console.info('test message from renderer')
-
     // this.testStun()
   }
 
