@@ -7,9 +7,15 @@
         </div>
         <div class="embed-responsive embed-responsive-1by1">
           <div class="embed-responsive-item">
-            <img v-if="imgSrc" :src="getImgSrc(imgSrc)" alt="Album Art" class="img-fluid w-100 h-100" />
+            <img
+              v-if="imgSrc && !forceEmptyImg"
+              :src="getImgSrc(imgSrc)"
+              alt="Album Art"
+              class="img-fluid w-100 h-100"
+              @error="handleError"
+            />
             <div class="default-icon">
-              <slot v-if="!imgSrc" name="defaultCover" />
+              <slot v-if="!imgSrc || forceEmptyImg" name="defaultCover" />
             </div>
           </div>
         </div>
@@ -47,6 +53,10 @@ export default class SongDetails extends mixins(Colors, ImageLoader) {
 
   @Watch('imgSrc') onImgSrcChange() {
     this.forceEmptyImg = false
+  }
+
+  private handleError() {
+    this.forceEmptyImg = true
   }
 
   private emitContext(event: Event) {
