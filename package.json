@@ -95,8 +95,7 @@
     "webpack-bundle-analyzer": "^4.4.2"
   },
   "optionalDependencies": {
-    "@nodert-win10-20h1/windows.media.transcoding": "^0.1.0",
-    "dmg-license": "^1.0.9"
+    "@nodert-win10-20h1/windows.media.transcoding": "^0.1.0"
   },
   "resolutions": {
     "electron-builder": "22.11.4"
