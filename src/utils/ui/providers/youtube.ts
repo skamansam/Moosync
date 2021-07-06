@@ -117,11 +117,10 @@ export class YoutubeProvider extends GenericProvider {
     return songs
   }
 
-  public async getPlaylistContent(id: string) {
+  public async * getPlaylistContent(id: string): AsyncGenerator<Song[]> {
     const validRefreshToken = await this.auth.hasValidRefreshToken()
     if (this.auth.loggedIn() || validRefreshToken) {
       let nextPageToken: string | undefined
-      const parsed: YoutubeResponses.PlaylistItems.Items[] = []
       do {
         const resp = await this.populateRequest(ApiResources.PLAYLIST_ITEMS, {
           params: {
@@ -132,11 +131,11 @@ export class YoutubeProvider extends GenericProvider {
           }
         })
         nextPageToken = resp.nextPageToken
-        parsed.push(...resp.items)
+        const parsed = await this.parsePlaylistItems(resp.items)
+        yield parsed
       } while (nextPageToken)
-      return this.parsePlaylistItems(parsed)
     }
-    return []
+    yield []
   }
 
   private async parseVideo(items: YoutubeResponses.VideoDetails.Item[]) {
@@ -160,24 +159,18 @@ export class YoutubeProvider extends GenericProvider {
     return songs
   }
 
-  public async getSongDetails(...id: string[]) {
+  private async getSongDetails(...id: string[]) {
     const validRefreshToken = await this.auth.hasValidRefreshToken()
     if (this.auth.loggedIn() || validRefreshToken) {
-      const parsed: YoutubeResponses.VideoDetails.Item[] = []
-      const totalPages = ((id.length / 50))
-      let curPage = 0
-      while (curPage <= totalPages) {
-        const resp = await this.populateRequest(ApiResources.VIDEO_DETAILS, {
-          params: {
-            part: ['contentDetails', 'snippet'],
-            id: [...id.slice(curPage * 50, curPage * 50 + 50)],
-            maxResults: 50,
-          }
-        })
-        parsed.push(...resp.items)
-        curPage++
-      }
-      return this.parseVideo(parsed)
+      const resp = await this.populateRequest(ApiResources.VIDEO_DETAILS, {
+        params: {
+          part: ['contentDetails', 'snippet'],
+          id: id,
+          maxResults: 50,
+        }
+      })
+      console.log(resp.items.length)
+      return this.parseVideo(resp.items)
     }
     return []
   }

@@ -1,9 +1,10 @@
 import { AuthFlow, AuthStateEmitter } from '@/utils/ui/oauth/flow'
+import { GenericProvider, cache } from '@/utils/ui/providers/genericProvider';
+
+import axios from 'axios';
+import { forageStore } from './genericProvider';
 import { once } from 'events'
 import qs from 'qs'
-import axios from 'axios';
-import { GenericProvider, cache } from '@/utils/ui/providers/genericProvider';
-import { forageStore } from './genericProvider';
 
 const BASE_URL = 'https://api.spotify.com/v1/'
 
@@ -122,14 +123,15 @@ export class SpotifyProvider extends GenericProvider {
     return parsed
   }
 
-  public async getPlaylistContent(id: string): Promise<Song[]> {
+  public async * getPlaylistContent(id: string): AsyncGenerator<Song[]> {
     const validRefreshToken = await this.auth.hasValidRefreshToken()
     if (this.auth.loggedIn() || validRefreshToken) {
 
       // Return directly from cache
       const content = await this.getCachePlaylistContent(id)
       if (content) {
-        return content;
+        yield content
+        return;
       }
 
       let nextOffset: number = 0
@@ -144,14 +146,15 @@ export class SpotifyProvider extends GenericProvider {
             offset: nextOffset
           }
         })
-        parsed.push(...(await this.parsePlaylistItems(resp.items)))
+        const items = await this.parsePlaylistItems(resp.items)
+        parsed.push(...items)
         isNext = !!resp.next
         if (resp.next) {
           nextOffset += limit
         }
+        yield items;
       } while (isNext)
       this.setCachePlaylistContent(id, parsed)
-      return parsed;
     }
     return []
   }

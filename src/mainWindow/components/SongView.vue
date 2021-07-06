@@ -22,6 +22,7 @@
       <SongList
         :songList="songList"
         :extrafields="[{ key: 'title' }, { key: 'album' }, { key: 'artists' }]"
+        :tableBusy="tableBusy"
         @onRowDoubleClicked="queueSong"
         @onRowContext="getSongContextMenu"
         @onRowSelected="updateCoverDetails"
@@ -48,6 +49,9 @@ import ModelHelper from '@/utils/ui/mixins/ModelHelper'
 export default class AllSongs extends mixins(Colors, PlayerControls, ModelHelper) {
   @Prop({ default: () => [] })
   private songList!: Song[]
+
+  @Prop({ default: false })
+  private tableBusy!: boolean
 
   private currentSong: Song | null = null
 

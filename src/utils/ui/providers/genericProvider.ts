@@ -1,5 +1,5 @@
-import { setupCache } from 'axios-cache-adapter'
 import localforage from 'localforage'
+import { setupCache } from 'axios-cache-adapter'
 
 export const forageStore = localforage.createInstance({
   driver: [
@@ -26,5 +26,5 @@ export abstract class GenericProvider {
 
   public abstract getUserPlaylists(): Promise<Playlist[]>
 
-  public abstract getPlaylistContent(id: string): Promise<Song[]>
+  public abstract getPlaylistContent(id: string): AsyncGenerator<Song[]>
 }

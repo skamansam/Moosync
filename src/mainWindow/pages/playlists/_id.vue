@@ -9,6 +9,7 @@
       :defaultDetails="defaultDetails"
       :songList="songList"
       :detailsButtonGroup="buttonGroups"
+      :tableBusy="tableBusy"
       @onRowContext="getSongMenu(arguments[0], arguments[1], undefined)"
       @playAll="playPlaylist"
       @addToQueue="addPlaylistToQueue"
@@ -33,6 +34,8 @@ import { arrayDiff } from '@/utils/common'
 })
 export default class SinglePlaylistView extends mixins(ContextMenuMixin) {
   private songList: Song[] = []
+
+  private tableBusy: boolean = false
 
   @Prop({ default: '' })
   private playlist_id!: string
@@ -70,11 +73,22 @@ export default class SinglePlaylistView extends mixins(ContextMenuMixin) {
     }
   }
 
+  private async fetchAsyncGen() {
+    let generator
+    if (this.isYoutubePlaylist === 'true')
+      generator = vxm.providers.youtubeProvider.getPlaylistContent(this.playlist_id.replace('youtube-', ''))
+    else if (this.isSpotifyPlaylist === 'true')
+      generator = vxm.providers.spotifyProvider.getPlaylistContent(this.playlist_id.replace('spotify-', ''))
+
+    if (generator)
+      for await (const items of generator) {
+        this.songList.push(...items)
+      }
+  }
+
   private async fetchPlaylist() {
-    if (this.isYoutubePlaylist === 'true') {
-      this.songList = await vxm.providers.youtubeProvider.getPlaylistContent(this.playlist_id.replace('youtube-', ''))
-    } else if (this.isSpotifyPlaylist === 'true') {
-      this.songList = await vxm.providers.spotifyProvider.getPlaylistContent(this.playlist_id.replace('spotify-', ''))
+    if (this.isYoutubePlaylist === 'true' || this.isSpotifyPlaylist === 'true') {
+      await this.fetchAsyncGen()
     } else {
       this.songList = await window.DBUtils.getSinglePlaylist(this.playlist_id)
     }

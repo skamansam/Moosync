@@ -12,6 +12,7 @@
       select-mode="range"
       primary-key="_id"
       :key="refreshKey"
+      :busy="tableBusy"
       @row-dblclicked="onRowDoubleClicked"
       @row-selected="onRowSelected"
       @row-contextmenu="onRowContext"
@@ -23,6 +24,15 @@
 
       <template #cell(artists)="data">
         {{ data.item.artists ? data.item.artists.join(', ') : '-' }}
+      </template>
+
+      <template #table-busy>
+        <div class="text-center loading-container">
+          <b-spinner class="align-middle"></b-spinner>
+          <div>
+            <strong>Fetching Data...</strong>
+          </div>
+        </div>
       </template>
     </b-table>
   </div>
@@ -49,6 +59,9 @@ export default class SongList extends mixins(Colors) {
 
   @Prop({ default: {} })
   private extrafields!: [{ key: string }]
+
+  @Prop({ default: false })
+  private tableBusy!: boolean
 
   @Ref('songListTable')
   private songListTable!: BTable
@@ -191,4 +204,7 @@ table.b-table > tfoot > tr > th[aria-sort="descending"]
 
   &::-webkit-scrollbar-track
     background: var(--primary) !important
+
+.loading-container
+  color: var(--accent)
 </style>
