@@ -91,8 +91,10 @@ export default class AllSongs extends mixins(Colors, PlayerControls, ModelHelper
 </script>
 
 <style lang="sass" scoped>
-@import '@/sass/variables.sass'
+@import "~bootstrap/scss/functions"
+@import '~bootstrap/scss/variables'
 @import "~bootstrap/scss/mixins"
+@import "~bootstrap/scss/bootstrap"
 
 .song-container
   overflow-y: hidden
