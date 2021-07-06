@@ -1,4 +1,4 @@
-mac_linux_task:
+win_linux_task:
   matrix:
     - container:
         image: node:latest
@@ -14,16 +14,16 @@ mac_linux_task:
       snap_artifacts:
         path: dist_electron/*.snap
 
-    - macos_instance:
-        image: big-sur-base
-      dep_script: brew update && brew install node && npm install --global yarn
-      node_modules_cache:
-        folder: node_modules
-        fingerprint_script: cat yarn.lock
-        populate_script: yarn install
-      build_script: chmod +x setup_env.sh && . setup_env.sh && yarn postinstall && yarn electron:build
-      dmg_artifacts:
-        path: dist_electron/*.dmg
+    # - macos_instance:
+    #     image: big-sur-base
+    #   dep_script: brew update && brew install node && npm install --global yarn
+    #   node_modules_cache:
+    #     folder: node_modules
+    #     fingerprint_script: cat yarn.lock
+    #     populate_script: yarn install
+    #   build_script: chmod +x setup_env.sh && . setup_env.sh && yarn postinstall && yarn electron:build
+    #   dmg_artifacts:
+    #     path: dist_electron/*.dmg
 
     - windows_container:
         image: cirrusci/windowsservercore:visualstudio2019
