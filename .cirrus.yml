@@ -16,7 +16,7 @@ mac_linux_task:
 
     - macos_instance:
         image: big-sur-base
-      dep_script: brew install node && npm install --global yarn
+      dep_script: brew update && brew install node && npm install --global yarn
       node_modules_cache:
         folder: node_modules
         fingerprint_script: cat yarn.lock
