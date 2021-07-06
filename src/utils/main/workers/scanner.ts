@@ -75,24 +75,29 @@ async function getInfo(data: mm.IAudioMetadata, stats: stats): Promise<Song> {
   }
 }
 
-async function start(paths: musicPaths, observer: SubscriptionObserver<any>) {
-  const promises: Promise<void>[] = []
-  // await this.destructiveScan()
-  for (const i in paths) {
-    if (fs.existsSync(paths[i].path)) {
-      const files = fs.readdirSync(paths[i].path)
-      files.forEach((file) => {
-        if (audioPatterns.exec(path.extname(file)) !== null) {
-          const filePath = path.join(paths[i].path, file)
-          promises.push(scanFile(filePath).then((result) => observer.next(result)))
-        }
-      })
-    } else {
-      console.error('invalid directory: ' + paths[i])
-    }
+async function scanDir(directory: string, observer: SubscriptionObserver<Song>) {
+  if (fs.existsSync(directory)) {
+    const promises: Promise<void>[] = []
+    const files = fs.readdirSync(directory)
+    files.forEach((file) => {
+      if (fs.statSync(path.join(directory, file)).isDirectory()) {
+        scanDir(path.join(directory, file), observer)
+      }
+      if (audioPatterns.exec(path.extname(file)) !== null) {
+        const filePath = path.join(directory, file)
+        promises.push(scanFile(filePath).then((result) => observer.next(result)))
+      }
+    })
+    await Promise.all(promises).then(() => observer.complete())
+  } else {
+    console.error('invalid directory: ' + directory)
   }
-  await Promise.all(promises).then(() => observer.complete())
-  // await this.updateCounts()
+}
+
+async function start(paths: musicPaths, observer: SubscriptionObserver<any>) {
+  for (const i in paths) {
+    paths[i].enabled && scanDir(paths[i].path, observer)
+  }
 }
 
 async function generateChecksum(file: string): Promise<string> {
