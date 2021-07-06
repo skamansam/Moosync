@@ -34,6 +34,7 @@ const stun = require('stun')
 export default class App extends mixins(ThemeHandler) {
   created() {
     this.registerLogger()
+    this.registerNotifier()
   }
 
   mounted() {
@@ -95,6 +96,14 @@ export default class App extends mixins(ThemeHandler) {
       preservedConsoleError.apply(console, args)
       window.LoggerUtils.error(args)
     }
+
+    window.onerror = (err) => window.LoggerUtils.error(err)
+  }
+
+  private registerNotifier() {
+    window.NotifierUtils.registerMainProcessNotifier((obj) => {
+      vxm.notifier.emit(obj)
+    })
   }
 }
 </script>

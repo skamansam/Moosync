@@ -28,6 +28,7 @@ import AlbumDefault from '@/mainWindow/components/icons/AlbumDefault.vue'
 })
 export default class Albums extends mixins(RouterPushes) {
   private albumList: Album[] = []
+
   private async getAlbums() {
     this.albumList = await window.DBUtils.getAllAlbums()
   }

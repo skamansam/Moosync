@@ -77,6 +77,9 @@ interface loggerUtils {
   error: (message: any) => Promise<void>
 }
 
+interface notifierUtils {
+  registerMainProcessNotifier: (callback: (obj: NotificationObject) => void) => void
+}
 declare global {
   interface Window {
     DBUtils: DBUtils
@@ -87,5 +90,6 @@ declare global {
     ProviderUtils: providerUtils
     Store: store
     LoggerUtils: loggerUtils
+    NotifierUtils: notifierUtils
   }
 }

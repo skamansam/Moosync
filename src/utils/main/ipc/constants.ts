@@ -11,7 +11,8 @@ export enum IpcEvents {
   SEARCH = 'search',
   STORE = 'store',
   SERVICE_PROVIDERS = 'serviceProviders',
-  LOGGER = 'logger'
+  LOGGER = 'logger',
+  NOTIFIER = 'notifier'
 }
 
 export enum StoreEvents {

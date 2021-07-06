@@ -119,3 +119,7 @@ contextBridge.exposeInMainWorld('LoggerUtils', {
   error: (message: any) =>
     ipcRendererHolder.send(IpcEvents.LOGGER, { type: LoggerEvents.ERROR, params: { message: message } })
 })
+
+contextBridge.exposeInMainWorld('NotifierUtils', {
+  registerMainProcessNotifier: (callback: (obj: NotificationObject) => void) => ipcRendererHolder.on(IpcEvents.NOTIFIER, callback)
+})

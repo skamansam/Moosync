@@ -1,12 +1,14 @@
+import { createProxy, extractVuexModule } from 'vuex-class-component'
+
+import { NotifierStore } from './notifications'
+import { PlayerStore } from './playerState'
+import { PlaylistStore } from '@/mainWindow/store/playlists'
+import { ProviderStore } from '@/mainWindow/store/providers'
+import { SyncStore } from '@/mainWindow/store/syncState'
 import ThemeStore from '@/commonStore/themeState'
 import Vue from 'vue'
 import Vuex from 'vuex'
-import { createProxy, extractVuexModule } from 'vuex-class-component'
-import { PlayerStore } from './playerState'
-import { PlaylistStore } from '@/mainWindow/store/playlists'
-import { SyncStore } from '@/mainWindow/store/syncState'
 import { createPersist } from '@/utils/ui/store/persist'
-import { ProviderStore } from '@/mainWindow/store/providers'
 
 Vue.use(Vuex)
 
@@ -19,7 +21,7 @@ export const store = new Vuex.Store({
     ...extractVuexModule(PlaylistStore),
     ...extractVuexModule(SyncStore),
     ...extractVuexModule(ProviderStore),
-
+    ...extractVuexModule(NotifierStore),
   },
   plugins: [createPersist(paths)],
 })
@@ -30,4 +32,5 @@ export const vxm = {
   playlist: createProxy(store, PlaylistStore),
   sync: createProxy(store, SyncStore),
   providers: createProxy(store, ProviderStore),
+  notifier: createProxy(store, NotifierStore),
 }

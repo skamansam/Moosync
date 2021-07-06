@@ -65,7 +65,9 @@ class SongDBInstance extends DBUtils {
       try {
         if (album_ids.count == 1) {
           const album = await this.getAlbumByID(album_ids.album)
-          if (album?.album_coverPath) fsP.unlink(album.album_coverPath)
+          if (album?.album_coverPath) fsP.unlink(album.album_coverPath).catch(err => console.error(err))
+          this.db.delete('albums', { album_id: album_ids.album })
+
         }
 
       } catch (err) {
@@ -75,14 +77,13 @@ class SongDBInstance extends DBUtils {
       try {
         if (artist_ids.count == 1) {
           const artist = await this.getArtistsByID(artist_ids.artist)
-          if (artist?.artist_coverPath) fsP.unlink(artist.artist_coverPath)
+          if (artist?.artist_coverPath) fsP.unlink(artist.artist_coverPath).catch(err => console.error(err))
+          this.db.delete('artists', { artist_id: artist_ids.artist })
         }
       } catch (err) {
         console.error(err)
       }
 
-      this.db.delete('albums', { album_id: album_ids.album })
-      this.db.delete('artists', { artist_id: artist_ids.artist })
 
     })(song_id)
   }

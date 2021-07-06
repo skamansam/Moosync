@@ -66,7 +66,7 @@ export default class SinglePlaylistView extends mixins(ContextMenuMixin) {
   get buttonGroups(): SongDetailButtons {
     return {
       enableContainer: true,
-      enableLibraryStore: true
+      enableLibraryStore: !!(this.isYoutubePlaylist || this.isSpotifyPlaylist)
     }
   }
 
