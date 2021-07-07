@@ -9,3 +9,5 @@ interface SongDetailButtons {
   enableContainer: boolean
   enableLibraryStore: boolean
 }
+
+type TableFields = 'index' | 'title' | 'album' | 'artists'

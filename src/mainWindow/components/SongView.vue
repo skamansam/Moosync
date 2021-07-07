@@ -21,7 +21,7 @@
     <b-row class="no-gutters list-container">
       <SongList
         :songList="songList"
-        :extrafields="[{ key: 'title' }, { key: 'album' }, { key: 'artists' }]"
+        :extrafields="[{ key: 'index' }, { key: 'title' }, { key: 'album' }, { key: 'artists' }]"
         :tableBusy="tableBusy"
         @onRowDoubleClicked="queueSong"
         @onRowContext="getSongContextMenu"

@@ -1,79 +1,90 @@
 <template>
   <div class="d-flex h-100 w-100">
-    <b-table
-      ref="songListTable"
-      class="custom-table-container"
-      table-class="custom-table w-100"
-      :items="songList"
-      :fields="fields"
-      sticky-header
-      :no-border-collapse="true"
-      selectable
-      select-mode="range"
-      primary-key="_id"
-      :key="refreshKey"
-      :busy="tableBusy"
-      @row-dblclicked="onRowDoubleClicked"
-      @row-selected="onRowSelected"
-      @row-contextmenu="onRowContext"
-      v-click-outside="clearSelection"
-    >
-      <template #cell(index)="data">{{ data.index + 1 }}</template>
-
-      <template #cell(album)="data">{{ getAlbumName(data.item) }}</template>
-
-      <template #cell(artists)="data">
-        {{ data.item.artists ? data.item.artists.join(', ') : '-' }}
-      </template>
-
-      <template #table-busy>
-        <div class="text-center loading-container">
-          <b-spinner class="align-middle"></b-spinner>
-          <div>
-            <strong>Fetching Data...</strong>
-          </div>
+    <b-container fluid>
+      <b-row no-gutters>
+        <div ref="headers" class="wrapper w-100 headers">
+          <template v-for="(field, index) of extrafields">
+            <div :style="{ width: columnWidths[index] + '%' }" :key="`box-${field.key}`" class="box text-truncate">
+              {{ field.key }}
+            </div>
+            <div
+              v-if="index !== extrafields.length - 1"
+              :key="`handler-${field.key}`"
+              :id="field.key"
+              class="handler"
+              @mousedown="mouseDown(arguments[0], field.key)"
+            ></div>
+          </template>
         </div>
-      </template>
-    </b-table>
+      </b-row>
+      <b-row no-gutters class="recycler-row">
+        <RecycleScroller
+          class="scroller w-100 h-100"
+          :items="songList"
+          :item-size="64"
+          key-field="_id"
+          :direction="'vertical'"
+        >
+          <template v-slot="{ item, index }">
+            <div class="wrapper w-100 field-content" :class="{ selectedItem: selected.includes(index) }">
+              <div
+                v-for="(field, i1) of extrafields"
+                :key="`${item._id}-${field.key}`"
+                class="box text-truncate"
+                :style="{ width: columnWidths[i1] + '%' }"
+                @dblclick="onRowDoubleClicked(item)"
+                @click="onRowSelected(index)"
+              >
+                {{ field.key === 'index' ? index + 1 : getFieldData(field.key, item) }}
+              </div>
+            </div>
+          </template>
+        </RecycleScroller>
+      </b-row>
+    </b-container>
   </div>
 </template>
 
 <script lang="ts">
 import Colors from '@/utils/ui/mixins/Colors'
-import { Resizer } from '@/utils/ui/resizer'
 import { BTable } from 'bootstrap-vue'
 import { mixins } from 'vue-class-component'
 import { Component, Prop, Ref } from 'vue-property-decorator'
-import Vue from 'vue/types/umd'
+import Vue from 'vue'
 
 @Component({})
 export default class SongList extends mixins(Colors) {
   private refreshKey: boolean = false
 
   private lastSelect: string = ''
-  private resizer!: Resizer
-  private selected: Song[] = []
+  private selected: number[] = []
 
   @Prop({ default: [] })
   private songList!: Song[]
 
   @Prop({ default: {} })
-  private extrafields!: [{ key: string }]
+  private extrafields!: [{ key: TableFields }]
 
   @Prop({ default: false })
   private tableBusy!: boolean
 
-  @Ref('songListTable')
-  private songListTable!: BTable
-
-  private fields: [{ key: string; label?: string; tdClass?: string; thClass?: string }] = [
-    { key: 'index', label: 'Sr. No', tdClass: 'index-no-td', thClass: 'index-no-th' }
-  ]
+  @Ref('headers')
+  private headers!: HTMLDivElement
 
   // Clear selection after table loses focus
   private clearSelection() {
-    this.songListTable?.clearSelected()
-    this.onRowSelected([])
+    this.selected = []
+  }
+
+  private getFieldData(field: TableFields, song: Song) {
+    switch (field) {
+      case 'title':
+        return song.title
+      case 'album':
+        return song.album?.album_name
+      case 'artists':
+        return song.artists?.join(', ')
+    }
   }
 
   private getAlbumName(data: Song) {
@@ -81,21 +92,105 @@ export default class SongList extends mixins(Colors) {
     return '-'
   }
 
-  created() {
-    this.fields.push(...this.extrafields)
+  mounted() {
+    this.computeDefaultWidths()
+    this.generateHandlerMap()
+    this.setupMouseEvents()
   }
 
-  mounted() {
-    this.resizer = new Resizer(document)
-    window.WindowUtils.setMainWindowResizeListener(this.rerenderTable)
+  beforeDestroy() {
+    this.destroyMouseEvents()
+  }
 
-    var doit: ReturnType<typeof setTimeout>
-    window.onresize = () => {
-      this.rerenderTable()
-      clearTimeout(doit)
-      // Add grips only after there is no resizeing event for 100ms
-      doit = setTimeout(() => this.resizer.addGrips(), 100)
+  private handlerMap: {
+    [key: string]: {
+      handler: HTMLDivElement
+      next: HTMLDivElement
+      prev: HTMLDivElement
+      prevWidth: number
+      nextWidth: number
+      startPos: number
     }
+  } = {}
+
+  private activeHandlerKey?: string
+
+  private columnWidths: number[] = []
+
+  private computeDefaultWidths() {
+    for (const index in this.extrafields) {
+      this.columnWidths[index] = 100 / this.extrafields.length
+    }
+  }
+
+  private generateHandlerMap() {
+    for (const field of this.extrafields) {
+      const handler = document.querySelector(`#${field.key}`) as HTMLDivElement | null
+      if (handler) {
+        this.handlerMap[field.key] = {
+          handler: handler,
+          next: handler.nextElementSibling as HTMLDivElement,
+          prev: handler.previousElementSibling as HTMLDivElement,
+          prevWidth: 0,
+          nextWidth: 0,
+          startPos: 0
+        }
+      }
+    }
+  }
+
+  private mouseDown(e: MouseEvent, id: string) {
+    const handlerData = this.handlerMap[id]
+    handlerData.startPos = e.pageX
+    handlerData.prevWidth = handlerData.prev.offsetWidth
+    handlerData.nextWidth = handlerData.next.offsetWidth
+    this.activeHandlerKey = id
+  }
+
+  private getNextField(key: string) {
+    const index = this.extrafields.findIndex((val) => val.key === key)
+    if (index !== -1) {
+      return index + 1
+    }
+  }
+
+  private mouseMove(e: MouseEvent) {
+    if (!this.activeHandlerKey) {
+      return
+    }
+
+    const handlerData = this.handlerMap[this.activeHandlerKey]
+    const pointerRelativeXpos = e.pageX - handlerData.startPos
+
+    const minWidth = 3
+
+    const prevWidthP = ((handlerData.prevWidth + pointerRelativeXpos) / this.headers.offsetWidth) * 100
+    const nextWidthP = ((handlerData.nextWidth - pointerRelativeXpos) / this.headers.offsetWidth) * 100
+
+    if (nextWidthP < minWidth || prevWidthP < minWidth) {
+      return
+    }
+
+    const rightI = this.getNextField(this.activeHandlerKey)
+
+    if (rightI) {
+      Vue.set(this.columnWidths, rightI - 1, prevWidthP + 1)
+      Vue.set(this.columnWidths, rightI, nextWidthP + 1)
+    }
+  }
+
+  private mouseUp() {
+    this.activeHandlerKey = undefined
+  }
+
+  private setupMouseEvents() {
+    document.addEventListener('mousemove', this.mouseMove)
+    document.addEventListener('mouseup', this.mouseUp)
+  }
+
+  private destroyMouseEvents() {
+    document.removeEventListener('mousemove', this.mouseMove)
+    document.removeEventListener('mouseup', this.mouseUp)
   }
 
   private onRowContext(item: Song, index: number, event: Event) {
@@ -106,12 +201,13 @@ export default class SongList extends mixins(Colors) {
     this.$emit('onRowDoubleClicked', item)
   }
 
-  private onRowSelected(items: Song[]) {
-    this.selected = items
-    if (items[items.length - 1] && items[items.length - 1]._id !== this.lastSelect) {
-      this.lastSelect = items[items.length - 1]._id!
-    }
-    this.$emit('onRowSelected', items)
+  private onRowSelected(index: number) {
+    // this.selected = items
+    // if (items[items.length - 1] && items[items.length - 1]._id !== this.lastSelect) {
+    //   this.lastSelect = items[items.length - 1]._id!
+    // }
+    // this.$emit('onRowSelected', items)
+    this.selected = [index]
   }
 
   private sortContent(): void {
@@ -132,79 +228,59 @@ export default class SongList extends mixins(Colors) {
 .index-no-th > div
   padding-left: 10px
 
-.custom-table
-  color: var(--textPrimary) !important
-  table-layout: fixed
-  margin-right: 10px
-  min-width: 10px
-
-.custom-table > thead > tr > th
-  background-color: var(--primary) !important
-  color: var(--textPrimary) !important
-  border-top: 0px !important
-  border-bottom: 1px solid var(--textSecondary) !important
-  text-align: left
-  padding: 12px 0 12px 0 !important
-
-.custom-table > tbody > tr > td
-  border-top: 0px !important
-  border-bottom: 1px solid var(--textSecondary) !important
-  text-align: left
-  padding: 20px 0 20px 0
-
-.custom-table > tbody > tr > td , .custom-table > thead > tr > th > div
-  white-space: nowrap
-  text-overflow: ellipsis
-  user-select: none
-  font-family: 'Proxima Nova'
-  overflow: hidden
-
-.custom-table > tbody > tr > td > div
-  font-size: 16px
-  line-height: 170.19%
-
-.custom-table > thead > tr > th > div
-  font-weight: bold
-  font-size: 18px
-  line-height: 167.19%
-
-.custom-table > tbody > tr
-  &:focus
-    outline: 1px solid var(--accent)
-
-table.b-table > thead > tr > th[aria-sort="ascending"],
-table.b-table > tfoot > tr > th[aria-sort="ascending"]
-  background-image: none !important
-  padding-right: 0px !important
-
-table.b-table > thead > tr > th[aria-sort="descending"],
-table.b-table > tfoot > tr > th[aria-sort="descending"]
-  background-image: none !important
-  padding-right: 0px !important
-
-.custom-table-container
-  display: inline-block
-  transition: color .3s ease
-  color: rgba(0, 0, 0, 0)
-  max-height: calc(100% - 15px) !important
-  max-width: 100%
-  overflow-x: hidden
-  overflow-y: scroll
-  margin-bottom: 0 !important
-  height: fit-content
-
-.custom-table-container > table
-  max-width: 100%
-
-.custom-table-container
-  &::-webkit-scrollbar-thumb
-    background: var(--textPrimary)
-    border: 10px solid var(--primary)
-    min-height: 50px
-
-  &::-webkit-scrollbar-track
-    background: var(--primary) !important
-
 .loading-container
   color: var(--accent)
+
+.scroller
+  &::-webkit-scrollbar-track
+    margin: 0
+
+.wrapper
+  display: flex
+
+.box
+  color: var(--textPrimary)
+  padding: 20px
+
+  box-sizing: border-box
+
+  /* Allow box to grow and shrink, and ensure they are all equally sized */
+  flex: 1 1 auto
+
+.handler
+  width: 8px
+  padding: 0
+  cursor: ew-resize
+  flex: 0 0 auto
+
+
+.handler::before
+  content: ''
+  display: block
+  width: 1px
+  height: 100%
+  background: var(--textSecondary)
+  padding-top: 14px
+  padding-bottom: 14px
+  background-clip: content-box
+.recycler-row
+  height: calc(100% - 64px)
+
+.field-content
+  height: 64px
+  border-bottom: 1px solid var(--textSecondary)
+  border-top: 1px solid transparent
+
+.headers
+  border-bottom: 1px solid var(--textSecondary)
+
+.wrapper
+  div
+    text-align: left
+    user-select: none
+
+.selectedItem
+  background: var(--secondary) !important
+  border-top: 1px solid var(--accent)
+  border-bottom: 1px solid var(--accent)
 </style>

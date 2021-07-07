@@ -88,6 +88,3 @@ export default class MusicInfo extends mixins(Colors, ImageLoader, ModelHelper) 
   &::-webkit-scrollbar-track
     margin: 0
 </style>
-
-function Prop(arg0: { default: string }) { throw new Error('Function not implemented.') } function Watch(arg0: string) {
-throw new Error('Function not implemented.') }
