@@ -13,9 +13,8 @@ export class NotifierStore extends VuexModule.With({ namespaced: 'notification' 
   public emit(notif: NotificationObject) {
     const index = this.notificationStore.findIndex((value) => value.id === notif.id)
     if (index !== -1) {
-      this.notificationStore[index] = notif
-    } else {
-      this.notificationStore.push(notif)
+      this.notificationStore.splice(index, 1)
     }
+    this.notificationStore.push(notif)
   }
 }

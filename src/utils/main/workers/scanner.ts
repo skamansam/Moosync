@@ -77,18 +77,18 @@ async function getInfo(data: mm.IAudioMetadata, stats: stats): Promise<Song> {
 
 async function scanDir(directory: string, observer: SubscriptionObserver<Song>) {
   if (fs.existsSync(directory)) {
-    const promises: Promise<void>[] = []
     const files = fs.readdirSync(directory)
-    files.forEach((file) => {
+    for (const file of files) {
+      console.log(file)
       if (fs.statSync(path.join(directory, file)).isDirectory()) {
-        scanDir(path.join(directory, file), observer)
+        await scanDir(path.join(directory, file), observer)
       }
       if (audioPatterns.exec(path.extname(file)) !== null) {
         const filePath = path.join(directory, file)
-        promises.push(scanFile(filePath).then((result) => observer.next(result)))
+        const result = await scanFile(filePath)
+        observer.next(result)
       }
-    })
-    await Promise.all(promises).then(() => observer.complete())
+    }
   } else {
     console.error('invalid directory: ' + directory)
   }
@@ -96,8 +96,9 @@ async function scanDir(directory: string, observer: SubscriptionObserver<Song>) 
 
 async function start(paths: musicPaths, observer: SubscriptionObserver<any>) {
   for (const i in paths) {
-    paths[i].enabled && scanDir(paths[i].path, observer)
+    paths[i].enabled && await scanDir(paths[i].path, observer)
   }
+  observer.complete()
 }
 
 async function generateChecksum(file: string): Promise<string> {

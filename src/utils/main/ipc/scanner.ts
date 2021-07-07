@@ -49,10 +49,8 @@ export class ScannerChannel implements IpcChannelInterface {
       scan(preferences.musicPaths).subscribe(
         (result) => this.checkDuplicate(result),
         (err: Error) => reject(err),
-        () => {
-          notifyRenderer({ id: v4(), message: 'Scanning Completed', type: 'info' })
+        () =>
           resolve()
-        }
       )
     })
   }
@@ -157,7 +155,7 @@ export class ScannerChannel implements IpcChannelInterface {
 
     await this.fetchArtworks(allArtists, scraper.fetchArtworks)
 
-    event.reply(request.responseChannel)
+    notifyRenderer({ id: v4(), message: 'Scanning Completed', type: 'info' })
 
     if (this.scanStatus == scanning.QUEUED) {
       this.scanAll(event, request)
