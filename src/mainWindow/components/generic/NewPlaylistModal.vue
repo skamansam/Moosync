@@ -4,6 +4,7 @@
       <b-container fluid class="p-0">
         <b-row no-gutters class="d-flex">
           <canvas
+            crossorigin="anonymous"
             v-if="!forceEmptyImg"
             ref="canvas"
             width="800"
@@ -99,6 +100,7 @@ export default class NewPlaylistModal extends mixins(Colors) {
   private getValidImages() {
     let mergableImages: string[] = []
     for (const song of this.songs) {
+      console.log(song)
       if (song.album && song.album.album_coverPath) mergableImages.push(song.album.album_coverPath)
     }
     return mergableImages.slice(0, 4)
@@ -106,7 +108,8 @@ export default class NewPlaylistModal extends mixins(Colors) {
 
   private createImage(src: string, quad: number, len: number, ctx: CanvasRenderingContext2D) {
     let img = new Image()
-    img.src = 'media://' + src
+    img.crossOrigin = 'anonymous'
+    img.src = src.startsWith('http') ? src : 'media://' + src
     img.onload = () => this.drawImage(quad, len, ctx, img)
   }
 
@@ -168,7 +171,8 @@ export default class NewPlaylistModal extends mixins(Colors) {
   }
 
   private async addToPlaylist(playlist_id: string, songs: Song[]) {
-    window.DBUtils.addToPlaylist(playlist_id, ...songs)
+    await window.DBUtils.storeSongs(songs.filter((val) => val.type !== 'LOCAL'))
+    await window.DBUtils.addToPlaylist(playlist_id, ...songs)
   }
 
   mounted() {

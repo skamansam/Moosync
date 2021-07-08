@@ -77,7 +77,7 @@ export class PlaylistsChannel implements IpcChannelInterface {
       } else {
         fs.mkdirSync(cacheDir)
       }
-      fs.writeFile(filePath, request.params.b64.replace(/^data:image\/pngbase64,/, ""), 'base64', () => {
+      fs.writeFile(filePath, request.params.b64.replace(/^data:image\/png;base64,/, ""), 'base64', () => {
         event.reply(request.responseChannel, filePath)
       })
     }

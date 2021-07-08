@@ -20,7 +20,7 @@
     <b-row v-if="divider" class="divider-row d-flex no-gutters">
       <div class="divider" />
     </b-row>
-    <b-row v-if="!divider" class="no-gutters">
+    <b-row v-else class="no-gutters">
       <div class="placeholder" />
     </b-row>
   </b-container>

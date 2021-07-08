@@ -209,7 +209,11 @@ export default class SongList extends mixins(Colors) {
   }
 
   private onRowContext(event: Event, item: Song) {
-    this.$emit('onRowContext', event, this.selected.length > 1 ? this.selected : [item])
+    this.$emit(
+      'onRowContext',
+      event,
+      this.selected.length > 1 ? this.selected.map((val) => this.songList[val]) : [item]
+    )
   }
 
   private onRowDoubleClicked(item: Song) {
