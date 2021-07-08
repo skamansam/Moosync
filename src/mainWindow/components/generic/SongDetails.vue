@@ -1,16 +1,16 @@
 <template>
   <b-container fluid class="w-100">
     <b-row class="d-flex h-100 no-gutters">
-      <b-col cols="2" class="d-flex h-100 image-container">
-        <b-img
-          v-if="(getImgSrc(imgSrc) || getImgSrc(defaultImgSrc)) && !forceEmptyImg"
-          class="image h-100 w-100"
-          :src="getImgSrc(imgSrc) ? getImgSrc(imgSrc) : getImgSrc(defaultImgSrc)"
-          @error="handleImageError"
-        />
-        <SongDefault v-if="!getImgSrc(imgSrc) || forceEmptyImg" class="h-100 image" />
-      </b-col>
-      <b-col class="text-container text-truncate">
+      <!-- <b-col cols="auto" class="d-flex h-100 image-container"> -->
+      <b-img
+        v-if="(getImgSrc(imgSrc) || getImgSrc(defaultImgSrc)) && !forceEmptyImg"
+        class="image h-100"
+        :src="getImgSrc(imgSrc) ? getImgSrc(imgSrc) : getImgSrc(defaultImgSrc)"
+        @error="handleImageError"
+      />
+      <SongDefault v-else class="h-100 image" />
+      <!-- </b-col> -->
+      <b-col cols="auto" class="text-container text-truncate">
         <div class="title text-truncate">{{ currentTitle ? currentTitle : defaultTitle }}</div>
         <div class="subtitle text-truncate">{{ currentsubTitle ? currentsubTitle : defaultsubTitle }}</div>
         <div class="subtitle text-truncate">{{ currentSubSubTitle ? currentSubSubTitle : '' }}</div>
@@ -109,7 +109,7 @@ export default class SongDetails extends mixins(Colors, ImageLoader) {
   object-fit: cover
 
 .image-container
-  max-width: 170px
+  // max-width: 170px
 
 .text-container > .b-overlay > .bg-dark
   background-image: linear-gradient(0deg, rgba(0, 0, 0, 0.58), rgba(0, 0, 0, 0.58)), radial-gradient(50% 50% at 50% 50%, rgba(255, 255, 255, 0) 0%, rgba(0, 0, 0, 0.2) 100%) !important

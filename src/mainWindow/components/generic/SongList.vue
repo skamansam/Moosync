@@ -5,7 +5,7 @@
         <div ref="headers" class="wrapper w-100 headers">
           <template v-for="(field, index) of extrafields">
             <div :style="{ width: columnWidths[index] + '%' }" :key="`box-${field.key}`" class="box text-truncate">
-              {{ field.key }}
+              {{ field.label ? field.label : field.key }}
             </div>
             <div
               v-if="index !== extrafields.length - 1"
@@ -24,6 +24,7 @@
           :item-size="64"
           key-field="_id"
           :direction="'vertical'"
+          v-click-outside="clearSelection"
         >
           <template v-slot="{ item, index }">
             <div class="wrapper w-100 field-content" :class="{ selectedItem: selected.includes(index) }">
@@ -34,6 +35,7 @@
                 :style="{ width: columnWidths[i1] + '%' }"
                 @dblclick="onRowDoubleClicked(item)"
                 @click="onRowSelected(index)"
+                @contextmenu="onRowContext(arguments[0], item)"
               >
                 {{ field.key === 'index' ? index + 1 : getFieldData(field.key, item) }}
               </div>
@@ -47,7 +49,6 @@
 
 <script lang="ts">
 import Colors from '@/utils/ui/mixins/Colors'
-import { BTable } from 'bootstrap-vue'
 import { mixins } from 'vue-class-component'
 import { Component, Prop, Ref } from 'vue-property-decorator'
 import Vue from 'vue'
@@ -63,7 +64,7 @@ export default class SongList extends mixins(Colors) {
   private songList!: Song[]
 
   @Prop({ default: {} })
-  private extrafields!: [{ key: TableFields }]
+  private extrafields!: [{ key: TableFields; label?: string }]
 
   @Prop({ default: false })
   private tableBusy!: boolean
@@ -76,13 +77,15 @@ export default class SongList extends mixins(Colors) {
     this.selected = []
   }
 
+  private keyPressed: 'Control' | 'Shift' | undefined
+
   private getFieldData(field: TableFields, song: Song) {
     switch (field) {
       case 'title':
         return song.title
-      case 'album':
+      case 'album_name':
         return song.album?.album_name
-      case 'artists':
+      case 'artist_name':
         return song.artists?.join(', ')
     }
   }
@@ -96,6 +99,7 @@ export default class SongList extends mixins(Colors) {
     this.computeDefaultWidths()
     this.generateHandlerMap()
     this.setupMouseEvents()
+    this.setupKeyEvents()
   }
 
   beforeDestroy() {
@@ -193,7 +197,18 @@ export default class SongList extends mixins(Colors) {
     document.removeEventListener('mouseup', this.mouseUp)
   }
 
-  private onRowContext(item: Song, index: number, event: Event) {
+  private setupKeyEvents() {
+    document.addEventListener('keydown', (e) => {
+      if (e.shiftKey || e.ctrlKey) this.keyPressed = e.key as 'Shift' | 'Control'
+    })
+
+    document.addEventListener('keyup', (e) => {
+      if (e.key === 'Shift' && this.keyPressed === 'Shift') this.keyPressed = undefined
+      else if (e.key === 'Control' && this.keyPressed === 'Control') this.keyPressed = undefined
+    })
+  }
+
+  private onRowContext(event: Event, item: Song) {
     this.$emit('onRowContext', event, this.selected.length > 1 ? this.selected : [item])
   }
 
@@ -202,12 +217,16 @@ export default class SongList extends mixins(Colors) {
   }
 
   private onRowSelected(index: number) {
-    // this.selected = items
-    // if (items[items.length - 1] && items[items.length - 1]._id !== this.lastSelect) {
-    //   this.lastSelect = items[items.length - 1]._id!
-    // }
-    // this.$emit('onRowSelected', items)
-    this.selected = [index]
+    if (this.keyPressed === 'Control') this.selected.push(index)
+    else if (this.keyPressed === 'Shift') {
+      if (this.selected.length > 0) {
+        const lastSelected = this.selected[0]
+        const min = Math.min(lastSelected, index)
+        const max = Math.max(lastSelected, index)
+        this.selected = Array.from({ length: max - min + 1 }, (x, i) => min + i)
+      }
+    } else this.selected = [index]
+    this.$emit('onRowSelected', this.songList[index])
   }
 
   private sortContent(): void {
@@ -273,6 +292,9 @@ export default class SongList extends mixins(Colors) {
 
 .headers
   border-bottom: 1px solid var(--textSecondary)
+  div
+    font-weight: bold
+    font-size: 16px
 
 .wrapper
   div

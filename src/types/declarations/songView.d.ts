@@ -10,4 +10,4 @@ interface SongDetailButtons {
   enableLibraryStore: boolean
 }
 
-type TableFields = 'index' | 'title' | 'album' | 'artists'
+type TableFields = 'index' | 'title' | 'album_name' | 'artist_name'

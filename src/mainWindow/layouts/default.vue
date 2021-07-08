@@ -65,7 +65,7 @@ export default class DefaultLayout extends mixins(ContextMenuMixin) {
   top: calc(70px + 18px + 4px)
   right: 0
   bottom: calc(6rem + 30px)
-  height: calc(100% - (6rem + 30px) - 70px)
+  height: calc(100% - (6rem + 30px) - 70px - 11px)
   overflow-y: auto
   overflow-x: hidden
   z-index: 1
@@ -73,7 +73,6 @@ export default class DefaultLayout extends mixins(ContextMenuMixin) {
   padding-right: 20px
   &.is-open
     left: calc(261px + 30px)
-    height: calc(100% - (6rem + 30px) - 70px + 16px)
 </style>
 
 <style lang="sass">

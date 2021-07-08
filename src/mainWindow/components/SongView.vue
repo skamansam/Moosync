@@ -1,27 +1,30 @@
 <template>
   <b-container fluid class="song-container h-100">
     <b-row align-v="center" class="w-100 no-gutters details-background">
-      <b-col class>
-        <SongDetails
-          class="details-container"
-          :currentTitle="currentSong ? currentSong.title : ''"
-          :currentsubTitle="getAlbumName(currentSong)"
-          :currentSubSubTitle="defaultDetails.defaultSubSubtitle"
-          :imgSrc="getImg(currentSong)"
-          :defaultTitle="defaultDetails.defaultTitle"
-          :defaultsubTitle="defaultDetails.defaultSubtitle"
-          :defaultImgSrc="defaultDetails.defaultCover"
-          :buttonGroup="detailsButtonGroup"
-          @playAll="playAll"
-          @addToQueue="addToQueue"
-          @addToLibrary="addToLibrary"
-        />
-      </b-col>
+      <SongDetails
+        class="details-container h-100"
+        :currentTitle="currentSong ? currentSong.title : ''"
+        :currentsubTitle="getAlbumName(currentSong)"
+        :currentSubSubTitle="defaultDetails.defaultSubSubtitle"
+        :imgSrc="getImg(currentSong)"
+        :defaultTitle="defaultDetails.defaultTitle"
+        :defaultsubTitle="defaultDetails.defaultSubtitle"
+        :defaultImgSrc="defaultDetails.defaultCover"
+        :buttonGroup="detailsButtonGroup"
+        @playAll="playAll"
+        @addToQueue="addToQueue"
+        @addToLibrary="addToLibrary"
+      />
     </b-row>
     <b-row class="no-gutters list-container">
       <SongList
         :songList="songList"
-        :extrafields="[{ key: 'index' }, { key: 'title' }, { key: 'album' }, { key: 'artists' }]"
+        :extrafields="[
+          { key: 'index', label: 'Sr. No' },
+          { key: 'title', label: 'Title' },
+          { key: 'album_name', label: 'Album' },
+          { key: 'artist_name', label: 'Artists' }
+        ]"
         :tableBusy="tableBusy"
         @onRowDoubleClicked="queueSong"
         @onRowContext="getSongContextMenu"
@@ -72,8 +75,8 @@ export default class AllSongs extends mixins(Colors, PlayerControls, ModelHelper
   })
   private detailsButtonGroup!: SongDetailButtons
 
-  private updateCoverDetails(items: Song[]) {
-    if (items) this.currentSong = items[items.length - 1]
+  private updateCoverDetails(item: Song | undefined) {
+    if (item) this.currentSong = item
   }
 
   private getSongContextMenu(event: Event, item: Song) {
@@ -95,11 +98,6 @@ export default class AllSongs extends mixins(Colors, PlayerControls, ModelHelper
 </script>
 
 <style lang="sass" scoped>
-@import "~bootstrap/scss/functions"
-@import '~bootstrap/scss/variables'
-@import "~bootstrap/scss/mixins"
-@import "~bootstrap/scss/bootstrap"
-
 .song-container
   overflow-y: hidden
 
@@ -107,26 +105,13 @@ export default class AllSongs extends mixins(Colors, PlayerControls, ModelHelper
   width: 100%
   padding-top: 15px
   padding-bottom: 15px
-  @include media-breakpoint-up(xs)
-    height: 120px
-  @include media-breakpoint-up(sm)
-    height: 150px
-  @include media-breakpoint-up(md-c)
-    height: 170px
-  @include media-breakpoint-up(lg-c)
-    height: 200px
 
 .list-container
-  @include media-breakpoint-up(xs)
-    height: calc(100% - 120px - 30px)
-  @include media-breakpoint-up(sm)
-    height: calc(100% - 150px - 30px)
-  @include media-breakpoint-up(md-c)
-    height: calc(100% - 170px - 30px)
-  @include media-breakpoint-up(lg-c)
-    height: calc(100% - 200px - 30px)
+  height: 75%
 
 .details-background
+  height: 25%
+  max-height: 200px
   margin-top: 15px
   width: calc(100% - 30px)
   border-radius: 28px
