@@ -100,7 +100,6 @@ export default class Sidebar extends mixins(Colors) {
 
 .text-format
   color: var(--textPrimary) !important
-  font-family: 'Proxima Nova'
 
 .button-bar
   margin-top: 1.25rem

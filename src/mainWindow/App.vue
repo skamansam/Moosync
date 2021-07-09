@@ -108,32 +108,28 @@ export default class App extends mixins(ThemeHandler) {
 }
 </script>
 
-<style lang="scss">
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  background: var(--primary);
-  color: var(--textPrimary) !important;
-  width: 100%;
-  height: 100%;
-  /* margin-top: 60px; */
-}
+<style lang="sass">
+#app
+  font-family: 'Nunito Sans'
+  -webkit-font-smoothing: antialiased
+  -moz-osx-font-smoothing: grayscale
+  text-align: center
+  background: var(--primary)
+  color: var(--textPrimary) !important
+  width: 100%
+  height: 100%
 
-*:focus {
-  outline: none;
-}
+*:focus
+  outline: none
 
-body {
-  background-color: var(--primary) !important;
-  color: var(--textPrimary) !important;
-  width: 100vw;
-  height: 100vh;
-}
+body
+  background-color: var(--primary) !important
+  color: var(--textPrimary) !important
+  width: 100vw
+  height: 100vh
 
-.appContainer {
-  width: 100%;
-  height: 100%;
-}
+
+.appContainer
+  width: 100%
+  height: 100%
 </style>

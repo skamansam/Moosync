@@ -234,7 +234,6 @@ export default class NewPlaylistModal extends mixins(Colors) {
   max-width: 100%
 
 .songs-count
-  font-family: 'Proxima Nova'
   font-size: 14px
   text-align: start
 
@@ -247,7 +246,6 @@ export default class NewPlaylistModal extends mixins(Colors) {
   margin-top: 5px
 
 .playlist-title
-  font-family: 'Proxima Nova'
   font-size: 26px
   max-width: 100%
   margin-bottom: 15px !important
@@ -264,7 +262,6 @@ export default class NewPlaylistModal extends mixins(Colors) {
     -webkit-box-shadow: none
 
 .create-button
-  font-family: 'Proxima Nova'
   font-size: 16px
   color: var(--textInverse)
   background-color: var(--accent)

@@ -86,7 +86,6 @@ export default class NewPlaylistModal extends mixins(Colors) {
   margin: 35px 35px 35px 35px
 
 .create-button
-  font-family: 'Proxima Nova'
   font-size: 16px
   color: var(--textInverse)
   background-color: var(--accent)

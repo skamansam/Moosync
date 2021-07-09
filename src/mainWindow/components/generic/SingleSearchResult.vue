@@ -112,8 +112,6 @@ export default class SingleSearchResult extends mixins(PlayerControls) {
 .text-container
   position: relative
   text-align: left
-  font-family: 'Proxima Nova'
-  font-style: normal
   font-weight: normal
 
 .song-title

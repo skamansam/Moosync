@@ -71,7 +71,7 @@ export default class App extends mixins(ThemeHandler) {
 
 <style>
 #app {
-  font-family: 'Proxima Nova';
+  font-family: 'Nunito Sans';
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-align: center;

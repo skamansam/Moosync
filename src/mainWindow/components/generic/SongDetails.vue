@@ -116,7 +116,6 @@ export default class SongDetails extends mixins(Colors, ImageLoader) {
   background-color: #00000000 !important
 
 .text-over
-  font-family: 'Proxima Nova'
   text-align: left
   margin-left: 15px
 

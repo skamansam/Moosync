@@ -96,8 +96,6 @@ export default class Albums extends mixins(RouterPushes, ContextMenuMixin) {
 .album-container
   position: absolute
 .title
-  font-family: Proxima Nova
-  font-style: normal
   font-weight: bold
   font-size: 64px
   line-height: 100px

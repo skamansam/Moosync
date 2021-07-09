@@ -136,9 +136,6 @@ export default class Sidebar extends mixins(Colors) {
   position: absolute
   overflow: hidden
 
-.sidebar-item
-  font-family: 'Proxima Nova'
-
 .icon-spacing
   margin-right: 26px
   padding-left: 6px

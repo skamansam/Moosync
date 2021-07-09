@@ -81,7 +81,6 @@ export default class MusicBar extends mixins(PlayerControls) {
 
 .timestamp
   color: var(--textSecondary)
-  font-family: 'Proxima Nova'
   font-style: normal
   font-weight: normal
   font-size: 18px

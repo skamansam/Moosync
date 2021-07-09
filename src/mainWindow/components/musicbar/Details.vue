@@ -64,8 +64,6 @@ export default class MusicBar extends mixins(Colors, ImageLoader) {
 
 .text
   text-align: left
-  font-family: 'Proxima Nova'
-  font-style: normal
   font-weight: normal
   line-height: 170.19%
 

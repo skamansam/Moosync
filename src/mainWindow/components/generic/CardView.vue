@@ -78,8 +78,6 @@ export default class SongDetails extends mixins(Colors, ImageLoader) {
   white-space: nowrap
   overflow: hidden
   text-overflow: ellipsis
-  font-family: Proxima Nova
-  font-style: normal
   font-weight: bold
   font-size: 24px
   line-height: 29px

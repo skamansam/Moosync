@@ -50,8 +50,6 @@ export default class IconButton extends mixins(Colors, ImageLoader) {
   height: 40px
 
 .title-wrapper
-  font-family: Proxima Nova
-  font-style: normal
   font-weight: bold
   font-size: 14px
   color: white

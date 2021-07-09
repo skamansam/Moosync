@@ -49,7 +49,6 @@ export default class Albums extends mixins(RouterPushes) {
 .album-container
   position: absolute
 .title
-  font-family: Proxima Nova
   font-style: normal
   font-weight: bold
   font-size: 64px
