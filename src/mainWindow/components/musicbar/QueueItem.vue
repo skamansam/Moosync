@@ -1,5 +1,5 @@
 <template>
-  <b-container fluid class="item-container">
+  <b-container fluid class="item-container" @contextmenu="getItemContextMenu">
     <b-row class="item-row">
       <b-col cols="auto" class="img-container h-100 d-flex justify-content-start">
         <b-img class="h-100 image" v-if="!forceEmptyImg" :src="getImgSrc(getValidImage(song))" />
@@ -52,6 +52,7 @@ import Play2 from '@/mainWindow/components/icons/Play2.vue'
 import PlayerControls from '@/utils/ui/mixins/PlayerControls'
 import YoutubeIcon from '@/mainWindow/components/icons/Youtube.vue'
 import SpotifyIcon from '@/mainWindow/components/icons/Spotify.vue'
+import ContextMenuMixin from '@/utils/ui/mixins/ContextMenuMixin'
 
 @Component({
   components: {
@@ -61,7 +62,7 @@ import SpotifyIcon from '@/mainWindow/components/icons/Spotify.vue'
     SpotifyIcon
   }
 })
-export default class MusicInfo extends mixins(Colors, ImgLoader, PlayerControls) {
+export default class MusicInfo extends mixins(Colors, ImgLoader, PlayerControls, ContextMenuMixin) {
   @Prop({ default: () => {} })
   private songID!: string
 
@@ -81,6 +82,17 @@ export default class MusicInfo extends mixins(Colors, ImgLoader, PlayerControls)
 
   private removeSong() {
     this.removeFromQueue(this.index)
+  }
+
+  private getItemContextMenu(event: Event) {
+    this.getContextMenu(event, {
+      type: 'QUEUE_ITEM',
+      args: {
+        isRemote: this.song.type === 'YOUTUBE' || this.song.type === 'SPOTIFY',
+        song: this.song,
+        refreshCallback: () => this.removeSong()
+      }
+    })
   }
 
   private forceEmptyImg: boolean = false

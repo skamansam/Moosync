@@ -135,6 +135,37 @@ export default class ContextMenuMixin extends mixins(PlayerControls, RemoteSong)
     return items
   }
 
+  private getQueueItemMenu(isRemote: boolean, refreshCallback: () => void, item: Song) {
+    const items = [
+      {
+        label: 'Play Now',
+        handler: () => {
+          this.playTop(item)
+        },
+      },
+      {
+        label: 'Remove from Library',
+        handler: async () => {
+          try {
+            await window.DBUtils.removeSongs([item])
+          } catch (e) { console.error(e) }
+          refreshCallback()
+        }
+      },
+      {
+        label: 'Add To Playlist',
+        children: this.populatePlaylistMenu([item], undefined),
+      },
+    ]
+    if (isRemote) {
+      items.push({
+        label: 'Add Song to Library',
+        handler: () => this.addSongsToLibrary(item),
+      })
+    }
+    return items
+  }
+
   public getContextMenu(event: Event, options: ContextMenuArgs) {
     let items: { label: string, handler?: () => void }[] = []
     switch (options.type) {
@@ -152,6 +183,9 @@ export default class ContextMenuMixin extends mixins(PlayerControls, RemoteSong)
         break
       case 'PLAYLIST_CONTENT':
         items = this.getPlaylistContentContextMenu(options.args.isRemote, options.args.refreshCallback, ...options.args.songs)
+        break
+      case 'QUEUE_ITEM':
+        items = this.getQueueItemMenu(options.args.isRemote, options.args.refreshCallback, options.args.song)
         break
     }
     this.emitMenu(event, items)

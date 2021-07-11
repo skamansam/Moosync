@@ -26,4 +26,11 @@ type ContextMenuArgs = {
     refreshCallback: () => void
     songs: Song[]
   }
+} | {
+  type: 'QUEUE_ITEM',
+  args: {
+    isRemote: boolean
+    refreshCallback: () => void
+    song: Song
+  }
 }
