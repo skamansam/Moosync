@@ -8,65 +8,6 @@ class Queue {
   data: { [id: string]: Song } = {}
   order: { id: string, songID: string }[] = []
   index: number = -1
-
-  get top(): Song | null {
-    if (this.index > -1 && this.data) {
-      return this.data[this.order[this.index].songID]
-    }
-    return null
-  }
-
-  private addSong(item: Song) {
-    if (!this.data[item._id!]) {
-      this.data[item._id!] = item
-    }
-  }
-
-  public push(item: Song): void {
-    this.addSong(item)
-    this.order.push({ id: v4(), songID: item._id! })
-  }
-
-  public pushAtIndex(item: Song): void {
-    this.addSong(item)
-    this.order.splice(this.index + 1, 0, { id: v4(), songID: item._id! })
-  }
-
-  public next() {
-    if (this.index < this.order.length - 1) this.index += 1
-    else this.index = 0
-  }
-
-  public prev() {
-    if (this.index > 0) this.index -= 1
-    else this.index = this.order.length - 1
-  }
-
-  public pop(): Song | null {
-    if (this.index > 0) {
-      const id = this.order.pop()
-      return this.data[id!.songID]
-    }
-    return null
-  }
-
-  // https://stackoverflow.com/a/12646864
-  private randomizeArray() {
-    for (let i: number = this.order.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1))
-      const temp = this.order[i]
-      this.order[i] = this.order[j]
-      this.order[j] = temp
-    }
-  }
-
-  public shuffle(): void {
-    const currentSong = this.order[this.index]
-    this.order.splice(this.index, 1)
-    this.randomizeArray()
-    this.order.unshift(currentSong)
-    this.index = 0
-  }
 }
 
 export class PlayerStore extends VuexModule.With({ namespaced: 'player' }) {
@@ -99,19 +40,85 @@ export class PlayerStore extends VuexModule.With({ namespaced: 'player' }) {
     this.songQueue.order = order
   }
 
-  @mutation
-  loadInQueue(Song: Song) {
-    this.songQueue.push(Song)
+  get queueTop(): Song | null {
+    if (this.songQueue.index > -1 && this.songQueue.data) {
+      const songID = this.songQueue.order[this.songQueue.index]
+      if (songID)
+        return this.songQueue.data[songID.songID]
+    }
+    return null
   }
 
   @mutation
-  loadInQueueTop(Song: Song) {
-    this.songQueue.pushAtIndex(Song)
+  private addSong(item: Song) {
+    if (!this.songQueue.data[item._id!]) {
+      this.songQueue.data[item._id!] = item
+    }
+
+    console.log(this.songQueue)
+  }
+
+  @mutation
+  private addInSongQueue(item: Song) {
+    this.songQueue.order.push({ id: v4(), songID: item._id! })
+  }
+
+  @action
+  async loadInQueue(item: Song) {
+    this.addSong(item)
+    this.addInSongQueue(item)
+  }
+
+  @mutation
+  private addInQueueTop(item: Song) {
+    this.songQueue.order.splice(this.songQueue.index + 1, 0, { id: v4(), songID: item._id! })
+  }
+
+  @action
+  async pushInQueueTop(item: Song) {
+    this.addSong(item)
+    this.addInQueueTop(item)
+  }
+
+  @mutation
+  private incrementQueue() {
+    if (this.songQueue.index < this.songQueue.order.length - 1) this.songQueue.index += 1
+    else this.songQueue.index = 0
+  }
+
+  @action
+  async nextSong() {
+    this.incrementQueue()
+    this.loadSong(this.queueTop)
+  }
+
+  @mutation
+  private decrementQueue() {
+    if (this.songQueue.index > 0) this.songQueue.index -= 1
+    else this.songQueue.index = this.songQueue.order.length - 1
+  }
+
+  @action
+  async prevSong() {
+    this.decrementQueue()
+    this.loadSong(this.queueTop)
   }
 
   @mutation
   shuffle() {
-    this.songQueue.shuffle()
+    const currentSong = this.songQueue.order[this.songQueue.index]
+    this.songQueue.order.splice(this.songQueue.index, 1)
+
+    // https://stackoverflow.com/a/12646864
+    for (let i: number = this.songQueue.order.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1))
+      const temp = this.songQueue.order[i]
+      this.songQueue.order[i] = this.songQueue.order[j]
+      this.songQueue.order[j] = temp
+    }
+
+    this.songQueue.order.unshift(currentSong)
+    this.songQueue.index = 0
   }
 
   @action async loadSong(song: Song | null) {
@@ -132,19 +139,5 @@ export class PlayerStore extends VuexModule.With({ namespaced: 'player' }) {
     if (this.currentSong == null) {
       this.nextSong()
     }
-  }
-
-  @action async pushInQueueTop(Song: Song) {
-    this.loadInQueueTop(Song)
-  }
-
-  @action async nextSong() {
-    this.songQueue.next()
-    this.loadSong(this.songQueue.top)
-  }
-
-  @action async prevSong() {
-    this.songQueue.prev()
-    this.loadSong(this.songQueue.top)
   }
 }

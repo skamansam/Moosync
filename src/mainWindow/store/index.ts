@@ -12,7 +12,7 @@ import { createPersist } from '@/utils/ui/store/persist'
 
 Vue.use(Vuex)
 
-const paths = ['player.volume', 'player.currentSong', 'player.state', 'themes.colors']
+const paths = ['player.volume', 'player.currentSong', 'player.state', 'player.songQueue', 'themes.colors']
 
 export const store = new Vuex.Store({
   modules: {
