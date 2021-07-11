@@ -3,14 +3,21 @@
     <div v-if="computedImg" class="dark-overlay"></div>
     <b-img class="bg-img" v-if="computedImg" :src="computedImg"></b-img>
     <b-container fluid class="w-100 h-100 main-container">
-      <b-row no-gutters class="h-100">
+      <b-row no-gutters class="h-100 flex-nowrap">
         <b-col class="h-100" cols="4">
-          <div class="image-container h-100">
-            <b-img class="albumart w-100" v-if="computedImg" :src="computedImg" />
-            <SongDefault class="albumart w-100" v-if="!computedImg" />
+          <div class="image-container w-100">
+            <div class="embed-responsive embed-responsive-1by1">
+              <div class="embed-responsive-item">
+                <b-img class="h-100 w-100 albumart" v-if="computedImg" :src="computedImg" />
+                <SongDefault class="albumart w-100" v-if="!computedImg" />
+              </div>
+            </div>
+
             <div v-if="currentSong" class="song-info-container">
-              <div class="song-title">{{ currentSong.title }}</div>
-              <div class="song-subtitle">
+              <div class="d-flex">
+                <div class="song-title text-truncate">{{ currentSong.title }}</div>
+              </div>
+              <div class="song-subtitle text-truncate">
                 {{ currentSong.artists.join(', ') }}
                 {{ currentSong.artists.length > 0 && currentSong.album && currentSong.album.album_name ? ' - ' : '' }}
                 {{ currentSong.album && currentSong.album.album_name }}
@@ -137,14 +144,13 @@ export default class MusicInfo extends mixins(Colors, ImageLoader, ModelHelper) 
 <style lang="sass" scoped>
 .albumart
   border-radius: 28px
-  max-width: min(600px, calc(100vh - 7.5rem - 1rem - 30px))
-  max-height: calc(100vh - 7.5rem - 1rem - 30px)
   -webkit-user-select: none
   user-select: none
+  object-fit: cover
 
 .image-container
-  max-height: 10%
-  margin-left: 72px
+  position: relative
+  padding-left: 72px
 
 .song-info-container
   text-align: left
@@ -178,6 +184,7 @@ export default class MusicInfo extends mixins(Colors, ImageLoader, ModelHelper) 
 
 .right-container
   margin-left: 5rem
+  padding-right: 72px !important
 
 .bg-img
   height: 100vh
@@ -198,7 +205,6 @@ export default class MusicInfo extends mixins(Colors, ImageLoader, ModelHelper) 
   top: -26px
   background: rgba(0,0,0,.75)
 
-
 .flip-list-move
   transition: transform 0.3s
 
@@ -210,6 +216,7 @@ export default class MusicInfo extends mixins(Colors, ImageLoader, ModelHelper) 
   border-radius: 17px
   padding: 8px 17px 8px 17px
   margin-right: 17px
+  filter: drop-shadow(4px 4px 6px rgba(0, 0, 0, 0.28))
 
 .queue-container-outer
   height: 95%

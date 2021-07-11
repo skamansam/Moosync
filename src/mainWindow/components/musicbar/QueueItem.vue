@@ -8,15 +8,32 @@
           <Play2 class="align-self-center" />
         </div>
       </b-col>
-      <b-col cols="auto">
-        <div class="text-left song-title">{{ song.title }}</div>
-        <div class="text-left song-subtitle">
+      <b-col xl="10" lg="8" sm="7" cols="7">
+        <div class="d-flex">
+          <div class="text-left song-title text-truncate">{{ song.title }}</div>
+          <YoutubeIcon
+            v-if="song.type === 'YOUTUBE'"
+            :color="'#E62017'"
+            :filled="true"
+            :dropShadow="true"
+            class="provider-icon"
+          />
+          <SpotifyIcon
+            v-if="song.type === 'SPOTIFY'"
+            :color="'#1ED760'"
+            :filled="true"
+            :dropShadow="true"
+            class="provider-icon"
+          />
+        </div>
+
+        <div class="text-left song-subtitle text-truncate">
           {{ song.artists.join(', ') }}
           {{ song.artists.length > 0 && song.album && song.album.album_name ? ' - ' : '' }}
           {{ song.album && song.album.album_name }}
         </div>
       </b-col>
-      <b-col class="text-right mr-4 d-flex align-items-center">
+      <b-col cols="auto" class="text-right ml-auto d-flex align-items-center">
         <div class="ml-auto remove-button" @click="removeSong">Remove</div>
       </b-col>
     </b-row>
@@ -33,11 +50,15 @@ import { vxm } from '@/mainWindow/store'
 import ImgLoader from '@/utils/ui/mixins/ImageLoader'
 import Play2 from '@/mainWindow/components/icons/Play2.vue'
 import PlayerControls from '@/utils/ui/mixins/PlayerControls'
+import YoutubeIcon from '@/mainWindow/components/icons/Youtube.vue'
+import SpotifyIcon from '@/mainWindow/components/icons/Spotify.vue'
 
 @Component({
   components: {
     SongDefault,
-    Play2
+    Play2,
+    YoutubeIcon,
+    SpotifyIcon
   }
 })
 export default class MusicInfo extends mixins(Colors, ImgLoader, PlayerControls) {
@@ -72,15 +93,20 @@ export default class MusicInfo extends mixins(Colors, ImgLoader, PlayerControls)
   height: 87px
 
 .image
+  object-fit: cover
+  width: 55px
+  height: 55px
   border-radius: 10px
 
 .song-title
   font-weight: 600
   font-size: 16px
+  min-width: 0
 
 .song-subtitle
-  font-weight: 300
+  font-weight: 250
   font-size: 14px
+  min-width: 0
 
 .item-row
   height: 80px
@@ -106,4 +132,14 @@ export default class MusicInfo extends mixins(Colors, ImgLoader, PlayerControls)
   transition: opacity 0.2s ease
   &:hover
     opacity: 1
+
+.provider-icon
+  align-self: center
+  margin-left: 10px
+
+.img-container
+  min-width: calc(56px + 12px)
+
+.text-content
+  min-width: 0%
 </style>
