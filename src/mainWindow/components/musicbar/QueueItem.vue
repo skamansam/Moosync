@@ -10,7 +10,11 @@
       </b-col>
       <b-col cols="auto">
         <div class="text-left song-title">{{ song.title }}</div>
-        <div class="text-left song-subtitle">{{ song.artists.join(', ') }}</div>
+        <div class="text-left song-subtitle">
+          {{ song.artists.join(', ') }}
+          {{ song.artists.length > 0 && song.album && song.album.album_name ? ' - ' : '' }}
+          {{ song.album && song.album.album_name }}
+        </div>
       </b-col>
       <b-col class="text-right mr-4 d-flex align-items-center">
         <div class="ml-auto remove-button" @click="removeSong">Remove</div>

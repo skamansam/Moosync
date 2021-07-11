@@ -10,7 +10,11 @@
             <SongDefault class="albumart w-100" v-if="!computedImg" />
             <div v-if="currentSong" class="song-info-container">
               <div class="song-title">{{ currentSong.title }}</div>
-              <div class="song-subtitle">{{ currentSong.artists ? currentSong.artists.join(', ') : 'Unknown' }}</div>
+              <div class="song-subtitle">
+                {{ currentSong.artists.join(', ') }}
+                {{ currentSong.artists.length > 0 && currentSong.album && currentSong.album.album_name ? ' - ' : '' }}
+                {{ currentSong.album && currentSong.album.album_name }}
+              </div>
               <div class="song-timestamp">{{ formattedDuration(currentSong.duration) }}</div>
             </div>
           </div>
