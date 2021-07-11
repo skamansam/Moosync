@@ -64,4 +64,12 @@ export default class PlayerControls extends Vue {
   public stop() {
     vxm.player.state = 'STOPPED'
   }
+
+  public playFromQueue(index: number) {
+    vxm.player.playQueueSong(index).catch((err) => console.error(err))
+  }
+
+  public removeFromQueue(index: number) {
+    vxm.player.pop(index)
+  }
 }

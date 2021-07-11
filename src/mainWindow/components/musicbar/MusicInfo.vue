@@ -37,6 +37,7 @@
                       v-for="(element, index) in queueOrder"
                       :key="element.id"
                       :songID="element.songID"
+                      :index="index"
                       :current="index === currentIndex"
                     />
                   </transition-group>

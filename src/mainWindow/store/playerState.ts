@@ -59,6 +59,19 @@ export class PlayerStore extends VuexModule.With({ namespaced: 'player' }) {
   }
 
   @mutation
+  public pop(index: number) {
+    if (index > -1) {
+      const id = this.songQueue.order[index]
+      if (id) {
+        this.songQueue.order.splice(index, 1)
+
+        if (this.songQueue.order.findIndex(val => val.songID === id.songID) === -1)
+          delete this.songQueue.data[id.songID]
+      }
+    }
+  }
+
+  @mutation
   private addInSongQueue(item: Song) {
     this.songQueue.order.push({ id: v4(), songID: item._id! })
   }
@@ -139,5 +152,16 @@ export class PlayerStore extends VuexModule.With({ namespaced: 'player' }) {
     if (this.currentSong == null) {
       this.nextSong()
     }
+  }
+
+  @mutation
+  private moveIndexTo(index: number) {
+    if (index > 0)
+      this.songQueue.index = index
+  }
+
+  @action async playQueueSong(index: number) {
+    this.moveIndexTo(index)
+    this.loadSong(this.queueTop)
   }
 }
