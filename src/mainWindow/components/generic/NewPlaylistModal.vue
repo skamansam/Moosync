@@ -51,13 +51,14 @@ import { mixins } from 'vue-class-component'
 import { bus } from '@/mainWindow/main'
 import { vxm } from '@/mainWindow/store'
 import SongDefault from '@/mainWindow/components/icons/SongDefault.vue'
+import ImgLoader from '@/utils/ui/mixins/ImageLoader'
 
 @Component({
   components: {
     SongDefault
   }
 })
-export default class NewPlaylistModal extends mixins(Colors) {
+export default class NewPlaylistModal extends mixins(Colors, ImgLoader) {
   @Prop({ default: 'NewPlaylistModal' })
   private id!: string
 
@@ -101,7 +102,8 @@ export default class NewPlaylistModal extends mixins(Colors) {
     let mergableImages: string[] = []
     for (const song of this.songs) {
       console.log(song)
-      if (song.album && song.album.album_coverPath) mergableImages.push(song.album.album_coverPath)
+      const cover = this.getValidImage(song)
+      if (cover) mergableImages.push(cover)
     }
     return mergableImages.slice(0, 4)
   }

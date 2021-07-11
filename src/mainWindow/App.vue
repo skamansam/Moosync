@@ -87,17 +87,19 @@ export default class App extends mixins(ThemeHandler) {
     const preservedConsoleInfo = console.info
     const preservedConsoleError = console.error
 
-    console.info = (...args: any[]) => {
-      preservedConsoleInfo.apply(console, args)
-      window.LoggerUtils.info(args)
-    }
+    if (window.LoggerUtils && window.LoggerUtils.info && window.LoggerUtils.error) {
+      console.info = (...args: any[]) => {
+        preservedConsoleInfo.apply(console, args)
+        window.LoggerUtils.info(args)
+      }
 
-    console.error = (...args: any[]) => {
-      preservedConsoleError.apply(console, args)
-      window.LoggerUtils.error(args)
-    }
+      console.error = (...args: any[]) => {
+        preservedConsoleError.apply(console, args)
+        window.LoggerUtils.error(args)
+      }
 
-    window.onerror = (err) => window.LoggerUtils.error(err)
+      window.onerror = (err) => window.LoggerUtils.error(err)
+    }
   }
 
   private registerNotifier() {
@@ -118,6 +120,8 @@ export default class App extends mixins(ThemeHandler) {
   color: var(--textPrimary) !important
   width: 100%
   height: 100%
+  user-select: none
+  user-drag: none
 
 *:focus
   outline: none

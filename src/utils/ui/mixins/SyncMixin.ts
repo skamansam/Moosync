@@ -1,4 +1,5 @@
 import { Component } from 'vue-property-decorator'
+import ImgLoader from '@/utils/ui/mixins/ImageLoader';
 import ModelHelper from '@/utils/ui/mixins/ModelHelper'
 import { PeerMode } from '@/mainWindow/store/syncState'
 import { SyncHolder } from '../sync/syncHandler'
@@ -7,7 +8,7 @@ import { mixins } from 'vue-class-component'
 import { vxm } from '@/mainWindow/store'
 
 @Component
-export default class SyncMixin extends mixins(ModelHelper) {
+export default class SyncMixin extends mixins(ModelHelper, ImgLoader) {
   private isFetching: boolean = false
   private peerHolder = new SyncHolder('http://retardnetwork.cf:4000')
   private isRemoteStateChange: boolean = false
@@ -99,10 +100,13 @@ export default class SyncMixin extends mixins(ModelHelper) {
 
   private async getLocalCover(songID: string) {
     const song = vxm.sync.localQueue.find((song) => song._id == songID)
-    if (song && this.isCoverExists(song)) {
-      const resp = await fetch('media://' + song!.album!.album_coverPath)
-      const buf = await resp.arrayBuffer()
-      return buf
+    if (song) {
+      const cover = this.getValidImage(song)
+      if (cover) {
+        const resp = await fetch(this.getImgSrc(cover))
+        const buf = await resp.arrayBuffer()
+        return buf
+      }
     }
     return null
   }

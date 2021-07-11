@@ -1,6 +1,6 @@
 <template>
   <b-row align-v="center" class="justify-content-center">
-    <b-col cols="auto" class="timestamp">{{ formatDuration(timestamp) }} / {{ formatDuration(duration) }}</b-col>
+    <b-col cols="auto" class="timestamp">{{ formattedDuration(timestamp) }} / {{ formattedDuration(duration) }}</b-col>
     <b-col cols="auto" v-on:click="prevSong()">
       <LastTrack />
     </b-col>
@@ -33,6 +33,7 @@ import Shuffle from '@/mainWindow/components/icons/Shuffle.vue'
 import { mixins } from 'vue-class-component'
 import PlayerControls from '@/utils/ui/mixins/PlayerControls'
 import { vxm } from '@/mainWindow/store'
+import { convertDuration } from '@/utils/common'
 
 @Component({
   components: {
@@ -60,18 +61,10 @@ export default class MusicBar extends mixins(PlayerControls) {
     return vxm.player.Repeat
   }
 
+  private formattedDuration = convertDuration
+
   private toggleRepeat() {
     vxm.player.repeat = !this.repeat
-  }
-
-  private formatDuration(n: number) {
-    let tmp = new Date(n * 1000).toISOString().substr(11, 8)
-
-    if (tmp[0] == '0' && tmp[1] == '0') {
-      return tmp.substr(3)
-    }
-
-    return tmp
   }
 }
 </script>

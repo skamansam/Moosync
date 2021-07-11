@@ -71,7 +71,7 @@ export default class Sidebar extends Vue {
   top: 0;
   left: 0;
   right: 0;
-  z-index: 1;
+  z-index: 999 !important;
   width: 100%;
   height: 18px;
   margin-top: 4px;

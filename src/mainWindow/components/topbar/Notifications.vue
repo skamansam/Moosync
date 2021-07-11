@@ -1,13 +1,7 @@
 <template>
   <div>
     <NotificationIcon id="notification" class="notification-icon" />
-    <b-popover
-      :show="true"
-      :target="`notification`"
-      placement="bottom"
-      triggers="focus"
-      custom-class="notification-popover"
-    >
+    <b-popover :target="`notification`" placement="bottom" triggers="focus" custom-class="notification-popover">
       <div v-if="notifications.length !== 0" class="event-container">
         <div v-for="event in notifications" :key="event.id" class="event">
           <div class="event-body">{{ event.message }}</div>

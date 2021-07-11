@@ -45,7 +45,7 @@
       />
     </div>
     <div class="slider" :class="{ open: sliderPosition }">
-      <MusicInfo :imgSrc="getImg(currentSong)" />
+      <MusicInfo :currentSong="currentSong" :imgSrc="getImg(currentSong)" />
     </div>
   </div>
 </template>
@@ -121,7 +121,7 @@ export default class MusicBar extends mixins(Colors, ModelHelper) {
   background: var(--primary)
   position: fixed
   bottom: 0
-  height: 6.5rem
+  height: 6rem
 
 .timeline-container
   height: 1rem
@@ -130,6 +130,7 @@ export default class MusicBar extends mixins(Colors, ModelHelper) {
 
 .timeline
   height: 0.5rem !important
+  padding: 0 !important
   width: 100%
 
 .musicbar

@@ -2,10 +2,6 @@ import { Component, Vue } from 'vue-property-decorator'
 
 @Component
 export default class ModelHelper extends Vue {
-  public isCoverExists(song: Song | null) {
-    return song && (song.song_coverPath || (song.album && song.album.album_coverPath))
-  }
-
   public isAlbumExists(song: Song | null) {
     return song && song.album
   }

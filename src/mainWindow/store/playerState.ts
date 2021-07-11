@@ -1,17 +1,17 @@
-
 import { action, mutation } from 'vuex-class-component'
-import { vxm } from '.'
-import { VuexModule } from './module'
 
+import { VuexModule } from './module'
+import { v4 } from 'uuid';
+import { vxm } from '.'
 
 class Queue {
   data: { [id: string]: Song } = {}
-  order: string[] = []
+  order: { id: string, songID: string }[] = []
   index: number = -1
 
   get top(): Song | null {
     if (this.index > -1 && this.data) {
-      return this.data[this.order[this.index]]
+      return this.data[this.order[this.index].songID]
     }
     return null
   }
@@ -24,12 +24,12 @@ class Queue {
 
   public push(item: Song): void {
     this.addSong(item)
-    this.order.push(item._id!)
+    this.order.push({ id: v4(), songID: item._id! })
   }
 
   public pushAtIndex(item: Song): void {
     this.addSong(item)
-    this.order.splice(this.index + 1, 0, item._id!)
+    this.order.splice(this.index + 1, 0, { id: v4(), songID: item._id! })
   }
 
   public next() {
@@ -45,7 +45,7 @@ class Queue {
   public pop(): Song | null {
     if (this.index > 0) {
       const id = this.order.pop()
-      return this.data[id!]
+      return this.data[id!.songID]
     }
     return null
   }
@@ -86,6 +86,17 @@ export class PlayerStore extends VuexModule.With({ namespaced: 'player' }) {
 
   get Repeat() {
     return this.repeat
+  }
+
+  get queueOrder() {
+    return this.songQueue.order
+  }
+
+  set queueOrder(order: { id: string, songID: string }[]) {
+    if (order.length === 0) {
+      this.currentSong = null
+    }
+    this.songQueue.order = order
   }
 
   @mutation
