@@ -6,6 +6,7 @@
         :currentTitle="currentSong ? currentSong.title : ''"
         :currentsubTitle="getAlbumName(currentSong)"
         :currentSubSubTitle="defaultDetails.defaultSubSubtitle"
+        :currentType="currentSong ? currentSong.type : 'LOCAL'"
         :imgSrc="getImg(currentSong)"
         :defaultTitle="defaultDetails.defaultTitle"
         :defaultsubTitle="defaultDetails.defaultSubtitle"

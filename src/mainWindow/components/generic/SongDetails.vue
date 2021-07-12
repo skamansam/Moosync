@@ -11,7 +11,23 @@
       <SongDefault v-else class="h-100 image" />
       <!-- </b-col> -->
       <b-col cols="auto" class="text-container text-truncate">
-        <div class="title text-truncate">{{ currentTitle ? currentTitle : defaultTitle }}</div>
+        <div class="d-flex">
+          <div class="title text-truncate">{{ currentTitle ? currentTitle : defaultTitle }}</div>
+          <YoutubeIcon
+            v-if="currentType === 'YOUTUBE'"
+            :color="'#E62017'"
+            :filled="true"
+            :dropShadow="true"
+            class="ml-2 align-self-center"
+          />
+          <SpotifyIcon
+            v-if="currentType === 'SPOTIFY'"
+            :color="'#07C330'"
+            :filled="true"
+            :dropShadow="true"
+            class="ml-2 align-self-center"
+          />
+        </div>
         <div class="subtitle text-truncate">{{ currentsubTitle ? currentsubTitle : defaultsubTitle }}</div>
         <div class="subtitle text-truncate">{{ currentSubSubTitle ? currentSubSubTitle : '' }}</div>
 
@@ -33,6 +49,8 @@ import SongDefault from '@/mainWindow/components/icons/SongDefault.vue'
 import PlainPlay from '@/mainWindow/components/icons/PlainPlay.vue'
 import AddToLibrary from '@/mainWindow/components/icons/AddToLibrary.vue'
 import AddToQueue from '@/mainWindow/components/icons/AddToQueue.vue'
+import YoutubeIcon from '@/mainWindow/components/icons/Youtube.vue'
+import SpotifyIcon from '@/mainWindow/components/icons/Spotify.vue'
 
 import ImageLoader from '@/utils/ui/mixins/ImageLoader'
 
@@ -41,7 +59,9 @@ import ImageLoader from '@/utils/ui/mixins/ImageLoader'
     SongDefault,
     PlainPlay,
     AddToLibrary,
-    AddToQueue
+    AddToQueue,
+    YoutubeIcon,
+    SpotifyIcon
   }
 })
 export default class SongDetails extends mixins(Colors, ImageLoader) {
@@ -56,6 +76,9 @@ export default class SongDetails extends mixins(Colors, ImageLoader) {
 
   @Prop({ default: '' })
   private imgSrc!: string
+
+  @Prop({ default: 'LOCAL' })
+  private currentType!: string
 
   @Prop({ default: '' })
   private defaultTitle!: string
