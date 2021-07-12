@@ -5,6 +5,7 @@ import 'threads/register'
 import { BrowserWindow, Menu, Tray, app, nativeTheme, protocol, session } from 'electron'
 import installExtension, { VUEJS_DEVTOOLS } from 'electron-devtools-installer'
 import path, { resolve } from 'path'
+import { scheduler, setupScanTask } from '@/utils/main/scheduler/index';
 
 import EventEmitter from 'events'
 import { OAuthHandler } from '@/utils/main/oauth/handler'
@@ -105,6 +106,7 @@ function initializeTray() {
         label: 'Quit',
         click: function () {
           isQuitting = true
+          scheduler.stop()
           app.exit()
         },
       },
@@ -210,6 +212,8 @@ app.on('ready', async () => {
   nativeTheme.themeSource = 'dark'
   await loadPreferences()
   mainWindow = await createWindow()
+
+  setupScanTask()
 })
 
 // Exit cleanly on request from parent process in development mode.

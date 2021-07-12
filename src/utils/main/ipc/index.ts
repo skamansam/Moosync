@@ -13,11 +13,13 @@ import { StoreChannel } from './store'
 import { ipcMain } from 'electron'
 import { mainWindow } from '@/background';
 
+export const scannerChannel = new ScannerChannel()
+
 export function registerIpcChannels() {
   const ipcChannels = [
     new SongsChannel(),
     new AlbumsChannel(),
-    new ScannerChannel(),
+    scannerChannel,
     new PlaylistsChannel(),
     new ArtistsChannel(),
     new GenreChannel(),

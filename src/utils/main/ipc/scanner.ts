@@ -136,7 +136,9 @@ export class ScannerChannel implements IpcChannelInterface {
     }
   }
 
-  private async scanAll(event: IpcMainEvent, request: IpcRequest) {
+  private async scanAll(event?: IpcMainEvent, request?: IpcRequest) {
+    console.log('scanning')
+
     const scanner = await spawn(new Worker('@/utils/main/workers/scanner.ts', { type: 'module' }))
     const cover = await spawn(new Worker('@/utils/main/workers/covers.ts', { type: 'module' }))
 
@@ -163,11 +165,11 @@ export class ScannerChannel implements IpcChannelInterface {
     if (this.scanStatus == scanning.QUEUED) {
       this.scanAll(event, request)
     }
-
+    if (event && request) event.reply(request.responseChannel)
     this.scanStatus = scanning.UNDEFINED
   }
 
-  private ScanSongs(event: IpcMainEvent, request: IpcRequest) {
-    this.scanAll(event, request).catch((err) => console.error(err))
+  public async ScanSongs(event?: IpcMainEvent, request?: IpcRequest) {
+    return this.scanAll(event, request).catch((err) => console.error(err))
   }
 }
