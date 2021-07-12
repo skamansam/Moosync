@@ -7,6 +7,9 @@
         <div @click="playSong" class="play-button d-flex justify-content-center">
           <Play2 class="align-self-center" />
         </div>
+        <div v-if="current" class="now-playing d-flex justify-content-center">
+          <AnimatedEqualizer class="animated-playing" />
+        </div>
       </b-col>
       <b-col xl="10" lg="8" sm="7" cols="7">
         <div class="d-flex">
@@ -52,6 +55,8 @@ import Play2 from '@/mainWindow/components/icons/Play2.vue'
 import PlayerControls from '@/utils/ui/mixins/PlayerControls'
 import YoutubeIcon from '@/mainWindow/components/icons/Youtube.vue'
 import SpotifyIcon from '@/mainWindow/components/icons/Spotify.vue'
+import AnimatedEqualizer from '@/mainWindow/components/icons/AnimatedEqualizer.vue'
+
 import ContextMenuMixin from '@/utils/ui/mixins/ContextMenuMixin'
 
 @Component({
@@ -59,7 +64,8 @@ import ContextMenuMixin from '@/utils/ui/mixins/ContextMenuMixin'
     SongDefault,
     Play2,
     YoutubeIcon,
-    SpotifyIcon
+    SpotifyIcon,
+    AnimatedEqualizer
   }
 })
 export default class MusicInfo extends mixins(Colors, ImgLoader, PlayerControls, ContextMenuMixin) {
@@ -134,12 +140,14 @@ export default class MusicInfo extends mixins(Colors, ImgLoader, PlayerControls,
   cursor: pointer
   padding: 10px
 
-.play-button
+.play-button, .now-playing
   width: calc(80px - (12px * 2))
   height: calc(80px - (12px * 2))
   background: rgba(0, 0, 0, 0.6)
   position: absolute
   border-radius: 10px
+
+.play-button
   opacity: 0
   transition: opacity 0.2s ease
   &:hover
@@ -154,4 +162,8 @@ export default class MusicInfo extends mixins(Colors, ImgLoader, PlayerControls,
 
 .text-content
   min-width: 0%
+
+.animated-playing
+  padding-top: 14px
+  padding-bottom: 14px
 </style>
