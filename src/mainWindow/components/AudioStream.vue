@@ -72,6 +72,7 @@ export default class AudioStream extends mixins(Colors, SyncMixin) {
   @Watch('currentSong')
   onSongChanged(newSong: Song | null) {
     if (newSong) this.loadAudio(newSong, false)
+    else this.unloadAudio()
   }
 
   onVolumeChanged(newValue: number) {
@@ -157,6 +158,10 @@ export default class AudioStream extends mixins(Colors, SyncMixin) {
     if (this.handleBroadcasterAudioLoad(song)) return
 
     this.handleFirstPlayback(loadedState)
+  }
+
+  private unloadAudio() {
+    this.activePlayer.stop()
   }
 
   private async handleActivePlayerState(newState: PlayerState) {

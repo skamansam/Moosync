@@ -33,6 +33,14 @@ export class PlayerStore extends VuexModule.With({ namespaced: 'player' }) {
     return this.songQueue.order
   }
 
+  get queueIndex() {
+    return this.songQueue.index
+  }
+
+  set queueIndex(value: number) {
+    this.songQueue.index = value
+  }
+
   set queueOrder(order: { id: string, songID: string }[]) {
     if (order.length === 0) {
       this.currentSong = null

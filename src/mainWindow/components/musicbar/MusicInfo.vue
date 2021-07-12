@@ -36,13 +36,7 @@
             </b-row>
             <b-row class="queue-container-outer">
               <b-col class="h-100 queue-container mr-4">
-                <draggable
-                  class="h-100"
-                  v-model="queueOrder"
-                  ghost-class="ghost"
-                  @start="drag = true"
-                  @end="drag = false"
-                >
+                <draggable class="h-100" v-model="queueOrder" ghost-class="ghost" @change="handleIndexChange">
                   <transition-group name="flip-list">
                     <QueueItem
                       v-for="(element, index) in queueOrder"
@@ -92,7 +86,7 @@ export default class MusicInfo extends mixins(Colors, ImageLoader, ModelHelper) 
   }
 
   get currentIndex() {
-    return vxm.player.queue.index
+    return vxm.player.queueIndex
   }
 
   set queueOrder(value: { id: string; songID: string }[]) {
@@ -123,6 +117,20 @@ export default class MusicInfo extends mixins(Colors, ImageLoader, ModelHelper) 
 
   private saveAsPlaylist() {
     bus.$emit(EventBus.SHOW_NEW_PLAYLIST_MODAL, this.parseQueueItems())
+  }
+
+  private handleIndexChange(change: {
+    moved: { element: { id: string; songID: string }; newIndex: number; oldIndex: number }
+  }) {
+    if (change.moved.oldIndex === this.currentIndex) {
+      vxm.player.queueIndex = change.moved.newIndex
+    } else if (change.moved.newIndex === this.currentIndex) {
+      if (change.moved.oldIndex < this.currentIndex) {
+        vxm.player.queueIndex = vxm.player.queueIndex - 1
+      } else {
+        vxm.player.queueIndex = vxm.player.queueIndex + 1
+      }
+    }
   }
 
   @Prop({ default: '' })
