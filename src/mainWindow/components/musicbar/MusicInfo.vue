@@ -26,7 +26,7 @@
             </div>
           </div>
         </b-col>
-        <b-col class="right-container h-100">
+        <b-col offset="1" cols="7" class="right-container h-100">
           <div class="h-100" v-if="queueOrder.length > 0">
             <b-row>
               <b-col cols="auto" class="d-flex">
@@ -36,7 +36,14 @@
             </b-row>
             <b-row class="queue-container-outer">
               <b-col class="h-100 queue-container mr-4">
-                <draggable class="h-100" v-model="queueOrder" ghost-class="ghost" @change="handleIndexChange">
+                <draggable
+                  class="h-100"
+                  v-model="queueOrder"
+                  ghost-class="ghost"
+                  @start="drag = true"
+                  @end="drag = false"
+                  @change="handleIndexChange"
+                >
                   <transition-group name="flip-list">
                     <QueueItem
                       v-for="(element, index) in queueOrder"
@@ -192,7 +199,6 @@ export default class MusicInfo extends mixins(Colors, ImageLoader, ModelHelper) 
 
 .right-container
   margin-left: 5rem
-  padding-right: 72px !important
 
 .bg-img
   height: 100vh
