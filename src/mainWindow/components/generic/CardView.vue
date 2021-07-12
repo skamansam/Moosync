@@ -12,7 +12,7 @@
               :src="getImgSrc(imgSrc)"
               alt="Album Art"
               class="img-fluid w-100 h-100"
-              @error="handleError"
+              @error="handlerImageError(arguments[0], handleError)"
             />
             <div class="default-icon">
               <slot v-if="!imgSrc || forceEmptyImg" name="defaultCover" />
@@ -32,11 +32,12 @@ import Colors from '@/utils/ui/mixins/Colors'
 import ImageLoader from '@/utils/ui/mixins/ImageLoader'
 import { mixins } from 'vue-class-component'
 import { Component, Prop, Watch } from 'vue-property-decorator'
+import ErrorHandler from '@/utils/ui/mixins/errorHandler'
 
 @Component({
   components: {}
 })
-export default class SongDetails extends mixins(Colors, ImageLoader) {
+export default class SongDetails extends mixins(Colors, ImageLoader, ErrorHandler) {
   @Prop({ default: '' })
   private title!: string
 

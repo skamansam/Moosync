@@ -76,7 +76,7 @@ export class SyncHolder {
   private onQueueAddCallback?: (value: string) => void
   private playRequestedSongCallback?: (songIndex: number) => void
 
-  private getCurrentSong?: () => Song | null
+  private getCurrentSong?: () => Song | null | undefined
   private getLocalSong?: (songID: string) => Promise<ArrayBuffer | null>
   private getLocalCover?: (songID: string) => Promise<ArrayBuffer | null>
 
@@ -123,7 +123,7 @@ export class SyncHolder {
     this.getLocalSong = callback
   }
 
-  set fetchCurrentSong(callback: () => Song | null) {
+  set fetchCurrentSong(callback: () => Song | null | undefined) {
     this.getCurrentSong = callback
   }
 
@@ -517,7 +517,7 @@ export class SyncHolder {
    * @param trackInfo
    * @param song_index index of song in room queue
    */
-  private sendSongDetails(trackInfo: Song | null) {
+  private sendSongDetails(trackInfo: Song | null | undefined) {
     if (trackInfo) {
       this.socketConnection.emit('trackMetadata', this.stripSong(trackInfo))
     }

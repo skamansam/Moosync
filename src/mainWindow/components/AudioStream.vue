@@ -17,9 +17,11 @@ import { YoutubePlayer } from '@/utils/ui/players/youtube'
 import { LocalPlayer } from '@/utils/ui/players/local'
 import SyncMixin from '@/utils/ui/mixins/SyncMixin'
 import { vxm } from '../store'
+import ErrorHandler from '@/utils/ui/mixins/errorHandler'
+import PlayerControls from '@/utils/ui/mixins/PlayerControls'
 
 @Component({})
-export default class AudioStream extends mixins(Colors, SyncMixin) {
+export default class AudioStream extends mixins(Colors, SyncMixin, PlayerControls, ErrorHandler) {
   @Ref('audio') audioElement!: HTMLAudioElement
 
   @Prop({ default: '' })
@@ -28,11 +30,8 @@ export default class AudioStream extends mixins(Colors, SyncMixin) {
   @Prop({ default: 0 })
   forceSeek!: number
 
-  @Prop({ default: 'STOPPED' })
-  playerState!: PlayerState
-
   @Prop({ default: null })
-  currentSong!: Song | null
+  currentSong!: Song | null | undefined
 
   private activePlayer!: Player
   private ytPlayer!: YoutubePlayer
@@ -48,7 +47,6 @@ export default class AudioStream extends mixins(Colors, SyncMixin) {
     return vxm.player.volume
   }
 
-  @Watch('playerState')
   onPlayerStateChanged(newState: PlayerState) {
     this.handleActivePlayerState(newState)
     this.emitPlayerState(newState)
@@ -70,7 +68,7 @@ export default class AudioStream extends mixins(Colors, SyncMixin) {
   }
 
   @Watch('currentSong')
-  onSongChanged(newSong: Song | null) {
+  onSongChanged(newSong: Song | null | undefined) {
     if (newSong) this.loadAudio(newSong, false)
     else this.unloadAudio()
   }
@@ -96,6 +94,8 @@ export default class AudioStream extends mixins(Colors, SyncMixin) {
     this.ytPlayer = new YoutubePlayer(new YTPlayer('#yt-player'))
     this.localPlayer = new LocalPlayer(this.audioElement)
     this.activePlayer = this.localPlayer
+
+    vxm.player.$watch('playerState', this.onPlayerStateChanged)
   }
 
   private setupSync() {
@@ -120,6 +120,7 @@ export default class AudioStream extends mixins(Colors, SyncMixin) {
   private registerPlayerListeners() {
     this.activePlayer.onEnded = () => this.onSongEnded()
     this.activePlayer.onTimeUpdate = (time) => this.$emit('onTimeUpdate', time)
+    this.activePlayer.onError = this.handlerFileError
 
     vxm.player.$watch('volume', this.onVolumeChanged)
   }
@@ -165,14 +166,19 @@ export default class AudioStream extends mixins(Colors, SyncMixin) {
   }
 
   private async handleActivePlayerState(newState: PlayerState) {
-    switch (newState) {
-      case 'PLAYING':
-        return this.activePlayer.play()
-      case 'PAUSED':
-      case 'LOADING':
-        return this.activePlayer.pause()
-      case 'STOPPED':
-        return this.activePlayer.stop()
+    try {
+      switch (newState) {
+        case 'PLAYING':
+          return await this.activePlayer.play()
+        case 'PAUSED':
+        case 'LOADING':
+          return this.activePlayer.pause()
+        case 'STOPPED':
+          return this.activePlayer.stop()
+      }
+    } catch (e) {
+      this.handlerFileError(e)
+      this.nextSong()
     }
   }
 }

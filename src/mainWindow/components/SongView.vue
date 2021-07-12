@@ -57,7 +57,7 @@ export default class AllSongs extends mixins(Colors, PlayerControls, ModelHelper
   @Prop({ default: false })
   private tableBusy!: boolean
 
-  private currentSong: Song | null = null
+  private currentSong: Song | null | undefined = null
 
   @Prop({
     default: () => {

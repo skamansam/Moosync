@@ -1,5 +1,6 @@
 import { Player } from './player'
 import YTPlayer from 'yt-player'
+
 export class YoutubePlayer extends Player {
   playerInstance: YTPlayer
 
@@ -52,6 +53,10 @@ export class YoutubePlayer extends Player {
 
   protected listenOnLoad(): void {
     this.playerInstance.on('cued', this.onLoadCallback!)
+  }
+
+  protected listenOnError(): void {
+    this.playerInstance.on('error', this.onErrorCallback as (err: Error) => void)
   }
 
   removeAllListeners(): void {

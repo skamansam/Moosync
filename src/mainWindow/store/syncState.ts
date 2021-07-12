@@ -1,6 +1,7 @@
-import { vxm } from '@/mainWindow/store';
-import { mutation, action } from 'vuex-class-component';
+import { action, mutation } from 'vuex-class-component';
+
 import { VuexModule } from './module'
+import { vxm } from '@/mainWindow/store';
 
 export enum PeerMode {
   WATCHER,
@@ -9,7 +10,7 @@ export enum PeerMode {
 }
 export class SyncStore extends VuexModule.With({ namespaced: 'sync' }) {
   mode: PeerMode = PeerMode.UNDEFINED
-  currentSongDets: Song | null = null
+  currentSongDets: Song | null | undefined = null
   currentCover: string = ''
   prefetch: prefetchData[] = []
   currentFetchSong: string = ''
@@ -30,7 +31,7 @@ export class SyncStore extends VuexModule.With({ namespaced: 'sync' }) {
   }
 
   @mutation
-  setSong(song: Song | null) {
+  setSong(song: Song | null | undefined) {
     this.currentSongDets = song
   }
 

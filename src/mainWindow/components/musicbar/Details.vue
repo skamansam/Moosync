@@ -7,7 +7,7 @@
       v-if="getImgSrc(imgSrc) && !forceEmptyImg"
       :src="getImgSrc(imgSrc)"
       alt="cover art"
-      @error="handleImageError"
+      @error="handlerImageError(arguments[0], handleError)"
     />
     <SongDefault v-if="!getImgSrc(imgSrc) || forceEmptyImg" class="coverimg" />
     <div class="text-container">
@@ -23,13 +23,14 @@ import { mixins } from 'vue-class-component'
 import { Component, Prop, Watch } from 'vue-property-decorator'
 import SongDefault from '@/mainWindow/components/icons/SongDefault.vue'
 import ImageLoader from '@/utils/ui/mixins/ImageLoader'
+import ErrorHandler from '@/utils/ui/mixins/errorHandler'
 
 @Component({
   components: {
     SongDefault
   }
 })
-export default class MusicBar extends mixins(Colors, ImageLoader) {
+export default class MusicBar extends mixins(Colors, ImageLoader, ErrorHandler) {
   @Prop({ default: '-' })
   title!: string
 
@@ -41,7 +42,7 @@ export default class MusicBar extends mixins(Colors, ImageLoader) {
 
   private forceEmptyImg: boolean = false
 
-  private handleImageError() {
+  private handleError() {
     this.forceEmptyImg = true
   }
 

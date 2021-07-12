@@ -1,4 +1,5 @@
 import { Player } from './player'
+
 export class LocalPlayer extends Player {
   playerInstance: HTMLAudioElement
 
@@ -51,6 +52,10 @@ export class LocalPlayer extends Player {
 
   protected listenOnLoad(): void {
     this.playerInstance.oncanplay = this.onLoadCallback!
+  }
+
+  protected listenOnError(): void {
+    this.playerInstance.onerror = this.onErrorCallback as OnErrorEventHandler
   }
 
   removeAllListeners(): void {

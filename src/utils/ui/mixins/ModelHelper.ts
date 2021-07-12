@@ -2,25 +2,25 @@ import { Component, Vue } from 'vue-property-decorator'
 
 @Component
 export default class ModelHelper extends Vue {
-  public isAlbumExists(song: Song | null) {
+  public isAlbumExists(song: Song | null | undefined) {
     return song && song.album
   }
 
-  public isArtistExists(song: Song | null) {
+  public isArtistExists(song: Song | null | undefined) {
     return song && song.artists
   }
 
-  public getImg(song: Song | null): string | undefined | null {
+  public getImg(song: Song | null | undefined): string | undefined | null {
     if (song)
       return song.song_coverPath ?? (this.isAlbumExists(song) && song!.album!.album_coverPath)
     return ''
   }
 
-  public getAlbumName(song: Song | null): String {
+  public getAlbumName(song: Song | null | undefined): String {
     return this.isAlbumExists(song) ? song!.album!.album_name! : ''
   }
 
-  public getArtists(song: Song | null) {
+  public getArtists(song: Song | null | undefined) {
     return this.isArtistExists(song) ? song!.artists!.join(', ') : '-'
   }
 }

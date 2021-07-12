@@ -12,7 +12,7 @@ class Queue {
 
 export class PlayerStore extends VuexModule.With({ namespaced: 'player' }) {
   public state: PlayerState = 'PAUSED'
-  public currentSong: Song | null = null
+  public currentSong: Song | null | undefined | undefined = null
   private songQueue = new Queue()
   public repeat: boolean = false
   public volume: number = 50
@@ -48,7 +48,7 @@ export class PlayerStore extends VuexModule.With({ namespaced: 'player' }) {
     this.songQueue.order = order
   }
 
-  get queueTop(): Song | null {
+  get queueTop(): Song | null | undefined {
     if (this.songQueue.index > -1 && this.songQueue.data) {
       const songID = this.songQueue.order[this.songQueue.index]
       if (songID)
@@ -142,7 +142,7 @@ export class PlayerStore extends VuexModule.With({ namespaced: 'player' }) {
     this.songQueue.index = 0
   }
 
-  @action async loadSong(song: Song | null) {
+  @action async loadSong(song: Song | null | undefined) {
     if (song && song.type === 'SPOTIFY') {
       const ytItem = await vxm.providers.spotifyProvider.spotifyToYoutube(song)
       if (ytItem) {

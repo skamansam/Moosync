@@ -90,7 +90,7 @@ export class ScannerChannel implements IpcChannelInterface {
     const songs = await SongDB.getAllSongs()
     const thumbPath = (await loadPreferences()).thumbnailPath
     for (const s of songs) {
-      if (s.type === 'LOCAL') {
+      if (s.type === 'LOCAL' && !s.song_coverPath) {
         const coverPath = path.join(thumbPath, s._id! + '.jpg')
         const coverStatus = await cover(s.path!, coverPath)
         if (coverStatus) {
@@ -99,9 +99,12 @@ export class ScannerChannel implements IpcChannelInterface {
           if (s.album && s.album.album_name) {
             const existingAlbum = await SongDB.getAlbumByName(s.album.album_name)
             if (!existingAlbum!.album_coverPath) {
-
               await SongDB.updateAlbum({ album_id: existingAlbum!.album_id, album_coverPath: coverPath })
             }
+          }
+        } else {
+          if (s.album && s.album.album_coverPath) {
+            await SongDB.updateSongCover(s._id!, s.album.album_coverPath)
           }
         }
       }

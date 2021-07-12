@@ -6,7 +6,7 @@
         v-if="(getImgSrc(imgSrc) || getImgSrc(defaultImgSrc)) && !forceEmptyImg"
         class="image h-100"
         :src="getImgSrc(imgSrc) ? getImgSrc(imgSrc) : getImgSrc(defaultImgSrc)"
-        @error="handleImageError"
+        @error="handlerImageError(arguments[0], handleError)"
       />
       <SongDefault v-else class="h-100 image" />
       <!-- </b-col> -->
@@ -18,14 +18,14 @@
             :color="'#E62017'"
             :filled="true"
             :dropShadow="true"
-            class="ml-2 align-self-center"
+            class="ml-2 align-self-center provider-icon"
           />
           <SpotifyIcon
             v-if="currentType === 'SPOTIFY'"
             :color="'#07C330'"
             :filled="true"
             :dropShadow="true"
-            class="ml-2 align-self-center"
+            class="ml-2 align-self-center provider-icon"
           />
         </div>
         <div class="subtitle text-truncate">{{ currentsubTitle ? currentsubTitle : defaultsubTitle }}</div>
@@ -51,7 +51,7 @@ import AddToLibrary from '@/mainWindow/components/icons/AddToLibrary.vue'
 import AddToQueue from '@/mainWindow/components/icons/AddToQueue.vue'
 import YoutubeIcon from '@/mainWindow/components/icons/Youtube.vue'
 import SpotifyIcon from '@/mainWindow/components/icons/Spotify.vue'
-
+import ErrorHandler from '@/utils/ui/mixins/errorHandler'
 import ImageLoader from '@/utils/ui/mixins/ImageLoader'
 
 @Component({
@@ -64,7 +64,7 @@ import ImageLoader from '@/utils/ui/mixins/ImageLoader'
     SpotifyIcon
   }
 })
-export default class SongDetails extends mixins(Colors, ImageLoader) {
+export default class SongDetails extends mixins(Colors, ImageLoader, ErrorHandler) {
   @Prop({ default: '' })
   private currentTitle!: string
 
@@ -99,7 +99,7 @@ export default class SongDetails extends mixins(Colors, ImageLoader) {
   })
   private buttonGroup!: SongDetailButtons
 
-  private handleImageError() {
+  private handleError() {
     this.forceEmptyImg = true
   }
 
@@ -163,4 +163,8 @@ export default class SongDetails extends mixins(Colors, ImageLoader) {
   bottom: 0
   svg
     margin-right: 16px
+
+.provider-icon
+  height: 20px
+  width: 20px
 </style>

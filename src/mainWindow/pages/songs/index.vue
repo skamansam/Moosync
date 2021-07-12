@@ -20,7 +20,7 @@ import { arrayDiff } from '@/utils/common'
 })
 export default class AllSongs extends mixins(ContextMenuMixin) {
   private songList: Song[] = []
-  private currentSong: Song | null = null
+  private currentSong: Song | null | undefined = null
 
   get playlists() {
     return vxm.playlist.playlists
