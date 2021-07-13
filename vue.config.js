@@ -1,5 +1,4 @@
 const webpack = require('webpack');
-const VuetifyLoaderPlugin = require('vuetify-loader/lib/plugin')
 const ThreadsPlugin = require('threads-plugin')
 const dotenv = require('dotenv').config({ path: __dirname + '/config.env' });
 
@@ -27,7 +26,6 @@ module.exports = {
         'process.env.SpotifyClientID': JSON.stringify(dotenv.parsed['SPOTIFYCLIENTID']),
         'process.env.SpotifyClientSecret': JSON.stringify(dotenv.parsed['SPOTIFYCLIENTSECRET'])
       }),
-      new VuetifyLoaderPlugin(),
     ],
     externals: ['better-sqlite3', 'youtube-music-api'],
     devtool: 'source-map'
