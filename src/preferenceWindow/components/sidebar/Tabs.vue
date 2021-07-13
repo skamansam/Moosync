@@ -69,7 +69,6 @@ export default class Sidebar extends mixins(Colors) {
 </script>
 
 <style lang="sass" scoped>
-@import "@/sass/variables.sass"
 
 .icon
   width: 38px

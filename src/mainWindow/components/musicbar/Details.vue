@@ -53,7 +53,6 @@ export default class MusicBar extends mixins(Colors, ImageLoader, ErrorHandler) 
 </script>
 
 <style lang="sass" scoped>
-@import '@/sass/variables.sass'
 
 .coverimg
   height: 56px

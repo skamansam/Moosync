@@ -124,7 +124,6 @@ export default class SongDetails extends mixins(Colors, ImageLoader, ErrorHandle
 </script>
 
 <style lang="sass">
-@import '@/sass/variables.sass'
 @import "~bootstrap/scss/mixins"
 
 .image

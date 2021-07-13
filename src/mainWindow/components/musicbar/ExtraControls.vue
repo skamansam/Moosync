@@ -64,7 +64,6 @@ export default class MusicBar extends mixins(Colors) {
 </script>
 
 <style lang="sass" scoped>
-@import '@/sass/variables.sass'
 
 .slider-container
   padding-right: 20px

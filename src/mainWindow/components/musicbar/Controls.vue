@@ -70,7 +70,6 @@ export default class MusicBar extends mixins(PlayerControls) {
 </script>
 
 <style lang="sass" scoped>
-@import '@/sass/variables.sass'
 
 .timestamp
   color: var(--textSecondary)
