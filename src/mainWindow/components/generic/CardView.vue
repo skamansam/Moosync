@@ -21,7 +21,7 @@
         </div>
       </div>
       <div class="card-body">
-        <p :id="id" @contextmenu="emitContext">{{ title }}</p>
+        <p :title="title" :id="id" @contextmenu="emitContext">{{ title }}</p>
       </div>
     </div>
   </div>
@@ -80,7 +80,7 @@ export default class SongDetails extends mixins(Colors, ImageLoader, ErrorHandle
   overflow: hidden
   text-overflow: ellipsis
   font-weight: bold
-  font-size: 24px
+  font-size: 20px
   line-height: 29px
 
 .default-icon

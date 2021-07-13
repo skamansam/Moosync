@@ -14,16 +14,16 @@
           @change="updateTimestmp"
           @error="errorHandler"
         />
-        <b-container fluid class="d-flex bar-container">
-          <b-row align-h="between" class="d-flex no-gutters w-100">
-            <b-col cols="3" align-self="center" class="no-gutters">
+        <b-container fluid class="d-flex bar-container h-100 pb-2">
+          <b-row align-h="center" align-content="center" class="d-flex no-gutters w-100 control-row">
+            <b-col cols="2" lg="3" xl="4" align-self="center" class="no-gutters details-col">
               <Details
                 :title="currentSong ? currentSong.title : '-'"
                 :artists="currentSong ? currentSong.artists : []"
                 :imgSrc="cover"
               />
             </b-col>
-            <b-col md="6" lg="auto" align-self="center" class="no-gutters">
+            <b-col cols="auto" align-self="center" class="no-gutters controls-col">
               <Controls
                 :playing="playerState == 'PLAYING'"
                 :duration="currentSong ? currentSong.duration : 0"
@@ -31,7 +31,7 @@
                 :loading="waiting"
               />
             </b-col>
-            <b-col cols="3" align-self="center" class="no-gutters">
+            <b-col cols="1" lg="2" align-self="center" class="no-gutters extra-col">
               <ExtraControls @onToggleSlider="toggleSlider" />
             </b-col>
           </b-row>
@@ -158,4 +158,16 @@ export default class MusicBar extends mixins(Colors, ModelHelper) {
 
 .vue-slider-rail
   background-color: var(--tertiary)
+
+.control-row
+  position: relative
+
+.details-col, .extra-col
+  position: absolute
+
+.details-col
+  left: 0
+
+.extra-col
+  right: 0
 </style>

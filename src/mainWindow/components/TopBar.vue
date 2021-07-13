@@ -2,17 +2,13 @@
   <div class="topbar-container d-flex align-items-center">
     <b-container fluid class="d-flex">
       <b-row class="flex-grow-1 justify-content-start">
-        <b-col col sm="8" md="8" lg="9">
+        <b-col>
           <Search />
         </b-col>
-        <b-col cols="auto" class="my-auto">
-          <Navigation />
-        </b-col>
-        <b-col cols="auto" align-self="center">
-          <Accounts />
-        </b-col>
-        <b-col cols="auto" align-self="center">
-          <Notifications />
+        <b-col cols="4" xl="3" class="my-auto d-flex">
+          <Navigation class="mr-4" />
+          <Notifications class="mr-4" />
+          <Accounts class="mr-4" />
         </b-col>
       </b-row>
     </b-container>

@@ -2,7 +2,7 @@
   <b-container fluid class="album-container" @contextmenu="contextHandler">
     <b-row class="title">Playlists</b-row>
     <b-row class="d-flex">
-      <b-col col xl="2" md="3" v-for="playlist in allPlaylists" :key="playlist.playlist_id">
+      <b-col col xl="2" md="3" v-for="playlist in allPlaylists" :key="playlist.playlist_id" class="card-col">
         <CardView
           :title="playlist.playlist_name"
           :imgSrc="playlist.playlist_coverPath"
@@ -95,10 +95,4 @@ export default class Albums extends mixins(RouterPushes, ContextMenuMixin) {
 <style lang="sass" scoped>
 .album-container
   position: absolute
-.title
-  font-weight: bold
-  font-size: 64px
-  line-height: 100px
-  padding-left: 15px
-  margin-bottom: 50px
 </style>

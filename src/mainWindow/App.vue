@@ -132,7 +132,6 @@ body
   width: 100vw
   height: 100vh
 
-
 .appContainer
   width: 100%
   height: 100%

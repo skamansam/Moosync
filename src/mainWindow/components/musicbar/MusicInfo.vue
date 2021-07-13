@@ -108,8 +108,10 @@ export default class MusicInfo extends mixins(Colors, ImageLoader, ModelHelper) 
     if (this.queueOrder.length > 0) {
       if (this.queueOrder.length === 1) {
         this.queueOrder = []
+        vxm.player.queueIndex = -1
       } else {
-        this.queueOrder = [this.queueOrder[0]]
+        this.queueOrder = [this.queueOrder[this.currentIndex]]
+        vxm.player.queueIndex = 0
       }
     }
   }
@@ -234,6 +236,7 @@ export default class MusicInfo extends mixins(Colors, ImageLoader, ModelHelper) 
 
 .queue-container-outer
   height: 95%
+  padding: 12px !important
 
 .empty-message
   margin-left: -30px

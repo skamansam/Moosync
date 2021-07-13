@@ -11,8 +11,12 @@
     />
     <SongDefault v-if="!getImgSrc(imgSrc) || forceEmptyImg" class="coverimg" />
     <div class="text-container">
-      <div class="text song-title text-truncate">{{ title }}</div>
-      <div class="text song-subtitle text-truncate">{{ artists ? artists.join(', ') : '-' }}</div>
+      <div :title="title" class="text song-title text-truncate">
+        {{ title }}
+      </div>
+      <div :title="artists ? artists.join(', ') : '-'" class="text song-subtitle text-truncate">
+        {{ artists ? artists.join(', ') : '-' }}
+      </div>
     </div>
   </div>
 </template>
@@ -77,5 +81,3 @@ export default class MusicBar extends mixins(Colors, ImageLoader, ErrorHandler) 
 .text-container
   width: calc( 100% - 56px - 15px )
 </style>
-
-function Watch(arg0: string) { throw new Error('Function not implemented.') }

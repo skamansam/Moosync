@@ -2,7 +2,12 @@
   <b-container fluid class="item-container" @contextmenu="getItemContextMenu">
     <b-row class="item-row">
       <b-col cols="auto" class="img-container h-100 d-flex justify-content-start">
-        <b-img class="h-100 image" v-if="!forceEmptyImg" :src="getImgSrc(getValidImage(song))" />
+        <b-img
+          class="h-100 image"
+          v-if="!forceEmptyImg"
+          :src="getImgSrc(getValidImage(song))"
+          @error="handlerImageError(arguments[0], handlerError)"
+        />
         <SongDefault v-else class="h-100" />
         <div @click="playSong" class="play-button d-flex justify-content-center">
           <Play2 class="align-self-center" />
@@ -58,6 +63,7 @@ import SpotifyIcon from '@/mainWindow/components/icons/Spotify.vue'
 import AnimatedEqualizer from '@/mainWindow/components/icons/AnimatedEqualizer.vue'
 
 import ContextMenuMixin from '@/utils/ui/mixins/ContextMenuMixin'
+import ErrorHandler from '@/utils/ui/mixins/errorHandler'
 
 @Component({
   components: {
@@ -68,7 +74,7 @@ import ContextMenuMixin from '@/utils/ui/mixins/ContextMenuMixin'
     AnimatedEqualizer
   }
 })
-export default class MusicInfo extends mixins(Colors, ImgLoader, PlayerControls, ContextMenuMixin) {
+export default class MusicInfo extends mixins(Colors, ImgLoader, PlayerControls, ContextMenuMixin, ErrorHandler) {
   @Prop({ default: () => {} })
   private songID!: string
 
@@ -102,6 +108,10 @@ export default class MusicInfo extends mixins(Colors, ImgLoader, PlayerControls,
   }
 
   private forceEmptyImg: boolean = false
+
+  private handlerError() {
+    this.forceEmptyImg = true
+  }
 }
 </script>
 
@@ -128,6 +138,7 @@ export default class MusicInfo extends mixins(Colors, ImgLoader, PlayerControls,
 
 .item-row
   height: 80px
+  padding: 12px !important
 
 .divider
   margin-top: 8px

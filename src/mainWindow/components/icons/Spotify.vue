@@ -1,5 +1,6 @@
 <template>
   <svg viewBox="0 0 17 17" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <title>Spotify</title>
     <g>
       <rect x="3" y="3" width="12" height="10" fill="white" v-if="filled" />
       <path

@@ -35,10 +35,4 @@ export default class Genres extends mixins(RouterPushes) {
 <style lang="sass" scoped>
 .album-container
   position: absolute
-.title
-  font-weight: bold
-  font-size: 64px
-  line-height: 100px
-  padding-left: 15px
-  margin-bottom: 50px
 </style>

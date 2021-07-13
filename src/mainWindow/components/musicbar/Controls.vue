@@ -5,7 +5,7 @@
       <LastTrack />
     </b-col>
     <b-col cols="auto" v-on:click="toggleRepeat()">
-      <Repeat />
+      <Repeat :filled="repeat" />
     </b-col>
     <b-col cols="auto" v-if="loading">
       <b-spinner label="Loading..."></b-spinner>
@@ -17,9 +17,8 @@
       <NextTrack />
     </b-col>
     <b-col cols="auto" v-on:click="shuffle()">
-      <Shuffle />
+      <Shuffle :filled="true" />
     </b-col>
-    <!-- <b-col cols="2" class="d-none d-xl-block"></b-col> -->
   </b-row>
 </template>
 
@@ -73,10 +72,7 @@ export default class MusicBar extends mixins(PlayerControls) {
 
 .timestamp
   color: var(--textSecondary)
-  font-style: normal
-  font-weight: normal
-  font-size: 18px
-  line-height: 170.19%
+  font-size: 16px
   overflow: hidden
   width: 150px
 

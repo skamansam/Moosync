@@ -1,5 +1,6 @@
 <template>
   <svg viewBox="0 0 21 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <title>Youtube</title>
     <g>
       <rect v-if="filled" x="9" y="5" width="5" height="6" fill="white" />
       <path

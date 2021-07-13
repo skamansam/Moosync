@@ -4,7 +4,12 @@
       <b-row no-gutters>
         <div ref="headers" class="wrapper w-100 headers">
           <template v-for="(field, index) of extrafields">
-            <div :style="{ width: columnWidths[index] + '%' }" :key="`box-${field.key}`" class="box text-truncate">
+            <div
+              :title="field.label ? field.label : field.key"
+              :style="{ width: columnWidths[index] + '%' }"
+              :key="`box-${field.key}`"
+              class="box text-truncate"
+            >
               {{ field.label ? field.label : field.key }}
             </div>
             <div
@@ -33,6 +38,7 @@
                 :key="`${item._id}-${field.key}`"
                 class="box text-truncate"
                 :style="{ width: columnWidths[i1] + '%' }"
+                :title="field.key === 'index' ? index + 1 : getFieldData(field.key, item)"
                 @dblclick="onRowDoubleClicked(item)"
                 @click="onRowSelected(index)"
                 @contextmenu="onRowContext(arguments[0], item)"
@@ -75,6 +81,7 @@ export default class SongList extends mixins(Colors) {
   // Clear selection after table loses focus
   private clearSelection() {
     this.selected = []
+    this.$emit('onRowSelected', null)
   }
 
   private keyPressed: 'Control' | 'Shift' | undefined

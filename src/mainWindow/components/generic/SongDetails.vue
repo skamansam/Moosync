@@ -1,7 +1,6 @@
 <template>
   <b-container fluid class="w-100">
     <b-row class="d-flex h-100 no-gutters">
-      <!-- <b-col cols="auto" class="d-flex h-100 image-container"> -->
       <b-img
         v-if="(getImgSrc(imgSrc) || getImgSrc(defaultImgSrc)) && !forceEmptyImg"
         class="image h-100"
@@ -9,10 +8,11 @@
         @error="handlerImageError(arguments[0], handleError)"
       />
       <SongDefault v-else class="h-100 image" />
-      <!-- </b-col> -->
       <b-col cols="auto" class="text-container text-truncate">
         <div class="d-flex">
-          <div class="title text-truncate">{{ currentTitle ? currentTitle : defaultTitle }}</div>
+          <div :title="currentTitle ? currentTitle : defaultTitle" class="title text-truncate">
+            {{ currentTitle ? currentTitle : defaultTitle }}
+          </div>
           <YoutubeIcon
             v-if="currentType === 'YOUTUBE'"
             :color="'#E62017'"
@@ -28,8 +28,12 @@
             class="ml-2 align-self-center provider-icon"
           />
         </div>
-        <div class="subtitle text-truncate">{{ currentsubTitle ? currentsubTitle : defaultsubTitle }}</div>
-        <div class="subtitle text-truncate">{{ currentSubSubTitle ? currentSubSubTitle : '' }}</div>
+        <div :title="currentsubTitle ? currentsubTitle : defaultsubTitle" class="subtitle text-truncate">
+          {{ currentsubTitle ? currentsubTitle : defaultsubTitle }}
+        </div>
+        <div :title="currentSubSubTitle ? currentSubSubTitle : ''" class="subtitle text-truncate">
+          {{ currentSubSubTitle ? currentSubSubTitle : '' }}
+        </div>
 
         <div v-if="buttonGroup.enableContainer" class="button-group d-flex">
           <PlainPlay @click.native="playAll" />

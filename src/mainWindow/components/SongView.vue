@@ -77,7 +77,7 @@ export default class AllSongs extends mixins(Colors, PlayerControls, ModelHelper
   private detailsButtonGroup!: SongDetailButtons
 
   private updateCoverDetails(item: Song | undefined) {
-    if (item) this.currentSong = item
+    this.currentSong = item
   }
 
   private getSongContextMenu(event: Event, item: Song) {

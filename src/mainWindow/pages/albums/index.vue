@@ -2,7 +2,7 @@
   <b-container fluid class="album-container">
     <b-row class="title">Albums</b-row>
     <b-row class="d-flex">
-      <b-col col xl="2" md="3" v-for="album in filteredAlbumList" :key="album.album_id">
+      <b-col col xl="2" md="3" v-for="album in filteredAlbumList" :key="album.album_id" class="card-col">
         <CardView :title="album.album_name" :imgSrc="album.album_coverPath" @click.native="gotoAlbum(album)">
           <template #defaultCover>
             <AlbumDefault />
@@ -45,14 +45,12 @@ export default class Albums extends mixins(RouterPushes) {
 }
 </script>
 
+<style lang="sass">
+.card-col
+  margin: 12px !important
+</style>
+
 <style lang="sass" scoped>
 .album-container
   position: absolute
-.title
-  font-style: normal
-  font-weight: bold
-  font-size: 64px
-  line-height: 100px
-  padding-left: 15px
-  margin-bottom: 50px
 </style>
