@@ -1,0 +1,1 @@
+export const EXTENSION_ENTRY_POINT = 'moosync_extension_entry'

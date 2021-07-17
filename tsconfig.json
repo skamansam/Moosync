@@ -28,6 +28,7 @@
     "tests/**/*.ts",
     "tests/**/*.tsx",
     "src/store/index.ts",
-    "src/mainWindow/plugins/kicontext.js"
+    "src/mainWindow/plugins/kicontext.js",
+    "src/test.ts"
   ]
 }

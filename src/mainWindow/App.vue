@@ -35,6 +35,7 @@ export default class App extends mixins(ThemeHandler) {
   created() {
     this.registerLogger()
     this.registerNotifier()
+    this.listenExtensionEvents()
   }
 
   mounted() {
@@ -106,6 +107,48 @@ export default class App extends mixins(ThemeHandler) {
     window.NotifierUtils.registerMainProcessNotifier((obj) => {
       vxm.notifier.emit(obj)
     })
+  }
+
+  private listenExtensionEvents() {
+    vxm.player.$watch(
+      'currentSong',
+      (newVal: Song) =>
+        window.ExtensionUtils.sendEvent({
+          type: 'song-change',
+          data: newVal
+        }),
+      { deep: false, immediate: true }
+    )
+
+    vxm.player.$watch(
+      'playerState',
+      (newVal: PlayerState) =>
+        window.ExtensionUtils.sendEvent({
+          type: 'playerState-change',
+          data: newVal
+        }),
+      { deep: false, immediate: true }
+    )
+
+    vxm.player.$watch(
+      'volume',
+      (newVal: number) =>
+        window.ExtensionUtils.sendEvent({
+          type: 'volume-change',
+          data: newVal
+        }),
+      { deep: false, immediate: true }
+    )
+
+    vxm.player.$watch(
+      'songQueue',
+      (newVal: SongQueue) =>
+        window.ExtensionUtils.sendEvent({
+          type: 'songQueue-change',
+          data: newVal
+        }),
+      { deep: true, immediate: true }
+    )
   }
 }
 </script>

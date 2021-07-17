@@ -21,6 +21,7 @@
       "Notif",
       "Prefs",
       "Queryable",
+      "Serializable",
       "Spotify",
       "Titlebar",
       "Vuex",

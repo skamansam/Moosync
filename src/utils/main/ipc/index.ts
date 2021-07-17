@@ -1,6 +1,7 @@
 import { AlbumsChannel } from './albums'
 import { ArtistsChannel } from './artists'
 import { BrowserWindowChannel } from './window'
+import { ExtensionHostChannel } from './extensionHost'
 import { GenreChannel } from './genre'
 import { IpcEvents } from './constants'
 import { LoggerChannel } from './logger'
@@ -27,7 +28,8 @@ export function registerIpcChannels() {
     new PreferenceChannel(),
     new SearchChannel(),
     new StoreChannel(),
-    new LoggerChannel()
+    new LoggerChannel(),
+    new ExtensionHostChannel()
   ]
   ipcChannels.forEach((channel) => ipcMain.on(channel.name, (event, request) => channel.handle(event, request)))
 }

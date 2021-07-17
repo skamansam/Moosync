@@ -13,6 +13,7 @@ import {
 } from '@/utils/main/ipc/constants'
 import { contextBridge, ipcRenderer } from 'electron'
 
+import { ExtensionHostEvents } from '@/utils/main/ipc/constants';
 import { IpcRendererHolder } from '@/utils/preload/ipc/index'
 import { LoggerEvents } from '@/utils/main/ipc/constants';
 import { StoreEvents } from '@/utils/main/ipc/constants'
@@ -122,4 +123,8 @@ contextBridge.exposeInMainWorld('LoggerUtils', {
 
 contextBridge.exposeInMainWorld('NotifierUtils', {
   registerMainProcessNotifier: (callback: (obj: NotificationObject) => void) => ipcRendererHolder.on(IpcEvents.NOTIFIER, callback)
+})
+
+contextBridge.exposeInMainWorld('ExtensionUtils', {
+  sendEvent: (data: extensionHostMessage) => ipcRendererHolder.send(IpcEvents.EXTENSION_HOST, { type: ExtensionHostEvents.EVENT_TRIGGER, params: { data: data } })
 })

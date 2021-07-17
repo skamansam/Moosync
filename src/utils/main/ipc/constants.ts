@@ -12,7 +12,8 @@ export enum IpcEvents {
   STORE = 'store',
   SERVICE_PROVIDERS = 'serviceProviders',
   LOGGER = 'logger',
-  NOTIFIER = 'notifier'
+  NOTIFIER = 'notifier',
+  EXTENSION_HOST = "extensionHost"
 }
 
 export enum StoreEvents {
@@ -93,6 +94,10 @@ export enum SongEvents {
 export enum LoggerEvents {
   INFO = 'info',
   ERROR = 'error'
+}
+
+export enum ExtensionHostEvents {
+  EVENT_TRIGGER = "eventTrigger"
 }
 
 export enum ServiceProviderEvents {

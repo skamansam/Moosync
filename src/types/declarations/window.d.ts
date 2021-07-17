@@ -80,6 +80,11 @@ interface loggerUtils {
 interface notifierUtils {
   registerMainProcessNotifier: (callback: (obj: NotificationObject) => void) => void
 }
+
+interface extensionUtils {
+  sendEvent: (data: extensionHostMessage) => Promise<void>
+}
+
 declare global {
   interface Window {
     DBUtils: DBUtils
@@ -91,5 +96,6 @@ declare global {
     Store: store
     LoggerUtils: loggerUtils
     NotifierUtils: notifierUtils
+    ExtensionUtils: extensionUtils
   }
 }

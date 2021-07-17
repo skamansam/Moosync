@@ -32,11 +32,11 @@ module.exports = {
   },
   pluginOptions: {
     electronBuilder: {
-      mainProcessWatch: ['src/utils/main'],
+      mainProcessWatch: ['src/utils/main', 'src/utils/extensions'],
       customFileProtocol: 'com.moosync://./',
       builderOptions: {
         publish: ['github'],
-        asarUnpack: ['*.worker.js'],
+        asarUnpack: ['*.worker.js', 'sandbox.js']
       },
       nodeIntegration: false,
       disableMainProcessTypescript: false,
@@ -46,6 +46,8 @@ module.exports = {
         'better-sqlite3'
       ],
       chainWebpackMainProcess: (config) => {
+        config.entry("sandbox").add(__dirname + '/src/utils/extensions/sandbox/index.ts').end()
+
         config.plugin('thread')
           .use(ThreadsPlugin, [{ target: 'electron-node-worker' }]);
       },
