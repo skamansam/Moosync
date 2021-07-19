@@ -110,7 +110,7 @@ export class PlayerStore extends VuexModule.With({ namespaced: 'player' }) {
   @action
   async nextSong() {
     this.incrementQueue()
-    this.loadSong(this.queueTop)
+    await this.loadSong(this.queueTop)
   }
 
   @mutation
@@ -122,7 +122,7 @@ export class PlayerStore extends VuexModule.With({ namespaced: 'player' }) {
   @action
   async prevSong() {
     this.decrementQueue()
-    this.loadSong(this.queueTop)
+    await this.loadSong(this.queueTop)
   }
 
   @mutation
@@ -143,6 +143,7 @@ export class PlayerStore extends VuexModule.With({ namespaced: 'player' }) {
   }
 
   @action async loadSong(song: Song | null | undefined) {
+    this.currentSong = song
     if (song && song.type === 'SPOTIFY') {
       const ytItem = await vxm.providers.spotifyProvider.spotifyToYoutube(song)
       if (ytItem) {
@@ -152,7 +153,6 @@ export class PlayerStore extends VuexModule.With({ namespaced: 'player' }) {
         throw new Error('Could not convert song')
       }
     }
-    this.currentSong = song
   }
 
   @action async pushInQueue(Song: Song) {
@@ -170,6 +170,6 @@ export class PlayerStore extends VuexModule.With({ namespaced: 'player' }) {
 
   @action async playQueueSong(index: number) {
     this.moveIndexTo(index)
-    this.loadSong(this.queueTop)
+    await this.loadSong(this.queueTop)
   }
 }
