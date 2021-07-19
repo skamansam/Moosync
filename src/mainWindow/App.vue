@@ -110,44 +110,32 @@ export default class App extends mixins(ThemeHandler) {
   }
 
   private listenExtensionEvents() {
-    vxm.player.$watch(
-      'currentSong',
-      (newVal: Song) =>
-        window.ExtensionUtils.sendEvent({
-          type: 'song-change',
-          data: newVal
-        }),
-      { deep: false, immediate: true }
+    vxm.player.$watch('currentSong', (newVal: Song) =>
+      window.ExtensionUtils.sendEvent({
+        type: 'song-change',
+        data: newVal
+      })
     )
 
-    vxm.player.$watch(
-      'playerState',
-      (newVal: PlayerState) =>
-        window.ExtensionUtils.sendEvent({
-          type: 'playerState-change',
-          data: newVal
-        }),
-      { deep: false, immediate: true }
+    vxm.player.$watch('playerState', (newVal: PlayerState) =>
+      window.ExtensionUtils.sendEvent({
+        type: 'playerState-change',
+        data: newVal
+      })
     )
 
-    vxm.player.$watch(
-      'volume',
-      (newVal: number) =>
-        window.ExtensionUtils.sendEvent({
-          type: 'volume-change',
-          data: newVal
-        }),
-      { deep: false, immediate: true }
+    vxm.player.$watch('volume', (newVal: number) =>
+      window.ExtensionUtils.sendEvent({
+        type: 'volume-change',
+        data: newVal
+      })
     )
 
-    vxm.player.$watch(
-      'songQueue',
-      (newVal: SongQueue) =>
-        window.ExtensionUtils.sendEvent({
-          type: 'songQueue-change',
-          data: newVal
-        }),
-      { deep: true, immediate: true }
+    vxm.player.$watch('songQueue', (newVal: SongQueue) =>
+      window.ExtensionUtils.sendEvent({
+        type: 'songQueue-change',
+        data: newVal
+      })
     )
   }
 }
