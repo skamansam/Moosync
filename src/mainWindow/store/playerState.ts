@@ -11,7 +11,7 @@ class Queue {
 }
 
 export class PlayerStore extends VuexModule.With({ namespaced: 'player' }) {
-  public state: PlayerState = 'PAUSED'
+  private state: PlayerState = 'PAUSED'
   public currentSong: Song | null | undefined | undefined = null
   private songQueue = new Queue()
   public repeat: boolean = false
@@ -19,6 +19,10 @@ export class PlayerStore extends VuexModule.With({ namespaced: 'player' }) {
 
   get playerState() {
     return this.state
+  }
+
+  set playerState(state: PlayerState) {
+    this.state = state
   }
 
   get queue() {
@@ -142,9 +146,16 @@ export class PlayerStore extends VuexModule.With({ namespaced: 'player' }) {
     this.songQueue.index = 0
   }
 
+  @mutation
+  private setPlayerState(state: PlayerState) {
+    this.state = state
+  }
+
   @action async loadSong(song: Song | null | undefined) {
     this.currentSong = song
     if (song && song.type === 'SPOTIFY') {
+      const oldState = this.playerState
+      this.setPlayerState('LOADING')
       const ytItem = await vxm.providers.spotifyProvider.spotifyToYoutube(song)
       if (ytItem) {
         song.url = ytItem._id
@@ -152,6 +163,7 @@ export class PlayerStore extends VuexModule.With({ namespaced: 'player' }) {
       } else {
         throw new Error('Could not convert song')
       }
+      this.setPlayerState(oldState)
     }
   }
 

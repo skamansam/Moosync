@@ -7,10 +7,10 @@
     <b-col cols="auto" v-on:click="toggleRepeat()">
       <Repeat :filled="repeat" />
     </b-col>
-    <b-col cols="auto" v-if="loading">
+    <b-col cols="auto" v-if="playerState === 'LOADING'">
       <b-spinner label="Loading..."></b-spinner>
     </b-col>
-    <b-col cols="auto" v-if="!loading" v-on:click="togglePlayerState()">
+    <b-col cols="auto" v-else v-on:click="togglePlayerState()">
       <Play :play="playing" />
     </b-col>
     <b-col cols="auto" v-on:click="nextSong()">
@@ -52,9 +52,6 @@ export default class MusicBar extends mixins(PlayerControls) {
 
   @Prop({ default: true })
   private playing!: boolean
-
-  @Prop({ default: false })
-  private loading!: boolean
 
   get repeat() {
     return vxm.player.Repeat

@@ -71,7 +71,7 @@ export default class SyncMixin extends mixins(ModelHelper, ImgLoader) {
     if (this.isSyncing && this.peerHolder.socketID !== from && event._id) {
       this.isRemoteTrackChange = true
       vxm.sync.setSong(event)
-      vxm.player.state = 'LOADING'
+      vxm.player.playerState = 'LOADING'
     }
 
     if (this.isYoutube(event)) {
@@ -139,7 +139,7 @@ export default class SyncMixin extends mixins(ModelHelper, ImgLoader) {
 
   private async handleRemotePlayerState(state: PlayerState) {
     this.isRemoteStateChange = true
-    vxm.player.state = state
+    vxm.player.playerState = state
   }
 
   private onRemoteSeek(time: number) {
@@ -240,7 +240,7 @@ export default class SyncMixin extends mixins(ModelHelper, ImgLoader) {
         return true
       }
 
-      vxm.player.state = 'LOADING'
+      vxm.player.playerState = 'LOADING'
       vxm.sync.setCover('')
       this.peerHolder.PlaySong(song)
 

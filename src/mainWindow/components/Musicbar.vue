@@ -28,7 +28,6 @@
                 :playing="playerState == 'PLAYING'"
                 :duration="currentSong ? currentSong.duration : 0"
                 :timestamp="timestamp"
-                :loading="waiting"
               />
             </b-col>
             <b-col cols="1" lg="2" align-self="center" class="no-gutters extra-col">
@@ -100,10 +99,6 @@ export default class MusicBar extends mixins(Colors, ModelHelper) {
 
   get cover() {
     return this.remoteCover ? this.remoteCover : this.getImg(this.currentSong)
-  }
-
-  get waiting() {
-    return vxm.player.playerState == 'LOADING'
   }
 
   private toggleSlider(position: boolean) {

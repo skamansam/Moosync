@@ -42,11 +42,11 @@ export default class PlayerControls extends Vue {
   }
 
   public play() {
-    vxm.player.state = 'PLAYING'
+    vxm.player.playerState = 'PLAYING'
   }
 
   public pause() {
-    vxm.player.state = 'PAUSED'
+    vxm.player.playerState = 'PAUSED'
   }
 
   public shuffle() {
@@ -55,14 +55,14 @@ export default class PlayerControls extends Vue {
 
   public togglePlayerState() {
     if (this.playerState == 'PAUSED' || this.playerState == 'STOPPED') {
-      vxm.player.state = 'PLAYING'
+      vxm.player.playerState = 'PLAYING'
     } else {
-      vxm.player.state = 'PAUSED'
+      vxm.player.playerState = 'PAUSED'
     }
   }
 
   public stop() {
-    vxm.player.state = 'STOPPED'
+    vxm.player.playerState = 'STOPPED'
   }
 
   public playFromQueue(index: number) {

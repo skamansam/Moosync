@@ -131,15 +131,14 @@ export default class AudioStream extends mixins(Colors, SyncMixin, PlayerControl
   }
 
   private handleFirstPlayback(loadedState: boolean) {
-    if (this.isFirst && !loadedState) {
-      vxm.player.state = 'PLAYING'
-      this.isFirst = false
+    if (this.isFirst) {
+      if (!loadedState) vxm.player.playerState = 'PLAYING'
+
+      if (this.playerState === 'LOADING') vxm.player.playerState = 'PLAYING'
     }
 
-    if (loadedState) this.isFirst = false
-    if (vxm.player.state == 'LOADING') {
-      vxm.player.state = 'PAUSED'
-    }
+    this.isFirst = false
+
     this.handleActivePlayerState(vxm.player.playerState)
   }
 
