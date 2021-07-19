@@ -54,7 +54,7 @@ export default class PathSelector extends Vue {
   }
 
   private openFileBrowser() {
-    window.WindowUtils.openFileBrowser().then((data) => {
+    window.WindowUtils.openFileBrowser(false).then((data) => {
       if (!data.canceled) {
         vxm.preferences.addPaths(...data.filePaths)
         vxm.preferences.setPathsChanged(true)

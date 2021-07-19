@@ -1,10 +1,9 @@
-import { ExtensionData, ExtensionDescriptor } from '@moosync/moosync-types';
-
+import { ExtensionFactory } from '@moosync/moosync-types';
 import { promises as fsP } from 'fs';
 import path from 'path';
 
 export abstract class AbstractExtensionFinder {
-  abstract findExtensions(): AsyncGenerator<ExtensionDescriptor>
+  abstract findExtensions(): AsyncGenerator<UnInitializedExtensionItem>
 }
 
 export class ExtensionFinder extends AbstractExtensionFinder {
@@ -26,7 +25,7 @@ export class ExtensionFinder extends AbstractExtensionFinder {
     return JSON.parse(raw)
   }
 
-  private async checkExtensionValidity(modulePath: string, packageMetadata: any): Promise<ExtensionDescriptor | undefined> {
+  private async checkExtensionValidity(modulePath: string, packageMetadata: any): Promise<ExtensionFactory | undefined> {
     if (packageMetadata.moosyncExtension) {
       const moduleEntryPath = packageMetadata.extensionEntry
       try {
@@ -35,15 +34,15 @@ export class ExtensionFinder extends AbstractExtensionFinder {
           return
         }
 
-        const instance = new extension.default() as ExtensionData
+        const instance = new extension.default()
 
         if (!Array.isArray(instance.extensionDescriptors)) {
           return
         }
 
-        for (const descriptor of instance.extensionDescriptors) {
-          if (descriptor.extensionName && descriptor.extensionDescription && descriptor.factory.create)
-            return descriptor
+        for (const factory of instance.extensionDescriptors) {
+          if (factory.create)
+            return factory as ExtensionFactory
         }
       } catch (e) {
         console.error(e)
@@ -51,7 +50,7 @@ export class ExtensionFinder extends AbstractExtensionFinder {
     }
   }
 
-  public async * findExtensions(): AsyncGenerator<ExtensionDescriptor> {
+  public async * findExtensions() {
     for (const searchPath of this.searchPaths) {
       try {
         const dirents = await fsP.readdir(searchPath, { withFileTypes: true })
@@ -64,7 +63,7 @@ export class ExtensionFinder extends AbstractExtensionFinder {
             const instance = await this.checkExtensionValidity(path.join(searchPath, folder.name), manifest)
 
             if (instance) {
-              yield instance
+              yield { name: manifest.name, packageName: manifest.packageName, desc: manifest.description, version: manifest.version, factory: instance }
             }
           }
         }

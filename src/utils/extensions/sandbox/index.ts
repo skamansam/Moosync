@@ -28,12 +28,23 @@ function setGlobalMethods() {
   global.getAllSongs = () => get<Song[]>({ type: 'get-all-songs' } as mainHostMessage)
 }
 
+function sendInstalledExtensions(items: ExtensionDetails[]) {
+  if (process.send)
+    process.send({ type: 'get-installed-extensions', data: items } as mainHostMessage)
+}
+
 function parseEventType(message: extensionHostMessage) {
   switch (message.type) {
+    case 'find-new-extensions':
+      manager?.registerPlugins().then(() => manager?.startAll())
+      break
     case 'app-path':
-      console.log('got path', message.data)
       manager = new ExtensionHandler([message.data])
       manager.startAll()
+      break
+    case 'get-installed-extensions':
+      if (manager)
+        sendInstalledExtensions(manager.getInstalledExtensions())
       break
     default:
       manager?.sendEvent(message)

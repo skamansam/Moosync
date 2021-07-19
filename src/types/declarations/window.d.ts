@@ -64,7 +64,7 @@ interface windowUtils {
   closeMainWindow: () => Promise<void>
   minMainWindow: () => Promise<void>
   maxMainWindow: () => Promise<boolean>
-  openFileBrowser: () => Promise<Electron.OpenDialogReturnValue>
+  openFileBrowser: (file: boolean) => Promise<Electron.OpenDialogReturnValue>
   toggleDevTools: () => Promise<void>
   setMainWindowResizeListener: (callback: () => void) => void
   openExternal: (url: string) => Promise<void>
@@ -82,7 +82,9 @@ interface notifierUtils {
 }
 
 interface extensionUtils {
+  install: (...path: string[]) => Promise<installMessage>
   sendEvent: (data: extensionHostMessage) => Promise<void>
+  getAllExtensions: () => Promise<ExtensionDetails[]>
 }
 
 declare global {

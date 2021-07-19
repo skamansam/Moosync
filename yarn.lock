@@ -2105,10 +2105,10 @@
     "@material/feature-targeting" "^11.0.0"
     tslib "^2.1.0"
 
-"@moosync/moosync-types@^1.0.4":
-  version "1.0.4"
-  resolved "https://registry.yarnpkg.com/@moosync/moosync-types/-/moosync-types-1.0.4.tgz#dc02d159a711aaaef5ce56f919536d04f83633c3"
-  integrity sha512-RTQOhNEaw9bdhYYPVZTOHYf9ZW39xdtpUICG61oaHtulyGp940uOdQ5w4g3lqEA2ofiGiLC0bIdVT2CRRExs/g==
+"@moosync/moosync-types@^1.0.6":
+  version "1.0.6"
+  resolved "https://registry.yarnpkg.com/@moosync/moosync-types/-/moosync-types-1.0.6.tgz#051993e8ee65539089d66d8dda14630df8af9b42"
+  integrity sha512-NEMRXL6p9GSAyHRt+02B/CcXBfe6wWtcP5M8YTJnEu/ThLGuxUedpvZg/vZ4F9eYerqv6DuwTeus2YlYE8QqYw==
 
 "@mrmlnc/readdir-enhanced@^2.2.1":
   version "2.2.1"
@@ -9201,6 +9201,11 @@ node-releases@^1.1.71:
   version "1.1.73"
   resolved "https://registry.yarnpkg.com/node-releases/-/node-releases-1.1.73.tgz#dd4e81ddd5277ff846b80b52bb40c49edf7a7b20"
   integrity sha512-uW7fodD6pyW2FZNZnp/Z3hvWKeEW1Y8R1+1CnErE8cXFXzl5blBOoVB41CvMer6P6Q0S5FXDwcHgFd1Wj0U9zg==
+
+node-stream-zip@^1.13.6:
+  version "1.13.6"
+  resolved "https://registry.yarnpkg.com/node-stream-zip/-/node-stream-zip-1.13.6.tgz#8abdfdbc4bc96ee11e9438d94cc8c93c7df28959"
+  integrity sha512-c7tRSVkLNOHvasWgmZ2d86cDgTWEygnkuuHNOY9c0mR3yLZtQTTrGvMaJ/fPs6+LOJn3240y30l5sjLaXFtcvw==
 
 noms@0.0.0:
   version "0.0.0"

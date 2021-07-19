@@ -50,7 +50,7 @@ export default class App extends mixins(ThemeHandler) {
 
   private loadPreferences() {
     window.PreferenceUtils.load().then((data) => {
-      vxm.preferences.setPreferences(data)
+      vxm.preferences.Preferences = data
     })
   }
 

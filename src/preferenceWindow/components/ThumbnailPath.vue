@@ -49,7 +49,7 @@ export default class ThumbnailPath extends Vue {
   }
 
   private openFileBrowser() {
-    window.WindowUtils.openFileBrowser().then((data) => {
+    window.WindowUtils.openFileBrowser(false).then((data) => {
       if (!data.canceled) {
         vxm.preferences.setThumbnailPath(data.filePaths[0])
       }

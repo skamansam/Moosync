@@ -1,4 +1,4 @@
-import { createModule, mutation, action } from 'vuex-class-component';
+import { createModule, mutation } from 'vuex-class-component';
 
 export enum PeerMode {
   WATCHER,
@@ -14,9 +14,12 @@ export class PreferenceStore extends VuexModule {
   preferences: Preferences | null = null
   pathsChanged: boolean = false
 
-  @mutation
-  setPreferences(preferences: Preferences) {
+  set Preferences(preferences: Preferences | null) {
     this.preferences = preferences
+  }
+
+  get Preferences() {
+    return this.preferences
   }
 
   @mutation

@@ -9,7 +9,25 @@ export class ExtensionHostChannel implements IpcChannelInterface {
       case ExtensionHostEvents.EVENT_TRIGGER:
         this.sendData(event, request)
         break
+      case ExtensionHostEvents.INSTALL:
+        this.installExt(event, request)
+        break
+      case ExtensionHostEvents.GET_ALL_EXTENSIONS:
+        this.getAllExtensions(event, request)
+        break
     }
+  }
+
+  private installExt(event: Electron.IpcMainEvent, request: IpcRequest) {
+    if (request.params.path) {
+      extensionHost.installExtension(request.params.path).then((result) => event.reply(request.responseChannel, result))
+      return
+    }
+    event.reply(request.responseChannel, { success: false })
+  }
+
+  private getAllExtensions(event: Electron.IpcMainEvent, request: IpcRequest) {
+    extensionHost.sendAsync({ type: 'get-installed-extensions', data: undefined }).then((data) => event.reply(request.responseChannel, data))
   }
 
   private sendData(event: Electron.IpcMainEvent, request: IpcRequest) {

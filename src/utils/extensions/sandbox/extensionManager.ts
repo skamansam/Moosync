@@ -1,12 +1,10 @@
-import { ExtensionDescriptor, ExtensionFactory, ExtensionItem } from '@moosync/moosync-types';
-
 import { InMemoryRegistry } from './extensionRegistry';
-import { v4 } from 'uuid';
 
 export abstract class AbstractExtensionManager {
-  abstract instantiateAndRegister(description: ExtensionDescriptor): Promise<void>
-
-  abstract getAllExtensions(): Iterable<ExtensionItem>
+  abstract instantiateAndRegister(extension: UnInitializedExtensionItem): Promise<void>
+  abstract deregister(packageName: string): void
+  abstract getExtensions(options?: getExtensionOptions): Iterable<ExtensionItem>
+  abstract setStarted(packageName: string, status: boolean): void
 }
 
 export class ExtensionManager extends AbstractExtensionManager {
@@ -16,23 +14,30 @@ export class ExtensionManager extends AbstractExtensionManager {
     this.extensionRegistry.register(extensionItem)
   }
 
-  async instantiateAndRegister(description: ExtensionDescriptor) {
-    const uuid = v4()
+  deregister(packageName: string) {
+    this.extensionRegistry.deregister(packageName)
+  }
 
-    const instance = await description.factory.create()
+  async instantiateAndRegister(extension: UnInitializedExtensionItem) {
+    const instance = await extension.factory.create()
     this.register({
-      id: uuid,
-      name: description.extensionName,
-      desc: description.extensionDescription,
-      instance: instance
+      name: extension.name,
+      desc: extension.desc,
+      packageName: extension.packageName,
+      version: extension.version,
+      hasStarted: false,
+      instance
     })
 
-    console.info(`Registered ${description.extensionName} - ${description.extensionDescription}`)
+    console.info(`Registered ${extension.name} - ${extension.desc}`)
   }
 
-  getAllExtensions(): Iterable<ExtensionItem> {
-    return this.extensionRegistry.getAll()
+  getExtensions(options?: getExtensionOptions): Iterable<ExtensionItem> {
+    return this.extensionRegistry.get(options)
   }
 
+  setStarted(packageName: string, status: boolean) {
+    this.extensionRegistry.setStarted(packageName, status)
+  }
 }
 

@@ -2,6 +2,8 @@ import { AbstractExtensionFinder, ExtensionFinder } from './extensionFinder';
 
 import { AbstractExtensionManager } from '@/utils/extensions/sandbox/extensionManager';
 import { ExtensionManager } from '@/utils/extensions/sandbox/extensionManager';
+import { MoosyncExtensionTemplate } from '@moosync/moosync-types';
+import { getVersion } from '@/utils/common';
 
 export class ExtensionHandler {
 
@@ -28,18 +30,34 @@ export class ExtensionHandler {
     })
   }
 
-  private async registerPlugins(): Promise<void> {
+  private isDuplicateExtension(ext: UnInitializedExtensionItem) {
+    const matches = this.extensionManager.getExtensions({ packageName: ext.packageName })
+    for (const oldExt of matches) {
+      const oldVer = getVersion(oldExt.version)
+      const newVer = getVersion(ext.version)
+      if (newVer > oldVer) {
+        this.extensionManager.deregister(oldExt.packageName)
+        return false
+      }
+      return true
+    }
+    return false
+  }
+
+  public async registerPlugins(): Promise<void> {
     for await (const ext of this.extensionFinder.findExtensions()) {
-      this.extensionManager.instantiateAndRegister(ext)
+      if (!this.isDuplicateExtension(ext)) {
+        this.extensionManager.instantiateAndRegister(ext)
+      }
     }
   }
 
   public startAll() {
     if (this.initialized) {
-      for (const ext of this.extensionManager.getAllExtensions()) {
-        console.log(ext.name, ext.instance.onStarted)
+      for (const ext of this.extensionManager.getExtensions({ started: false })) {
         if (ext.instance.onStarted)
           ext.instance.onStarted()
+        this.extensionManager.setStarted(ext.packageName, true)
       }
     } else {
       this.preInitializedCalls.push({ func: this.startAll })
@@ -47,7 +65,7 @@ export class ExtensionHandler {
   }
 
   public sendEvent(event: extensionHostMessage) {
-    let method: extensionMethods | undefined = undefined
+    let method: keyof MoosyncExtensionTemplate | undefined = undefined
     if (this.initialized) {
       switch (event.type) {
         case 'song-change':
@@ -69,8 +87,28 @@ export class ExtensionHandler {
     }
   }
 
-  public sendToAllExtensions(method: extensionMethods, args: any) {
-    for (const ext of this.extensionManager.getAllExtensions()) {
+  private toExtensionDetails(item: ExtensionItem): ExtensionDetails {
+    return {
+      name: item.name,
+      desc: item.desc,
+      packageName: item.packageName,
+      version: item.version,
+      hasStarted: item.hasStarted
+    }
+  }
+
+  public getInstalledExtensions() {
+    const extensions = this.extensionManager.getExtensions()
+    const parsed: ExtensionDetails[] = []
+    for (const e of extensions) {
+      parsed.push(this.toExtensionDetails(e))
+    }
+
+    return parsed
+  }
+
+  public sendToAllExtensions(method: keyof MoosyncExtensionTemplate, args: any) {
+    for (const ext of this.extensionManager.getExtensions()) {
       if (ext.instance[method])
         (ext.instance[method] as Function)(args)
     }

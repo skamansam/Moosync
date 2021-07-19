@@ -11,3 +11,7 @@ export function convertDuration(n: number) {
 
   return tmp
 }
+
+export function getVersion(verS: string) {
+  return verS.split('').map(x => x.charCodeAt(0)).reduce((a, b) => a + b)
+}

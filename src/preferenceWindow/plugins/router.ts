@@ -1,5 +1,6 @@
+import Extensions from '@/preferenceWindow/components/pages/Extensions.vue'
+import Paths from '@/preferenceWindow/components/pages/Paths.vue'
 import Router from 'vue-router'
-import Scanner from '@/preferenceWindow/components/pages/Paths.vue'
 import Vue from 'vue'
 
 Vue.use(Router)
@@ -12,22 +13,22 @@ const routes = [
   {
     name: 'paths',
     path: '/paths',
-    component: Scanner,
+    component: Paths,
   },
   {
     name: 'cache',
     path: '/cache',
-    component: Scanner,
+    component: Extensions,
   },
   {
     name: 'interface',
     path: '/interface',
-    component: Scanner,
+    component: Paths,
   },
   {
     name: 'system',
     path: '/system',
-    component: Scanner,
+    component: Paths,
   },
 ]
 

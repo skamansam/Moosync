@@ -86,7 +86,7 @@ export class BrowserWindowChannel implements IpcChannelInterface {
     if (this.preferenceWindow) {
       dialog
         .showOpenDialog(this.preferenceWindow, {
-          properties: ['openDirectory'],
+          properties: [request.params.file ? 'openFile' : 'openDirectory'],
         })
         .then((folders) => {
           event.reply(request.responseChannel, folders)

@@ -49,7 +49,7 @@ export default class ArtworkPath extends Vue {
   }
 
   private openFileBrowser() {
-    window.WindowUtils.openFileBrowser().then((data) => {
+    window.WindowUtils.openFileBrowser(false).then((data) => {
       if (!data.canceled) {
         vxm.preferences.setArtworkPath(data.filePaths[0])
       }
