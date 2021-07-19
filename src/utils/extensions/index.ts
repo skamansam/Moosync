@@ -3,57 +3,119 @@ import { ChildProcess, fork } from 'child_process'
 import { SongDB } from '@/utils/main/db/index';
 import { app } from 'electron'
 import { async } from 'node-stream-zip'
+import { extensionRequests } from '@/utils/extensions/constants';
+import { extensionRequestsKeys } from '@/utils/extensions/constants';
 import { promises as fsP } from 'fs'
 import { getVersion } from '@/utils/common';
+import { mainRequests } from '@/utils/extensions/constants';
 import path from 'path'
+import { v4 } from 'uuid';
 
 export const defaultExtensionPath = path.join(app.getPath('appData'), app.getName(), 'extensions')
 
-class ExtensionHost {
+class MainHostIPCHandler {
   private sandboxProcess: ChildProcess
+  private extensionRequestHandler: ExtensionRequestHandler
+  private extensionResourceHandler = new ExtensionHandler()
+  public mainRequestGenerator: MainRequestGenerator
+  public extensionEventGenerator: ExtensionEventGenerator
 
   constructor() {
     this.sandboxProcess = this.createExtensionHost()
+    this.extensionRequestHandler = new ExtensionRequestHandler(this.sandboxProcess)
+    this.mainRequestGenerator = new MainRequestGenerator(this.sandboxProcess)
+    this.extensionEventGenerator = new ExtensionEventGenerator(this.sandboxProcess)
     this.registerListeners()
-  }
-
-  private createExtensionHost() {
-    return fork(__dirname + '/sandbox.js')
   }
 
   private registerListeners() {
     this.sandboxProcess.on("message", this.parseMessage)
-    this.send({
-      type: 'app-path',
-      data: defaultExtensionPath
-    })
   }
 
-  private parseMessage(data: mainHostMessage) {
-    if (data.type === 'get-all-songs') {
-      SongDB.getAllSongs().then((songs) => this.send({ type: data.type, data: songs }))
+  private createExtensionHost() {
+    return fork(__dirname + '/sandbox.js', [defaultExtensionPath])
+  }
+
+  private isExtensionRequest(key: string) {
+    return extensionRequestsKeys.includes(key as any)
+  }
+
+  private parseMessage(message: mainHostMessage) {
+    if (this.isExtensionRequest(message.type)) {
+      this.extensionRequestHandler.parseRequest(message as extensionRequestMessage)
     }
   }
 
-  public send(message: extensionHostMessage) {
-    this.sandboxProcess.send(message)
+  public async installExtension(zipPaths: string[]): Promise<installMessage> {
+    const resp = await this.extensionResourceHandler.installExtension(zipPaths)
+    await this.mainRequestGenerator.findNewExtensions()
+    return resp
+  }
+}
+
+class MainRequestGenerator {
+  private sandboxProcess: ChildProcess
+
+  constructor(process: ChildProcess) {
+    this.sandboxProcess = process
   }
 
-  // TODO: setup better method for communications
-  public sendAsync(message: extensionHostMessage) {
-    return new Promise(resolve => {
-      let listener: (data: mainHostMessage) => void
-      this.sandboxProcess.on('message', listener = (data: mainHostMessage) => {
-        if (data.type === message.type) {
+  public async findNewExtensions() {
+    await this.sendAsync<void>('find-new-extensions')
+  }
+
+  public async getInstalledExtensions() {
+    return this.sendAsync<ExtensionDetails[]>('get-installed-extensions')
+  }
+
+  private sendAsync<T>(type: mainRequests): Promise<T> {
+    const channel = v4()
+    return new Promise<T>(resolve => {
+      let listener: (data: mainReplyMessage) => void
+      this.sandboxProcess.on('message', listener = (data: mainReplyMessage) => {
+        if (data.channel === channel) {
           this.sandboxProcess.off('message', listener)
           resolve(data.data)
         }
       })
-      this.sandboxProcess.send(message)
+      this.sandboxProcess.send({ type, channel } as mainRequestMessage)
     })
   }
+}
 
-  public async checkVersion(oldS: string, newS: string) {
+class ExtensionEventGenerator {
+  private sandboxProcess: ChildProcess
+
+  constructor(process: ChildProcess) {
+    this.sandboxProcess = process
+  }
+
+  public send(data: extensionEventMessage) {
+    this.sandboxProcess.send(data)
+  }
+}
+
+class ExtensionRequestHandler {
+  private sandboxProcess: ChildProcess
+
+  constructor(process: ChildProcess) {
+    this.sandboxProcess = process
+  }
+
+  public parseRequest(message: extensionRequestMessage) {
+    if (message.type === 'get-all-songs') {
+      SongDB.getAllSongs().then((songs) => this.send(message.type, message.channel, songs))
+    }
+  }
+
+  private send(type: extensionRequests, channel: string, data: any) {
+    this.sandboxProcess.send({ type, channel, data } as extensionReplyMessage)
+  }
+}
+
+class ExtensionHandler {
+
+  private async checkVersion(oldS: string, newS: string) {
     const oldV = getVersion(oldS)
     const newV = getVersion(newS)
 
@@ -68,19 +130,15 @@ class ExtensionHost {
     }
   }
 
-  public async isExistingExtension(packageName: string): Promise<string | undefined> {
+  private async isExistingExtension(packageName: string): Promise<string | undefined> {
     try {
       const extPath = path.join(defaultExtensionPath, packageName)
       await fsP.access(extPath)
       const manifest = JSON.parse(await fsP.readFile(path.join(extPath, 'package.json'), 'utf-8'))
       return manifest.version
     } catch (e) {
-      console.log('Seems like new extensions')
+      undefined
     }
-  }
-
-  private findNewPlugins() {
-    this.send({ type: 'find-new-extensions', data: undefined })
   }
 
   public async installExtension(zipPaths: string[]): Promise<installMessage> {
@@ -93,16 +151,17 @@ class ExtensionHost {
         if (existingVersion) {
           if (!(await this.checkVersion(existingVersion, manifest.version))) {
             return {
-              success: false
+              success: false,
+              message: `Duplicate extension ${manifest.packageName}. Can not install`
             }
           }
         }
         const installPath = path.join(defaultExtensionPath, manifest.packageName)
         await this.createDirIfNotExists(installPath)
         await zip.extract(null, installPath)
-        this.findNewPlugins()
         return {
           success: true,
+          message: "Extension installed successfully",
           extensionDescription: {
             name: manifest.name,
             desc: manifest.description,
@@ -123,5 +182,4 @@ class ExtensionHost {
   }
 }
 
-export const extensionHost = new ExtensionHost()
-
+export const extensionHost = new MainHostIPCHandler()

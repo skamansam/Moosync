@@ -64,7 +64,7 @@ export class ExtensionHandler {
     }
   }
 
-  public sendEvent(event: extensionHostMessage) {
+  public sendEvent(event: extensionEventMessage) {
     let method: keyof MoosyncExtensionTemplate | undefined = undefined
     if (this.initialized) {
       switch (event.type) {

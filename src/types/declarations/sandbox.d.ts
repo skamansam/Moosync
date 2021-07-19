@@ -1,28 +1,35 @@
-type extensionHostMessage = {
-  type: 'app-path',
-  data: string
-} | {
-  type: 'find-new-extensions',
-  data: undefined
-} | {
-  type: 'song-change'
-  data: Song
-} | {
-  type: 'playerState-change'
-  data: PlayerState
-} | {
-  type: 'volume-change'
-  data: number
-} | {
-  type: 'songQueue-change'
-  data: SongQueue
-} | {
-  type: 'get-all-songs'
-  data: Song[]
-} | {
-  type: 'get-installed-extensions'
-  data: undefined
+type extensionEventMessage = {
+  type: import('@/utils/extensions/constants').extensionEvents
+  data: any
 }
+
+type extensionRequestMessage = {
+  type: import('@/utils/extensions/constants').extensionRequests
+  channel: string
+}
+
+type extensionReplyMessage = {
+  type: import('@/utils/extensions/constants').extensionRequests
+  channel: string
+  data: any
+}
+
+type extensionHostMessage = extensionEventMessage | mainRequestMessage
+
+
+type mainRequestMessage = {
+  type: import('@/utils/extensions/constants').mainRequests
+  channel: string
+}
+
+type mainReplyMessage = {
+  type: import('@/utils/extensions/constants').mainRequests
+  channel: string
+  data: any
+}
+
+type mainHostMessage = mainReplyMessage | extensionRequestMessage
+
 
 interface installedExtensionDesc {
   name: string
@@ -34,6 +41,7 @@ interface installedExtensionDesc {
 }
 interface installMessage {
   success: boolean
+  message?: string
   extensionDescription?: installedExtensionDesc
 }
 
@@ -43,11 +51,6 @@ type mainHostMessage = {
 } | {
   type: 'get-installed-extensions'
   data: ExtensionDetails[]
-}
-declare module NodeJS {
-  interface Global {
-    getAllSongs(): Promise<Song[]>
-  }
 }
 
 interface ExtensionDetails {
@@ -73,4 +76,14 @@ interface UnInitializedExtensionItem {
 interface getExtensionOptions {
   started?: boolean
   packageName?: string
+}
+
+declare module NodeJS {
+  interface Global {
+    getAllSongs(): Promise<Song[] | undefined>
+    getCurrentSong(): Promise<Song | undefined>
+    getVolume(): Promise<number | undefined>
+    getTime(): Promise<number | undefined>
+    getQueue(): Promise<SongQueue | undefined>
+  }
 }

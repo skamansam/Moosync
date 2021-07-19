@@ -27,12 +27,12 @@ export class ExtensionHostChannel implements IpcChannelInterface {
   }
 
   private getAllExtensions(event: Electron.IpcMainEvent, request: IpcRequest) {
-    extensionHost.sendAsync({ type: 'get-installed-extensions', data: undefined }).then((data) => event.reply(request.responseChannel, data))
+    extensionHost.mainRequestGenerator.getInstalledExtensions().then((data) => event.reply(request.responseChannel, data))
   }
 
   private sendData(event: Electron.IpcMainEvent, request: IpcRequest) {
     if (request.params.data)
-      extensionHost.send(request.params.data)
+      extensionHost.extensionEventGenerator.send(request.params.data)
     event.reply(request.responseChannel)
   }
 }

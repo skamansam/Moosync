@@ -38,20 +38,11 @@ export default class Extensions extends Vue {
       if (!data.canceled) {
         window.ExtensionUtils.install(...data.filePaths).then((result) => {
           if (result.success) {
-            //
+            Vue.nextTick().then(() => this.fetchExtensions())
           }
         })
       }
     })
-  }
-
-  private async writePreferences() {
-    if (vxm.preferences.preferences) {
-      await window.PreferenceUtils.save(vxm.preferences.preferences)
-      if (vxm.preferences.pathsChanged) {
-        Vue.nextTick(() => window.FileUtils.scan())
-      }
-    }
   }
 
   private async fetchExtensions() {
