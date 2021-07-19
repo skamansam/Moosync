@@ -114,7 +114,7 @@ export class PlayerStore extends VuexModule.With({ namespaced: 'player' }) {
   @action
   async nextSong() {
     this.incrementQueue()
-    await this.loadSong(this.queueTop)
+    this.loadSong(this.queueTop)
   }
 
   @mutation
@@ -126,7 +126,7 @@ export class PlayerStore extends VuexModule.With({ namespaced: 'player' }) {
   @action
   async prevSong() {
     this.decrementQueue()
-    await this.loadSong(this.queueTop)
+    this.loadSong(this.queueTop)
   }
 
   @mutation
@@ -152,7 +152,6 @@ export class PlayerStore extends VuexModule.With({ namespaced: 'player' }) {
   }
 
   @action async loadSong(song: Song | null | undefined) {
-    this.currentSong = song
     if (song && song.type === 'SPOTIFY') {
       const oldState = this.playerState
       this.setPlayerState('LOADING')
@@ -165,6 +164,7 @@ export class PlayerStore extends VuexModule.With({ namespaced: 'player' }) {
       }
       this.setPlayerState(oldState)
     }
+    this.currentSong = song
   }
 
   @action async pushInQueue(Song: Song) {
@@ -182,6 +182,6 @@ export class PlayerStore extends VuexModule.With({ namespaced: 'player' }) {
 
   @action async playQueueSong(index: number) {
     this.moveIndexTo(index)
-    await this.loadSong(this.queueTop)
+    this.loadSong(this.queueTop)
   }
 }
