@@ -176,7 +176,7 @@ export class PlayerStore extends VuexModule.With({ namespaced: 'player' }) {
 
   @mutation
   private moveIndexTo(index: number) {
-    if (index > 0)
+    if (index >= 0)
       this.songQueue.index = index
   }
 
