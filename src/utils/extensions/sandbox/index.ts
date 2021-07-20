@@ -1,4 +1,4 @@
-import { ExtensionHandler } from '@/utils/extensions/sandbox/handler'
+import { ExtensionHandler } from '@/utils/extensions/sandbox/extensionHandler'
 import { extensionEventsKeys } from '@/utils/extensions/constants';
 import { extensionRequests } from '@/utils/extensions/constants';
 import { mainRequestsKeys } from '@/utils/extensions/constants';
@@ -7,14 +7,14 @@ import { v4 } from 'uuid';
 class ExtensionHostIPCHandler {
   private extensionHandler: ExtensionHandler
   private mainRequestHandler: MainRequestHandler
-  private extensionRequestGenerator = new ExtensionRequestGenerator()
 
   constructor() {
-    this.extensionHandler = new ExtensionHandler(process.argv)
+    this.extensionHandler = new ExtensionHandler([process.argv[2]])
     this.mainRequestHandler = new MainRequestHandler(this.extensionHandler)
 
     this.registerListeners()
     this.setGlobalMethods()
+    this.extensionHandler.startAll()
   }
 
   private isExtensionEvent(key: string) {
@@ -32,7 +32,7 @@ class ExtensionHostIPCHandler {
   }
 
   private setGlobalMethods() {
-    global.getAllSongs = this.extensionRequestGenerator.getAllSongs
+    global.api = new ExtensionRequestGenerator()
   }
 
   private parseMessage(message: extensionHostMessage) {
@@ -54,6 +54,22 @@ class ExtensionRequestGenerator {
     return this.sendAsync<Song[]>('get-all-songs')
   }
 
+  public async getCurrentSong() {
+    return this.sendAsync<Song>('get-current-song')
+  }
+
+  public async getVolume() {
+    return this.sendAsync<number>('get-volume')
+  }
+
+  public async getTime() {
+    return this.sendAsync<number>('get-time')
+  }
+
+  public async getQueue() {
+    return this.sendAsync<SongQueue>('get-queue')
+  }
+
   private sendAsync<T>(type: extensionRequests): Promise<T | undefined> {
     const channel = v4()
     return new Promise(resolve => {
@@ -65,7 +81,8 @@ class ExtensionRequestGenerator {
             resolve(data.data)
           }
         })
-        process.send({ type } as mainHostMessage)
+        process.send({ type, channel } as mainHostMessage)
+        return
       }
       resolve(undefined)
     })
@@ -100,4 +117,4 @@ class MainRequestHandler {
   }
 }
 
-new ExtensionHostIPCHandler()
+const handler = new ExtensionHostIPCHandler()

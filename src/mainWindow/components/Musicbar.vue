@@ -61,6 +61,7 @@ import Colors from '@/utils/ui/mixins/Colors'
 import { mixins } from 'vue-class-component'
 import ModelHelper from '@/utils/ui/mixins/ModelHelper'
 import { vxm } from '../store'
+import { time, timeStamp } from 'console'
 
 @Component({
   components: {
@@ -72,10 +73,13 @@ import { vxm } from '../store'
   }
 })
 export default class MusicBar extends mixins(Colors, ModelHelper) {
-  private timestamp: number = 0
   private forceSeek: number = 0
   private PlayerState: PlayerState = 'PAUSED'
   private sliderPosition: boolean = false
+
+  get timestamp() {
+    return vxm.player.currentTime
+  }
 
   private errorHandler(e: Event) {
     console.error(e)
@@ -106,7 +110,7 @@ export default class MusicBar extends mixins(Colors, ModelHelper) {
   }
 
   private updateTimestamp(timestamp: number) {
-    this.timestamp = timestamp
+    vxm.player.currentTime = timestamp
   }
 }
 </script>

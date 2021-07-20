@@ -78,12 +78,16 @@ interface getExtensionOptions {
   packageName?: string
 }
 
+interface extensionAPI {
+  getAllSongs(): Promise<Song[] | undefined>
+  getCurrentSong(): Promise<Song | undefined>
+  getVolume(): Promise<number | undefined>
+  getTime(): Promise<number | undefined>
+  getQueue(): Promise<SongQueue | undefined>
+}
+
 declare module NodeJS {
   interface Global {
-    getAllSongs(): Promise<Song[] | undefined>
-    getCurrentSong(): Promise<Song | undefined>
-    getVolume(): Promise<number | undefined>
-    getTime(): Promise<number | undefined>
-    getQueue(): Promise<SongQueue | undefined>
+    api: extensionAPI
   }
 }

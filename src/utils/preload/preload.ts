@@ -129,4 +129,6 @@ contextBridge.exposeInMainWorld('ExtensionUtils', {
   install: (...path: string[]) => ipcRendererHolder.send(IpcEvents.EXTENSION_HOST, { type: ExtensionHostEvents.INSTALL, params: { path: path } }),
   sendEvent: (data: extensionHostMessage) => ipcRendererHolder.send(IpcEvents.EXTENSION_HOST, { type: ExtensionHostEvents.EVENT_TRIGGER, params: { data: data } }),
   getAllExtensions: () => ipcRendererHolder.send(IpcEvents.EXTENSION_HOST, { type: ExtensionHostEvents.GET_ALL_EXTENSIONS }),
+  listenRequests: (callback: (request: extensionRequestMessage) => void) => ipcRendererHolder.on(ExtensionHostEvents.EXTENSION_REQUESTS, callback),
+  replyToRequest: (data: extensionReplyMessage) => ipcRenderer.send(ExtensionHostEvents.EXTENSION_REQUESTS, data),
 })

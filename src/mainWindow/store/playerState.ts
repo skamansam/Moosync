@@ -16,6 +16,15 @@ export class PlayerStore extends VuexModule.With({ namespaced: 'player' }) {
   private songQueue = new Queue()
   public repeat: boolean = false
   public volume: number = 50
+  public timestamp: number = 0
+
+  get currentTime() {
+    return this.timestamp
+  }
+
+  set currentTime(time: number) {
+    this.timestamp = time
+  }
 
   get playerState() {
     return this.state

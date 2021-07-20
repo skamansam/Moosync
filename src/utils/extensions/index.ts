@@ -1,13 +1,18 @@
+import { BrowserWindow, app } from 'electron';
 import { ChildProcess, fork } from 'child_process'
 
+import { ExtensionHostEvents } from '@/utils/main/ipc/constants';
+import { IpcMainEvent } from 'electron/main';
 import { SongDB } from '@/utils/main/db/index';
-import { app } from 'electron'
 import { async } from 'node-stream-zip'
 import { extensionRequests } from '@/utils/extensions/constants';
 import { extensionRequestsKeys } from '@/utils/extensions/constants';
+import { extensionUIRequestsKeys } from '@/utils/extensions/constants';
 import { promises as fsP } from 'fs'
 import { getVersion } from '@/utils/common';
+import { ipcMain } from 'electron'
 import { mainRequests } from '@/utils/extensions/constants';
+import { mainWindow } from '@/background';
 import path from 'path'
 import { v4 } from 'uuid';
 
@@ -15,34 +20,34 @@ export const defaultExtensionPath = path.join(app.getPath('appData'), app.getNam
 
 class MainHostIPCHandler {
   private sandboxProcess: ChildProcess
-  private extensionRequestHandler: ExtensionRequestHandler
+
+  private extensionRequestHandler = new ExtensionRequestHandler()
   private extensionResourceHandler = new ExtensionHandler()
   public mainRequestGenerator: MainRequestGenerator
   public extensionEventGenerator: ExtensionEventGenerator
 
   constructor() {
     this.sandboxProcess = this.createExtensionHost()
-    this.extensionRequestHandler = new ExtensionRequestHandler(this.sandboxProcess)
     this.mainRequestGenerator = new MainRequestGenerator(this.sandboxProcess)
     this.extensionEventGenerator = new ExtensionEventGenerator(this.sandboxProcess)
     this.registerListeners()
   }
 
   private registerListeners() {
-    this.sandboxProcess.on("message", this.parseMessage)
+    this.sandboxProcess.on("message", this.parseMessage.bind(this))
   }
 
   private createExtensionHost() {
     return fork(__dirname + '/sandbox.js', [defaultExtensionPath])
   }
 
-  private isExtensionRequest(key: string) {
-    return extensionRequestsKeys.includes(key as any)
+  public mainWindowCreated() {
+    this.extensionRequestHandler.mainWindowCreated()
   }
 
   private parseMessage(message: mainHostMessage) {
-    if (this.isExtensionRequest(message.type)) {
-      this.extensionRequestHandler.parseRequest(message as extensionRequestMessage)
+    if (extensionRequestsKeys.includes(message.type as any) || extensionUIRequestsKeys.includes(message.type as any)) {
+      this.extensionRequestHandler.parseRequest(message as extensionRequestMessage).then(resp => this.sendToExtensionHost(resp))
     }
   }
 
@@ -50,6 +55,10 @@ class MainHostIPCHandler {
     const resp = await this.extensionResourceHandler.installExtension(zipPaths)
     await this.mainRequestGenerator.findNewExtensions()
     return resp
+  }
+
+  private sendToExtensionHost(data: any) {
+    this.sandboxProcess.send(data)
   }
 }
 
@@ -96,20 +105,50 @@ class ExtensionEventGenerator {
 }
 
 class ExtensionRequestHandler {
-  private sandboxProcess: ChildProcess
+  private mainWindowCallsQueue: { func: Function, args: any[] }[] = []
 
-  constructor(process: ChildProcess) {
-    this.sandboxProcess = process
-  }
-
-  public parseRequest(message: extensionRequestMessage) {
-    if (message.type === 'get-all-songs') {
-      SongDB.getAllSongs().then((songs) => this.send(message.type, message.channel, songs))
+  public mainWindowCreated() {
+    for (const f of this.mainWindowCallsQueue) {
+      f.func(...f.args)
     }
   }
 
-  private send(type: extensionRequests, channel: string, data: any) {
-    this.sandboxProcess.send({ type, channel, data } as extensionReplyMessage)
+  private requestFromMainWindow(message: extensionRequestMessage) {
+    return new Promise(resolve => {
+      let listener: (event: Electron.IpcMainEvent, data: extensionReplyMessage) => void
+      ipcMain.on(ExtensionHostEvents.EXTENSION_REQUESTS, listener = (event, data: extensionReplyMessage) => {
+        if (data.channel === message.channel) {
+          ipcMain.off(ExtensionHostEvents.EXTENSION_REQUESTS, listener)
+          resolve(data.data)
+        }
+      })
+
+      // Defer call till mainWindow is created
+      if (mainWindow)
+        this.sendToMainWindow(message)
+      else {
+        this.mainWindowCallsQueue.push({ func: this.sendToMainWindow, args: [message] })
+      }
+    })
+  }
+
+  private sendToMainWindow(message: extensionRequestMessage) {
+    mainWindow.webContents.send(ExtensionHostEvents.EXTENSION_REQUESTS, message)
+  }
+
+  public async parseRequest(message: extensionRequestMessage): Promise<extensionReplyMessage | undefined> {
+    const resp: extensionReplyMessage = { ...message, data: undefined }
+    if (message.type === 'get-all-songs') {
+      const songs = await SongDB.getAllSongs()
+      resp.data = songs
+    }
+
+    if (extensionUIRequestsKeys.includes(message.type as any)) {
+      const data = await this.requestFromMainWindow(message)
+      resp.data = data
+    }
+
+    return resp
   }
 }
 

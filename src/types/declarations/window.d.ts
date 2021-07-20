@@ -85,6 +85,8 @@ interface extensionUtils {
   install: (...path: string[]) => Promise<installMessage>
   sendEvent: (data: extensionHostMessage) => Promise<void>
   getAllExtensions: () => Promise<ExtensionDetails[]>
+  listenRequests: (callback: (request: extensionRequestMessage) => void) => void
+  replyToRequest: (data: extensionReplyMessage) => void
 }
 
 declare global {

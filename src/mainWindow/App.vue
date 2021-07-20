@@ -36,6 +36,7 @@ export default class App extends mixins(ThemeHandler) {
     this.registerLogger()
     this.registerNotifier()
     this.listenExtensionEvents()
+    this.listenExtensionRequests()
   }
 
   mounted() {
@@ -106,6 +107,30 @@ export default class App extends mixins(ThemeHandler) {
   private registerNotifier() {
     window.NotifierUtils.registerMainProcessNotifier((obj) => {
       vxm.notifier.emit(obj)
+    })
+  }
+
+  private listenExtensionRequests() {
+    window.ExtensionUtils.listenRequests((data) => {
+      if (data.type === 'get-current-song') {
+        window.ExtensionUtils.replyToRequest({ ...data, data: vxm.player.currentSong })
+        return
+      }
+
+      if (data.type === 'get-volume') {
+        window.ExtensionUtils.replyToRequest({ ...data, data: vxm.player.volume })
+        return
+      }
+
+      if (data.type === 'get-time') {
+        window.ExtensionUtils.replyToRequest({ ...data, data: vxm.player.currentTime })
+        return
+      }
+
+      if (data.type === 'get-queue') {
+        window.ExtensionUtils.replyToRequest({ ...data, data: vxm.player.queue })
+        return
+      }
     })
   }
 

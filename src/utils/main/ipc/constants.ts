@@ -99,7 +99,8 @@ export enum LoggerEvents {
 export enum ExtensionHostEvents {
   EVENT_TRIGGER = "eventTrigger",
   GET_ALL_EXTENSIONS = 'getAllExtensions',
-  INSTALL = 'install'
+  INSTALL = 'install',
+  EXTENSION_REQUESTS = 'extensionRequests'
 }
 
 export enum ServiceProviderEvents {
