@@ -36,6 +36,7 @@ export default class AudioStream extends mixins(Colors, SyncMixin, PlayerControl
   private activePlayer!: Player
   private ytPlayer!: YoutubePlayer
   private localPlayer!: LocalPlayer
+  private activePlayerType!: PlayerType
 
   private isFirst: boolean = true
 
@@ -53,18 +54,21 @@ export default class AudioStream extends mixins(Colors, SyncMixin, PlayerControl
   }
 
   private onPlayerTypeChanged(newType: PlayerType) {
-    this.activePlayer.stop()
-    this.activePlayer.removeAllListeners()
+    if (this.activePlayerType !== newType) {
+      this.activePlayer.stop()
+      this.activePlayer.removeAllListeners()
+      this.activePlayerType = newType
 
-    switch (newType) {
-      case 'LOCAL':
-        this.activePlayer = this.localPlayer
-        break
-      case 'YOUTUBE':
-        this.activePlayer = this.ytPlayer
-        break
+      switch (newType) {
+        case 'LOCAL':
+          this.activePlayer = this.localPlayer
+          break
+        case 'YOUTUBE':
+          this.activePlayer = this.ytPlayer
+          break
+      }
+      this.registerPlayerListeners()
     }
-    this.registerPlayerListeners()
   }
 
   @Watch('currentSong')
@@ -94,6 +98,7 @@ export default class AudioStream extends mixins(Colors, SyncMixin, PlayerControl
     this.ytPlayer = new YoutubePlayer(new YTPlayer('#yt-player'))
     this.localPlayer = new LocalPlayer(this.audioElement)
     this.activePlayer = this.localPlayer
+    this.activePlayerType = 'LOCAL'
 
     vxm.player.$watch('playerState', this.onPlayerStateChanged)
   }
