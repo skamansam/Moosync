@@ -17,6 +17,8 @@ import path from 'path'
 import { v4 } from 'uuid';
 
 export const defaultExtensionPath = path.join(app.getPath('appData'), app.getName(), 'extensions')
+const defaultLogPath = path.join(app.getPath('logs'))
+
 
 class MainHostIPCHandler {
   private sandboxProcess: ChildProcess
@@ -38,7 +40,7 @@ class MainHostIPCHandler {
   }
 
   private createExtensionHost() {
-    return fork(__dirname + '/sandbox.js', [defaultExtensionPath])
+    return fork(__dirname + '/sandbox.js', ['extensionPath', defaultExtensionPath, 'logPath', defaultLogPath])
   }
 
   public mainWindowCreated() {

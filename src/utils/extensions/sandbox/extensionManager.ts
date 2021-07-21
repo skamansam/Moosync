@@ -1,4 +1,5 @@
 import { InMemoryRegistry } from './extensionRegistry';
+import { Logger } from 'winston';
 
 export abstract class AbstractExtensionManager {
   abstract instantiateAndRegister(extension: UnInitializedExtensionItem): Promise<void>
@@ -9,6 +10,12 @@ export abstract class AbstractExtensionManager {
 
 export class ExtensionManager extends AbstractExtensionManager {
   private extensionRegistry = new InMemoryRegistry();
+  private logger: Logger
+
+  constructor(logger: Logger) {
+    super()
+    this.logger = logger
+  }
 
   private register(extensionItem: ExtensionItem) {
     this.extensionRegistry.register(extensionItem)
@@ -19,7 +26,7 @@ export class ExtensionManager extends AbstractExtensionManager {
   }
 
   async instantiateAndRegister(extension: UnInitializedExtensionItem) {
-    const instance = await extension.factory.create()
+    const instance = await extension.factory.create(this.logger.child({ label: extension.packageName }))
     this.register({
       name: extension.name,
       desc: extension.desc,

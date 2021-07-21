@@ -2,6 +2,7 @@ import { AbstractExtensionFinder, ExtensionFinder } from './extensionFinder';
 
 import { AbstractExtensionManager } from '@/utils/extensions/sandbox/extensionManager';
 import { ExtensionManager } from '@/utils/extensions/sandbox/extensionManager';
+import { Logger } from 'winston';
 import { MoosyncExtensionTemplate } from '@moosync/moosync-types';
 import { getVersion } from '@/utils/common';
 
@@ -12,9 +13,9 @@ export class ExtensionHandler {
   private initialized: boolean = false
   private preInitializedCalls: { func: Function, args?: any[] }[]
 
-  constructor(searchPaths: string[]) {
+  constructor(searchPaths: string[], logger: Logger) {
     this.preInitializedCalls = []
-    this.extensionManager = new ExtensionManager()
+    this.extensionManager = new ExtensionManager(logger)
     this.extensionFinder = new ExtensionFinder(searchPaths)
 
     this.registerPlugins().then(() => {

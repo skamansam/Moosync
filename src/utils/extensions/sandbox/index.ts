@@ -1,4 +1,6 @@
 import { ExtensionHandler } from '@/utils/extensions/sandbox/extensionHandler'
+import { Logger } from 'winston';
+import { createLogger } from './logger';
 import { extensionEventsKeys } from '@/utils/extensions/constants';
 import { extensionRequests } from '@/utils/extensions/constants';
 import { mainRequestsKeys } from '@/utils/extensions/constants';
@@ -7,14 +9,48 @@ import { v4 } from 'uuid';
 class ExtensionHostIPCHandler {
   private extensionHandler: ExtensionHandler
   private mainRequestHandler: MainRequestHandler
+  private logger: Logger
 
   constructor() {
-    this.extensionHandler = new ExtensionHandler([process.argv[2]])
+    let extensionPath = ""
+    let logsPath = ""
+    for (const [index, arg] of process.argv.entries()) {
+      if (process.argv[index + 1]) {
+        if (arg === 'extensionPath') {
+          extensionPath = process.argv[index + 1]
+        }
+
+        if (arg === 'logPath') {
+          logsPath = process.argv[index + 1]
+        }
+      }
+    }
+    this.logger = createLogger(logsPath)
+    this.overrideConsole()
+
+    this.extensionHandler = new ExtensionHandler([extensionPath], this.logger)
     this.mainRequestHandler = new MainRequestHandler(this.extensionHandler)
 
     this.registerListeners()
     this.setGlobalMethods()
     this.extensionHandler.startAll()
+  }
+
+  private overrideConsole() {
+    const preservedConsoleInfo = console.info;
+    const preservedConsoleError = console.error;
+
+    console.info = (...args: any[]) => {
+      if (process.env.NODE_ENV !== 'production')
+        preservedConsoleInfo.apply(console, args);
+      this.logger.info(args.toString(), { label: 'Main' })
+    }
+
+    console.error = (...args: any[]) => {
+      if (process.env.NODE_ENV !== 'production')
+        preservedConsoleError.apply(console, args);
+      this.logger.error(args.toString(), { label: 'Main' })
+    }
   }
 
   private isExtensionEvent(key: string) {
