@@ -70,8 +70,8 @@ export class SyncStore extends VuexModule.With({ namespaced: 'sync' }) {
   }
 
   @mutation
-  addQueueItem(value: string) {
-    this.queueOrder.push(value)
+  addQueueItem(...value: string[]) {
+    this.queueOrder.push(...value)
   }
 
   @mutation
@@ -86,14 +86,16 @@ export class SyncStore extends VuexModule.With({ namespaced: 'sync' }) {
   }
 
   @action
-  async addToLocalQueue(song: Song) {
-    const ytItem = await vxm.providers.spotifyProvider.spotifyToYoutube(song)
-    if (ytItem) {
-      song.url = ytItem._id
-      song.duration = ytItem.duration
-    } else {
-      throw new Error('Could not convert song')
+  async addToLocalQueue(songs: Song[]) {
+    for (const song of songs) {
+      const ytItem = await vxm.providers.spotifyProvider.spotifyToYoutube(song)
+      if (ytItem) {
+        song.url = ytItem._id
+        song.duration = ytItem.duration
+      } else {
+        throw new Error('Could not convert song')
+      }
+      this.localQueue.push(song)
     }
-    this.localQueue.push(song)
   }
 }

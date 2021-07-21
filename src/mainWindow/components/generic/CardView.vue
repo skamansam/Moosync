@@ -21,7 +21,7 @@
         </div>
       </div>
       <div class="card-body">
-        <p :title="title" :id="id" @contextmenu="emitContext">{{ title }}</p>
+        <p ref="title" :title="title" :id="id" @contextmenu="emitContext">{{ title }}</p>
       </div>
     </div>
   </div>
@@ -31,7 +31,7 @@
 import Colors from '@/utils/ui/mixins/Colors'
 import ImageLoader from '@/utils/ui/mixins/ImageLoader'
 import { mixins } from 'vue-class-component'
-import { Component, Prop, Watch } from 'vue-property-decorator'
+import { Component, Prop, Ref, Watch } from 'vue-property-decorator'
 import ErrorHandler from '@/utils/ui/mixins/errorHandler'
 
 @Component({
@@ -49,6 +49,9 @@ export default class SongDetails extends mixins(Colors, ImageLoader, ErrorHandle
 
   @Prop({ default: '' })
   private imgSrc!: string
+
+  @Ref('title')
+  private titleText!: HTMLParagraphElement
 
   private forceEmptyImg: boolean = false
 
@@ -75,13 +78,12 @@ export default class SongDetails extends mixins(Colors, ImageLoader, ErrorHandle
   padding-right: 0
   max-width: 200px
 
-.card-body > p, .card-body > h4
+.card-body > p, .card-body > p
   white-space: nowrap
   overflow: hidden
   text-overflow: ellipsis
   font-weight: bold
   font-size: 20px
-  line-height: 29px
 
 .default-icon
   svg
@@ -97,6 +99,9 @@ img
 
 .card
   background-color: transparent
+
+.card-body
+  padding: 12px
 
 .icon-container
   z-index: 1

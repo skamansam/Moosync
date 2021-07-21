@@ -1,7 +1,7 @@
 import { action, mutation } from 'vuex-class-component'
+import { v1, v4 } from 'uuid';
 
 import { VuexModule } from './module'
-import { v4 } from 'uuid';
 import { vxm } from '.'
 
 class Queue {
@@ -71,12 +71,12 @@ export class PlayerStore extends VuexModule.With({ namespaced: 'player' }) {
   }
 
   @mutation
-  private addSong(item: Song) {
-    if (!this.songQueue.data[item._id!]) {
-      this.songQueue.data[item._id!] = item
+  private addSong(...item: Song[]) {
+    for (const s of item) {
+      if (!this.songQueue.data[s._id!]) {
+        this.songQueue.data[s._id!] = s
+      }
     }
-
-    console.log(this.songQueue)
   }
 
   @mutation
@@ -93,25 +93,48 @@ export class PlayerStore extends VuexModule.With({ namespaced: 'player' }) {
   }
 
   @mutation
-  private addInSongQueue(item: Song) {
-    this.songQueue.order.push({ id: v4(), songID: item._id! })
+  private addInSongQueue(...item: Song[]) {
+    this.songQueue.order.push(...item.map(obj => { return { id: v1(), songID: obj._id! } }))
   }
 
   @action
-  async loadInQueue(item: Song) {
-    this.addSong(item)
-    this.addInSongQueue(item)
+  async pushInQueue(...item: Song[]) {
+    if (item.length > 0) {
+      if (!this.currentSong) {
+        // Add first item immediately to start playing
+        this.addSong(item[0])
+        this.addInSongQueue(item[0])
+        item.splice(0, 1)
+        this.nextSong()
+      }
+
+      this.addSong(...item)
+      this.addInSongQueue(...item)
+    }
+
   }
 
   @mutation
-  private addInQueueTop(item: Song) {
-    this.songQueue.order.splice(this.songQueue.index + 1, 0, { id: v4(), songID: item._id! })
+  private addInQueueTop(item: Song[]) {
+    this.songQueue.order.splice(this.songQueue.index + 1, 0, ...item.map(obj => {
+      return { id: v1(), songID: obj._id! }
+    }))
   }
 
   @action
-  async pushInQueueTop(item: Song) {
-    this.addSong(item)
-    this.addInQueueTop(item)
+  async pushInQueueTop(item: Song[]) {
+    if (item.length > 0) {
+      // Add first item immediately to start playing
+      this.addSong(item[0])
+      this.addInQueueTop([item[0]])
+      await this.nextSong()
+
+      item.splice(0, 1)
+
+
+      this.addSong(...item)
+      this.addInQueueTop(item)
+    }
   }
 
   @mutation
@@ -174,13 +197,6 @@ export class PlayerStore extends VuexModule.With({ namespaced: 'player' }) {
       this.setPlayerState(oldState)
     }
     this.currentSong = song
-  }
-
-  @action async pushInQueue(Song: Song) {
-    this.loadInQueue(Song)
-    if (this.currentSong == null) {
-      this.nextSong()
-    }
   }
 
   @mutation

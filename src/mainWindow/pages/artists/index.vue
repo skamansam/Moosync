@@ -39,4 +39,11 @@ export default class Artists extends mixins(RouterPushes) {
 <style lang="sass" scoped>
 .album-container
   position: absolute
+
+.title
+  font-weight: bold
+  font-size: 55px
+  margin-left: 15px
+  margin-bottom: 50px
+  margin-top: 20px
 </style>

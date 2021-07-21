@@ -6417,11 +6417,6 @@ find-up@^4.0.0, find-up@^4.1.0:
     locate-path "^5.0.0"
     path-exists "^4.0.0"
 
-fitty@^2.3.4:
-  version "2.3.4"
-  resolved "https://registry.yarnpkg.com/fitty/-/fitty-2.3.4.tgz#44a826c207e490244e28188cc94ad10e6d1bed74"
-  integrity sha512-wYvt/s0Aif/EENOTA/e/t0SiJKAeI6e+l9ugJ6E6QJBHsq80jL/INNuHz5nSVauzWOn5JK6JgcBGAiFrzJ+qYQ==
-
 flat-cache@^3.0.4:
   version "3.0.4"
   resolved "https://registry.yarnpkg.com/flat-cache/-/flat-cache-3.0.4.tgz#61b0338302b2fe9f957dcc32fc2a87f1c3048b11"
