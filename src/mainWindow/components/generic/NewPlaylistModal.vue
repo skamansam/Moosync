@@ -101,18 +101,26 @@ export default class NewPlaylistModal extends mixins(Colors, ImgLoader) {
   private getValidImages() {
     let mergableImages: string[] = []
     for (const song of this.songs) {
-      console.log(song)
       const cover = this.getValidImage(song)
       if (cover) mergableImages.push(cover)
     }
     return mergableImages.slice(0, 4)
   }
 
-  private createImage(src: string, quad: number, len: number, ctx: CanvasRenderingContext2D) {
+  private async createImage(
+    src: string,
+    quad: number,
+    len: number,
+    ctx: CanvasRenderingContext2D,
+    crossOrigin?: string
+  ) {
     let img = new Image()
-    img.crossOrigin = 'anonymous'
-    img.src = src.startsWith('http') ? src : 'media://' + src
+    img.onerror = () => {
+      if (!crossOrigin) this.createImage(src, quad, len, ctx, 'anonymous')
+    }
     img.onload = () => this.drawImage(quad, len, ctx, img)
+    img.crossOrigin = crossOrigin ?? null
+    img.src = src.startsWith('http') ? src : 'media://' + src
   }
 
   private isExpandedImage(quad: number, len: number) {
