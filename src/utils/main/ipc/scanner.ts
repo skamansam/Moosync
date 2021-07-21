@@ -86,11 +86,25 @@ export class ScannerChannel implements IpcChannelInterface {
     })
   }
 
+  private async checkCoverExists(coverPath: string | undefined): Promise<boolean> {
+    if (coverPath) {
+      try {
+        await fs.promises.access(coverPath)
+        return true
+      } catch (e) {
+        console.error(`${coverPath} not accessible`)
+        return false
+      }
+    }
+    return false
+  }
+
   private async extractCovers(cover: (songPath: string, coverPath: string) => ObservablePromise<string | undefined>) {
     const songs = await SongDB.getAllSongs()
     const thumbPath = (await loadPreferences()).thumbnailPath
     for (const s of songs) {
-      if (s.type === 'LOCAL' && !s.song_coverPath) {
+      const coverExists = await this.checkCoverExists(s.song_coverPath)
+      if (s.type === 'LOCAL' && !coverExists) {
         const coverPath = path.join(thumbPath, s._id! + '.jpg')
         const coverStatus = await cover(s.path!, coverPath)
         if (coverStatus) {

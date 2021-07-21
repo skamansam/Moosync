@@ -281,7 +281,6 @@ class SongDBInstance extends DBUtils {
     return this.db.query(
       `SELECT * FROM artists A
         INNER JOIN artists_bridge B ON A.artist_id = B.artist
-        INNER JOIN allsongs C ON B.song = C._id
         ${this.addExcludeWhereClause(true, exclude)}
         GROUP BY A.artist_id`
     )

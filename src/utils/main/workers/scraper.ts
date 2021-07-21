@@ -5,6 +5,7 @@ import axios from 'axios'
 import axiosRetry from 'axios-retry'
 import { createHash } from 'crypto'
 import { expose } from 'threads'
+import fs from 'fs';
 import path from 'path'
 import rateLimit from 'axios-rate-limit'
 import { v4 } from 'uuid'
@@ -18,6 +19,7 @@ expose({
 
   fetchArtworks(artists: artists[], basePath: string) {
     return new Observable((observer) => {
+      console.log(artists)
       fetchArtworks(artists, basePath, observer)
     })
   },
@@ -157,10 +159,24 @@ async function queryArtwork(a: artists, coverPath: string) {
   return data ? data : 'default'
 }
 
+async function checkCoverExists(coverPath: string | undefined): Promise<boolean> {
+  if (coverPath) {
+    try {
+      await fs.promises.access(coverPath)
+      return true
+    } catch (e) {
+      console.error(`${coverPath} not accessible`)
+      return false
+    }
+  }
+  return false
+}
+
 export async function fetchArtworks(artists: artists[], coverPath: string, observer: SubscriptionObserver<artists>) {
   const promises: Promise<void>[] = []
   for (const a of artists) {
-    if (!a.artist_coverPath) {
+    const coverExists = await checkCoverExists(a.artist_coverPath)
+    if (!coverExists) {
       promises.push(
         queryArtwork(a, coverPath).then((result) => observer.next({ artist_id: a.artist_id, artist_coverPath: result }))
       )
