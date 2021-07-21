@@ -1,4 +1,4 @@
-import { ExtensionHostEvents, IpcEvents } from './constants'
+import { ExtensionHostEvents, IpcEvents } from './constants';
 
 import { extensionHost } from '@/utils/extensions/index';
 

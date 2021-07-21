@@ -1,7 +1,7 @@
-import { AuthorizationError, AuthorizationRequest, AuthorizationRequestHandler, AuthorizationRequestResponse, AuthorizationResponse, AuthorizationServiceConfiguration, BasicQueryStringUtils, QueryStringUtils } from "@openid/appauth"
-import { WebCrypto } from "./crypto_utils"
-import { Crypto } from '@openid/appauth'
+import { AuthorizationError, AuthorizationRequest, AuthorizationRequestHandler, AuthorizationRequestResponse, AuthorizationResponse, AuthorizationServiceConfiguration, BasicQueryStringUtils, Crypto, QueryStringUtils } from "@openid/appauth"
+
 import EventEmitter from 'events'
+import { WebCrypto } from "./crypto_utils"
 
 class ServerEventsEmitter extends EventEmitter {
   static ON_AUTHORIZATION_RESPONSE = 'authorization_response'

@@ -1,8 +1,8 @@
-import { action, mutation } from 'vuex-class-component'
-import { v1, v4 } from 'uuid';
+import { action, mutation } from 'vuex-class-component';
 
-import { VuexModule } from './module'
-import { vxm } from '.'
+import { VuexModule } from './module';
+import { v1 } from 'uuid';
+import { vxm } from '.';
 
 class Queue {
   data: { [id: string]: Song } = {}

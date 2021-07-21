@@ -1,6 +1,7 @@
-import merge from 'deepmerge'
-import { Store } from 'vuex'
 import * as shvl from 'shvl'
+
+import { Store } from 'vuex'
+import merge from 'deepmerge'
 
 export function createPersist(paths: string[]) {
   return (store: Store<any>) => {

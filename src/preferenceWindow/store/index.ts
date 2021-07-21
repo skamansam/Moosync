@@ -1,8 +1,9 @@
+import { createProxy, extractVuexModule } from 'vuex-class-component'
+
+import { PreferenceStore } from '@/preferenceWindow/store/preferences'
 import ThemeStore from '@/commonStore/themeState'
 import Vue from 'vue'
 import Vuex from 'vuex'
-import { createProxy, extractVuexModule } from 'vuex-class-component'
-import { PreferenceStore } from '@/preferenceWindow/store/preferences'
 import { createPersist } from '@/utils/ui/store/persist'
 
 Vue.use(Vuex)

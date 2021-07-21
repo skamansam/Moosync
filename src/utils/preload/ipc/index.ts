@@ -1,4 +1,4 @@
-import { IpcRenderer } from 'electron'
+import { IpcRenderer } from 'electron';
 import { v4 } from 'uuid';
 
 export class IpcRendererHolder {

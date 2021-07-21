@@ -1,10 +1,10 @@
-import { AuthFlow, AuthStateEmitter } from '@/utils/ui/oauth/flow'
+import { AuthFlow, AuthStateEmitter } from '@/utils/ui/oauth/flow';
 import { GenericProvider, cache } from '@/utils/ui/providers/genericProvider';
 
 import axios from 'axios';
 import { forageStore } from './genericProvider';
-import { once } from 'events'
-import qs from 'qs'
+import { once } from 'events';
+import qs from 'qs';
 
 const BASE_URL = 'https://api.spotify.com/v1/'
 

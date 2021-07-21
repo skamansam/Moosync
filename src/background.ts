@@ -5,14 +5,14 @@ import 'threads/register'
 import { BrowserWindow, Menu, Tray, app, nativeTheme, protocol, session } from 'electron'
 import installExtension, { VUEJS_DEVTOOLS } from 'electron-devtools-installer'
 import path, { resolve } from 'path'
-import { scheduler, setupScanTask } from '@/utils/main/scheduler/index';
+import { scheduler, setupScanTask } from '@/utils/main/scheduler/index'
 
 import EventEmitter from 'events'
 import { OAuthHandler } from '@/utils/main/oauth/handler'
 import { createProtocol } from 'vue-cli-plugin-electron-builder/lib'
-import { extensionHost } from '@/utils/extensions/index';
+import { extensionHost } from '@/utils/extensions/index'
 import { loadPreferences } from '@/utils/main/db/preferences'
-import { logger } from './utils/main/logger/index';
+import { logger } from './utils/main/logger/index'
 import { registerIpcChannels } from '@/utils/main/ipc' // Import for side effects
 
 overrideConsole()

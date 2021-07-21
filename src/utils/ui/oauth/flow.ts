@@ -17,29 +17,29 @@
 import {
   AuthorizationNotifier,
   AuthorizationRequestHandler
-} from "@openid/appauth/built/authorization_request_handler"
+} from "@openid/appauth/built/authorization_request_handler";
 import {
   BaseTokenRequestHandler,
   TokenRequestHandler
-} from "@openid/appauth/built/token_request_handler"
+} from "@openid/appauth/built/token_request_handler";
 import {
   GRANT_TYPE_AUTHORIZATION_CODE,
   GRANT_TYPE_REFRESH_TOKEN,
   TokenRequest
-} from "@openid/appauth/built/token_request"
+} from "@openid/appauth/built/token_request";
 
 import { AppAuthError } from '@openid/appauth';
-import { AuthFlowRequestHandler } from './AuthFlowRequestHandler'
-import { AuthorizationRequest } from "@openid/appauth/built/authorization_request"
-import { AuthorizationServiceConfiguration } from "@openid/appauth/built/authorization_service_configuration"
-import EventEmitter from 'events'
-import { NodeRequestor } from '@openid/appauth/built/node_support/node_requestor'
+import { AuthFlowRequestHandler } from './AuthFlowRequestHandler';
+import { AuthorizationRequest } from "@openid/appauth/built/authorization_request";
+import { AuthorizationServiceConfiguration } from "@openid/appauth/built/authorization_service_configuration";
+import EventEmitter from 'events';
+import { NodeRequestor } from '@openid/appauth/built/node_support/node_requestor';
 import { SpotifyTokenRequestHandler } from './tokenHandler';
-import { StringMap } from "@openid/appauth/built/types"
+import { StringMap } from "@openid/appauth/built/types";
 import {
   TokenResponse
-} from "@openid/appauth/built/token_response"
-import { WebCrypto } from "./crypto_utils"
+} from "@openid/appauth/built/token_response";
+import { WebCrypto } from "./crypto_utils";
 
 export class AuthStateEmitter extends EventEmitter {
   static ON_TOKEN_RESPONSE = "on_token_response"

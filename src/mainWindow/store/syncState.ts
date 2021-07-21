@@ -1,6 +1,6 @@
 import { action, mutation } from 'vuex-class-component';
 
-import { VuexModule } from './module'
+import { VuexModule } from './module';
 import { vxm } from '@/mainWindow/store';
 
 export enum PeerMode {

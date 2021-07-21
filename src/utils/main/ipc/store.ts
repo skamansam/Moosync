@@ -1,8 +1,8 @@
 import { IpcEvents } from './constants'
 import { StoreEvents } from '@/utils/main/ipc/constants'
-import { store } from '@/utils/main/db/preferences'
 import keytar from 'keytar'
 import os from 'os'
+import { store } from '@/utils/main/db/preferences'
 
 export class StoreChannel implements IpcChannelInterface {
   name = IpcEvents.STORE

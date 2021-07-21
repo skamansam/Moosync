@@ -1,12 +1,12 @@
-import { Component } from 'vue-property-decorator'
-import { EventBus } from '@/utils/main/ipc/constants'
-import { MenuItem } from 'vue-context-menu-popup'
-import PlayerControls from '@/utils/ui/mixins/PlayerControls'
+import { Component } from 'vue-property-decorator';
+import { EventBus } from '@/utils/main/ipc/constants';
+import { MenuItem } from 'vue-context-menu-popup';
+import PlayerControls from '@/utils/ui/mixins/PlayerControls';
 import RemoteSong from '@/utils/ui/mixins/remoteSongMixin';
-import { bus } from '@/mainWindow/main'
-import { mixins } from 'vue-class-component'
-import { toSong } from '@/utils/models/youtube'
-import { vxm } from '@/mainWindow/store'
+import { bus } from '@/mainWindow/main';
+import { mixins } from 'vue-class-component';
+import { toSong } from '@/utils/models/youtube';
+import { vxm } from '@/mainWindow/store';
 
 @Component
 export default class ContextMenuMixin extends mixins(PlayerControls, RemoteSong) {

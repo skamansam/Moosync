@@ -1,4 +1,4 @@
-import { IpcEvents, LoggerEvents } from './constants'
+import { IpcEvents, LoggerEvents } from './constants';
 
 import { logger } from './../logger/index';
 

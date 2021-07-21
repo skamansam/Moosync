@@ -8,7 +8,7 @@ import fs from 'fs'
 import { loadPreferences } from '@/utils/main/db/preferences'
 import { notifyRenderer } from '.'
 import path from 'path'
-import { v4 } from 'uuid';
+import { v4 } from 'uuid'
 
 enum scanning {
   UNDEFINED,

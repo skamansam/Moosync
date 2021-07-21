@@ -2,7 +2,6 @@ import { IpcEvents, PlaylistEvents } from './constants'
 import { getDisabledPaths, loadPreferences } from '@/utils/main/db/preferences'
 
 import { SongDB } from '@/utils/main/db'
-import { app } from 'electron'
 import fs from 'fs'
 import path from 'path'
 import { v4 } from 'uuid'

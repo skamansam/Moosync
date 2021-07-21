@@ -1,4 +1,4 @@
-import { bufferToString, urlSafe, Crypto } from '@openid/appauth'
+import { Crypto, bufferToString, urlSafe } from '@openid/appauth'
 
 export class WebCrypto implements Crypto {
   generateRandom(size: number): string {

@@ -12,7 +12,7 @@ import { SearchChannel } from './search'
 import { SongsChannel } from './songs'
 import { StoreChannel } from './store'
 import { ipcMain } from 'electron'
-import { mainWindow } from '@/background';
+import { mainWindow } from '@/background'
 
 export const scannerChannel = new ScannerChannel()
 

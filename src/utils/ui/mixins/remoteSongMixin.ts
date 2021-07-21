@@ -1,7 +1,6 @@
-import { toSong } from '@/utils/models/youtube'
-import { Component, Vue } from 'vue-property-decorator'
-import AddToLibrary from '@/mainWindow/components/icons/AddToLibrary.vue';
+import { Component, Vue } from 'vue-property-decorator';
 
+import { toSong } from '@/utils/models/youtube';
 
 @Component
 export default class RemoteSong extends Vue {

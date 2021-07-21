@@ -1,19 +1,14 @@
-import { BrowserWindow, app } from 'electron';
-import { ChildProcess, fork } from 'child_process'
+import { ChildProcess, fork } from 'child_process';
+import { app, ipcMain } from 'electron';
+import { extensionRequestsKeys, extensionUIRequestsKeys, mainRequests } from '@/utils/extensions/constants';
 
 import { ExtensionHostEvents } from '@/utils/main/ipc/constants';
-import { IpcMainEvent } from 'electron/main';
 import { SongDB } from '@/utils/main/db/index';
-import { async } from 'node-stream-zip'
-import { extensionRequests } from '@/utils/extensions/constants';
-import { extensionRequestsKeys } from '@/utils/extensions/constants';
-import { extensionUIRequestsKeys } from '@/utils/extensions/constants';
-import { promises as fsP } from 'fs'
+import { async } from 'node-stream-zip';
+import { promises as fsP } from 'fs';
 import { getVersion } from '@/utils/common';
-import { ipcMain } from 'electron'
-import { mainRequests } from '@/utils/extensions/constants';
 import { mainWindow } from '@/background';
-import path from 'path'
+import path from 'path';
 import { v4 } from 'uuid';
 
 export const defaultExtensionPath = path.join(app.getPath('appData'), app.getName(), 'extensions')

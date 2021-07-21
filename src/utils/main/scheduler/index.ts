@@ -1,4 +1,4 @@
-import { AsyncTask, SimpleIntervalJob, ToadScheduler } from 'toad-scheduler'
+import { AsyncTask, SimpleIntervalJob, ToadScheduler } from 'toad-scheduler';
 
 import { scannerChannel } from '@/utils/main/ipc';
 

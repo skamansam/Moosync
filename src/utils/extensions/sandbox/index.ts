@@ -1,9 +1,8 @@
-import { ExtensionHandler } from '@/utils/extensions/sandbox/extensionHandler'
+import { extensionEventsKeys, extensionRequests, mainRequestsKeys } from '@/utils/extensions/constants';
+
+import { ExtensionHandler } from '@/utils/extensions/sandbox/extensionHandler';
 import { Logger } from 'winston';
 import { createLogger } from './logger';
-import { extensionEventsKeys } from '@/utils/extensions/constants';
-import { extensionRequests } from '@/utils/extensions/constants';
-import { mainRequestsKeys } from '@/utils/extensions/constants';
 import { v4 } from 'uuid';
 
 class ExtensionHostIPCHandler {

@@ -1,5 +1,6 @@
-import { vxm } from '@/mainWindow/store'
 import { Component, Vue } from 'vue-property-decorator'
+
+import { vxm } from '@/mainWindow/store'
 
 @Component
 export default class Colors extends Vue {

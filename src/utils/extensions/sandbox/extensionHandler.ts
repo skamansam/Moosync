@@ -1,7 +1,6 @@
 import { AbstractExtensionFinder, ExtensionFinder } from './extensionFinder';
+import { AbstractExtensionManager, ExtensionManager } from '@/utils/extensions/sandbox/extensionManager';
 
-import { AbstractExtensionManager } from '@/utils/extensions/sandbox/extensionManager';
-import { ExtensionManager } from '@/utils/extensions/sandbox/extensionManager';
 import { Logger } from 'winston';
 import { MoosyncExtensionTemplate } from '@moosync/moosync-types';
 import { getVersion } from '@/utils/common';

@@ -5,7 +5,7 @@ import axios from 'axios'
 import axiosRetry from 'axios-retry'
 import { createHash } from 'crypto'
 import { expose } from 'threads'
-import fs from 'fs';
+import fs from 'fs'
 import path from 'path'
 import rateLimit from 'axios-rate-limit'
 import { v4 } from 'uuid'

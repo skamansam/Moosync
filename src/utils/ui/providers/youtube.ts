@@ -1,11 +1,10 @@
-import { AuthFlow, AuthStateEmitter } from '@/utils/ui/oauth/flow'
+import { AuthFlow, AuthStateEmitter } from '@/utils/ui/oauth/flow';
+import { GenericProvider, cache } from '@/utils/ui/providers/genericProvider';
 
-import { GenericProvider } from '@/utils/ui/providers/genericProvider';
 import axios from 'axios';
-import { cache } from '@/utils/ui/providers/genericProvider';
-import moment from 'moment'
-import { once } from 'events'
-import qs from 'qs'
+import moment from 'moment';
+import { once } from 'events';
+import qs from 'qs';
 
 const BASE_URL = 'https://youtube.googleapis.com/youtube/v3/'
 

@@ -1,22 +1,22 @@
 import {
   AlbumEvents,
   ArtistEvents,
+  ExtensionHostEvents,
   GenreEvents,
   IpcEvents,
+  LoggerEvents,
   PlaylistEvents,
   PreferenceEvents,
   ScannerEvents,
   SearchEvents,
   ServiceProviderEvents,
   SongEvents,
-  WindowEvents,
-} from '@/utils/main/ipc/constants'
-import { contextBridge, ipcRenderer } from 'electron'
+  StoreEvents,
+  WindowEvents
+} from '@/utils/main/ipc/constants';
+import { contextBridge, ipcRenderer } from 'electron';
 
-import { ExtensionHostEvents } from '@/utils/main/ipc/constants';
-import { IpcRendererHolder } from '@/utils/preload/ipc/index'
-import { LoggerEvents } from '@/utils/main/ipc/constants';
-import { StoreEvents } from '@/utils/main/ipc/constants'
+import { IpcRendererHolder } from '@/utils/preload/ipc/index';
 
 const ipcRendererHolder = new IpcRendererHolder(ipcRenderer)
 

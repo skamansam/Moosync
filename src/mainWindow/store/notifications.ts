@@ -1,6 +1,5 @@
-import { action, mutation } from 'vuex-class-component'
-
 import { VuexModule } from './module'
+import { mutation } from 'vuex-class-component'
 
 export class NotifierStore extends VuexModule.With({ namespaced: 'notification' }) {
   private notificationStore: NotificationObject[] = []

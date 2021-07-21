@@ -1,11 +1,11 @@
-import { Component } from 'vue-property-decorator'
+import { Component } from 'vue-property-decorator';
 import ImgLoader from '@/utils/ui/mixins/ImageLoader';
-import ModelHelper from '@/utils/ui/mixins/ModelHelper'
-import { PeerMode } from '@/mainWindow/store/syncState'
-import { SyncHolder } from '../sync/syncHandler'
-import { bus } from '@/mainWindow/main'
-import { mixins } from 'vue-class-component'
-import { vxm } from '@/mainWindow/store'
+import ModelHelper from '@/utils/ui/mixins/ModelHelper';
+import { PeerMode } from '@/mainWindow/store/syncState';
+import { SyncHolder } from '../sync/syncHandler';
+import { bus } from '@/mainWindow/main';
+import { mixins } from 'vue-class-component';
+import { vxm } from '@/mainWindow/store';
 
 @Component
 export default class SyncMixin extends mixins(ModelHelper, ImgLoader) {
