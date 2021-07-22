@@ -80,7 +80,8 @@ export class SpotifyProvider extends GenericProvider {
         playlist_id: `spotify-${i.id}`,
         playlist_name: i.name,
         playlist_coverPath: (i.images[0]) ? i.images[0].url : '',
-        playlist_song_count: i.tracks.total
+        playlist_song_count: i.tracks.total,
+        isRemote: true
       })
     }
     return parsed

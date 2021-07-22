@@ -56,27 +56,23 @@ import PlaylistDefault from '@/mainWindow/components/icons/PlaylistDefault.vue'
 export default class Albums extends mixins(RouterPushes, ContextMenuMixin) {
   private allPlaylists: Playlist[] = []
   private async getPlaylists() {
-    this.allPlaylists = []
     let localPlaylists = await window.DBUtils.getAllPlaylists()
     let ytPlaylists = await vxm.providers.youtubeProvider.getUserPlaylists()
     let spotifyPlaylists = await vxm.providers.spotifyProvider.getUserPlaylists()
-    this.allPlaylists.push(...localPlaylists, ...ytPlaylists, ...spotifyPlaylists)
+    this.allPlaylists = [...localPlaylists, ...ytPlaylists, ...spotifyPlaylists]
   }
 
   private contextHandler(event: MouseEvent) {
-    if ((event.target as HTMLElement).localName !== 'img' && !(event.target as HTMLElement).id) {
+    if (
+      !['img', 'svg', 'rect', 'path'].includes((event.target as HTMLElement).localName) &&
+      !(event.target as HTMLElement).id
+    ) {
       this.getContextMenu(event, { type: 'GENERAL_PLAYLIST' })
     }
   }
 
   mounted() {
     this.getPlaylists()
-
-    // window.addEventListener('contextmenu', this.contextHandler)
-  }
-
-  destroyed() {
-    // window.removeEventListener('contextmenu', this.contextHandler)
   }
 
   private refreshCallback() {

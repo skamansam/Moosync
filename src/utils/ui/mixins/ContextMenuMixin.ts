@@ -100,15 +100,16 @@ export default class ContextMenuMixin extends mixins(PlayerControls, RemoteSong)
   }
 
   private getPlaylistContextMenu(playlist: Playlist, refreshCallback: () => void) {
-    const items = [
-      {
+    const items = []
+    if (!playlist.isRemote) {
+      items.push({
         label: 'Remove Playlist',
         handler: () => {
           window.DBUtils.removePlaylist(playlist.playlist_id)
           refreshCallback()
         },
-      }
-    ]
+      })
+    }
     return items
   }
 

@@ -77,7 +77,8 @@ export class YoutubeProvider extends GenericProvider {
             playlist_id: `youtube-${p.id}`,
             playlist_name: p.snippet.title,
             playlist_coverPath: (p.snippet.thumbnails.maxres ?? p.snippet.thumbnails.high ?? p.snippet.thumbnails.default).url,
-            playlist_song_count: p.contentDetails.itemCount
+            playlist_song_count: p.contentDetails.itemCount,
+            isRemote: true
           })
       }
     }

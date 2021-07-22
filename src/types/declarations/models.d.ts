@@ -27,6 +27,7 @@ interface Playlist {
   playlist_coverPath: string | undefined
   playlist_songs?: Song[]
   playlist_song_count: number
+  isRemote?: boolean
 }
 
 interface SearchResult {
