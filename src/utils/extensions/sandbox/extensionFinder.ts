@@ -1,6 +1,7 @@
 import { ExtensionFactory } from '@moosync/moosync-types';
 import { promises as fsP } from 'fs';
 import path from 'path';
+import { v1 } from 'uuid';
 
 export abstract class AbstractExtensionFinder {
   abstract findExtensions(): AsyncGenerator<UnInitializedExtensionItem>
@@ -16,7 +17,7 @@ export class ExtensionFinder extends AbstractExtensionFinder {
   }
 
   private async loadExtension(entryFilePath: string) {
-    return import( /* webpackIgnore: true */ 'file://' + entryFilePath)
+    return import( /* webpackIgnore: true */ 'file://' + entryFilePath + `?${v1()}`)
   }
 
 
