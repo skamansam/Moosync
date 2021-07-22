@@ -5,7 +5,7 @@
     <b-container fluid class="w-100 h-100 main-container">
       <b-row no-gutters class="h-100 flex-nowrap">
         <b-col class="h-100 position-relative" cols="4">
-          <div class="image-container w-100">
+          <div class="image-container w-100 h-100">
             <div class="embed-responsive embed-responsive-1by1">
               <div class="embed-responsive-item">
                 <b-img class="h-100 w-100 albumart" v-if="computedImg" :src="computedImg" />
@@ -168,6 +168,15 @@ export default class MusicInfo extends mixins(Colors, ImageLoader, ModelHelper) 
 .image-container
   position: relative
   padding-left: 72px
+  overflow-y: scroll
+  transition: color 0.3s ease
+  color: transparent
+  text-shadow: 0 0 white
+  &::-webkit-scrollbar-track
+    background: transparent
+    margin-top: 0 !important
+  &:hover
+    color: white
 
 .song-info-container
   text-align: left
