@@ -254,9 +254,6 @@ export default class SearchPage extends mixins(RouterPushes, ContextMenuMixin) {
 .nav-tabs .nav-link
   color: var(--textPrimary)
 
-.nav-tabs
-//   border-bottom: none
-
 .nav-tabs .nav-link
   border: none
 
