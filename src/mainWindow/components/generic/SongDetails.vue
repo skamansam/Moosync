@@ -1,14 +1,16 @@
 <template>
   <b-container fluid class="w-100">
     <b-row class="d-flex h-100 no-gutters">
-      <b-img
-        v-if="(getImgSrc(imgSrc) || getImgSrc(defaultImgSrc)) && !forceEmptyImg"
-        class="image h-100"
-        :src="getImgSrc(imgSrc) ? getImgSrc(imgSrc) : getImgSrc(defaultImgSrc)"
-        @error="handlerImageError(arguments[0], handleError)"
-      />
-      <SongDefault v-else class="h-100 image" />
-      <b-col cols="auto" class="text-container text-truncate">
+      <b-col class="h-100" cols="auto">
+        <b-img
+          v-if="(getImgSrc(imgSrc) || getImgSrc(defaultImgSrc)) && !forceEmptyImg"
+          class="image h-100"
+          :src="getImgSrc(imgSrc) ? getImgSrc(imgSrc) : getImgSrc(defaultImgSrc)"
+          @error="handlerImageError(arguments[0], handleError)"
+        />
+        <SongDefault v-else class="h-100 image" />
+      </b-col>
+      <b-col class="text-container text-truncate">
         <div class="d-flex">
           <div :title="currentTitle ? currentTitle : defaultTitle" class="title text-truncate">
             {{ currentTitle ? currentTitle : defaultTitle }}
@@ -48,7 +50,7 @@
 <script lang="ts">
 import Colors from '@/utils/ui/mixins/Colors'
 import { mixins } from 'vue-class-component'
-import { Component, Prop, Watch } from 'vue-property-decorator'
+import { Component, Prop, Ref, Watch } from 'vue-property-decorator'
 import SongDefault from '@/mainWindow/components/icons/SongDefault.vue'
 import PlainPlay from '@/mainWindow/components/icons/PlainPlay.vue'
 import AddToLibrary from '@/mainWindow/components/icons/AddToLibrary.vue'

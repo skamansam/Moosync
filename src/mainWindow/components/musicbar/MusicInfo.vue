@@ -4,7 +4,7 @@
     <b-img class="bg-img" v-if="computedImg" :src="computedImg"></b-img>
     <b-container fluid class="w-100 h-100 main-container">
       <b-row no-gutters class="h-100 flex-nowrap">
-        <b-col class="h-100" cols="4">
+        <b-col class="h-100 position-relative" cols="4">
           <div class="image-container w-100">
             <div class="embed-responsive embed-responsive-1by1">
               <div class="embed-responsive-item">

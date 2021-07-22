@@ -1,24 +1,17 @@
 <template>
   <div class="search-content w-100">
-    <v-card color="var(--primary)">
-      <v-tabs fixed-tabs v-model="tab" dark background-color="primary" show-arrows>
-        <v-tab v-for="item in items" :key="item.tab" :href="`#${item.tab}`">{{ item.tab }}</v-tab>
-      </v-tabs>
-    </v-card>
-
-    <v-tabs-items v-model="tab" class="tab-content-holder">
-      <v-tab-item v-for="item in items" :id="item.tab" :key="item.key" :eager="true" class="tab-content-holder">
+    <b-tabs content-class="mt-3 tab-inner-container" justified v-model="tabModel" class="tab-container">
+      <b-tab :title="item.tab" v-for="item in items" :id="item.tab" :key="item.key" class="tab-content">
         <RecycleScroller
           class="scroller"
           :items="ComputeTabContent(item.tab)"
-          :item-size="82"
+          :item-size="80"
           key-field="_id"
           v-slot="{ item, index }"
           v-if="result"
           :direction="'vertical'"
         >
           <SingleSearchResult
-            :first="index == 0"
             :title="ComputeTabTitle(tab, item)"
             :subtitle="ComputeTabSubTitle(tab, item)"
             :coverImg="ComputeTabImage(tab, item)"
@@ -30,8 +23,8 @@
             @onContextMenu="contextMenuHandler(tab, ...arguments)"
           />
         </RecycleScroller>
-      </v-tab-item>
-    </v-tabs-items>
+      </b-tab>
+    </b-tabs>
   </div>
 </template>
 
@@ -50,7 +43,7 @@ import ContextMenuMixin from '@/utils/ui/mixins/ContextMenuMixin'
 })
 export default class SearchPage extends mixins(RouterPushes, ContextMenuMixin) {
   private term: string = ''
-  private tab = null
+  private tabModel = 0
   private result: SearchResult = {}
   private items = [
     { tab: 'Songs', count: 0, key: 'Songs-0' },
@@ -60,6 +53,10 @@ export default class SearchPage extends mixins(RouterPushes, ContextMenuMixin) {
     { tab: 'Playlists', count: 0, key: 'Playlists-0' },
     { tab: 'Youtube', count: 0, key: 'Youtube-0' }
   ]
+
+  get tab() {
+    return this.items[this.tabModel!].tab
+  }
 
   private async fetchData() {
     this.result = await window.SearchUtils.searchAll(this.term)
@@ -248,21 +245,30 @@ export default class SearchPage extends mixins(RouterPushes, ContextMenuMixin) {
 }
 </script>
 
-<style lang="sass" scoped>
-.tab-content, .tab-holder, .tab-content-holder
-  background: var(--primary)
+<style lang="sass">
 
-.tab-content-holder
-  height: calc(100% - 16px)
+.nav-tabs .nav-link.active, .nav-tabs .nav-item.show .nav-link
+  background-color: var(--accent)
+  color: var(--textPrimary)
+
+.nav-tabs .nav-link
+  color: var(--textPrimary)
+
+.nav-tabs
+//   border-bottom: none
+
+.nav-tabs .nav-link
+  border: none
+
+.tab-container
+  height: 100%
+
+.tab-inner-container
+  height: 100%
+  overflow: scroll
 
 .tab-content
   height: 100%
-
-.fixed-tabs-bar .v-tabs__bar
-  position: -webkit-sticky
-  position: sticky
-  top: 4rem
-  z-index: 2
 
 .search-content
   margin-left: 30px

@@ -50,9 +50,6 @@ export default class SingleSearchResult extends mixins(PlayerControls) {
   @Prop({ default: false })
   divider!: boolean
 
-  @Prop({ default: false })
-  first!: boolean
-
   @Prop({ default: null })
   id!: any
 
@@ -89,10 +86,9 @@ export default class SingleSearchResult extends mixins(PlayerControls) {
 
 .img-container
   position: relative
-  width: 56px
-  min-width: 56px
-  height: 56px
   margin-right: 20px
+  .coverimg
+    border-radius: 10px
   &:hover
     .coverimg
       opacity: 0.2
@@ -115,11 +111,11 @@ export default class SingleSearchResult extends mixins(PlayerControls) {
   font-weight: normal
 
 .song-title
-  font-size: 19.1549px
+  font-size: 16px
   color: var(--textPrimary)
 
 .song-subtitle
-  font-size: 14.2592px
+  font-size: 14px
   color: var(--textSecondary)
 
 .divider

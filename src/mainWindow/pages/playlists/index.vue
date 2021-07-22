@@ -56,6 +56,7 @@ import PlaylistDefault from '@/mainWindow/components/icons/PlaylistDefault.vue'
 export default class Albums extends mixins(RouterPushes, ContextMenuMixin) {
   private allPlaylists: Playlist[] = []
   private async getPlaylists() {
+    this.allPlaylists = []
     let localPlaylists = await window.DBUtils.getAllPlaylists()
     let ytPlaylists = await vxm.providers.youtubeProvider.getUserPlaylists()
     let spotifyPlaylists = await vxm.providers.spotifyProvider.getUserPlaylists()
