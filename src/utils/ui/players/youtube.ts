@@ -56,7 +56,7 @@ export class YoutubePlayer extends Player {
   }
 
   protected listenOnError(): void {
-    this.playerInstance.on('error', this.onErrorCallback as (err: Error) => void)
+    this.playerInstance.on('error', this.onErrorCallback as (err: any) => void)
   }
 
   removeAllListeners(): void {

@@ -87,7 +87,7 @@ export class ScannerChannel implements IpcChannelInterface {
   }
 
   private async checkCoverExists(coverPath: string | undefined): Promise<boolean> {
-    if (coverPath) {
+    if (coverPath && !coverPath.startsWith('http')) {
       try {
         await fs.promises.access(coverPath)
         return true
