@@ -25,7 +25,6 @@ import NotificationIcon from '@/mainWindow/components/icons/Notification.vue'
 })
 export default class Notifications extends mixins(Colors) {
   get notifications() {
-    console.log(vxm.notifier.notifications)
     return vxm.notifier.notifications
   }
 }
