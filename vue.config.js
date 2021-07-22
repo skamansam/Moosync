@@ -35,6 +35,7 @@ module.exports = {
       mainProcessWatch: ['src/utils/main', 'src/utils/extensions'],
       customFileProtocol: 'com.moosync://./',
       builderOptions: {
+        productName: 'Moosync',
         publish: ['github'],
         asarUnpack: ['*.worker.js', 'sandbox.js']
       },
