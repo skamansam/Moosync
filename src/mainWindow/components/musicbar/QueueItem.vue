@@ -16,7 +16,7 @@
           <AnimatedEqualizer class="animated-playing" />
         </div>
       </b-col>
-      <b-col xl="9" lg="8" sm="7" cols="7">
+      <b-col xl="8" lg="7" cols="5">
         <div class="d-flex">
           <div class="text-left song-title text-truncate">{{ song.title }}</div>
           <YoutubeIcon
