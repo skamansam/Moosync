@@ -73,12 +73,10 @@ export class PlayerStore extends VuexModule.With({ namespaced: 'player' }) {
   @mutation
   private addSong(item: Song[]) {
     for (const s of item) {
-      console.log(s)
       if (s && !this.songQueue.data[s._id!]) {
         this.songQueue.data[s._id!] = s
       }
     }
-    console.log(this.songQueue)
   }
 
   @mutation
