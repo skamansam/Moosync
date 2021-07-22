@@ -2,13 +2,15 @@
   <b-container fluid class="w-100">
     <b-row class="d-flex h-100 no-gutters">
       <b-col class="h-100" cols="auto">
-        <b-img
-          v-if="(getImgSrc(imgSrc) || getImgSrc(defaultImgSrc)) && !forceEmptyImg"
-          class="image h-100"
-          :src="getImgSrc(imgSrc) ? getImgSrc(imgSrc) : getImgSrc(defaultImgSrc)"
-          @error="handlerImageError(arguments[0], handleError)"
-        />
-        <SongDefault v-else class="h-100 image" />
+        <div class="h-100">
+          <b-img
+            v-if="(getImgSrc(imgSrc) || getImgSrc(defaultImgSrc)) && !forceEmptyImg"
+            class="image h-100"
+            :src="getImgSrc(imgSrc) ? getImgSrc(imgSrc) : getImgSrc(defaultImgSrc)"
+            @error="handlerImageError(arguments[0], handleError)"
+          />
+          <SongDefault v-else class="h-100 image" />
+        </div>
       </b-col>
       <b-col class="text-container text-truncate">
         <div class="d-flex">
@@ -135,6 +137,7 @@ export default class SongDetails extends mixins(Colors, ImageLoader, ErrorHandle
 .image
   border-radius: 25px
   object-fit: cover
+  aspect-ratio: 1 / 1
 
 .image-container
   // max-width: 170px
