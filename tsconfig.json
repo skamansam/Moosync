@@ -13,22 +13,35 @@
     "allowSyntheticDefaultImports": true,
     "sourceMap": true,
     "baseUrl": ".",
-    "types": ["webpack-env", "bootstrap-vue"],
+    "types": [
+      "webpack-env",
+      "bootstrap-vue"
+    ],
     "paths": {
-      "*": ["node_modules/"],
-      "@/*": ["src/*"]
+      "*": [
+        "node_modules/"
+      ],
+      "@/*": [
+        "src/*"
+      ]
     },
-    "lib": ["esnext", "dom", "dom.iterable", "scripthost"]
+    "lib": [
+      "esnext",
+      "dom",
+      "dom.iterable",
+      "scripthost"
+    ]
   },
-  "typeRoots": ["./node_modules", "./node_modules/@types", "./src/types/declarations"],
+  "typeRoots": [
+    "./node_modules",
+    "./node_modules/@types",
+    "./src/types/declarations"
+  ],
   "include": [
     "src/**/*.ts",
     "src/**/*.tsx",
     "src/**/*.vue",
     "tests/**/*.ts",
     "tests/**/*.tsx",
-    "src/store/index.ts",
-    "src/mainWindow/plugins/kicontext.js",
-    "src/test.ts"
   ]
 }
