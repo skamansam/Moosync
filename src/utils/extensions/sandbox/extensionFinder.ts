@@ -17,7 +17,9 @@ export class ExtensionFinder extends AbstractExtensionFinder {
   }
 
   private async loadExtension(entryFilePath: string) {
-    return import( /* webpackIgnore: true */ 'file://' + entryFilePath + `?${v1()}`)
+    console.log(await fsP.readFile(entryFilePath, 'utf8'))
+    return __non_webpack_require__(entryFilePath)
+    // return import( /* webpackIgnore: true */ 'file://' + entryFilePath)
   }
 
 
@@ -26,28 +28,25 @@ export class ExtensionFinder extends AbstractExtensionFinder {
     return JSON.parse(raw)
   }
 
-  private async checkExtensionValidity(modulePath: string, packageMetadata: any): Promise<ExtensionFactory | undefined> {
-    if (packageMetadata.moosyncExtension) {
-      const moduleEntryPath = packageMetadata.extensionEntry
-      try {
-        const extension = await this.loadExtension(path.join(modulePath, moduleEntryPath))
-        if (typeof extension.default !== 'function') {
-          return
-        }
-
-        const instance = new extension.default()
-
-        if (!Array.isArray(instance.extensionDescriptors)) {
-          return
-        }
-
-        for (const factory of instance.extensionDescriptors) {
-          if (factory.create)
-            return factory as ExtensionFactory
-        }
-      } catch (e) {
-        console.error(e)
+  private async checkExtValidityAndGetInstance(modulePath: string): Promise<ExtensionFactory | undefined> {
+    try {
+      const extension = await this.loadExtension(modulePath)
+      if (typeof extension !== 'function') {
+        return
       }
+
+      const instance = new extension()
+
+      if (!Array.isArray(instance.extensionDescriptors)) {
+        return
+      }
+
+      for (const factory of instance.extensionDescriptors) {
+        if (factory.create)
+          return factory as ExtensionFactory
+      }
+    } catch (e) {
+      console.error(e)
     }
   }
 
@@ -61,10 +60,12 @@ export class ExtensionFinder extends AbstractExtensionFinder {
           const possibleManifests = extDir.filter(val => val.isFile() && val.name === 'package.json')
           if (possibleManifests.length > 0) {
             const manifest = await this.parseJson(path.join(searchPath, folder.name, possibleManifests[0].name))
-            const instance = await this.checkExtensionValidity(path.join(searchPath, folder.name), manifest)
-
-            if (instance) {
-              yield { name: manifest.name, packageName: manifest.packageName, desc: manifest.description, version: manifest.version, factory: instance }
+            if (manifest.moosyncExtension) {
+              const modulePath = path.join(searchPath, folder.name, manifest.extensionEntry)
+              const instance = await this.checkExtValidityAndGetInstance(modulePath)
+              if (instance) {
+                yield { name: manifest.name, packageName: manifest.packageName, desc: manifest.description, version: manifest.version, entry: modulePath, factory: instance }
+              }
             }
           }
         }

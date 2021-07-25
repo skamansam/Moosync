@@ -13,9 +13,41 @@ export class InMemoryRegistry extends AbstractExtensionRegistry {
   }
 
   deregister(packageName: string) {
-    const index = this.extensionStore.findIndex(val => val.packageName === packageName)
-    if (index !== -1) {
-      this.extensionStore.splice(index, 1)
+    const ext = this.extensionStore.find(val => val.packageName === packageName)
+    if (ext) {
+      this.removeExtension(ext.entry)
+      delete this.extensionStore[this.extensionStore.indexOf(ext)]
+      this.extensionStore.splice(this.extensionStore.indexOf(ext), 1)
+    }
+  }
+
+  private removeExtension(filePath: string) {
+    const self = (__non_webpack_require__ as NodeRequire).cache[__non_webpack_require__.resolve(filePath)]
+    if (self) {
+
+      // https://github.com/sindresorhus/clear-module/blob/b4412fe5159e984aa864ef0fa01476483ca7c4fa/index.js
+
+      // Delete itself from module parent
+
+      let i = (__non_webpack_require__ as NodeRequire).main?.children.length
+      if (i) {
+        while (i--) {
+          if ((__non_webpack_require__ as NodeRequire).main?.children[i].id === filePath) {
+            delete (__non_webpack_require__ as NodeRequire).main?.children.splice(i, 1)[0];
+          }
+        }
+      }
+
+      // Remove all descendants from cache as well
+      const { children } = self;
+
+      // id is the filePath of module
+      for (const { id } of children) {
+        this.removeExtension(id);
+      }
+
+      // Delete module from caches
+      delete __non_webpack_require__.cache[__non_webpack_require__.resolve(filePath)];
     }
   }
 

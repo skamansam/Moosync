@@ -93,7 +93,9 @@ export class ExtensionHandler {
       desc: item.desc,
       packageName: item.packageName,
       version: item.version,
-      hasStarted: item.hasStarted
+      hasStarted: item.hasStarted,
+      entry: item.entry,
+      preferences: item.preferences
     }
   }
 
@@ -103,7 +105,6 @@ export class ExtensionHandler {
     for (const e of extensions) {
       parsed.push(this.toExtensionDetails(e))
     }
-
     return parsed
   }
 

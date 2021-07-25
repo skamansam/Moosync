@@ -27,12 +27,16 @@ export class ExtensionManager extends AbstractExtensionManager {
 
   async instantiateAndRegister(extension: UnInitializedExtensionItem) {
     const instance = await extension.factory.create(this.logger.child({ label: extension.packageName }))
+    const preferences = extension.factory.registerPreferences ? await extension.factory.registerPreferences() : []
+    console.log(preferences)
     this.register({
       name: extension.name,
       desc: extension.desc,
       packageName: extension.packageName,
       version: extension.version,
       hasStarted: false,
+      entry: extension.entry,
+      preferences,
       instance
     })
 
