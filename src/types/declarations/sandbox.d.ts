@@ -59,10 +59,14 @@ interface ExtensionDetails {
   desc: string
   version: string
   hasStarted: boolean
+  entry: string
+  preferences: import('@moosync/moosync-types/index').ExtensionPreferenceGroup[]
 }
 
 interface ExtensionItem extends ExtensionDetails {
   instance: MoosyncExtensionTemplate
+  preferences: import('@moosync/moosync-types/index').ExtensionPreferenceGroup[]
+  vm: import('vm2').NodeVM
 }
 
 interface UnInitializedExtensionItem {
@@ -70,7 +74,7 @@ interface UnInitializedExtensionItem {
   packageName: string,
   desc: string,
   version: string
-  factory: import('@moosync/moosync-types/index').ExtensionFactory
+  entry: string
 }
 
 interface getExtensionOptions {
@@ -88,6 +92,6 @@ interface extensionAPI {
 
 declare module NodeJS {
   interface Global {
-    api: extensionAPI
+    logger: import('winston').Logger
   }
 }

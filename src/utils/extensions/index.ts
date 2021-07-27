@@ -159,11 +159,8 @@ class ExtensionHandler {
   }
 
   private async createDirIfNotExists(path: string) {
-    try {
-      await fsP.access(path)
-    } catch (e) {
-      await fsP.mkdir(path)
-    }
+    await fsP.rm(path, { recursive: true, force: true })
+    await fsP.mkdir(path)
   }
 
   private async isExistingExtension(packageName: string): Promise<string | undefined> {

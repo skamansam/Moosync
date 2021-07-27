@@ -1,5 +1,5 @@
 export const extensionEventsKeys = ['song-change', 'playerState-change', 'volume-change', 'songQueue-change'] as const
-export const extensionRequestsKeys = ['get-all-songs'] as const
+export const extensionRequestsKeys = ['get-all-songs', 'get-preferences'] as const
 export const extensionUIRequestsKeys = ['get-current-song', 'get-volume', 'get-time', 'get-queue'] as const
 export const mainRequestsKeys = ['get-installed-extensions', 'find-new-extensions'] as const
 
