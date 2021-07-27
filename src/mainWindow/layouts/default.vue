@@ -95,6 +95,7 @@ export default class DefaultLayout extends mixins(ContextMenuMixin) {
 
 *::-webkit-scrollbar-thumb
   box-shadow: inset 0 0 0 10px
+  min-height: 40px
 
 *::-webkit-scrollbar-track
   margin-top: calc( 0.75rem * 2 + 18px)

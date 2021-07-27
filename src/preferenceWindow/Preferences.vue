@@ -113,6 +113,7 @@ body {
 
 *::-webkit-scrollbar-thumb
   box-shadow: inset 0 0 0 10px
+  min-height: 40px
 
 *::-webkit-scrollbar-track
   background: var(--primary)
