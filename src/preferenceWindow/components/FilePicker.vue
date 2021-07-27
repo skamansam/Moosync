@@ -1,14 +1,7 @@
 <template>
   <b-container fluid class="path-container w-100">
-    <b-row no-gutters>
-      <b-col cols="auto" align-self="center" class="title d-flex">
-        <div>Generated Thumbnail Path</div>
-        <div class="ml-3">
-          <Tooltip tooltipId="song-directories-tooltip" text="Directory where generated thumbnails are stored" />
-        </div>
-      </b-col>
-    </b-row>
-    <b-row no-gutters class="background w-100 mt-4 d-flex">
+    <PreferenceHeader :title="title" :tooltip="tooltip" />
+    <b-row no-gutters class="background w-100 mt-2 d-flex">
       <b-row no-gutters class="mt-3 item w-100">
         <b-col cols="auto" align-self="center" class="ml-4 folder-icon">
           <svg
@@ -26,7 +19,7 @@
           </svg>
         </b-col>
         <b-col cols="auto" align-self="center" class="ml-3 justify-content-start">
-          <div class="item-text text-truncate">{{ thumbnailPath }}</div>
+          <div class="item-text text-truncate">{{ value }}</div>
         </b-col>
       </b-row>
     </b-row>
@@ -34,24 +27,26 @@
 </template>
 
 <script lang="ts">
-import { Component, Prop, Vue } from 'vue-property-decorator'
-import Tooltip from '@/commonComponents/Tooltip.vue'
+import { Component, Mixins, Prop } from 'vue-property-decorator'
+import PreferenceHeader from './PreferenceHeader.vue'
 import { vxm } from '@/preferenceWindow/store'
+import { ExtensionPreferenceMixin } from '../mixins/extensionPreferenceMixin'
+
 @Component({
-  components: {
-    Tooltip
-  }
+  components: { PreferenceHeader }
 })
-export default class ThumbnailPath extends Vue {
-  get thumbnailPath() {
-    if (vxm.preferences.preferences) return vxm.preferences.preferences.thumbnailPath
-    return ''
-  }
+export default class FilePicker extends Mixins(ExtensionPreferenceMixin) {
+  @Prop()
+  private title!: string
+
+  @Prop()
+  private tooltip!: string
 
   private openFileBrowser() {
     window.WindowUtils.openFileBrowser(false).then((data) => {
-      if (!data.canceled) {
-        vxm.preferences.setThumbnailPath(data.filePaths[0])
+      if (!data.canceled && data.filePaths.length > 0) {
+        this.value = data.filePaths[0]
+        this.onInputChange()
       }
     })
   }

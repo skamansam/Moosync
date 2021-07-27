@@ -1,11 +1,30 @@
 <template>
   <div>
-    <b-container fluid>
+    <b-container fluid class="pref-container">
       <b-row no-gutters class="w-100">
         <b-col>
           <div class="add-extension-button" @click="openFileBrowser">Add New Directory...</div>
-          <div v-for="ext of extensions" :key="ext.packageName">{{ ext }}</div>
+          <div v-for="ext of extensions" :key="`ext-${ext.packageName}`">{{ ext }}</div>
         </b-col>
+      </b-row>
+      <b-row v-for="ext of extensions" :key="ext.packageName" class="w-100">
+        <b-container fluid>
+          <b-row v-if="ext.preferences.length > 0" no-gutters class="w-100">
+            <div class="w-100">
+              <h2>{{ ext.name }}</h2>
+              <div v-for="pref of ext.preferences" :key="pref.key">
+                <component
+                  v-if="isComponentExists(pref.type)"
+                  :title="pref.title"
+                  :tooltip="pref.description"
+                  :prefKey="`${ext.packageName}.${pref.key}`"
+                  :defaultValue="pref.default ? pref.default : pref.items"
+                  :is="pref.type"
+                />
+              </div>
+            </div>
+          </b-row>
+        </b-container>
       </b-row>
     </b-container>
   </div>
@@ -14,16 +33,17 @@
 <script lang="ts">
 import { Component } from 'vue-property-decorator'
 import Vue from 'vue'
-import PathSelector from '../PathSelector.vue'
-import ThumbnailPath from '../ThumbnailPath.vue'
-import ArtworkPath from '@/preferenceWindow/components/ArtworkPath.vue'
-import { vxm } from '@/preferenceWindow/store'
+import EditText from '../EditText.vue'
+import DirectoryGroup from '../DirectoryGroup.vue'
+import FilePicker from '../FilePicker.vue'
+import CheckboxGroup from '../CheckboxGroup.vue'
 
 @Component({
   components: {
-    PathSelector,
-    ThumbnailPath,
-    ArtworkPath
+    EditText,
+    DirectoryGroup,
+    FilePicker,
+    CheckboxGroup
   }
 })
 export default class Extensions extends Vue {
@@ -31,6 +51,11 @@ export default class Extensions extends Vue {
 
   created() {
     this.fetchExtensions()
+  }
+
+  private isComponentExists(type: string) {
+    if (this.$options.components) return !!this.$options.components[type]
+    return false
   }
 
   private openFileBrowser() {
@@ -52,6 +77,12 @@ export default class Extensions extends Vue {
 </script>
 
 <style lang="sass" scoped>
+*
+  text-align: left
+.pref-container
+  max-width: 750px
+  margin-left: 0 !important
+
 .add-extension-button
   font-size: 22px
   color: var(--textPrimary)

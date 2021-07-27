@@ -59,9 +59,9 @@ export default class App extends mixins(ThemeHandler) {
   }
 
   private async writePreferences() {
-    if (vxm.preferences.preferences) {
-      await window.PreferenceUtils.save(vxm.preferences.preferences)
-      if (vxm.preferences.pathsChanged) {
+    if (vxm.preferences.Preferences) {
+      await window.PreferenceUtils.save(vxm.preferences.Preferences)
+      if (vxm.preferences.PathsChanged) {
         Vue.nextTick(() => window.FileUtils.scan())
       }
     }

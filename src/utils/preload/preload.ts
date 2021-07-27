@@ -58,6 +58,9 @@ contextBridge.exposeInMainWorld('PreferenceUtils', {
       type: PreferenceEvents.SAVE_PREFERENCES,
       params: { preferences: preferences },
     }),
+  saveSelective: (key: string, value: any) => ipcRendererHolder.send(IpcEvents.PREFERENCES, { type: PreferenceEvents.SAVE_SELECTIVE_PREFERENCES, params: { key, value } }),
+  loadSelective: (key: string) => ipcRendererHolder.send(IpcEvents.PREFERENCES, { type: PreferenceEvents.LOAD_SELECTIVE_PREFERENCES, params: { key } }),
+
 })
 
 contextBridge.exposeInMainWorld('ProviderUtils', {

@@ -27,7 +27,7 @@ module.exports = {
         'process.env.SpotifyClientSecret': JSON.stringify(dotenv.parsed['SPOTIFYCLIENTSECRET'])
       }),
     ],
-    externals: ['better-sqlite3', 'youtube-music-api'],
+    externals: { 'better-sqlite3': 'commonjs better-sqlite3', "vm2": "require('vm2')" },
     devtool: 'source-map'
   },
   pluginOptions: {
@@ -44,7 +44,7 @@ module.exports = {
       mainProcessTypeChecking: true,
       preload: 'src/utils/preload/preload.ts',
       externals: [
-        'better-sqlite3'
+        'better-sqlite3', 'vm2'
       ],
       chainWebpackMainProcess: (config) => {
         config.entry("sandbox").add(__dirname + '/src/utils/extensions/sandbox/index.ts').end()

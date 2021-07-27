@@ -32,6 +32,8 @@ export enum SearchEvents {
 
 export enum PreferenceEvents {
   SAVE_PREFERENCES = 'savePreferences',
+  SAVE_SELECTIVE_PREFERENCES = 'saveSelectivePreferences',
+  LOAD_SELECTIVE_PREFERENCES = 'loadSelectivePreferences',
   LOAD_PREFERENCES = 'loadPreferences',
   PREFERENCE_REFRESH = 'preferenceRefresh'
 }

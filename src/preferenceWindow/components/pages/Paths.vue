@@ -3,9 +3,26 @@
     <b-container fluid>
       <b-row no-gutters class="w-100">
         <div class="path-selector w-100">
-          <PathSelector />
-          <ThumbnailPath class="mt-5" />
-          <ArtworkPath class="mt-5" />
+          <DirectoryGroup
+            title="Song Directories"
+            tooltip="Directories where all your local music is stored"
+            :defaultValue="[]"
+            prefKey="musicPaths"
+          />
+          <FilePicker
+            title="Downloaded Artwork Path"
+            tooltip="Directory where downloaded artworks are stored"
+            prefKey="artworkPath"
+            defaultValue="''"
+            class="mt-5"
+          />
+          <FilePicker
+            title="Generated Thumbnail Path"
+            tooltip="Directory where generated thumbnails are stored"
+            prefKey="thumbnailPath"
+            defaultValue="''"
+            class="mt-5"
+          />
         </div>
       </b-row>
     </b-container>
@@ -15,18 +32,17 @@
 <script lang="ts">
 import { Component } from 'vue-property-decorator'
 import Vue from 'vue'
-import PathSelector from '../PathSelector.vue'
-import ThumbnailPath from '../ThumbnailPath.vue'
-import ArtworkPath from '@/preferenceWindow/components/ArtworkPath.vue'
+import FilePicker from '../FilePicker.vue'
+import { vxm } from '@/preferenceWindow/store'
+import DirectoryGroup from '../DirectoryGroup.vue'
 
 @Component({
   components: {
-    PathSelector,
-    ThumbnailPath,
-    ArtworkPath
+    DirectoryGroup,
+    FilePicker
   }
 })
-export default class scanner extends Vue {}
+export default class Paths extends Vue {}
 </script>
 
 <style lang="sass" scoped>

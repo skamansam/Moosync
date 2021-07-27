@@ -1,5 +1,7 @@
 import { createModule, mutation } from 'vuex-class-component';
 
+import { vxm } from '../../preferenceWindow/store/index';
+
 export enum PeerMode {
   WATCHER,
   BROADCASTER,
@@ -7,12 +9,14 @@ export enum PeerMode {
 }
 
 const VuexModule = createModule({
-  namespaced: 'player',
+  strict: false,
+  namespaced: 'preferences',
+  enableLocalWatchers: true
 })
 
 export class PreferenceStore extends VuexModule {
-  preferences: Preferences | null = null
-  pathsChanged: boolean = false
+  private preferences: Preferences | null = null
+  private pathsChanged: boolean = false
 
   set Preferences(preferences: Preferences | null) {
     this.preferences = preferences
@@ -32,23 +36,32 @@ export class PreferenceStore extends VuexModule {
     }
   }
 
-  @mutation
-  setThumbnailPath(path: string) {
-    if (this.preferences) {
+  get ThumbnailPath(): string | undefined {
+    return this.preferences?.thumbnailPath
+  }
+
+  set ThumbnailPath(path: string | undefined) {
+    if (this.preferences && path) {
       this.preferences.thumbnailPath = path
     }
   }
 
-  @mutation
-  setArtworkPath(path: string) {
-    if (this.preferences) {
+  get ArtworkPath(): string | undefined {
+    return this.preferences?.artworkPath
+  }
+
+  set ArtworkPath(path: string | undefined) {
+    if (this.preferences && path) {
       this.preferences.artworkPath = path
     }
   }
 
-  @mutation
-  setPathsChanged(value: boolean) {
+  set PathsChanged(value: boolean) {
     this.pathsChanged = value
+  }
+
+  get PathsChanged() {
+    return this.pathsChanged
   }
 
   @mutation
@@ -67,6 +80,30 @@ export class PreferenceStore extends VuexModule {
         this.preferences.musicPaths.findIndex((x) => x.path === path),
         1
       )
+    }
+  }
+
+  static $watch = {
+    ThumbnailPath(payload: string) {
+      window.PreferenceUtils.saveSelective('thumbnailPath', payload)
+    },
+    ArtworkPath(payload: string) {
+      window.PreferenceUtils.saveSelective('artworkPath', payload)
+    },
+  }
+
+  static $subscribe = {
+    addPaths() {
+      if (vxm.preferences.Preferences)
+        window.PreferenceUtils.saveSelective('musicPaths', vxm.preferences.Preferences.musicPaths)
+    },
+    removePath() {
+      if (vxm.preferences.Preferences)
+        window.PreferenceUtils.saveSelective('musicPaths', vxm.preferences.Preferences.musicPaths)
+    },
+    togglePath() {
+      if (vxm.preferences.Preferences)
+        window.PreferenceUtils.saveSelective('musicPaths', vxm.preferences.Preferences.musicPaths)
     }
   }
 }

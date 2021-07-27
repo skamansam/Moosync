@@ -19,6 +19,15 @@ export async function savePreferences(prefs: Preferences) {
   preferencesChanged()
 }
 
+export async function saveSelectivePreference(key: string, value: any) {
+  store.set(`prefs.${key}`, value)
+  preferencesChanged()
+}
+
+export async function loadSelectivePreference(key: string) {
+  return store.get(`prefs.${key}`)
+}
+
 function validatePrefs(prefs: Preferences): Preferences {
   if (!prefs.musicPaths) {
     prefs.musicPaths = defaultPreferences.musicPaths
@@ -36,14 +45,14 @@ function validatePrefs(prefs: Preferences): Preferences {
 }
 
 export async function loadPreferences(): Promise<Preferences> {
-  const tmp = store.get('prefs')
+  const tmp = store.get('prefs') as Preferences
   if (tmp) {
-    return validatePrefs(JSON.parse(tmp as string))
+    return validatePrefs(tmp)
   }
   return defaultPreferences
 }
 
-export function getDisabledPaths(paths: musicPaths): string[] {
+export function getDisabledPaths(paths: togglePaths): string[] {
   const disablePaths = []
   for (const p of paths) {
     if (!p.enabled) disablePaths.push(p.path)

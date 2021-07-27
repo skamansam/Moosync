@@ -46,6 +46,8 @@ interface fileUtils {
 interface preferenceUtils {
   load: () => Promise<Preferences>
   save: (preference: Preferences) => Promise<void>
+  saveSelective: (key: string, value: any) => Promise<void>
+  loadSelective: (key: string) => Promise<Object>
 }
 
 interface store {

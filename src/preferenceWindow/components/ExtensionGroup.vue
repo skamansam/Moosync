@@ -2,25 +2,25 @@
   <b-container fluid class="path-container w-100">
     <b-row no-gutters>
       <b-col cols="auto" align-self="center" class="title d-flex">
-        <div>Song Directories</div>
+        <div>{{ title }}</div>
         <div class="ml-3">
-          <Tooltip tooltipId="song-directories-tooltip" text="Directories where all your local music is stored" />
+          <Tooltip tooltipId="song-directories-tooltip" :text="tooltip" />
         </div>
       </b-col>
       <b-col cols="auto" align-self="center" class="new-directories ml-auto">
         <div class="add-directories-button" @click="openFileBrowser">Add New Directory...</div>
       </b-col>
     </b-row>
-    <b-row no-gutters class="background w-100 mt-4 d-flex">
-      <b-row no-gutters class="mt-3 item w-100" v-for="path in musicPaths" :key="path.path">
+    <b-row no-gutters class="background w-100 mt-4 d-flex" v-if="Array.isArray(value)">
+      <b-row no-gutters class="mt-3 item w-100" v-for="(path, index) in value" :key="path.path">
         <b-col cols="auto" align-self="center" class="ml-4">
-          <b-checkbox @change="togglePath(path.path)" :id="`checkbox-${path.path}`" :checked="path.enabled" />
+          <b-checkbox @change="togglePath(index)" :id="`path-${index}`" :checked="path.enabled" />
         </b-col>
         <b-col col md="8" lg="9" align-self="center" class="ml-3 justify-content-start">
           <div class="item-text text-truncate">{{ path.path }}</div>
         </b-col>
         <b-col cols="auto" align-self="center" class="ml-auto">
-          <div class="remove-button w-100" @click="removePath(path.path)">Remove</div>
+          <div class="remove-button w-100" @click="removePath(index)">Remove</div>
         </b-col>
       </b-row>
     </b-row>
@@ -28,36 +28,42 @@
 </template>
 
 <script lang="ts">
-import { Component, Prop, Vue } from 'vue-property-decorator'
+import { Component, Prop, Vue, Mixins } from 'vue-property-decorator'
 import Tooltip from '@/commonComponents/Tooltip.vue'
-import { vxm } from '@/preferenceWindow/store'
+import { ExtensionPreferenceMixin } from '../mixins/extensionPreferenceMixin'
 @Component({
   components: {
     Tooltip
   }
 })
-export default class PathSelector extends Vue {
-  get musicPaths() {
-    if (vxm.preferences.Preferences) return vxm.preferences.Preferences.musicPaths
-    return []
-  }
-  private togglePath(path: string) {
-    vxm.preferences.togglePath({
-      path: path,
-      value: (document.getElementById(`checkbox-${path}`) as HTMLInputElement).checked
-    })
+export default class DirectoryGroup extends Mixins(ExtensionPreferenceMixin) {
+  @Prop()
+  private title!: string
+
+  @Prop()
+  private tooltip!: string
+
+  private togglePath(index: number) {
+    if (index >= 0) {
+      this.value[index].enabled = (document.getElementById(`path-${index}`) as HTMLInputElement).checked
+      this.onInputChange()
+    }
   }
 
-  private removePath(path: string) {
-    vxm.preferences.removePath(path)
-    vxm.preferences.PathsChanged = true
+  private removePath(index: number) {
+    if (index >= 0) {
+      this.value.splice(index, 1)
+      this.onInputChange()
+    }
   }
 
   private openFileBrowser() {
     window.WindowUtils.openFileBrowser(false).then((data) => {
       if (!data.canceled) {
-        vxm.preferences.addPaths(...data.filePaths)
-        vxm.preferences.PathsChanged = true
+        for (const path of data.filePaths) {
+          this.value.push({ path, enabled: true })
+        }
+        this.onInputChange()
       }
     })
   }

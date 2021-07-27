@@ -11,7 +11,7 @@ import { v4 } from 'uuid'
 const audioPatterns = new RegExp('.flac|.mp3|.ogg|.m4a|.webm|.wav|.wv', 'i')
 
 expose({
-  start(paths: musicPaths) {
+  start(paths: togglePaths) {
     return new Observable<any>((observer) => {
       start(paths, observer)
     })
@@ -94,7 +94,7 @@ async function scanDir(directory: string, observer: SubscriptionObserver<Song>) 
   }
 }
 
-async function start(paths: musicPaths, observer: SubscriptionObserver<any>) {
+async function start(paths: togglePaths, observer: SubscriptionObserver<any>) {
   for (const i in paths) {
     paths[i].enabled && await scanDir(paths[i].path, observer)
   }

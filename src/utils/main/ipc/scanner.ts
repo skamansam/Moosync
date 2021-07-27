@@ -44,7 +44,7 @@ export class ScannerChannel implements IpcChannelInterface {
     }
   }
 
-  private scanSongs(preferences: Preferences, scan: (paths: musicPaths) => ObservablePromise<Song>): Promise<void> {
+  private scanSongs(preferences: Preferences, scan: (paths: togglePaths) => ObservablePromise<Song>): Promise<void> {
     return new Promise((resolve, reject) => {
       scan(preferences.musicPaths).subscribe(
         (result) => this.checkDuplicate(result),
@@ -132,7 +132,7 @@ export class ScannerChannel implements IpcChannelInterface {
     SongDB.updateSongCountPlaylists()
   }
 
-  private async destructiveScan(paths: musicPaths) {
+  private async destructiveScan(paths: togglePaths) {
     const allSongs = await SongDB.getAllSongs()
     const regex = new RegExp(paths.join('|'))
     for (const s of allSongs) {

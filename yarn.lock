@@ -2105,10 +2105,12 @@
     "@material/feature-targeting" "^11.0.0"
     tslib "^2.1.0"
 
-"@moosync/moosync-types@^1.0.6":
-  version "1.0.6"
-  resolved "https://registry.yarnpkg.com/@moosync/moosync-types/-/moosync-types-1.0.6.tgz#051993e8ee65539089d66d8dda14630df8af9b42"
-  integrity sha512-NEMRXL6p9GSAyHRt+02B/CcXBfe6wWtcP5M8YTJnEu/ThLGuxUedpvZg/vZ4F9eYerqv6DuwTeus2YlYE8QqYw==
+"@moosync/moosync-types@^1.0.8":
+  version "1.0.8"
+  resolved "https://registry.yarnpkg.com/@moosync/moosync-types/-/moosync-types-1.0.8.tgz#5d44b0e8c67c003fe0f2e37ad135c39fc2f1354b"
+  integrity sha512-cThviEd8rh4k50tWl7jk8egwf7WqHoa12UMb4xU1U0NzYvSjo4oyTslvfngR3OszJNJLExtYZp7pXZ9Z7Wq+Ig==
+  dependencies:
+    winston "^3.3.3"
 
 "@mrmlnc/readdir-enhanced@^2.2.1":
   version "2.2.1"
@@ -12709,6 +12711,11 @@ vm-browserify@^1.0.1:
   version "1.1.2"
   resolved "https://registry.yarnpkg.com/vm-browserify/-/vm-browserify-1.1.2.tgz#78641c488b8e6ca91a75f511e7a3b32a86e5dda0"
   integrity sha512-2ham8XPWTONajOR0ohOKOHXkm3+gaBmGut3SRuu75xLd/RRaY6vqgh8NBYYk7+RW3u5AtzPQZG8F10LHkl0lAQ==
+
+vm2@^3.9.3:
+  version "3.9.3"
+  resolved "https://registry.yarnpkg.com/vm2/-/vm2-3.9.3.tgz#29917f6cc081cc43a3f580c26c5b553fd3c91f40"
+  integrity sha512-smLS+18RjXYMl9joyJxMNI9l4w7biW8ilSDaVRvFBDwOH8P0BK1ognFQTpg0wyQ6wIKLTblHJvROW692L/E53Q==
 
 vue-auto-routing@^1.0.0:
   version "1.0.1"

@@ -1,8 +1,8 @@
 
-type musicPaths = { path: string, enabled: boolean }[]
+type togglePaths = { path: string, enabled: boolean }[]
 
 interface Preferences {
-  musicPaths: musicPaths
+  musicPaths: togglePaths
   thumbnailPath: string
   artworkPath: string,
 }
