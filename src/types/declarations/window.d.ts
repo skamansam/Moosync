@@ -90,7 +90,7 @@ interface extensionUtils {
   uninstall: (packageName: string) => Promise<void>
   sendEvent: (data: extensionHostMessage) => Promise<void>
   getAllExtensions: () => Promise<ExtensionDetails[]>
-  listenRequests: (callback: (request: extensionRequestMessage) => void) => void
+  listenRequests: (callback: (request: extensionUIRequestMessage) => void) => void
   replyToRequest: (data: extensionReplyMessage) => void
   toggleExtStatus: (packageName: string, enabled: boolean) => Promise<void>
 }

@@ -1,7 +1,8 @@
+import { extensionAPI } from "@moosync/moosync-types";
 import { extensionRequests } from "../constants"
 import { v4 } from 'uuid';
 
-export class ExtensionRequestGenerator {
+export class ExtensionRequestGenerator implements extensionAPI {
   private packageName: string
 
   constructor(packageName: string) {
@@ -28,12 +29,16 @@ export class ExtensionRequestGenerator {
     return this.sendAsync<SongQueue>('get-queue')
   }
 
+  public async getPlayerState() {
+    return this.sendAsync<PlayerState>('get-player-state')
+  }
+
   public async getPreferences(key?: string, defaultValue?: any) {
     return this.sendAsync<SongQueue>('get-preferences', { packageName: this.packageName, key, defaultValue })
   }
 
   public async setPreferences(key: string, value: any) {
-    return this.sendAsync<SongQueue>('set-preferences', { packageName: this.packageName, key, value })
+    return this.sendAsync<void>('set-preferences', { packageName: this.packageName, key, value })
   }
 
   private sendAsync<T>(type: extensionRequests, data?: any): Promise<T | undefined> {

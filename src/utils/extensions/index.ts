@@ -219,6 +219,7 @@ class ExtensionHandler {
               message: `Duplicate extension ${manifest.packageName}. Can not install`
             }
           }
+          this.uninstallExtension(manifest.name)
         }
         const installPath = path.join(defaultExtensionPath, manifest.name)
         await this.createDirIfNotExists(installPath)

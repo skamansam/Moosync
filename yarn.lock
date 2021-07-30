@@ -1392,10 +1392,10 @@
     "@material/feature-targeting" "^11.0.0"
     tslib "^2.1.0"
 
-"@moosync/moosync-types@^1.1.0":
-  version "1.1.0"
-  resolved "https://registry.yarnpkg.com/@moosync/moosync-types/-/moosync-types-1.1.0.tgz#48d4c34ce5ac64ecb9eb92772822a1a97699bc22"
-  integrity sha512-jhtBjEb6kjfgeuFVXD3ZHAhabGafV5qHZnopeY315CnpJM27KUXVQYWv1Cy1p5XXXSjQLp4C+NBRWHfEv/qnjQ==
+"@moosync/moosync-types@^1.1.1":
+  version "1.1.1"
+  resolved "https://registry.yarnpkg.com/@moosync/moosync-types/-/moosync-types-1.1.1.tgz#7a36965a9192538c83e1d1560830d35d0934d80d"
+  integrity sha512-QYL4pYabCqYlTr64et20a5P370yV8qkEidno/IVJmko8WQxO1JjcMk+IG0NjGAblkNUb2psgo+w6RpBhGHSI2Q==
 
 "@mrmlnc/readdir-enhanced@^2.2.1":
   version "2.2.1"

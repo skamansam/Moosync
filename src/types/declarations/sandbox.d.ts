@@ -10,6 +10,12 @@ type extensionRequestMessage = {
   data: any
 }
 
+type extensionUIRequestMessage = {
+  type: import('@/utils/extensions/constants').extensionUIRequests
+  channel: string,
+  data: any
+}
+
 type extensionReplyMessage = extensionRequestMessage
 
 type extensionHostMessage = extensionEventMessage | mainRequestMessage
@@ -74,14 +80,6 @@ interface UnInitializedExtensionItem {
 interface getExtensionOptions {
   started?: boolean
   packageName?: string
-}
-
-interface extensionAPI {
-  getAllSongs(): Promise<Song[] | undefined>
-  getCurrentSong(): Promise<Song | undefined>
-  getVolume(): Promise<number | undefined>
-  getTime(): Promise<number | undefined>
-  getQueue(): Promise<SongQueue | undefined>
 }
 
 declare module NodeJS {

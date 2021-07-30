@@ -200,6 +200,10 @@ export default class App extends mixins(ThemeHandler, PlayerControls) {
         window.ExtensionUtils.replyToRequest({ ...data, data: vxm.player.queue })
         return
       }
+
+      if (data.type === 'get-player-state') {
+        window.ExtensionUtils.replyToRequest({ ...data, data: vxm.player.playerState })
+      }
     })
   }
 
