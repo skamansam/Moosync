@@ -37,7 +37,8 @@ class SongDBInstance extends DBUtils {
     const albumID = newDoc.album ? this.storeAlbum(newDoc.album) : ''
     const genreID = this.storeGenre(newDoc.genre)
     const marshaledSong = this.marshalSong(newDoc)
-    this.db.insert('allsongs', marshaledSong)
+    if (this.db.query(`SELECT _id from allsongs WHERE _id = ?`, marshaledSong._id).length === 0)
+      this.db.insert('allsongs', marshaledSong)
     this.storeArtistBridge(artistID, marshaledSong._id)
     this.storeGenreBridge(genreID, marshaledSong._id)
     this.storeAlbumBridge(albumID, marshaledSong._id)
