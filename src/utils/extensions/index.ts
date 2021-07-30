@@ -211,7 +211,7 @@ class ExtensionHandler {
       const manifestRaw = await zip.entryData('package.json')
       const manifest = JSON.parse((manifestRaw.toString('utf-8')))
       if (this.validateManifest(manifest)) {
-        const existingVersion = await this.isExistingExtension(manifest.packageName)
+        const existingVersion = await this.isExistingExtension(manifest.name)
         if (existingVersion) {
           if (!(await this.checkVersion(existingVersion, manifest.version))) {
             return {
@@ -220,7 +220,7 @@ class ExtensionHandler {
             }
           }
         }
-        const installPath = path.join(defaultExtensionPath, manifest.packageName)
+        const installPath = path.join(defaultExtensionPath, manifest.name)
         await this.createDirIfNotExists(installPath)
         await zip.extract(null, installPath)
         return {
@@ -248,7 +248,7 @@ class ExtensionHandler {
   }
 
   private validateManifest(manifest: any) {
-    return !!(manifest.moosyncExtension && manifest.packageName && manifest.extensionEntry && manifest.name && manifest.version)
+    return !!(manifest.moosyncExtension && manifest.displayName && manifest.extensionEntry && manifest.name && manifest.version)
   }
 }
 
