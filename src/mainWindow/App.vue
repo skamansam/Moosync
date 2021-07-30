@@ -47,6 +47,7 @@ export default class App extends mixins(ThemeHandler, PlayerControls) {
     this.watchPlaylistUpdates()
     this.populatePlaylists()
     this.registerDevTools()
+    this.registerFileDragListener()
     // this.testStun()
   }
 
@@ -155,6 +156,27 @@ export default class App extends mixins(ThemeHandler, PlayerControls) {
       }
     })
     window.WindowUtils.mainWindowHasMounted()
+  }
+
+  private registerFileDragListener() {
+    document.addEventListener('drop', async (event) => {
+      event.preventDefault()
+      event.stopPropagation()
+      if (event.dataTransfer) {
+        console.log(event.dataTransfer.files.length)
+        for (const f of event.dataTransfer.files) {
+          if (f) {
+            const song = await this.getSongFromPath(f.path)
+            await this.playTop([song])
+          }
+        }
+      }
+    })
+
+    document.addEventListener('dragover', (e) => {
+      e.preventDefault()
+      e.stopPropagation()
+    })
   }
 
   private listenExtensionRequests() {
