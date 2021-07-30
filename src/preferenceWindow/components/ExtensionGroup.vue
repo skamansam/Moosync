@@ -24,20 +24,30 @@
         </b-col>
       </b-row>
     </b-row>
+    <DeleteModal
+      v-if="extensions[extensionInAction]"
+      id="extensionDeleteModal"
+      :itemName="extensions[extensionInAction].name"
+      @confirm="removeExtension"
+    />
   </b-container>
 </template>
 
 <script lang="ts">
 import { Component, Prop, Vue } from 'vue-property-decorator'
 import Tooltip from '@/commonComponents/Tooltip.vue'
+import DeleteModal from '../../commonComponents/DeleteModal.vue'
 @Component({
   components: {
-    Tooltip
+    Tooltip,
+    DeleteModal
   }
 })
 export default class ExtensionGroup extends Vue {
   @Prop({ default: () => [] })
   private extensions!: ExtensionDetails[]
+
+  private extensionInAction: number = 0
 
   private togglePath(index: number) {
     if (index >= 0) {
@@ -47,9 +57,19 @@ export default class ExtensionGroup extends Vue {
     }
   }
 
+  private removeExtension() {
+    if (this.extensions[this.extensionInAction]) {
+      window.ExtensionUtils.uninstall(this.extensions[this.extensionInAction].packageName).then(() =>
+        this.$emit('extensionsChanged')
+      )
+    }
+  }
+
   private removePath(index: number) {
     if (index >= 0) {
-      window.ExtensionUtils.uninstall(this.extensions[index].packageName).then(() => this.$emit('extensionsChanged'))
+      this.extensionInAction = index
+      this.$bvModal.show('extensionDeleteModal')
+      // window.ExtensionUtils.uninstall(this.extensions[index].packageName).then(() => this.$emit('extensionsChanged'))
     }
   }
 

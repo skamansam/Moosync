@@ -120,5 +120,6 @@ export enum EventBus {
   COVER_SELECTED = 'cover-select',
   SHOW_CONTEXT = 'show-context',
   SHOW_NEW_PLAYLIST_MODAL = 'show-new-playlist-modal',
-  SHOW_ADD_PLAYLIST_MODAL = 'show-add-playlist-modal'
+  SHOW_ADD_PLAYLIST_MODAL = 'show-add-playlist-modal',
+  SHOW_DELETE_MODAL = 'show-delete-modal',
 }
