@@ -102,7 +102,9 @@ export enum ExtensionHostEvents {
   EVENT_TRIGGER = "eventTrigger",
   GET_ALL_EXTENSIONS = 'getAllExtensions',
   INSTALL = 'install',
-  EXTENSION_REQUESTS = 'extensionRequests'
+  EXTENSION_REQUESTS = 'extensionRequests',
+  TOGGLE_EXT_STATUS = 'toggleExtStatus',
+  REMOVE_EXT = 'removeExt'
 }
 
 export enum ServiceProviderEvents {

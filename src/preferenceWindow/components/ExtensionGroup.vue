@@ -2,22 +2,22 @@
   <b-container fluid class="path-container w-100">
     <b-row no-gutters>
       <b-col cols="auto" align-self="center" class="title d-flex">
-        <div>{{ title }}</div>
+        <div>Extensions</div>
         <div class="ml-3">
-          <Tooltip tooltipId="song-directories-tooltip" :text="tooltip" />
+          <Tooltip tooltipId="song-directories-tooltip" text="List of all installed extensions" />
         </div>
       </b-col>
       <b-col cols="auto" align-self="center" class="new-directories ml-auto">
-        <div class="add-directories-button" @click="openFileBrowser">Add New Directory...</div>
+        <div class="add-directories-button" @click="openFileBrowser">Install Extension</div>
       </b-col>
     </b-row>
-    <b-row no-gutters class="background w-100 mt-4 d-flex" v-if="Array.isArray(value)">
-      <b-row no-gutters class="mt-3 item w-100" v-for="(path, index) in value" :key="path.path">
+    <b-row no-gutters class="background w-100 mt-4 d-flex" v-if="Array.isArray(extensions)">
+      <b-row no-gutters class="mt-3 item w-100" v-for="(ext, index) in extensions" :key="ext.packageName">
         <b-col cols="auto" align-self="center" class="ml-4">
-          <b-checkbox @change="togglePath(index)" :id="`path-${index}`" :checked="path.enabled" />
+          <b-checkbox @change="togglePath(index)" :id="`ext-${index}`" :checked="ext.hasStarted" />
         </b-col>
         <b-col col md="8" lg="9" align-self="center" class="ml-3 justify-content-start">
-          <div class="item-text text-truncate">{{ path.path }}</div>
+          <div class="item-text text-truncate">{{ ext.name }}</div>
         </b-col>
         <b-col cols="auto" align-self="center" class="ml-auto">
           <div class="remove-button w-100" @click="removePath(index)">Remove</div>
@@ -28,44 +28,39 @@
 </template>
 
 <script lang="ts">
-import { Component, Prop, Vue, Mixins } from 'vue-property-decorator'
+import { Component, Prop, Vue } from 'vue-property-decorator'
 import Tooltip from '@/commonComponents/Tooltip.vue'
-import { ExtensionPreferenceMixin } from '../mixins/extensionPreferenceMixin'
 @Component({
   components: {
     Tooltip
   }
 })
-export default class DirectoryGroup extends Mixins(ExtensionPreferenceMixin) {
-  @Prop()
-  private title!: string
-
-  @Prop()
-  private tooltip!: string
+export default class ExtensionGroup extends Vue {
+  @Prop({ default: () => [] })
+  private extensions!: ExtensionDetails[]
 
   private togglePath(index: number) {
     if (index >= 0) {
-      this.value[index].enabled = (document.getElementById(`path-${index}`) as HTMLInputElement).checked
-      this.onInputChange()
+      const ext = this.extensions[index]
+      const status = (document.getElementById(`ext-${index}`) as HTMLInputElement).checked
+      window.ExtensionUtils.toggleExtStatus(ext.packageName, status).then(() => (ext.hasStarted = status))
     }
   }
 
   private removePath(index: number) {
     if (index >= 0) {
-      this.value.splice(index, 1)
-      this.onInputChange()
+      window.ExtensionUtils.uninstall(this.extensions[index].packageName).then(() => this.$emit('extensionsChanged'))
     }
   }
 
   private openFileBrowser() {
-    window.WindowUtils.openFileBrowser(false).then((data) => {
-      if (!data.canceled) {
-        for (const path of data.filePaths) {
-          this.value.push({ path, enabled: true })
+    window.WindowUtils.openFileBrowser(true, [{ name: 'Moosync Extension File', extensions: ['msox'] }]).then(
+      (data) => {
+        if (!data.canceled) {
+          window.ExtensionUtils.install(...data.filePaths).then(() => this.$emit('extensionsChanged'))
         }
-        this.onInputChange()
       }
-    })
+    )
   }
 }
 </script>

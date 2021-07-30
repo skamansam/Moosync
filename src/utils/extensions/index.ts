@@ -1,6 +1,7 @@
 import { ChildProcess, fork } from 'child_process';
 import { app, ipcMain } from 'electron';
 import { extensionRequestsKeys, extensionUIRequestsKeys, mainRequests } from '@/utils/extensions/constants';
+import { loadSelectivePreference, saveSelectivePreference } from '../main/db/preferences';
 
 import { ExtensionHostEvents } from '@/utils/main/ipc/constants';
 import { SongDB } from '@/utils/main/db/index';
@@ -54,6 +55,11 @@ class MainHostIPCHandler {
     return resp
   }
 
+  public async uninstallExtension(packageName: string): Promise<void> {
+    await this.mainRequestGenerator.removeExtension(packageName)
+    await this.extensionResourceHandler.uninstallExtension(packageName)
+  }
+
   private sendToExtensionHost(data: any) {
     this.sandboxProcess.send(data)
   }
@@ -74,7 +80,15 @@ class MainRequestGenerator {
     return this.sendAsync<ExtensionDetails[]>('get-installed-extensions')
   }
 
-  private sendAsync<T>(type: mainRequests): Promise<T> {
+  public async toggleExtensionStatus(packageName: string, enabled: boolean) {
+    return this.sendAsync<void>('toggle-extension-status', { packageName, enabled })
+  }
+
+  public async removeExtension(packageName: string) {
+    return this.sendAsync<void>('remove-extension', { packageName })
+  }
+
+  private sendAsync<T>(type: mainRequests, data?: any): Promise<T> {
     const channel = v4()
     return new Promise<T>(resolve => {
       let listener: (data: mainReplyMessage) => void
@@ -84,7 +98,7 @@ class MainRequestGenerator {
           resolve(data.data)
         }
       })
-      this.sandboxProcess.send({ type, channel } as mainRequestMessage)
+      this.sandboxProcess.send({ type, channel, data } as mainRequestMessage)
     })
   }
 }
@@ -133,11 +147,27 @@ class ExtensionRequestHandler {
     mainWindow.webContents.send(ExtensionHostEvents.EXTENSION_REQUESTS, message)
   }
 
+  private getPreferenceKey(packageName: string, key?: string) {
+    let str = packageName
+    if (key) str += "." + key
+    return str
+  }
+
   public async parseRequest(message: extensionRequestMessage): Promise<extensionReplyMessage | undefined> {
     const resp: extensionReplyMessage = { ...message, data: undefined }
     if (message.type === 'get-all-songs') {
       const songs = await SongDB.getAllSongs()
       resp.data = songs
+    }
+
+    if (message.type === 'get-preferences') {
+      const { packageName, key, defaultValue }: { packageName: string, key?: string, defaultValue?: any } = message.data
+      resp.data = await loadSelectivePreference(this.getPreferenceKey(packageName, key), true, defaultValue)
+    }
+
+    if (message.type === 'set-preferences') {
+      const { packageName, key, value }: { packageName: string, key: string, value: any } = message.data
+      resp.data = await saveSelectivePreference(this.getPreferenceKey(packageName, key), value, true)
     }
 
     if (extensionUIRequestsKeys.includes(message.type as any)) {
@@ -170,6 +200,7 @@ class ExtensionHandler {
       const manifest = JSON.parse(await fsP.readFile(path.join(extPath, 'package.json'), 'utf-8'))
       return manifest.version
     } catch (e) {
+      console.info(`No existing extension found with packageName: ${packageName}`)
       undefined
     }
   }
@@ -196,9 +227,9 @@ class ExtensionHandler {
           success: true,
           message: "Extension installed successfully",
           extensionDescription: {
-            name: manifest.name,
+            name: manifest.displayName,
             desc: manifest.description,
-            packageName: manifest.packageName,
+            packageName: manifest.name,
             ver: manifest.version,
             path: installPath
           }
@@ -207,6 +238,12 @@ class ExtensionHandler {
     }
     return {
       success: false
+    }
+  }
+
+  public async uninstallExtension(packageName: string) {
+    if (await this.isExistingExtension(packageName)) {
+      await fsP.rm(path.join(defaultExtensionPath, packageName), { recursive: true, force: true })
     }
   }
 

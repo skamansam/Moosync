@@ -35,13 +35,13 @@ export class PreferenceChannel implements IpcChannelInterface {
 
   private saveSelective(event: Electron.IpcMainEvent, request: IpcRequest) {
     if (request.params.key && request.params.value) {
-      saveSelectivePreference(request.params.key, request.params.value).then((data) => event.reply(request.responseChannel, data))
+      saveSelectivePreference(request.params.key, request.params.value, request.params.isExtension).then((data) => event.reply(request.responseChannel, data))
     }
   }
 
   private loadSelective(event: Electron.IpcMainEvent, request: IpcRequest) {
     if (request.params.key) {
-      loadSelectivePreference(request.params.key).then((data) => event.reply(request.responseChannel, data))
+      loadSelectivePreference(request.params.key, request.params.isExtension).then((data) => event.reply(request.responseChannel, data))
     }
   }
 }

@@ -58,9 +58,8 @@ contextBridge.exposeInMainWorld('PreferenceUtils', {
       type: PreferenceEvents.SAVE_PREFERENCES,
       params: { preferences: preferences },
     }),
-  saveSelective: (key: string, value: any) => ipcRendererHolder.send(IpcEvents.PREFERENCES, { type: PreferenceEvents.SAVE_SELECTIVE_PREFERENCES, params: { key, value } }),
-  loadSelective: (key: string) => ipcRendererHolder.send(IpcEvents.PREFERENCES, { type: PreferenceEvents.LOAD_SELECTIVE_PREFERENCES, params: { key } }),
-
+  saveSelective: (key: string, value: any, isExtension?: boolean) => ipcRendererHolder.send(IpcEvents.PREFERENCES, { type: PreferenceEvents.SAVE_SELECTIVE_PREFERENCES, params: { key, value, isExtension } }),
+  loadSelective: (key: string, isExtension?: boolean) => ipcRendererHolder.send(IpcEvents.PREFERENCES, { type: PreferenceEvents.LOAD_SELECTIVE_PREFERENCES, params: { key, isExtension } }),
 })
 
 contextBridge.exposeInMainWorld('ProviderUtils', {
@@ -110,7 +109,7 @@ contextBridge.exposeInMainWorld('WindowUtils', {
   closeMainWindow: () => ipcRendererHolder.send(IpcEvents.BROWSER_WINDOWS, { type: WindowEvents.CLOSE_MAIN }),
   minMainWindow: () => ipcRendererHolder.send(IpcEvents.BROWSER_WINDOWS, { type: WindowEvents.MIN_MAIN }),
   maxMainWindow: () => ipcRendererHolder.send(IpcEvents.BROWSER_WINDOWS, { type: WindowEvents.MAX_MAIN }),
-  openFileBrowser: (file: boolean) => ipcRendererHolder.send(IpcEvents.BROWSER_WINDOWS, { type: WindowEvents.OPEN_FILE_BROWSER, params: { file: file } }),
+  openFileBrowser: (file: boolean, filters?: Electron.FileFilter[]) => ipcRendererHolder.send(IpcEvents.BROWSER_WINDOWS, { type: WindowEvents.OPEN_FILE_BROWSER, params: { file, filters } }),
   toggleDevTools: () => ipcRendererHolder.send(IpcEvents.BROWSER_WINDOWS, { type: WindowEvents.TOGGLE_DEV_TOOLS }),
   openExternal: (url: string) => ipcRendererHolder.send(IpcEvents.BROWSER_WINDOWS, { type: WindowEvents.OPEN_URL_EXTERNAL, params: { url: url } }),
   registerOAuthCallback: (callback: (data: string) => void) => ipcRendererHolder.on(WindowEvents.LISTEN_OAUTH_EVENT, callback),
@@ -130,8 +129,10 @@ contextBridge.exposeInMainWorld('NotifierUtils', {
 
 contextBridge.exposeInMainWorld('ExtensionUtils', {
   install: (...path: string[]) => ipcRendererHolder.send(IpcEvents.EXTENSION_HOST, { type: ExtensionHostEvents.INSTALL, params: { path: path } }),
+  uninstall: (packageName: string) => ipcRendererHolder.send(IpcEvents.EXTENSION_HOST, { type: ExtensionHostEvents.REMOVE_EXT, params: { packageName } }),
   sendEvent: (data: extensionHostMessage) => ipcRendererHolder.send(IpcEvents.EXTENSION_HOST, { type: ExtensionHostEvents.EVENT_TRIGGER, params: { data: data } }),
   getAllExtensions: () => ipcRendererHolder.send(IpcEvents.EXTENSION_HOST, { type: ExtensionHostEvents.GET_ALL_EXTENSIONS }),
   listenRequests: (callback: (request: extensionRequestMessage) => void) => ipcRendererHolder.on(ExtensionHostEvents.EXTENSION_REQUESTS, callback),
   replyToRequest: (data: extensionReplyMessage) => ipcRenderer.send(ExtensionHostEvents.EXTENSION_REQUESTS, data),
+  toggleExtStatus: (packageName: string, enabled: boolean) => ipcRendererHolder.send(IpcEvents.EXTENSION_HOST, { type: ExtensionHostEvents.TOGGLE_EXT_STATUS, params: { packageName, enabled } }),
 })

@@ -1,9 +1,13 @@
 <template>
-  <b-container fluid class="path-container w-100">
+  <b-container fluid class="path-container w-100" v-if="Array.isArray(value)">
     <PreferenceHeader :title="title" :tooltip="tooltip" />
     <b-row no-gutters class="item w-100" v-for="(checkbox, index) in value" :key="checkbox.key">
       <b-col cols="auto" align-self="center">
-        <b-checkbox @change="toggleCheck(index)" :id="`checkbox-${checkbox.key}`" :checked="checkbox.enabled" />
+        <b-checkbox
+          @change="toggleCheck(index)"
+          :id="`checkbox-${packageName}-${checkbox.key}`"
+          :checked="checkbox.enabled"
+        />
       </b-col>
       <b-col col md="8" lg="9" align-self="center" class="ml-3 justify-content-start">
         <div class="item-text text-truncate">{{ checkbox.title }}</div>
@@ -30,7 +34,7 @@ export default class CheckboxGroup extends Mixins(ExtensionPreferenceMixin) {
 
   private toggleCheck(index: number) {
     this.value[index].enabled = (
-      document.getElementById(`checkbox-${this.value[index].key}`) as HTMLInputElement
+      document.getElementById(`checkbox-${this.packageName}-${this.value[index].key}`) as HTMLInputElement
     ).checked
     this.onInputChange()
   }

@@ -23,16 +23,18 @@ export class ExtensionManager extends AbstractExtensionManager {
   }
 
   private getVM(entryFilePath: string) {
+    const events = require('jsEvents');
     const vm = new NodeVM({
       console: 'inherit',
       sandbox: {},
       require: {
-        external: {
-          modules: ['*'],
-          transitive: true
-        },
-        builtin: ['fs', 'path'],
-        root: path.dirname(entryFilePath)
+        external: true,
+        context: 'sandbox',
+        builtin: ['*'],
+        root: path.dirname(entryFilePath),
+        mock: {
+          events
+        }
       }
     })
 
@@ -52,12 +54,14 @@ export class ExtensionManager extends AbstractExtensionManager {
       const vm = this.getVM(modulePath)
       const extension = vm.runFile(modulePath)
 
+      console.log(extension, typeof extension)
       if (typeof extension !== 'function') {
         return
       }
 
       const instance = new extension()
 
+      console.log(instance)
       if (!Array.isArray(instance.extensionDescriptors)) {
         return
       }

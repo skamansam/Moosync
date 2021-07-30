@@ -19,13 +19,15 @@ export async function savePreferences(prefs: Preferences) {
   preferencesChanged()
 }
 
-export async function saveSelectivePreference(key: string, value: any) {
-  store.set(`prefs.${key}`, value)
-  preferencesChanged()
+export async function saveSelectivePreference(key: string, value: any, isExtension?: boolean) {
+  store.set(`prefs.${isExtension ? 'extension.' : ''}${key}`, value)
+  if (!isExtension)
+    preferencesChanged()
 }
 
-export async function loadSelectivePreference(key: string) {
-  return store.get(`prefs.${key}`)
+export async function loadSelectivePreference(key?: string, isExtension?: boolean, defaultValue?: any) {
+  console.log(key)
+  return store.get(`prefs.${isExtension ? 'extension.' : ''}${key}`, defaultValue)
 }
 
 function validatePrefs(prefs: Preferences): Preferences {

@@ -1,4 +1,4 @@
-import { extensionEventsKeys, extensionRequests, mainRequestsKeys } from '@/utils/extensions/constants';
+import { extensionEventsKeys, mainRequestsKeys } from '@/utils/extensions/constants';
 
 import { ExtensionHandler } from '@/utils/extensions/sandbox/extensionHandler';
 import { createLogger } from './logger';
@@ -34,7 +34,7 @@ class ExtensionHostIPCHandler {
     return extensionEventsKeys.includes(key as any)
   }
 
-  private isMainRequest(key: string) {
+  private isMainReply(key: string) {
     return mainRequestsKeys.includes(key as any)
   }
 
@@ -50,7 +50,7 @@ class ExtensionHostIPCHandler {
       return
     }
 
-    if (this.isMainRequest(message.type)) {
+    if (this.isMainReply(message.type)) {
       this.mainRequestHandler.parseRequest(message as mainRequestMessage)
       return
     }
@@ -74,6 +74,17 @@ class MainRequestHandler {
 
     if (message.type === 'get-installed-extensions') {
       this.sendToMain(message.channel, this.handler.getInstalledExtensions())
+      return
+    }
+
+    if (message.type === 'toggle-extension-status') {
+      this.handler.toggleExtStatus(message.data.packageName, message.data.enabled)
+      this.sendToMain(message.channel)
+      return
+    }
+
+    if (message.type === 'remove-extension') {
+      this.sendToMain(message.channel, this.handler.removeExt(message.data.packageName))
       return
     }
   }

@@ -61,7 +61,7 @@ import Colors from '@/utils/ui/mixins/Colors'
 import { mixins } from 'vue-class-component'
 import ModelHelper from '@/utils/ui/mixins/ModelHelper'
 import { vxm } from '../store'
-import { time, timeStamp } from 'console'
+import { bus } from '@/mainWindow/main'
 
 @Component({
   components: {
@@ -86,6 +86,7 @@ export default class MusicBar extends mixins(Colors, ModelHelper) {
   }
 
   private updateTimestmp(value: number) {
+    bus.$emit('forceSeek', value)
     this.forceSeek = value
   }
 

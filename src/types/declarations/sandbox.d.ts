@@ -1,18 +1,16 @@
 type extensionEventMessage = {
-  type: import('@/utils/extensions/constants').extensionEvents
+  type: keyof import('@moosync/moosync-types').MoosyncExtensionTemplate
   data: any
+  packageName?: string
 }
 
 type extensionRequestMessage = {
   type: import('@/utils/extensions/constants').extensionRequests
-  channel: string
-}
-
-type extensionReplyMessage = {
-  type: import('@/utils/extensions/constants').extensionRequests
-  channel: string
+  channel: string,
   data: any
 }
+
+type extensionReplyMessage = extensionRequestMessage
 
 type extensionHostMessage = extensionEventMessage | mainRequestMessage
 
@@ -20,16 +18,12 @@ type extensionHostMessage = extensionEventMessage | mainRequestMessage
 type mainRequestMessage = {
   type: import('@/utils/extensions/constants').mainRequests
   channel: string
-}
-
-type mainReplyMessage = {
-  type: import('@/utils/extensions/constants').mainRequests
-  channel: string
   data: any
 }
 
-type mainHostMessage = mainReplyMessage | extensionRequestMessage
+type mainReplyMessage = mainRequestMessage
 
+type mainHostMessage = mainReplyMessage | extensionRequestMessage
 
 interface installedExtensionDesc {
   name: string
@@ -64,9 +58,9 @@ interface ExtensionDetails {
 }
 
 interface ExtensionItem extends ExtensionDetails {
-  instance: MoosyncExtensionTemplate
+  instance: import('@moosync/moosync-types/index').MoosyncExtensionTemplate
   preferences: import('@moosync/moosync-types/index').ExtensionPreferenceGroup[]
-  vm: import('vm2').NodeVM
+  vm: import('vm')
 }
 
 interface UnInitializedExtensionItem {
@@ -94,4 +88,14 @@ declare module NodeJS {
   interface Global {
     logger: import('winston').Logger
   }
+}
+
+interface NodeRequire {
+  (dependencies: string[], callback: (...args: any[]) => any, errorback?: (err: any) => void): any;
+  config(data: any): any;
+  onError: Function;
+  __$__nodeRequire<T>(moduleName: string): T;
+  getStats(): ReadonlyArray<LoaderEvent>;
+  hasDependencyCycle(): boolean;
+  define(amdModuleId: string, dependencies: string[], callback: (...args: any[]) => any): any;
 }

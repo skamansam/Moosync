@@ -20,6 +20,7 @@ import NewPlaylistModal from '@/mainWindow/components/generic/NewPlaylistModal.v
 import AddPlaylistModal from '@/mainWindow/components/generic/AddPlaylistModal.vue'
 
 import { vxm } from './store'
+import { bus } from './main'
 
 const stun = require('stun')
 
@@ -137,28 +138,35 @@ export default class App extends mixins(ThemeHandler) {
   private listenExtensionEvents() {
     vxm.player.$watch('currentSong', (newVal: Song) =>
       window.ExtensionUtils.sendEvent({
-        type: 'song-change',
+        type: 'onSongChanged',
         data: newVal
       })
     )
 
     vxm.player.$watch('playerState', (newVal: PlayerState) =>
       window.ExtensionUtils.sendEvent({
-        type: 'playerState-change',
+        type: 'onPlayerStateChanged',
         data: newVal
       })
     )
 
     vxm.player.$watch('volume', (newVal: number) =>
       window.ExtensionUtils.sendEvent({
-        type: 'volume-change',
+        type: 'onVolumeChanged',
         data: newVal
       })
     )
 
     vxm.player.$watch('songQueue', (newVal: SongQueue) =>
       window.ExtensionUtils.sendEvent({
-        type: 'songQueue-change',
+        type: 'onSongQueueChanged',
+        data: newVal
+      })
+    )
+
+    bus.$on('forceSeek', (newVal: number) =>
+      window.ExtensionUtils.sendEvent({
+        type: 'onSeeked',
         data: newVal
       })
     )

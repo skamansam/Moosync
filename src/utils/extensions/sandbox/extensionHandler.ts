@@ -1,7 +1,6 @@
 import { AbstractExtensionFinder, ExtensionFinder } from './extensionFinder';
 import { AbstractExtensionManager, ExtensionManager } from '@/utils/extensions/sandbox/extensionManager';
 
-import { Logger } from 'winston';
 import { MoosyncExtensionTemplate } from '@moosync/moosync-types';
 import { getVersion } from '@/utils/common';
 
@@ -64,24 +63,30 @@ export class ExtensionHandler {
     }
   }
 
-  public sendEvent(event: extensionEventMessage) {
-    let method: keyof MoosyncExtensionTemplate | undefined = undefined
-    if (this.initialized) {
-      switch (event.type) {
-        case 'song-change':
-          method = 'onSongChanged'
-          break
-        case 'playerState-change':
-          method = 'onPlayerStateChanged'
-          break
-        case 'volume-change':
-          method = 'onVolumeChanged'
-          break
-        case 'songQueue-change':
-          method = 'onSongQueueChanged'
-          break
+  public toggleExtStatus(packageName: string, enabled: boolean) {
+    const ext = this.extensionManager.getExtensions({ packageName })
+    for (const e of ext) {
+      if (enabled) {
+        if (e.instance.onStarted)
+          e.instance.onStarted()
+      } else {
+        if (e.instance.onStopped)
+          e.instance.onStopped()
       }
-      method && this.sendToAllExtensions(method, event.data)
+      this.extensionManager.setStarted(packageName, enabled)
+    }
+  }
+
+  public removeExt(packageName: string) {
+    // Shut down extension before removing
+    this.toggleExtStatus(packageName, false)
+    this.extensionManager.deregister(packageName)
+  }
+
+  public sendEvent(event: extensionEventMessage) {
+    const method: keyof MoosyncExtensionTemplate = event.type
+    if (this.initialized) {
+      this.sendToExtensions(event.packageName, method, event.data)
     } else {
       this.preInitializedCalls.push({ func: this.sendEvent, args: [event] })
     }
@@ -108,8 +113,8 @@ export class ExtensionHandler {
     return parsed
   }
 
-  public sendToAllExtensions(method: keyof MoosyncExtensionTemplate, args: any) {
-    for (const ext of this.extensionManager.getExtensions()) {
+  public sendToExtensions(packageName: string | undefined, method: keyof MoosyncExtensionTemplate, args: any) {
+    for (const ext of this.extensionManager.getExtensions({ started: true, packageName })) {
       if (ext.instance[method])
         (ext.instance[method] as Function)(args)
     }

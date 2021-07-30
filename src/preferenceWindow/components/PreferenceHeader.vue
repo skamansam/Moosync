@@ -1,9 +1,9 @@
 <template>
   <b-row no-gutters>
     <b-col cols="auto" align-self="center" class="title d-flex">
-      <div>{{ title }}</div>
-      <div class="ml-3">
-        <Tooltip tooltipId="song-directories-tooltip" :text="tooltip" />
+      <div class="preference-title">{{ title }}</div>
+      <div class="ml-2 tooltip-pos">
+        <Tooltip :text="tooltip" />
       </div>
     </b-col>
   </b-row>
@@ -24,3 +24,13 @@ export default class PreferenceHeader extends Vue {
   private tooltip!: string
 }
 </script>
+
+<style lang="sass" scoped>
+.preference-title
+  font-weight: normal
+  font-size: 20px
+  color: var(--textSecondary)
+
+.tooltip-pos
+  margin-top: 2px
+</style>

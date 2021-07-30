@@ -14,7 +14,7 @@
     <b-row no-gutters class="background w-100 mt-4 d-flex" v-if="Array.isArray(value)">
       <b-row no-gutters class="mt-3 item w-100" v-for="(path, index) in value" :key="path.path">
         <b-col cols="auto" align-self="center" class="ml-4">
-          <b-checkbox @change="togglePath(index)" :id="`path-${index}`" :checked="path.enabled" />
+          <b-checkbox @change="togglePath(index)" :id="`path-${packageName}-${path.path}`" :checked="path.enabled" />
         </b-col>
         <b-col col md="8" lg="9" align-self="center" class="ml-3 justify-content-start">
           <div class="item-text text-truncate">{{ path.path }}</div>
@@ -45,7 +45,10 @@ export default class DirectoryGroup extends Mixins(ExtensionPreferenceMixin) {
 
   private togglePath(index: number) {
     if (index >= 0) {
-      this.value[index].enabled = (document.getElementById(`path-${index}`) as HTMLInputElement).checked
+      const path = this.value[index]
+      this.value[index].enabled = (
+        document.getElementById(`path-${this.packageName}-${path.path}`) as HTMLInputElement
+      ).checked
       this.onInputChange()
     }
   }

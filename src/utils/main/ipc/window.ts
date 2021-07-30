@@ -23,7 +23,7 @@ export class BrowserWindowChannel implements IpcChannelInterface {
         this.toggleDevTools(event, request)
         break
       case WindowEvents.OPEN_FILE_BROWSER:
-        this.getFolder(event, request)
+        this.openFileBrowser(event, request)
         break
       case WindowEvents.CLOSE_MAIN:
         this.closeMainWindow(event, request)
@@ -82,12 +82,14 @@ export class BrowserWindowChannel implements IpcChannelInterface {
     event.reply(request.responseChannel, null)
   }
 
-  private getFolder(event: Electron.IpcMainEvent, request: IpcRequest) {
+  private openFileBrowser(event: Electron.IpcMainEvent, request: IpcRequest) {
     if (this.preferenceWindow) {
+      const options: Electron.OpenDialogOptions = {
+        properties: [request.params.file ? 'openFile' : 'openDirectory'],
+        filters: request.params.filters
+      }
       dialog
-        .showOpenDialog(this.preferenceWindow, {
-          properties: [request.params.file ? 'openFile' : 'openDirectory'],
-        })
+        .showOpenDialog(this.preferenceWindow, options)
         .then((folders) => {
           event.reply(request.responseChannel, folders)
         })

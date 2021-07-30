@@ -46,8 +46,8 @@ interface fileUtils {
 interface preferenceUtils {
   load: () => Promise<Preferences>
   save: (preference: Preferences) => Promise<void>
-  saveSelective: (key: string, value: any) => Promise<void>
-  loadSelective: (key: string) => Promise<Object>
+  saveSelective: (key: string, value: any, isExtension?: boolean) => Promise<void>
+  loadSelective: (key: string, isExtension?: boolean) => Promise<Object>
 }
 
 interface store {
@@ -66,7 +66,7 @@ interface windowUtils {
   closeMainWindow: () => Promise<void>
   minMainWindow: () => Promise<void>
   maxMainWindow: () => Promise<boolean>
-  openFileBrowser: (file: boolean) => Promise<Electron.OpenDialogReturnValue>
+  openFileBrowser: (file: boolean, filters?: Electron.FileFilter[]) => Promise<Electron.OpenDialogReturnValue>
   toggleDevTools: () => Promise<void>
   setMainWindowResizeListener: (callback: () => void) => void
   openExternal: (url: string) => Promise<void>
@@ -85,10 +85,12 @@ interface notifierUtils {
 
 interface extensionUtils {
   install: (...path: string[]) => Promise<installMessage>
+  uninstall: (packageName: string) => Promise<void>
   sendEvent: (data: extensionHostMessage) => Promise<void>
   getAllExtensions: () => Promise<ExtensionDetails[]>
   listenRequests: (callback: (request: extensionRequestMessage) => void) => void
   replyToRequest: (data: extensionReplyMessage) => void
+  toggleExtStatus: (packageName: string, enabled: boolean) => Promise<void>
 }
 
 declare global {

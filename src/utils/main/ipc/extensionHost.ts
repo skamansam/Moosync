@@ -15,6 +15,12 @@ export class ExtensionHostChannel implements IpcChannelInterface {
       case ExtensionHostEvents.GET_ALL_EXTENSIONS:
         this.getAllExtensions(event, request)
         break
+      case ExtensionHostEvents.TOGGLE_EXT_STATUS:
+        this.toggleExtensionStatus(event, request)
+        break
+      case ExtensionHostEvents.REMOVE_EXT:
+        this.removeExtension(event, request)
+        break
     }
   }
 
@@ -28,6 +34,18 @@ export class ExtensionHostChannel implements IpcChannelInterface {
 
   private getAllExtensions(event: Electron.IpcMainEvent, request: IpcRequest) {
     extensionHost.mainRequestGenerator.getInstalledExtensions().then((data) => event.reply(request.responseChannel, data))
+  }
+
+  private toggleExtensionStatus(event: Electron.IpcMainEvent, request: IpcRequest) {
+    if (request.params.packageName && request.params.enabled !== undefined) {
+      extensionHost.mainRequestGenerator.toggleExtensionStatus(request.params.packageName, request.params.enabled).then(() => event.reply(request.responseChannel))
+    }
+  }
+
+  private removeExtension(event: Electron.IpcMainEvent, request: IpcRequest) {
+    if (request.params.packageName) {
+      extensionHost.uninstallExtension(request.params.packageName).then(() => event.reply(request.responseChannel))
+    }
   }
 
   private sendData(event: Electron.IpcMainEvent, request: IpcRequest) {

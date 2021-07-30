@@ -28,7 +28,15 @@ export class ExtensionRequestGenerator {
     return this.sendAsync<SongQueue>('get-queue')
   }
 
-  private sendAsync<T>(type: extensionRequests): Promise<T | undefined> {
+  public async getPreferences(key?: string, defaultValue?: any) {
+    return this.sendAsync<SongQueue>('get-preferences', { packageName: this.packageName, key, defaultValue })
+  }
+
+  public async setPreferences(key: string, value: any) {
+    return this.sendAsync<SongQueue>('set-preferences', { packageName: this.packageName, key, value })
+  }
+
+  private sendAsync<T>(type: extensionRequests, data?: any): Promise<T | undefined> {
     const channel = v4()
     return new Promise(resolve => {
       if (process.send) {
@@ -39,7 +47,7 @@ export class ExtensionRequestGenerator {
             resolve(data.data)
           }
         })
-        process.send({ type, channel } as mainHostMessage)
+        process.send({ type, channel, data } as extensionRequestMessage)
         return
       }
       resolve(undefined)
