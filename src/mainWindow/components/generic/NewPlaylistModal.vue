@@ -107,19 +107,10 @@ export default class NewPlaylistModal extends mixins(Colors, ImgLoader) {
     return mergableImages.slice(0, 4)
   }
 
-  private async createImage(
-    src: string,
-    quad: number,
-    len: number,
-    ctx: CanvasRenderingContext2D,
-    crossOrigin?: string
-  ) {
+  private async createImage(src: string, quad: number, len: number, ctx: CanvasRenderingContext2D) {
     let img = new Image()
-    img.onerror = () => {
-      if (!crossOrigin) this.createImage(src, quad, len, ctx, 'anonymous')
-    }
     img.onload = () => this.drawImage(quad, len, ctx, img)
-    img.crossOrigin = crossOrigin ?? null
+    img.crossOrigin = ''
     img.src = src.startsWith('http') ? src : 'media://' + src
   }
 

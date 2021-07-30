@@ -47,6 +47,22 @@ function interceptHttp() {
   // We'll load the app on http://localhost
   // Which will then be intercepted here and normal files will be delivered
   // Essentially spoofing window.location.origin to become http://localhost
+
+  session.defaultSession.webRequest.onHeadersReceived((details, callback) => {
+    let headers: { [key: string]: string | string[] } = { ...details.responseHeaders }
+
+    if (details.url.startsWith('https://i.ytimg.com')) {
+      console.log('adding header')
+      headers = {
+        'Access-Control-Allow-Origin': '*'
+      }
+    }
+
+    callback({
+      responseHeaders: headers
+    })
+  })
+
   if (!process.env.WEBPACK_DEV_SERVER_URL) {
     session.defaultSession.protocol.interceptFileProtocol('http', (request, callback) => {
       let pathName = new URL(request.url).pathname
