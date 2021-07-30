@@ -31,6 +31,7 @@
         </CardView>
       </b-col>
     </b-row>
+    <DeleteModal id="playlistDeleteModal" @confirm="deletePlaylist" />
   </b-container>
 </template>
 
@@ -44,17 +45,22 @@ import { vxm } from '@/mainWindow/store'
 import SpotifyIcon from '@/mainWindow/components/icons/Spotify.vue'
 import YoutubeIcon from '@/mainWindow/components/icons/Youtube.vue'
 import PlaylistDefault from '@/mainWindow/components/icons/PlaylistDefault.vue'
+import DeleteModal from '../../../commonComponents/DeleteModal.vue'
 
 @Component({
   components: {
     CardView,
     SpotifyIcon,
     YoutubeIcon,
-    PlaylistDefault
+    PlaylistDefault,
+    DeleteModal
   }
 })
 export default class Albums extends mixins(RouterPushes, ContextMenuMixin) {
   private allPlaylists: Playlist[] = []
+
+  private playlistInAction: Playlist | undefined
+
   private async getPlaylists() {
     let localPlaylists = await window.DBUtils.getAllPlaylists()
     let ytPlaylists = await vxm.providers.youtubeProvider.getUserPlaylists()
@@ -71,19 +77,24 @@ export default class Albums extends mixins(RouterPushes, ContextMenuMixin) {
     }
   }
 
+  private deletePlaylist() {
+    if (this.playlistInAction) window.DBUtils.removePlaylist(this.playlistInAction.playlist_id)
+    this.refresh()
+  }
+
   mounted() {
     this.getPlaylists()
   }
 
-  private refreshCallback() {
-    this.getPlaylists()
-    vxm.playlist.updated = true
+  private refresh() {
+    this.getPlaylists().then(() => (vxm.playlist.updated = true))
   }
 
   private getPlaylistMenu(event: Event, playlist: Playlist) {
+    this.playlistInAction = playlist
     this.getContextMenu(event, {
       type: 'PLAYLIST',
-      args: { playlist: playlist, refreshCallback: this.refreshCallback }
+      args: { playlist: playlist, deleteCallback: () => this.$bvModal.show('playlistDeleteModal') }
     })
   }
 }

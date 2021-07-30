@@ -14,7 +14,7 @@ type ContextMenuArgs = {
   type: 'PLAYLIST'
   args: {
     playlist: Playlist
-    refreshCallback: () => void
+    deleteCallback: () => void
   }
 } |
 {

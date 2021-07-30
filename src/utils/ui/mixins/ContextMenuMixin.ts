@@ -99,14 +99,13 @@ export default class ContextMenuMixin extends mixins(PlayerControls, RemoteSong)
     return items
   }
 
-  private getPlaylistContextMenu(playlist: Playlist, refreshCallback: () => void) {
+  private getPlaylistContextMenu(playlist: Playlist, callback: () => void) {
     const items = []
     if (!playlist.isRemote) {
       items.push({
         label: 'Remove Playlist',
         handler: () => {
-          window.DBUtils.removePlaylist(playlist.playlist_id)
-          refreshCallback()
+          callback()
         },
       })
     }
@@ -177,7 +176,7 @@ export default class ContextMenuMixin extends mixins(PlayerControls, RemoteSong)
         items = this.getYoutubeContextMenu(...options.args.ytItems)
         break
       case 'PLAYLIST':
-        items = this.getPlaylistContextMenu(options.args.playlist, options.args.refreshCallback)
+        items = this.getPlaylistContextMenu(options.args.playlist, options.args.deleteCallback)
         break
       case 'GENERAL_PLAYLIST':
         items = this.getGeneralPlaylistMenu()

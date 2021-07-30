@@ -35,10 +35,12 @@ export default class DeleteModal extends mixins(Colors) {
 
   private onCancelPressed() {
     this.$emit('cancel')
+    this.$bvModal.hide(this.id)
   }
 
   private onConfirmPressed() {
     this.$emit('confirm')
+    this.$bvModal.hide(this.id)
   }
 }
 </script>
