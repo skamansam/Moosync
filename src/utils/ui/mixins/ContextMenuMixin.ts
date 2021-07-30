@@ -47,13 +47,13 @@ export default class ContextMenuMixin extends mixins(PlayerControls, RemoteSong)
       {
         label: 'Play Now',
         handler: () => {
-          this.playTop(...item)
+          this.playTop(item)
         },
       },
       {
         label: 'Add To Queue',
         handler: () => {
-          this.queueSong(...item)
+          this.queueSong(item)
         },
       },
       {
@@ -78,13 +78,13 @@ export default class ContextMenuMixin extends mixins(PlayerControls, RemoteSong)
       {
         label: 'Play Now',
         handler: () => {
-          this.playTop(...toSong(...item))
+          this.playTop(toSong(...item))
         },
       },
       {
         label: 'Add To Queue',
         handler: () => {
-          this.queueSong(...toSong(...item))
+          this.queueSong(toSong(...item))
         },
       },
       {
@@ -141,7 +141,7 @@ export default class ContextMenuMixin extends mixins(PlayerControls, RemoteSong)
       {
         label: 'Play Now',
         handler: () => {
-          this.playTop(item)
+          this.playTop([item])
         },
       },
       {

@@ -54,14 +54,12 @@ export class ExtensionManager extends AbstractExtensionManager {
       const vm = this.getVM(modulePath)
       const extension = vm.runFile(modulePath)
 
-      console.log(extension, typeof extension)
       if (typeof extension !== 'function') {
         return
       }
 
       const instance = new extension()
 
-      console.log(instance)
       if (!Array.isArray(instance.extensionDescriptors)) {
         return
       }

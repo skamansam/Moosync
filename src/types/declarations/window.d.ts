@@ -41,6 +41,7 @@ interface fileUtils {
   savePlaylistCover: (b64: string) => Promise<string>
   isAudioExists: (path: string) => Promise<string | null>
   isImageExists: (path: string) => Promise<string | null>
+  listenInitialFileOpenRequest: (callback: (paths: string[]) => void) => void
 }
 
 interface preferenceUtils {
@@ -72,6 +73,7 @@ interface windowUtils {
   openExternal: (url: string) => Promise<void>
   registerOAuthCallback: (callback: (data: string) => void) => void
   deregisterOAuthCallback: () => void
+  mainWindowHasMounted: () => Promise<void>
 }
 
 interface loggerUtils {

@@ -9,9 +9,9 @@ import { scheduler, setupScanTask } from '@/utils/main/scheduler/index'
 
 import EventEmitter from 'events'
 import { OAuthHandler } from '@/utils/main/oauth/handler'
+import { SongEvents } from './utils/main/ipc/constants';
 import { createProtocol } from 'vue-cli-plugin-electron-builder/lib'
 import { extensionHost } from '@/utils/extensions/index'
-import { loadPreferences } from '@/utils/main/db/preferences'
 import { logger } from './utils/main/logger/index'
 import { registerIpcChannels } from '@/utils/main/ipc' // Import for side effects
 
@@ -22,10 +22,17 @@ export let mainWindow: BrowserWindow
 export const oauthHandler = new OAuthHandler()
 export const oauthEventEmitter = new EventEmitter()
 
+export let isMainWindowMounted = false
+
 // Since in development mode, it is valid to have multiple processes open,
 // quit the app if it is supposed to be used for oauth purposes only
 if (isDevelopment && process.argv.findIndex((arg) => arg.startsWith('com.moosync')) !== -1) {
   app.quit()
+}
+
+if (!app.requestSingleInstanceLock()) {
+  if (!isDevelopment)
+    app.quit()
 }
 
 // Scheme must be registered before the app is ready
@@ -183,6 +190,7 @@ app.on('before-quit', function () {
   isQuitting = true
 })
 
+
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
@@ -211,9 +219,10 @@ app.on('ready', async () => {
   interceptHttp()
   createProtocol('com.moosync')
   nativeTheme.themeSource = 'dark'
-  await loadPreferences()
   mainWindow = await createWindow()
   extensionHost.mainWindowCreated()
+  handleFileOpen()
+
 
   setupScanTask()
 })
@@ -249,16 +258,13 @@ if (isDevelopment && process.platform === 'win32') {
   app.setAsDefaultProtocolClient('com.moosync')
 }
 
-if (!app.requestSingleInstanceLock()) {
-  if (!isDevelopment)
-    app.quit()
-}
-
 app.on('second-instance', (event, argv) => {
   if (process.platform !== 'darwin') {
     const arg = argv.find((arg) => arg.startsWith('com.moosync'))
     if (arg) {
       oauthHandler.handleEvents(arg)
+    } else {
+      handleFileOpen(argv)
     }
   }
 
@@ -284,5 +290,25 @@ function overrideConsole() {
     if (process.env.NODE_ENV !== 'production')
       preservedConsoleError.apply(console, args);
     logger.error(args.toString(), { label: 'Main' })
+  }
+}
+
+const pathQueue: string[] = []
+
+function sendPathToRenderer(paths: string[]) {
+  mainWindow && mainWindow.webContents.send(SongEvents.GOT_FILE_PATH, paths)
+}
+
+export function mainWindowHasMounted() {
+  isMainWindowMounted = true
+  sendPathToRenderer(pathQueue)
+}
+
+function handleFileOpen(argv: string[] = process.argv) {
+  const parsedArgv = argv.filter(val => !val.startsWith('-') && !val.startsWith('--')).slice((isDevelopment) ? 2 : 1)
+  if (isMainWindowMounted) {
+    sendPathToRenderer(parsedArgv)
+  } else {
+    pathQueue.push(...parsedArgv)
   }
 }

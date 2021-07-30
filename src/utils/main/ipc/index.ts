@@ -3,7 +3,7 @@ import { ArtistsChannel } from './artists'
 import { BrowserWindowChannel } from './window'
 import { ExtensionHostChannel } from './extensionHost'
 import { GenreChannel } from './genre'
-import { IpcEvents } from './constants'
+import { IpcEvents } from './constants';
 import { LoggerChannel } from './logger'
 import { PlaylistsChannel } from './playlists'
 import { PreferenceChannel } from './preferences'

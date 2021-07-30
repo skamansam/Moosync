@@ -179,7 +179,7 @@ export default class SearchPage extends mixins(RouterPushes, ContextMenuMixin) {
   private imgClickHandler(tab: string, item: any) {
     switch (tab) {
       case 'Songs':
-        this.playTop(item as Song)
+        this.playTop([item as Song])
         return
       case 'Albums':
         this.playAlbum(item as Album)
@@ -194,7 +194,7 @@ export default class SearchPage extends mixins(RouterPushes, ContextMenuMixin) {
         this.playPlaylist(item as Playlist)
         return
       case 'Youtube':
-        this.playTop(...toSong(item as YoutubeItem))
+        this.playTop(toSong(item as YoutubeItem))
     }
   }
 

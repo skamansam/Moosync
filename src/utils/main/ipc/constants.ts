@@ -51,7 +51,9 @@ export enum WindowEvents {
   MAX_PREF = 'maxPref',
   MIN_PREF = 'minPref',
   OPEN_URL_EXTERNAL = 'openUrlExternal',
-  LISTEN_OAUTH_EVENT = 'listenOauthEvent'
+  LISTEN_OAUTH_EVENT = 'listenOauthEvent',
+
+  MAIN_WINDOW_HAS_MOUNTED = 'mainWindowsHasMounted'
 }
 
 export enum AlbumEvents {
@@ -90,7 +92,8 @@ export enum SongEvents {
   SAVE_AUDIO_TO_FILE = 'saveAudioToFile',
   SAVE_IMAGE_TO_FILE = 'saveImageToFile',
   AUDIO_EXISTS = 'fileExists',
-  IMAGE_EXISTS = 'imageExists'
+  IMAGE_EXISTS = 'imageExists',
+  GOT_FILE_PATH = 'gotSongPath'
 }
 
 export enum LoggerEvents {

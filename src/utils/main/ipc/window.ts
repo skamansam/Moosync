@@ -2,6 +2,8 @@ import { BrowserWindow, dialog, shell } from 'electron'
 import { IpcEvents, WindowEvents } from './constants'
 import { createPreferenceWindow, mainWindow } from '@/background'
 
+import { mainWindowHasMounted } from '../../../background';
+
 export class BrowserWindowChannel implements IpcChannelInterface {
   name = IpcEvents.BROWSER_WINDOWS
   preferenceWindow: BrowserWindow | null = null
@@ -36,6 +38,9 @@ export class BrowserWindowChannel implements IpcChannelInterface {
         break
       case WindowEvents.OPEN_URL_EXTERNAL:
         this.openUrl(event, request)
+        break
+      case WindowEvents.MAIN_WINDOW_HAS_MOUNTED:
+        this.mainWindowMounted(event, request)
         break
     }
   }
@@ -126,5 +131,10 @@ export class BrowserWindowChannel implements IpcChannelInterface {
   private openUrl(event: Electron.IpcMainEvent, request: IpcRequest) {
     if (request.params.url)
       shell.openExternal(request.params.url).then(() => event.reply(request.responseChannel))
+  }
+
+  private mainWindowMounted(event: Electron.IpcMainEvent, request: IpcRequest) {
+    mainWindowHasMounted()
+    event.reply(request.responseChannel)
   }
 }

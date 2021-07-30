@@ -85,7 +85,8 @@ contextBridge.exposeInMainWorld('FileUtils', {
     ipcRendererHolder.send(IpcEvents.SONG, { type: SongEvents.AUDIO_EXISTS, params: { path: path } }),
   isImageExists: (path: string) =>
     ipcRendererHolder.send(IpcEvents.SONG, { type: SongEvents.IMAGE_EXISTS, params: { path: path } }),
-  savePlaylistCover: (b64: string) => ipcRendererHolder.send(IpcEvents.PLAYLIST, { type: PlaylistEvents.SAVE_COVER, params: { b64: b64 } })
+  savePlaylistCover: (b64: string) => ipcRendererHolder.send(IpcEvents.PLAYLIST, { type: PlaylistEvents.SAVE_COVER, params: { b64: b64 } }),
+  listenInitialFileOpenRequest: (callback: (paths: string[]) => void) => ipcRendererHolder.on(SongEvents.GOT_FILE_PATH, callback)
 })
 
 contextBridge.exposeInMainWorld('SearchUtils', {
@@ -113,7 +114,8 @@ contextBridge.exposeInMainWorld('WindowUtils', {
   toggleDevTools: () => ipcRendererHolder.send(IpcEvents.BROWSER_WINDOWS, { type: WindowEvents.TOGGLE_DEV_TOOLS }),
   openExternal: (url: string) => ipcRendererHolder.send(IpcEvents.BROWSER_WINDOWS, { type: WindowEvents.OPEN_URL_EXTERNAL, params: { url: url } }),
   registerOAuthCallback: (callback: (data: string) => void) => ipcRendererHolder.on(WindowEvents.LISTEN_OAUTH_EVENT, callback),
-  deregisterOAuthCallback: () => ipcRendererHolder.removeAllListener(WindowEvents.LISTEN_OAUTH_EVENT)
+  deregisterOAuthCallback: () => ipcRendererHolder.removeAllListener(WindowEvents.LISTEN_OAUTH_EVENT),
+  mainWindowHasMounted: () => ipcRendererHolder.send(IpcEvents.BROWSER_WINDOWS, { type: WindowEvents.MAIN_WINDOW_HAS_MOUNTED })
 })
 
 contextBridge.exposeInMainWorld('LoggerUtils', {

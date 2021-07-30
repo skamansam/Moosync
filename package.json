@@ -54,6 +54,7 @@
     "stun": "^2.1.0",
     "threads": "1.6.5",
     "toad-scheduler": "^1.4.0",
+    "tslib": "^2.3.0",
     "typescript": "4.3.2",
     "uuid": "^8.3.2",
     "vm2": "https://github.com/patriksimek/vm2",
@@ -104,7 +105,7 @@
     "@nodert-win10-20h1/windows.media.transcoding": "^0.1.0"
   },
   "resolutions": {
-    "electron-builder": "22.11.4"
+    "electron-builder": "22.11.7"
   },
   "eslintConfig": {
     "root": true,

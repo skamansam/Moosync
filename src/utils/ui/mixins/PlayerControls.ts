@@ -23,12 +23,13 @@ export default class PlayerControls extends Vue {
     else vxm.player.prevSong().catch((err) => console.error(err))
   }
 
-  public queueSong(...songs: Song[]) {
-    if (this.isSyncing) vxm.sync.addToLocalQueue(songs).catch((err) => console.error(err))
-    else vxm.player.pushInQueue(songs).catch((err) => console.error(err))
+  public async queueSong(songs: Song[]) {
+    if (this.isSyncing) await vxm.sync.addToLocalQueue(songs).catch((err) => console.error(err))
+    else await vxm.player.pushInQueue(songs).catch((err) => console.error(err))
   }
 
-  public async playTop(...songs: Song[]) {
+  public async playTop(songs: Song[]) {
+
     if (this.isSyncing) await vxm.sync.addToLocalQueue(songs)
     else {
       await vxm.player.pushInQueueTop(songs)

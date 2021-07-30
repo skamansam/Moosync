@@ -21,6 +21,8 @@ import AddPlaylistModal from '@/mainWindow/components/generic/AddPlaylistModal.v
 
 import { vxm } from './store'
 import { bus } from './main'
+import PlayerControls from '@/utils/ui/mixins/PlayerControls'
+import { v1 } from 'uuid'
 
 const stun = require('stun')
 
@@ -32,7 +34,7 @@ const stun = require('stun')
     AddPlaylistModal
   }
 })
-export default class App extends mixins(ThemeHandler) {
+export default class App extends mixins(ThemeHandler, PlayerControls) {
   created() {
     this.registerLogger()
     this.registerNotifier()
@@ -41,6 +43,7 @@ export default class App extends mixins(ThemeHandler) {
   }
 
   mounted() {
+    this.registerFileOpenRequests()
     this.watchPlaylistUpdates()
     this.populatePlaylists()
     this.registerDevTools()
@@ -109,6 +112,49 @@ export default class App extends mixins(ThemeHandler) {
     window.NotifierUtils.registerMainProcessNotifier((obj) => {
       vxm.notifier.emit(obj)
     })
+  }
+
+  private getFileName(path: string) {
+    let li = Math.max(path.lastIndexOf('/'), path.lastIndexOf('\\'))
+    return path.substring(li + 1)
+  }
+
+  private getDuration(src: string): Promise<number> {
+    return new Promise(function (resolve) {
+      var audio = new Audio()
+      audio.addEventListener('loadedmetadata', function () {
+        resolve(audio.duration)
+      })
+      audio.src = 'media://' + src
+    })
+  }
+
+  private async getSongFromPath(path: string): Promise<Song> {
+    const duration = await this.getDuration(path)
+    return {
+      _id: v1(),
+      title: this.getFileName(path),
+      duration: duration,
+      artists: [],
+      path: path,
+      type: 'LOCAL'
+    }
+  }
+
+  private registerFileOpenRequests() {
+    window.FileUtils.listenInitialFileOpenRequest(async (paths) => {
+      if (paths.length > 0) {
+        for (let [index, path] of paths.entries()) {
+          const song = await this.getSongFromPath(path)
+          if (index === 0) {
+            await this.playTop([song])
+          } else {
+            await this.queueSong([song])
+          }
+        }
+      }
+    })
+    window.WindowUtils.mainWindowHasMounted()
   }
 
   private listenExtensionRequests() {

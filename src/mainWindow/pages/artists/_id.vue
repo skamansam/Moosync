@@ -77,11 +77,11 @@ export default class SingleArtistView extends mixins(ContextMenuMixin) {
   }
 
   private playArtist() {
-    this.playTop(...this.songList)
+    this.playTop(this.songList)
   }
 
   private addArtistToQueue() {
-    this.queueSong(...this.songList)
+    this.queueSong(this.songList)
   }
 }
 </script>

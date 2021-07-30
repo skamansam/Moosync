@@ -18,8 +18,15 @@
                 <div class="song-title text-truncate">{{ currentSong.title }}</div>
               </div>
               <div class="song-subtitle text-truncate">
-                {{ currentSong.artists.join(', ') }}
-                {{ currentSong.artists.length > 0 && currentSong.album && currentSong.album.album_name ? ' - ' : '' }}
+                {{ currentSong.artists && currentSong.artists.join(', ') }}
+                {{
+                  currentSong.artists &&
+                  currentSong.artists.length > 0 &&
+                  currentSong.album &&
+                  currentSong.album.album_name
+                    ? ' - '
+                    : ''
+                }}
                 {{ currentSong.album && currentSong.album.album_name }}
               </div>
               <div class="song-timestamp">{{ formattedDuration(currentSong.duration) }}</div>

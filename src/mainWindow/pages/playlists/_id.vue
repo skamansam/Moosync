@@ -106,11 +106,11 @@ export default class SinglePlaylistView extends mixins(ContextMenuMixin) {
   }
 
   private playPlaylist() {
-    this.playTop(...this.songList)
+    this.playTop(this.songList)
   }
 
   private addPlaylistToQueue() {
-    this.queueSong(...this.songList)
+    this.queueSong(this.songList)
   }
 
   private addPlaylistToLibrary() {

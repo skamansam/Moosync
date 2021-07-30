@@ -19,7 +19,6 @@ expose({
 
   fetchArtworks(artists: artists[], basePath: string) {
     return new Observable((observer) => {
-      console.log(artists)
       fetchArtworks(artists, basePath, observer)
     })
   },

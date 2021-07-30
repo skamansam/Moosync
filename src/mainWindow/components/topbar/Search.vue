@@ -72,7 +72,7 @@ export default class Sidebar extends mixins(Colors, PlayerControls) {
   }
 
   private handleClick(index: any) {
-    this.playTop(this.results!.songs![index])
+    this.playTop([this.results!.songs![index]])
   }
 
   private openSearchPage() {

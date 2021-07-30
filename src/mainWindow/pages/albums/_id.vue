@@ -89,11 +89,11 @@ export default class SingleAlbumView extends mixins(ContextMenuMixin, PlayerCont
   }
 
   private playAlbum() {
-    this.playTop(...this.songList)
+    this.playTop(this.songList)
   }
 
   private addAlbumToQueue() {
-    this.queueSong(...this.songList)
+    this.queueSong(this.songList)
   }
 }
 </script>

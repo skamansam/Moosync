@@ -26,7 +26,6 @@ export async function saveSelectivePreference(key: string, value: any, isExtensi
 }
 
 export async function loadSelectivePreference(key?: string, isExtension?: boolean, defaultValue?: any) {
-  console.log(key)
   return store.get(`prefs.${isExtension ? 'extension.' : ''}${key}`, defaultValue)
 }
 

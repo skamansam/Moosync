@@ -36,8 +36,8 @@
         </div>
 
         <div class="text-left song-subtitle text-truncate">
-          {{ song.artists.join(', ') }}
-          {{ song.artists.length > 0 && song.album && song.album.album_name ? ' - ' : '' }}
+          {{ song.artists && song.artists.join(', ') }}
+          {{ song.artists && song.artists.length > 0 && song.album && song.album.album_name ? ' - ' : '' }}
           {{ song.album && song.album.album_name }}
         </div>
       </b-col>

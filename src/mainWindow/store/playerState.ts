@@ -131,7 +131,6 @@ export class PlayerStore extends VuexModule.With({ namespaced: 'player' }) {
 
       item.splice(0, 1)
 
-
       this.addSong(item)
       this.addInQueueTop(item)
     }

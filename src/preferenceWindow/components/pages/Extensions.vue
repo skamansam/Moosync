@@ -168,7 +168,6 @@ export default class Extensions extends Vue {
   }
 
   private onExtensionChanged() {
-    console.log('fewtching')
     return this.fetchExtensions()
   }
 }
