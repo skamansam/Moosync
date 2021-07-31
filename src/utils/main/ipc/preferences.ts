@@ -1,5 +1,5 @@
 import { IpcEvents, PreferenceEvents } from './constants'
-import { loadPreferences, loadSelectivePreference, savePreferences, saveSelectivePreference } from '../db/preferences'
+import { loadPreferences, loadSelectivePreference, onPreferenceChanged, savePreferences, saveSelectivePreference } from '../db/preferences'
 
 import { mainWindow } from '@/background'
 
@@ -18,6 +18,10 @@ export class PreferenceChannel implements IpcChannelInterface {
         break
       case PreferenceEvents.LOAD_SELECTIVE_PREFERENCES:
         this.loadSelective(event, request)
+        break
+      case PreferenceEvents.PREFERENCE_REFRESH:
+        this.onPreferenceChanged(event, request)
+        break
     }
   }
 
@@ -43,6 +47,13 @@ export class PreferenceChannel implements IpcChannelInterface {
     if (request.params.key) {
       loadSelectivePreference(request.params.key, request.params.isExtension).then((data) => event.reply(request.responseChannel, data))
     }
+  }
+
+  private onPreferenceChanged(event: Electron.IpcMainEvent, request: IpcRequest) {
+    if (request.params.key) {
+      onPreferenceChanged(request.params.key, request.params.value)
+    }
+    event.reply(request.responseChannel)
   }
 }
 

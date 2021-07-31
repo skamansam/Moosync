@@ -14,6 +14,7 @@ import { createProtocol } from 'vue-cli-plugin-electron-builder/lib'
 import { extensionHost } from '@/utils/extensions/index'
 import { logger } from './utils/main/logger/index'
 import { registerIpcChannels } from '@/utils/main/ipc' // Import for side effects
+import { setInitialInterfaceSettings } from './utils/main/db/preferences'
 
 overrideConsole()
 
@@ -23,6 +24,7 @@ export const oauthHandler = new OAuthHandler()
 export const oauthEventEmitter = new EventEmitter()
 
 export let isMainWindowMounted = false
+let minimizeToTray = true
 
 // Since in development mode, it is valid to have multiple processes open,
 // quit the app if it is supposed to be used for oauth purposes only
@@ -52,7 +54,6 @@ function interceptHttp() {
     let headers: { [key: string]: string | string[] } = { ...details.responseHeaders }
 
     if (details.url.startsWith('https://i.ytimg.com')) {
-      console.log('adding header')
       headers = {
         'Access-Control-Allow-Origin': '*'
       }
@@ -173,11 +174,13 @@ async function createWindow() {
   }
   win.removeMenu()
 
-  win.on('close', function (event) {
-    if (!isQuitting) {
+  win.on('close', (event) => {
+    if (!isQuitting && minimizeToTray) {
       event.preventDefault()
       mainWindow.hide()
       initializeTray()
+    } else {
+      app.quit()
     }
   })
 
@@ -202,7 +205,7 @@ app.on('activate', () => {
   if (BrowserWindow.getAllWindows().length === 0) createWindow()
 })
 
-app.on('before-quit', function () {
+app.on('before-quit', () => {
   isQuitting = true
 })
 
@@ -212,6 +215,7 @@ app.on('before-quit', function () {
 // Some APIs can only be used after this event occurs.
 app.on('ready', async () => {
   registerIpcChannels()
+  setInitialInterfaceSettings()
 
   if (isDevelopment && !process.env.IS_TEST) {
     // Install Vue Devtools
@@ -327,4 +331,8 @@ function handleFileOpen(argv: string[] = process.argv) {
   } else {
     pathQueue.push(...parsedArgv)
   }
+}
+
+export function setMinimizeToTray(enabled: boolean) {
+  minimizeToTray = enabled
 }

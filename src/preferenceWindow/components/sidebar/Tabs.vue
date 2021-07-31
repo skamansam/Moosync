@@ -54,7 +54,7 @@ import { mixins } from 'vue-class-component'
 export default class Sidebar extends mixins(Colors) {
   private componentNames = [
     { component: 'AllSongs', title: 'Paths', link: '/paths' },
-    { component: 'Playlists', title: 'Cache', link: '/cache' },
+    { component: 'Playlists', title: 'Extensions', link: '/extensions' },
     { component: 'Albums', title: 'Interface', link: '/interface' },
     { component: 'Artists', title: 'System', link: '/system' }
   ]

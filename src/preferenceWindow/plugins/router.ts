@@ -1,4 +1,5 @@
 import Extensions from '@/preferenceWindow/components/pages/Extensions.vue'
+import Interface from '../components/pages/Interface.vue';
 import Paths from '@/preferenceWindow/components/pages/Paths.vue'
 import Router from 'vue-router'
 import Vue from 'vue'
@@ -16,14 +17,14 @@ const routes = [
     component: Paths,
   },
   {
-    name: 'cache',
-    path: '/cache',
+    name: 'extensions',
+    path: '/extensions',
     component: Extensions,
   },
   {
     name: 'interface',
     path: '/interface',
-    component: Paths,
+    component: Interface,
   },
   {
     name: 'system',

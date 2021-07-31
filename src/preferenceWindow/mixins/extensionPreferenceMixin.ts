@@ -23,7 +23,13 @@ export class ExtensionPreferenceMixin extends Vue {
   mounted() {
     if (this.prefKey) {
       this.loading = true
-      window.PreferenceUtils.loadSelective(this.prefKey, this.isExtension).then((val) => (this.value = val ?? this.defaultValue)).then(() => this.loading = false).then(() => console.log(this.value))
+      window.PreferenceUtils.loadSelective(this.prefKey, this.isExtension).then((val) => {
+        if (typeof val === 'object' && typeof this.defaultValue === 'object') {
+          this.value = Object.assign(this.defaultValue, val)
+        } else {
+          this.value = val ?? this.defaultValue
+        }
+      }).then(() => this.loading = false)
     }
   }
 
@@ -31,5 +37,6 @@ export class ExtensionPreferenceMixin extends Vue {
     this.prefKey && window.PreferenceUtils.saveSelective(this.prefKey, this.value, this.isExtension)
 
     if (this.isExtension) window.ExtensionUtils.sendEvent({ data: { key: this.prefKey, value: this.value }, type: 'onPreferenceChanged', packageName: this.packageName } as extensionEventMessage)
+    else this.prefKey && window.PreferenceUtils.notifyPreferenceChanged(this.prefKey, this.value)
   }
 }

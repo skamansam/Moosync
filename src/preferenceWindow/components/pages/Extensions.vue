@@ -19,18 +19,6 @@
               <a class="nav-link active ext-tab text-truncate" aria-controls="__BVID__41">{{ ext.name }}</a>
             </li>
           </ul>
-          <!-- <b-tabs class="w-100">
-            <b-tab
-              v-for="(ext, index) of currentTabs"
-              :key="ext.packageName"
-              :title="ext.name"
-              no-body
-              :title-link-attributes="{ style: 'max-width: min(140px, calc(100% / 5))' }"
-              :title-link-class="`ext-tab text-truncate ${isActive(ext.packageName) ? 'manual-active' : ''}`"
-              class="ext-tab"
-              @click="activeTab = index"
-            ></b-tab> -->
-          <!-- </b-tabs> -->
         </b-col>
         <b-col cols="auto" align-self="center" class="d-flex ml-4" v-if="maxPage > 1">
           <PrevIcon class="mr-3" @click.native="prevPage"></PrevIcon>

@@ -49,6 +49,7 @@ interface preferenceUtils {
   save: (preference: Preferences) => Promise<void>
   saveSelective: (key: string, value: any, isExtension?: boolean) => Promise<void>
   loadSelective: (key: string, isExtension?: boolean) => Promise<Object>
+  notifyPreferenceChanged: (key: string, value: any) => Promise<void>
 }
 
 interface store {
