@@ -1,19 +1,19 @@
 'use strict'
 
-import 'threads/register'
+import 'threads/register';
 
-import { BrowserWindow, app, nativeTheme, protocol, session } from 'electron'
+import { BrowserWindow, app, nativeTheme, protocol, session } from 'electron';
 import { WindowHandler, setIsQuitting } from './utils/main/windowManager';
-import path, { resolve } from 'path'
+import path, { resolve } from 'path';
 
-import EventEmitter from 'events'
-import { OAuthHandler } from '@/utils/main/oauth/handler'
-import { createProtocol } from 'vue-cli-plugin-electron-builder/lib'
-import { extensionHost } from '@/utils/extensions/index'
-import { logger } from './utils/main/logger/index'
-import { registerIpcChannels } from '@/utils/main/ipc' // Import for side effects
-import { setInitialInterfaceSettings } from './utils/main/db/preferences'
-import { setupScanTask } from '@/utils/main/scheduler/index'
+import EventEmitter from 'events';
+import { OAuthHandler } from '@/utils/main/oauth/handler';
+import { createProtocol } from 'vue-cli-plugin-electron-builder/lib';
+import { extensionHost } from '@/utils/extensions/index';
+import { logger } from './utils/main/logger/index';
+import { registerIpcChannels } from '@/utils/main/ipc'; // Import for side effects
+import { setInitialInterfaceSettings } from './utils/main/db/preferences';
+import { setupScanTask } from '@/utils/main/scheduler/index';
 
 overrideConsole()
 

@@ -1,4 +1,4 @@
-import { WindowEvents } from "@/utils/main/ipc/constants"
+import { WindowEvents } from "@/utils/main/ipc/constants";
 import { WindowHandler } from '../windowManager';
 
 export class OAuthHandler {

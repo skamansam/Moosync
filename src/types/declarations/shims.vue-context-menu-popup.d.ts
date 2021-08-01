@@ -1,6 +1,6 @@
 declare module 'vue-context-menu-popup' {
-  import { DefaultData, DefaultMethods } from 'vue/types/options'
   import { Component } from 'vue'
+  import { DefaultData, DefaultMethods } from 'vue/types/options'
 
   export interface MenuItem {
     label: string

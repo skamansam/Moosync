@@ -1,8 +1,8 @@
-import Store from 'electron-store'
-import { app } from 'electron'
+import Store from 'electron-store';
+import { app } from 'electron';
 import { enableStartup } from '../autoLaunch';
-import path from 'path'
-import { preferencesChanged } from '@/utils/main/ipc/preferences'
+import path from 'path';
+import { preferencesChanged } from '@/utils/main/ipc/preferences';
 import { scannerChannel } from '../ipc';
 import { setMinimizeToTray } from '@/utils/main/windowManager';
 

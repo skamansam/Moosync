@@ -1,5 +1,5 @@
-import { IpcEvents, PreferenceEvents } from './constants'
-import { loadPreferences, loadSelectivePreference, onPreferenceChanged, savePreferences, saveSelectivePreference } from '../db/preferences'
+import { IpcEvents, PreferenceEvents } from './constants';
+import { loadPreferences, loadSelectivePreference, onPreferenceChanged, savePreferences, saveSelectivePreference } from '../db/preferences';
 
 import { WindowHandler } from '../windowManager';
 

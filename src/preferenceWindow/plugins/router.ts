@@ -1,8 +1,8 @@
-import Extensions from '@/preferenceWindow/components/pages/Extensions.vue'
+import Extensions from '@/preferenceWindow/components/pages/Extensions.vue';
 import Interface from '../components/pages/Interface.vue';
-import Paths from '@/preferenceWindow/components/pages/Paths.vue'
-import Router from 'vue-router'
-import Vue from 'vue'
+import Paths from '@/preferenceWindow/components/pages/Paths.vue';
+import Router from 'vue-router';
+import Vue from 'vue';
 
 Vue.use(Router)
 

@@ -1,5 +1,5 @@
 import { extensionAPI } from "@moosync/moosync-types";
-import { extensionRequests } from "../constants"
+import { extensionRequests } from "../constants";
 import { v4 } from 'uuid';
 
 export class ExtensionRequestGenerator implements extensionAPI {

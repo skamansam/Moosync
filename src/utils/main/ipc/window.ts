@@ -1,9 +1,9 @@
-import { BrowserWindow, dialog, shell } from 'electron'
-import { IpcEvents, WindowEvents } from './constants'
+import { IpcEvents, WindowEvents } from './constants';
 
 import { WindowHandler } from '../windowManager';
 import { _windowHandler } from './../../../background';
 import { mainWindowHasMounted } from '../../../background';
+import { shell } from 'electron';
 
 export class BrowserWindowChannel implements IpcChannelInterface {
   name = IpcEvents.BROWSER_WINDOWS

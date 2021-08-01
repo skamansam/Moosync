@@ -1,9 +1,8 @@
 import { BrowserWindow, Menu, Tray, app, dialog, protocol } from 'electron';
+import installExtension, { VUEJS_DEVTOOLS } from 'electron-devtools-installer';
 
 import { BrowserWindowConstructorOptions } from 'electron/main';
 import { SongEvents } from './ipc/constants';
-import { VUEJS_DEVTOOLS } from 'electron-devtools-installer';
-import installExtension from 'electron-devtools-installer';
 import path from 'path';
 
 export class WindowHandler {
