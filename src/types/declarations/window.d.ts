@@ -61,20 +61,17 @@ interface store {
 }
 
 interface windowUtils {
-  openPreferenceWindow: () => Promise<void>
-  closePreferenceWindow: () => Promise<void>
-  minPreferenceWindow: () => Promise<void>
-  maxPreferenceWindow: () => Promise<boolean>
-  closeMainWindow: () => Promise<void>
-  minMainWindow: () => Promise<void>
-  maxMainWindow: () => Promise<boolean>
+  openWindow: (isMainWindow: boolean) => Promise<void>
+  closeWindow: (isMainWindow: boolean) => Promise<void>
+  minWindow: (isMainWindow: boolean) => Promise<void>
+  maxWindow: (isMainWindow: boolean) => Promise<boolean>
   openFileBrowser: (file: boolean, filters?: Electron.FileFilter[]) => Promise<Electron.OpenDialogReturnValue>
-  toggleDevTools: () => Promise<void>
-  setMainWindowResizeListener: (callback: () => void) => void
+  toggleDevTools: (isMainWindow: boolean) => Promise<void>
   openExternal: (url: string) => Promise<void>
   registerOAuthCallback: (callback: (data: string) => void) => void
   deregisterOAuthCallback: () => void
   mainWindowHasMounted: () => Promise<void>
+  isWindowMaximized: (isMainWindow: boolean) => Promise<boolean>
 }
 
 interface loggerUtils {

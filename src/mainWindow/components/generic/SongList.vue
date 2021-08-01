@@ -294,7 +294,7 @@ export default class SongList extends mixins(Colors) {
   padding-bottom: 14px
   background-clip: content-box
 .recycler-row
-  height: calc(100% - 64px)
+  height: calc(100% - 70px)
 
 .field-content
   height: 64px

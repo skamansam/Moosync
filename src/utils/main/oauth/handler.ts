@@ -1,9 +1,9 @@
 import { WindowEvents } from "@/utils/main/ipc/constants"
-import { mainWindow } from '@/background'
+import { WindowHandler } from '../windowManager';
 
 export class OAuthHandler {
   public handleEvents(data: string) {
-    mainWindow.webContents.send(WindowEvents.LISTEN_OAUTH_EVENT, data)
-    mainWindow.focus()
+    WindowHandler.getWindow()?.webContents.send(WindowEvents.LISTEN_OAUTH_EVENT, data)
+    WindowHandler.getWindow()?.focus()
   }
 }

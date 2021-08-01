@@ -5,10 +5,10 @@ import { loadSelectivePreference, saveSelectivePreference } from '../main/db/pre
 
 import { ExtensionHostEvents } from '@/utils/main/ipc/constants';
 import { SongDB } from '@/utils/main/db/index';
+import { WindowHandler } from '../main/windowManager';
 import { async } from 'node-stream-zip';
 import { promises as fsP } from 'fs';
 import { getVersion } from '@/utils/common';
-import { mainWindow } from '@/background';
 import path from 'path';
 import { v4 } from 'uuid';
 
@@ -135,7 +135,7 @@ class ExtensionRequestHandler {
       })
 
       // Defer call till mainWindow is created
-      if (mainWindow)
+      if (WindowHandler.getWindow(true))
         this.sendToMainWindow(message)
       else {
         this.mainWindowCallsQueue.push({ func: this.sendToMainWindow, args: [message] })
@@ -144,7 +144,7 @@ class ExtensionRequestHandler {
   }
 
   private sendToMainWindow(message: extensionRequestMessage) {
-    mainWindow.webContents.send(ExtensionHostEvents.EXTENSION_REQUESTS, message)
+    WindowHandler.getWindow(true)?.webContents.send(ExtensionHostEvents.EXTENSION_REQUESTS, message)
   }
 
   private getPreferenceKey(packageName: string, key?: string) {

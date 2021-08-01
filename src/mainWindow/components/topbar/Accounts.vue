@@ -128,7 +128,7 @@ export default class TopBar extends mixins(Colors) {
   }
 
   private openSettings() {
-    window.WindowUtils.openPreferenceWindow()
+    window.WindowUtils.openWindow(false)
   }
 }
 </script>

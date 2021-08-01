@@ -5,7 +5,10 @@
     }
   ],
   "settings": {
-    "eslint.validate": ["javascript", "vue"],
+    "eslint.validate": [
+      "javascript",
+      "vue"
+    ],
     "prettier.configPath": ".prettierrc.json",
     "editor.tabSize": 2,
     "cSpell.words": [
@@ -32,6 +35,8 @@
       "inode",
       "keytar",
       "localforage",
+      "maximizable",
+      "minimizable",
       "minisong",
       "mixins",
       "musicmetadata",

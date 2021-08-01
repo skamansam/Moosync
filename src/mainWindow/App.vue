@@ -54,7 +54,7 @@ export default class App extends mixins(ThemeHandler, PlayerControls) {
   private registerDevTools() {
     document.addEventListener('keydown', function (e) {
       if (e.code === 'F12') {
-        window.WindowUtils.toggleDevTools()
+        window.WindowUtils.toggleDevTools(true)
       } else if (e.code === 'F5') {
         location.reload()
       }

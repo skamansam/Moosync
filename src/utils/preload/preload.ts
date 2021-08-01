@@ -100,19 +100,13 @@ contextBridge.exposeInMainWorld('SearchUtils', {
 })
 
 contextBridge.exposeInMainWorld('WindowUtils', {
-  openPreferenceWindow: () => ipcRendererHolder.send(IpcEvents.BROWSER_WINDOWS, { type: WindowEvents.OPEN_PREF }),
-  closePreferenceWindow: () => ipcRendererHolder.send(IpcEvents.BROWSER_WINDOWS, { type: WindowEvents.CLOSE_PREF }),
-  minPreferenceWindow: () => ipcRendererHolder.send(IpcEvents.BROWSER_WINDOWS, { type: WindowEvents.MIN_PREF }),
-  maxPreferenceWindow: () => ipcRendererHolder.send(IpcEvents.BROWSER_WINDOWS, { type: WindowEvents.MAX_PREF }),
-  setMainWindowResizeListener: (callback: () => void) => {
-    ipcRendererHolder.on(WindowEvents.MAX_MAIN, callback)
-    ipcRendererHolder.on(WindowEvents.MIN_MAIN, callback)
-  },
-  closeMainWindow: () => ipcRendererHolder.send(IpcEvents.BROWSER_WINDOWS, { type: WindowEvents.CLOSE_MAIN }),
-  minMainWindow: () => ipcRendererHolder.send(IpcEvents.BROWSER_WINDOWS, { type: WindowEvents.MIN_MAIN }),
-  maxMainWindow: () => ipcRendererHolder.send(IpcEvents.BROWSER_WINDOWS, { type: WindowEvents.MAX_MAIN }),
+  openWindow: (isMainWindow: boolean) => ipcRendererHolder.send(IpcEvents.BROWSER_WINDOWS, { type: WindowEvents.OPEN_WIN, params: { isMainWindow } }),
+  closeWindow: (isMainWindow: boolean) => ipcRendererHolder.send(IpcEvents.BROWSER_WINDOWS, { type: WindowEvents.CLOSE_WIN, params: { isMainWindow } }),
+  minWindow: (isMainWindow: boolean) => ipcRendererHolder.send(IpcEvents.BROWSER_WINDOWS, { type: WindowEvents.MIN_WIN, params: { isMainWindow } }),
+  maxWindow: (isMainWindow: boolean) => ipcRendererHolder.send(IpcEvents.BROWSER_WINDOWS, { type: WindowEvents.MAX_WIN, params: { isMainWindow } }),
+  isWindowMaximized: (isMainWindow: boolean) => ipcRendererHolder.send(IpcEvents.BROWSER_WINDOWS, { type: WindowEvents.IS_MAXIMIZED, params: { isMainWindow } }),
   openFileBrowser: (file: boolean, filters?: Electron.FileFilter[]) => ipcRendererHolder.send(IpcEvents.BROWSER_WINDOWS, { type: WindowEvents.OPEN_FILE_BROWSER, params: { file, filters } }),
-  toggleDevTools: () => ipcRendererHolder.send(IpcEvents.BROWSER_WINDOWS, { type: WindowEvents.TOGGLE_DEV_TOOLS }),
+  toggleDevTools: (isMainWindow: boolean) => ipcRendererHolder.send(IpcEvents.BROWSER_WINDOWS, { type: WindowEvents.TOGGLE_DEV_TOOLS, params: { isMainWindow } }),
   openExternal: (url: string) => ipcRendererHolder.send(IpcEvents.BROWSER_WINDOWS, { type: WindowEvents.OPEN_URL_EXTERNAL, params: { url: url } }),
   registerOAuthCallback: (callback: (data: string) => void) => ipcRendererHolder.on(WindowEvents.LISTEN_OAUTH_EVENT, callback),
   deregisterOAuthCallback: () => ipcRendererHolder.removeAllListener(WindowEvents.LISTEN_OAUTH_EVENT),

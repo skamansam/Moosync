@@ -46,14 +46,16 @@ export enum WindowEvents {
   MAX_MAIN = 'maxMain',
   MIN_MAIN = 'minMain',
 
-  OPEN_PREF = 'openPref',
-  CLOSE_PREF = 'closePref',
-  MAX_PREF = 'maxPref',
-  MIN_PREF = 'minPref',
+  OPEN_WIN = 'openPref',
+  CLOSE_WIN = 'closePref',
+  MAX_WIN = 'maxPref',
+  MIN_WIN = 'minPref',
   OPEN_URL_EXTERNAL = 'openUrlExternal',
   LISTEN_OAUTH_EVENT = 'listenOauthEvent',
 
-  MAIN_WINDOW_HAS_MOUNTED = 'mainWindowsHasMounted'
+  MAIN_WINDOW_HAS_MOUNTED = 'mainWindowsHasMounted',
+
+  IS_MAXIMIZED = 'isMaximized'
 }
 
 export enum AlbumEvents {

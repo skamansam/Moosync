@@ -2,32 +2,32 @@
 
 import 'threads/register'
 
-import { BrowserWindow, Menu, Tray, app, nativeTheme, protocol, session } from 'electron'
-import installExtension, { VUEJS_DEVTOOLS } from 'electron-devtools-installer'
+import { BrowserWindow, app, nativeTheme, protocol, session } from 'electron'
+import { WindowHandler, setIsQuitting } from './utils/main/windowManager';
 import path, { resolve } from 'path'
-import { scheduler, setupScanTask } from '@/utils/main/scheduler/index'
 
 import EventEmitter from 'events'
 import { OAuthHandler } from '@/utils/main/oauth/handler'
-import { SongEvents } from './utils/main/ipc/constants';
 import { createProtocol } from 'vue-cli-plugin-electron-builder/lib'
 import { extensionHost } from '@/utils/extensions/index'
 import { logger } from './utils/main/logger/index'
 import { registerIpcChannels } from '@/utils/main/ipc' // Import for side effects
 import { setInitialInterfaceSettings } from './utils/main/db/preferences'
+import { setupScanTask } from '@/utils/main/scheduler/index'
 
 overrideConsole()
 
 const isDevelopment = process.env.NODE_ENV !== 'production'
-export let mainWindow: BrowserWindow
 export const oauthHandler = new OAuthHandler()
 export const oauthEventEmitter = new EventEmitter()
+export const _windowHandler = new WindowHandler()
 
-export let isMainWindowMounted = false
-let minimizeToTray = true
+nativeTheme.themeSource = 'dark'
+
 
 // Since in development mode, it is valid to have multiple processes open,
-// quit the app if it is supposed to be used for oauth purposes only
+// Quit the app if it is supposed to be launched for oauth
+// The argv/s will be passed to the original instance
 if (isDevelopment && process.argv.findIndex((arg) => arg.startsWith('com.moosync')) !== -1) {
   app.quit()
 }
@@ -41,15 +41,10 @@ if (!app.requestSingleInstanceLock()) {
 protocol.registerSchemesAsPrivileged([{ scheme: 'com.moosync', privileges: { secure: true, standard: true } }])
 protocol.registerSchemesAsPrivileged([{ scheme: 'media', privileges: { corsEnabled: true, supportFetchAPI: true } }])
 
-let isQuitting = false
-let tray: Tray
-
 function interceptHttp() {
-  // Since youtube embeds are blocked on custom protocols like file:// or app://
-  // We'll load the app on http://localhost
-  // Which will then be intercepted here and normal files will be delivered
-  // Essentially spoofing window.location.origin to become http://localhost
-
+  // Youtube images don't have a CORS header set [Access-Control-Allow-Origin]
+  // So to display them and export them, we spoof the request here
+  // This should pose any security risk as such since we're only doing it for youtube trusted urls
   session.defaultSession.webRequest.onHeadersReceived((details, callback) => {
     let headers: { [key: string]: string | string[] } = { ...details.responseHeaders }
 
@@ -64,6 +59,10 @@ function interceptHttp() {
     })
   })
 
+  // Since youtube embeds are blocked on custom protocols like file:// or app://
+  // We'll load the app on http://localhost
+  // Which will then be intercepted here and normal files will be delivered
+  // Essentially spoofing window.location.origin to become http://localhost
   if (!process.env.WEBPACK_DEV_SERVER_URL) {
     session.defaultSession.protocol.interceptFileProtocol('http', (request, callback) => {
       let pathName = new URL(request.url).pathname
@@ -85,111 +84,6 @@ function interceptHttp() {
   }
 }
 
-export async function createPreferenceWindow() {
-  const win = new BrowserWindow({
-    width: 840,
-    height: 653,
-    minHeight: 653,
-    minWidth: 840,
-    backgroundColor: '#212121',
-    show: true,
-    frame: false,
-    webPreferences: {
-      contextIsolation: true,
-      // Use pluginOptions.nodeIntegration, leave this alone
-      // See nklayman.github.io/vue-cli-plugin-electron-builder/guide/security.html#node-integration for more info
-      nodeIntegration: (process.env.ELECTRON_NODE_INTEGRATION as unknown) as boolean,
-      preload: path.join(__dirname, 'preload.js'),
-    },
-  })
-
-  if (process.env.WEBPACK_DEV_SERVER_URL) {
-    // Load the url of the dev server if in development mode
-    await win.loadURL((process.env.WEBPACK_DEV_SERVER_URL + 'preferenceWindow') as string)
-    if (!process.env.IS_TEST) win.webContents.openDevTools()
-  } else {
-    // Load the index.html when not in development
-    win.loadURL('com.moosync://./preferenceWindow.html')
-  }
-  win.removeMenu()
-  return win
-}
-
-function initializeTray() {
-  tray = new Tray(path.join(__static, 'logo.png'))
-  tray.setContextMenu(
-    Menu.buildFromTemplate([
-      {
-        label: 'Show App',
-        click: function () {
-          tray.destroy()
-          isQuitting = false
-          mainWindow.show()
-        },
-      },
-      {
-        label: 'Quit',
-        click: function () {
-          isQuitting = true
-          scheduler.stop()
-          app.exit()
-        },
-      },
-    ])
-  )
-
-  tray.on('double-click', () => {
-    mainWindow.show()
-    tray.destroy()
-  })
-}
-
-async function createWindow() {
-  // Create the browser window.
-  const win = new BrowserWindow({
-    width: 1016,
-    height: 653,
-    minHeight: 653,
-    minWidth: 1016,
-    backgroundColor: '#212121',
-    titleBarStyle: 'hidden',
-    frame: false,
-    webPreferences: {
-      contextIsolation: true,
-      nodeIntegrationInWorker: true,
-      // Use pluginOptions.nodeIntegration, leave this alone
-      // See nklayman.github.io/vue-cli-plugin-electron-builder/guide/security.html#node-integration for more info
-      nodeIntegration: (process.env.ELECTRON_NODE_INTEGRATION as unknown) as boolean,
-      preload: path.join(__dirname, 'preload.js'),
-    },
-  })
-
-  if (process.env.WEBPACK_DEV_SERVER_URL) {
-    // Load the url of the dev server if in development mode
-    await win.loadURL(process.env.WEBPACK_DEV_SERVER_URL as string)
-    if (!process.env.IS_TEST) win.webContents.openDevTools()
-  } else {
-    // Load the index.html when not in development
-    win.loadURL('http://localhost/./index.html')
-  }
-  win.removeMenu()
-
-  win.on('close', (event) => {
-    if (!isQuitting && minimizeToTray) {
-      event.preventDefault()
-      mainWindow.hide()
-      initializeTray()
-    } else {
-      app.quit()
-    }
-  })
-
-  win.on('show', () => {
-    win.focus()
-  })
-  return win
-}
-
 // Quit when all windows are closed.
 app.on('window-all-closed', () => {
   // On macOS it is common for applications and their menu bar
@@ -202,11 +96,11 @@ app.on('window-all-closed', () => {
 app.on('activate', () => {
   // On macOS it's common to re-create a window in the app when the
   // dock icon is clicked and there are no other windows open.
-  if (BrowserWindow.getAllWindows().length === 0) createWindow()
+  if (BrowserWindow.getAllWindows().length === 0) _windowHandler.createWindow(true)
 })
 
 app.on('before-quit', () => {
-  isQuitting = true
+  setIsQuitting(true)
 })
 
 
@@ -215,35 +109,18 @@ app.on('before-quit', () => {
 // Some APIs can only be used after this event occurs.
 app.on('ready', async () => {
   registerIpcChannels()
-  setInitialInterfaceSettings()
+  await setInitialInterfaceSettings()
 
-  if (isDevelopment && !process.env.IS_TEST) {
-    // Install Vue Devtools
-    try {
-      await installExtension(VUEJS_DEVTOOLS)
-    } catch (e) {
-      console.error('Vue Devtools failed to install:', e)
-    }
-  }
-  const protocolName = 'media'
-  protocol.registerFileProtocol(protocolName, (request, callback) => {
-    const url = request.url.replace(`${protocolName}://`, '')
-    try {
-      return callback(decodeURIComponent(url))
-    } catch (error) {
-      // Handle the error as needed
-      console.error(error)
-    }
-  })
+  await _windowHandler.installExtensions()
+  _windowHandler.registerProtocol('media')
+  createProtocol('com.moosync')
 
   interceptHttp()
-  createProtocol('com.moosync')
-  nativeTheme.themeSource = 'dark'
-  mainWindow = await createWindow()
+
+  await _windowHandler.createWindow(true)
   extensionHost.mainWindowCreated()
-  handleFileOpen()
 
-
+  _windowHandler.handleFileOpen()
   setupScanTask()
 })
 
@@ -278,23 +155,30 @@ if (isDevelopment && process.platform === 'win32') {
   app.setAsDefaultProtocolClient('com.moosync')
 }
 
-app.on('second-instance', (event, argv) => {
+app.on('second-instance', handleSecondInstance)
+
+function findOAuthArg(argv: string[]) {
+  return argv.find((arg) => arg.startsWith('com.moosync'))
+}
+
+function handleSecondInstance(_: Event, argv: string[]) {
   if (process.platform !== 'darwin') {
-    const arg = argv.find((arg) => arg.startsWith('com.moosync'))
+    const arg = findOAuthArg(argv)
     if (arg) {
       oauthHandler.handleEvents(arg)
     } else {
-      handleFileOpen(argv)
+      _windowHandler.handleFileOpen(argv)
     }
   }
 
   if (!isDevelopment) {
-    if (mainWindow && !mainWindow.isFocused()) {
-      if (tray && !tray.isDestroyed()) tray.destroy()
-      mainWindow.show()
+    const window = WindowHandler.getWindow()
+    if (window && !window.isFocused()) {
+      _windowHandler.destroyTray()
+      window.show()
     }
   }
-})
+}
 
 function overrideConsole() {
   const preservedConsoleInfo = console.info;
@@ -303,36 +187,16 @@ function overrideConsole() {
   console.info = (...args: any[]) => {
     if (process.env.NODE_ENV !== 'production')
       preservedConsoleInfo.apply(console, args);
-    logger.info(args.toString(), { label: 'Main' })
+    logger.log('info', '%j', args, { label: 'Main' })
   }
 
   console.error = (...args: any[]) => {
     if (process.env.NODE_ENV !== 'production')
       preservedConsoleError.apply(console, args);
-    logger.error(args.toString(), { label: 'Main' })
+    logger.log('error', '%j', args, { label: 'Main' })
   }
-}
-
-const pathQueue: string[] = []
-
-function sendPathToRenderer(paths: string[]) {
-  mainWindow && mainWindow.webContents.send(SongEvents.GOT_FILE_PATH, paths)
 }
 
 export function mainWindowHasMounted() {
-  isMainWindowMounted = true
-  sendPathToRenderer(pathQueue)
-}
-
-function handleFileOpen(argv: string[] = process.argv) {
-  const parsedArgv = argv.filter(val => !val.startsWith('-') && !val.startsWith('--')).slice((isDevelopment) ? 2 : 1)
-  if (isMainWindowMounted) {
-    sendPathToRenderer(parsedArgv)
-  } else {
-    pathQueue.push(...parsedArgv)
-  }
-}
-
-export function setMinimizeToTray(enabled: boolean) {
-  minimizeToTray = enabled
+  _windowHandler.mainWindowHasMounted()
 }

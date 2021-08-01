@@ -41,7 +41,7 @@ export default class App extends mixins(ThemeHandler) {
   private registerDevTools() {
     document.addEventListener('keydown', function (e) {
       if (e.code === 'F12') {
-        window.WindowUtils.toggleDevTools()
+        window.WindowUtils.toggleDevTools(false)
       } else if (e.code === 'F5') {
         location.reload()
       }
@@ -55,7 +55,7 @@ export default class App extends mixins(ThemeHandler) {
   }
 
   private closeWindow() {
-    window.WindowUtils.closePreferenceWindow()
+    window.WindowUtils.closeWindow(false)
   }
 
   private async writePreferences() {

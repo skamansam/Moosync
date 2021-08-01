@@ -11,8 +11,8 @@ import { ScannerChannel } from './scanner'
 import { SearchChannel } from './search'
 import { SongsChannel } from './songs'
 import { StoreChannel } from './store'
+import { WindowHandler } from '../windowManager';
 import { ipcMain } from 'electron'
-import { mainWindow } from '@/background'
 
 export const scannerChannel = new ScannerChannel()
 
@@ -35,7 +35,7 @@ export function registerIpcChannels() {
 }
 
 export function notifyRenderer(notif: NotificationObject) {
-  mainWindow.webContents.send(IpcEvents.NOTIFIER, notif)
+  WindowHandler.getWindow()?.webContents.send(IpcEvents.NOTIFIER, notif)
 }
 
 

@@ -23,7 +23,7 @@ export class ExtensionManager extends AbstractExtensionManager {
   }
 
   private getVM(entryFilePath: string) {
-    const events = require('jsEvents');
+    const events = require('events');
     const vm = new NodeVM({
       console: 'inherit',
       sandbox: {},

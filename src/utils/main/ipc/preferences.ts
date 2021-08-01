@@ -1,7 +1,7 @@
 import { IpcEvents, PreferenceEvents } from './constants'
 import { loadPreferences, loadSelectivePreference, onPreferenceChanged, savePreferences, saveSelectivePreference } from '../db/preferences'
 
-import { mainWindow } from '@/background'
+import { WindowHandler } from '../windowManager';
 
 export class PreferenceChannel implements IpcChannelInterface {
   name = IpcEvents.PREFERENCES
@@ -58,5 +58,5 @@ export class PreferenceChannel implements IpcChannelInterface {
 }
 
 export function preferencesChanged() {
-  mainWindow.webContents.send(PreferenceEvents.PREFERENCE_REFRESH)
+  WindowHandler.getWindow(true)?.webContents.send(PreferenceEvents.PREFERENCE_REFRESH)
 }

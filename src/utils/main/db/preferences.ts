@@ -4,7 +4,7 @@ import { enableStartup } from '../autoLaunch';
 import path from 'path'
 import { preferencesChanged } from '@/utils/main/ipc/preferences'
 import { scannerChannel } from '../ipc';
-import { setMinimizeToTray } from '../../../background';
+import { setMinimizeToTray } from '@/utils/main/windowManager';
 
 export const store = new Store()
 
