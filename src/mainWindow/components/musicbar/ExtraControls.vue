@@ -40,8 +40,6 @@ import { vxm } from '@/mainWindow/store'
   }
 })
 export default class MusicBar extends mixins(Colors) {
-  // TODO: Load last used volume
-
   private sliderOpen: boolean = false
 
   get volume() {
