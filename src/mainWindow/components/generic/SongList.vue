@@ -58,6 +58,7 @@ import Colors from '@/utils/ui/mixins/Colors'
 import { mixins } from 'vue-class-component'
 import { Component, Prop, Ref } from 'vue-property-decorator'
 import Vue from 'vue'
+import { max } from 'moment'
 
 @Component({})
 export default class SongList extends mixins(Colors) {
@@ -220,6 +221,8 @@ export default class SongList extends mixins(Colors) {
   private setupKeyEvents() {
     document.addEventListener('keydown', (e) => {
       if (e.shiftKey || e.ctrlKey) this.keyPressed = e.key as 'Shift' | 'Control'
+
+      if (e.ctrlKey && e.key === 'a') this.selectAll()
     })
 
     document.addEventListener('keyup', (e) => {
@@ -240,6 +243,10 @@ export default class SongList extends mixins(Colors) {
     this.$emit('onRowDoubleClicked', item)
   }
 
+  private selectAll() {
+    this.selected = Array.from({ length: this.songList.length }, (_, i) => i)
+  }
+
   private onRowSelected(index: number) {
     if (this.keyPressed === 'Control') this.selected.push(index)
     else if (this.keyPressed === 'Shift') {
@@ -247,7 +254,7 @@ export default class SongList extends mixins(Colors) {
         const lastSelected = this.selected[0]
         const min = Math.min(lastSelected, index)
         const max = Math.max(lastSelected, index)
-        this.selected = Array.from({ length: max - min + 1 }, (x, i) => min + i)
+        this.selected = Array.from({ length: max - min + 1 }, (_, i) => min + i)
       }
     } else this.selected = [index]
     this.$emit('onRowSelected', this.songList[index])
