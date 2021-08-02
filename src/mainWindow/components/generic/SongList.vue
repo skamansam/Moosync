@@ -128,9 +128,12 @@ export default class SongList extends mixins(Colors) {
 
   private columnWidths: number[] = []
 
-  private computeDefaultWidths() {
-    for (const index in this.extrafields) {
-      this.columnWidths[index] = 100 / this.extrafields.length - 1
+  private async computeDefaultWidths() {
+    await this.loadWidths()
+    if (this.columnWidths.length === 0) {
+      for (const index in this.extrafields) {
+        this.columnWidths[index] = 100 / this.extrafields.length - 1
+      }
     }
   }
 
@@ -192,6 +195,7 @@ export default class SongList extends mixins(Colors) {
 
   private mouseUp() {
     this.activeHandlerKey = undefined
+    this.saveWidths()
   }
 
   private setupMouseEvents() {
@@ -202,6 +206,15 @@ export default class SongList extends mixins(Colors) {
   private destroyMouseEvents() {
     document.removeEventListener('mousemove', this.mouseMove)
     document.removeEventListener('mouseup', this.mouseUp)
+  }
+
+  private saveWidths() {
+    return window.PreferenceUtils.saveSelective('UI.columnHeaders.widths', this.columnWidths, false)
+  }
+
+  private async loadWidths() {
+    this.columnWidths =
+      ((await window.PreferenceUtils.loadSelective('UI.columnHeaders.widths', false)) as number[]) ?? []
   }
 
   private setupKeyEvents() {
