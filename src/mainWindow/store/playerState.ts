@@ -31,7 +31,6 @@ export class PlayerStore extends VuexModule.With({ namespaced: 'player' }) {
   }
 
   set playerState(state: PlayerState) {
-    console.trace(state)
     this.state = state
   }
 
