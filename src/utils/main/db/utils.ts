@@ -80,6 +80,7 @@ export class DBUtils {
       deviceno: song.deviceno,
       type: song.type,
       url: song.url,
+      playbackUrl: song.playbackUrl
     }
   }
 
