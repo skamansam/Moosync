@@ -28,7 +28,6 @@ import CheckboxGroup from '../CheckboxGroup.vue'
 })
 export default class System extends Vue {
   get checkboxValues() {
-    console.log([this.startupCheckbox, this.minimizeToTrayCheckbox])
     return [this.startupCheckbox, this.minimizeToTrayCheckbox]
   }
 
