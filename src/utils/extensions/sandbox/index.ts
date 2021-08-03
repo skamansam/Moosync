@@ -2,6 +2,7 @@ import { extensionEventsKeys, mainRequestsKeys } from '@/utils/extensions/consta
 
 import { ExtensionHandler } from '@/utils/extensions/sandbox/extensionHandler';
 import { createLogger } from './logger';
+import express from 'express';
 
 class ExtensionHostIPCHandler {
   private extensionHandler: ExtensionHandler

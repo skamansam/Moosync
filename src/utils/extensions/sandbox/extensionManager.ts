@@ -41,9 +41,11 @@ export class ExtensionManager extends AbstractExtensionManager {
     return vm
   }
 
-  private getGlobalObject(packageName: string) {
+  private getGlobalObject(packageName: string, entryFilePath: string) {
     const child = global.logger.child({ label: packageName })
     return {
+      __dirname: path.dirname(entryFilePath),
+      __filename: entryFilePath,
       api: new ExtensionRequestGenerator(packageName),
       logger: child
     }
@@ -74,8 +76,8 @@ export class ExtensionManager extends AbstractExtensionManager {
     }
   }
 
-  private setGlobalObjectToVM(vm: NodeVM, packageName: string) {
-    const globalObj = this.getGlobalObject(packageName)
+  private setGlobalObjectToVM(vm: NodeVM, packageName: string, entryFilePath: string) {
+    const globalObj = this.getGlobalObject(packageName, entryFilePath)
     vm.freeze(globalObj.api, 'api')
     vm.freeze(globalObj.logger, 'logger')
   }
@@ -83,7 +85,7 @@ export class ExtensionManager extends AbstractExtensionManager {
   async instantiateAndRegister(extension: UnInitializedExtensionItem) {
     const vmObj = this.checkExtValidityAndGetInstance(extension.entry)
     if (vmObj) {
-      this.setGlobalObjectToVM(vmObj.vm, extension.packageName)
+      this.setGlobalObjectToVM(vmObj.vm, extension.packageName, extension.entry)
 
       const preferences = vmObj.factory.registerPreferences ? await vmObj.factory.registerPreferences() : []
       const instance = await vmObj.factory.create()

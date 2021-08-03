@@ -204,6 +204,26 @@ export default class App extends mixins(ThemeHandler, PlayerControls) {
       if (data.type === 'get-player-state') {
         window.ExtensionUtils.replyToRequest({ ...data, data: vxm.player.playerState })
       }
+
+      if (data.type === 'play') {
+        window.ExtensionUtils.replyToRequest({ ...data, data: this.play() })
+      }
+
+      if (data.type === 'pause') {
+        window.ExtensionUtils.replyToRequest({ ...data, data: this.pause() })
+      }
+
+      if (data.type === 'stop') {
+        window.ExtensionUtils.replyToRequest({ ...data, data: this.stop() })
+      }
+
+      if (data.type === 'prev') {
+        window.ExtensionUtils.replyToRequest({ ...data, data: this.prevSong() })
+      }
+
+      if (data.type === 'next') {
+        window.ExtensionUtils.replyToRequest({ ...data, data: this.nextSong() })
+      }
     })
   }
 

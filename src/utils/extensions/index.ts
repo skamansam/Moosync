@@ -10,6 +10,7 @@ import { async } from 'node-stream-zip';
 import { promises as fsP } from 'fs';
 import { getVersion } from '@/utils/common';
 import path from 'path';
+import { playerControlRequests } from './constants';
 import { v4 } from 'uuid';
 
 export const defaultExtensionPath = path.join(app.getPath('appData'), app.getName(), 'extensions')
@@ -44,9 +45,7 @@ class MainHostIPCHandler {
   }
 
   private parseMessage(message: mainHostMessage) {
-    if (extensionRequestsKeys.includes(message.type as any) || extensionUIRequestsKeys.includes(message.type as any)) {
-      this.extensionRequestHandler.parseRequest(message as extensionRequestMessage).then(resp => this.sendToExtensionHost(resp))
-    }
+    this.extensionRequestHandler.parseRequest(message as extensionRequestMessage).then(resp => this.sendToExtensionHost(resp))
   }
 
   public async installExtension(zipPaths: string[]): Promise<installMessage> {
@@ -155,8 +154,8 @@ class ExtensionRequestHandler {
 
   public async parseRequest(message: extensionRequestMessage): Promise<extensionReplyMessage | undefined> {
     const resp: extensionReplyMessage = { ...message, data: undefined }
-    if (message.type === 'get-all-songs') {
-      const songs = await SongDB.getAllSongs()
+    if (message.type === 'get-songs') {
+      const songs = await SongDB.getSongByOptions(message.data)
       resp.data = songs
     }
 
@@ -170,7 +169,7 @@ class ExtensionRequestHandler {
       resp.data = await saveSelectivePreference(this.getPreferenceKey(packageName, key), value, true)
     }
 
-    if (extensionUIRequestsKeys.includes(message.type as any)) {
+    if (extensionUIRequestsKeys.includes(message.type as any) || playerControlRequests.includes(message.type as any)) {
       const data = await this.requestFromMainWindow(message)
       resp.data = data
     }

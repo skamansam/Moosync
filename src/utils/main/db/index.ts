@@ -1,4 +1,5 @@
 import { DBUtils } from './utils'
+import { SongAPIOptions } from '@moosync/moosync-types';
 import { promises as fsP } from 'fs'
 import { v4 } from 'uuid'
 
@@ -117,6 +118,48 @@ class SongDBInstance extends DBUtils {
     const genre: Genre[] = this.getMetaCommon(term, 'genre', 'genre_bridge', 'genre', exclude) as Genre[]
 
     return { songs: this.batchUnmarshal(songs), albums: albums, artists: artists, genres: genre }
+  }
+
+  private populateWhereQuery(options: SongAPIOptions) {
+    let where = ''
+    const args: string[] = []
+    let isFirst = true
+
+    const addANDorOR = () => {
+      const str = (!isFirst ? ((options.inclusive ? 'AND' : 'OR')) : '')
+      isFirst = false
+      return str
+    }
+
+    if (options.name) {
+      where += `${addANDorOR()} allsongs.path LIKE ?`
+      args.push(options.name)
+    }
+
+    if (options.album) {
+      where += `${addANDorOR()} albums.album_name LIKE ?`
+      args.push(options.album)
+    }
+
+    if (options.artist) {
+      where += `${addANDorOR()} artists.artist_name LIKE ?`
+      args.push(options.artist)
+    }
+
+    return { where, args }
+  }
+
+  public async getSongByOptions(options: SongAPIOptions) {
+    const { where, args } = this.populateWhereQuery(options)
+
+    const songs: marshaledSong[] = this.db.query(
+      `SELECT *, ${this.addGroupConcatClause()} FROM allsongs
+      ${this.addLeftJoinClause(undefined, 'allsongs')}
+        WHERE ${where}
+        ${this.addExcludeWhereClause(false, [])} GROUP BY allsongs._id`,
+      ...args
+    )
+    return this.batchUnmarshal(songs)
   }
 
   public async countByHash(hash: string): Promise<number> {
