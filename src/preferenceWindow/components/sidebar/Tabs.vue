@@ -26,37 +26,27 @@
 </template>
 
 <script lang="ts">
-import { Component, Prop } from 'vue-property-decorator'
+import { Component } from 'vue-property-decorator'
 import { ActiveTab } from '@/utils/ui/enums'
-import Playlists from '@/mainWindow/components/icons/Playlists.vue'
-import AllSongs from '@/mainWindow/components/icons/AllSongs.vue'
-import Artists from '@/mainWindow/components/icons/Artists.vue'
-import Fav from '@/mainWindow/components/icons/Fav.vue'
-import Genre from '@/mainWindow/components/icons/Genre.vue'
-import Albums from '@/mainWindow/components/icons/Albums.vue'
-import Toggle from '@/mainWindow/components/icons/Toggle.vue'
-import Rooms from '@/mainWindow/components/icons/Rooms.vue'
+import Extensions from '@/preferenceWindow/components/icons/Extensions.vue'
+import Paths from '@/preferenceWindow/components/icons/Paths.vue'
+import System from '@/preferenceWindow/components/icons/System.vue'
 import Colors from '@/utils/ui/mixins/Colors'
 import { mixins } from 'vue-class-component'
 
 @Component({
   components: {
-    Playlists,
-    AllSongs,
-    Artists,
-    Fav,
-    Genre,
-    Albums,
-    Toggle,
-    Rooms
+    Extensions,
+    Paths,
+    System
   }
 })
 export default class Sidebar extends mixins(Colors) {
   private componentNames = [
-    { component: 'AllSongs', title: 'Paths', link: '/paths' },
-    { component: 'Playlists', title: 'Extensions', link: '/extensions' },
-    { component: 'Albums', title: 'Interface', link: '/interface' },
-    { component: 'Artists', title: 'System', link: '/system' }
+    { component: 'Paths', title: 'Paths', link: '/paths' },
+    { component: 'Extensions', title: 'Extensions', link: '/extensions' },
+    { component: 'System', title: 'System', link: '/system' }
+    // { component: 'Artists', title: 'System', link: '/system' }
   ]
 
   private active: ActiveTab = ActiveTab.ALLSONGS

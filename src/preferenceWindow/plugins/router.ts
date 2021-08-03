@@ -1,7 +1,7 @@
 import Extensions from '@/preferenceWindow/components/pages/Extensions.vue';
-import Interface from '../components/pages/Interface.vue';
 import Paths from '@/preferenceWindow/components/pages/Paths.vue';
 import Router from 'vue-router';
+import System from '../components/pages/System.vue'
 import Vue from 'vue';
 
 Vue.use(Router)
@@ -22,14 +22,9 @@ const routes = [
     component: Extensions,
   },
   {
-    name: 'interface',
-    path: '/interface',
-    component: Interface,
-  },
-  {
     name: 'system',
     path: '/system',
-    component: Paths,
+    component: System,
   },
 ]
 

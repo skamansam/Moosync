@@ -8,7 +8,7 @@
             tooltip=""
             :isExtension="false"
             :defaultValue="checkboxValues"
-            prefKey="interface"
+            prefKey="system"
           />
         </div>
       </b-row>
@@ -26,7 +26,7 @@ import CheckboxGroup from '../CheckboxGroup.vue'
     CheckboxGroup
   }
 })
-export default class Interface extends Vue {
+export default class System extends Vue {
   get checkboxValues() {
     console.log([this.startupCheckbox, this.minimizeToTrayCheckbox])
     return [this.startupCheckbox, this.minimizeToTrayCheckbox]

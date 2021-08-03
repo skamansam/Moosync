@@ -5,7 +5,7 @@ interface Preferences {
   musicPaths: togglePaths
   thumbnailPath: string
   artworkPath: string,
-  interface: {
+  systemSettings: {
     key: String,
     title: String,
     enabled: boolean

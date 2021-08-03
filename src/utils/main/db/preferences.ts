@@ -12,7 +12,7 @@ export const defaultPreferences: Preferences = {
   musicPaths: [],
   thumbnailPath: path.join(app.getPath('appData'), app.getName(), '.thumbnails'),
   artworkPath: path.join(app.getPath('appData'), app.getName(), '.thumbnails'),
-  interface: []
+  systemSettings: []
 }
 
 export async function savePreferences(prefs: Preferences) {
@@ -34,11 +34,11 @@ export async function loadSelectivePreference(key?: string, isExtension?: boolea
 }
 
 export async function setInitialInterfaceSettings() {
-  onPreferenceChanged('interface', (await loadPreferences()).interface)
+  onPreferenceChanged('system', (await loadPreferences()).systemSettings)
 }
 
 export async function onPreferenceChanged(key: string, value: any) {
-  if (key === 'interface' && value) {
+  if (key === 'system' && value) {
     for (const val of value) {
       if (val.key === 'startOnStartup') {
         val.enabled !== undefined && enableStartup(val.enabled)
