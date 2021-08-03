@@ -228,12 +228,15 @@ export default class App extends mixins(ThemeHandler, PlayerControls) {
   }
 
   private listenExtensionEvents() {
-    vxm.player.$watch('currentSong', (newVal: Song) =>
+    vxm.player.$watch('currentSong', (newVal: Song) => {
+      if (newVal.type !== 'LOCAL' && !newVal.playbackUrl) {
+        return
+      }
       window.ExtensionUtils.sendEvent({
         type: 'onSongChanged',
         data: newVal
       })
-    )
+    })
 
     vxm.player.$watch('playerState', (newVal: PlayerState) =>
       window.ExtensionUtils.sendEvent({
