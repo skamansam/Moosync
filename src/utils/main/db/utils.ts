@@ -51,6 +51,7 @@ export class DBUtils {
       deviceno: '',
       type: dbSong.type,
       url: dbSong.url,
+      playbackUrl: dbSong.playbackUrl
     }
   }
 

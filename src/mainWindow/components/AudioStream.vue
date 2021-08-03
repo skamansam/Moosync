@@ -19,6 +19,7 @@ import SyncMixin from '@/utils/ui/mixins/SyncMixin'
 import { vxm } from '../store'
 import ErrorHandler from '@/utils/ui/mixins/errorHandler'
 import PlayerControls from '@/utils/ui/mixins/PlayerControls'
+import Vue from 'vue'
 
 @Component({})
 export default class AudioStream extends mixins(Colors, SyncMixin, PlayerControls, ErrorHandler) {
@@ -147,7 +148,17 @@ export default class AudioStream extends mixins(Colors, SyncMixin, PlayerControl
     this.handleActivePlayerState(vxm.player.playerState)
   }
 
-  private loadAudio(song: Song, loadedState: boolean) {
+  private getPlaybackUrlAndDuration(song: Song) {
+    if (song.type === 'YOUTUBE') {
+      return vxm.providers.youtubeProvider.getPlaybackUrlAndDuration(song)
+    }
+
+    if (song.type === 'SPOTIFY') {
+      return vxm.providers.spotifyProvider.getPlaybackUrlAndDuration(song)
+    }
+  }
+
+  private async loadAudio(song: Song, loadedState: boolean) {
     // vxm.player.state = 'PLAYING'
     if (song.type === 'LOCAL') {
       this.onPlayerTypeChanged('LOCAL')
@@ -155,8 +166,22 @@ export default class AudioStream extends mixins(Colors, SyncMixin, PlayerControl
       this.onPlayerTypeChanged('YOUTUBE')
     }
 
-    if (song.path) this.activePlayer.load('media://' + song.path)
-    else if (song.url) this.activePlayer.load(song.url)
+    if (song.type === 'LOCAL') song.path && this.activePlayer.load('media://' + song.path)
+    else {
+      if (!song.playbackUrl || !song.duration) {
+        const oldState = vxm.player.playerState
+        vxm.player.playerState = 'LOADING'
+        const res = await this.getPlaybackUrlAndDuration(song)
+        if (res) {
+          // Shouldn't react on property set normally
+          vxm.player.currentSong!.duration = res.duration
+          Vue.set(song, 'playbackUrl', res.url)
+        }
+        vxm.player.playerState = oldState
+        return
+      }
+      this.activePlayer.load(song.playbackUrl)
+    }
 
     this.activePlayer.volume = this.volume
 

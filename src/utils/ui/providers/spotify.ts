@@ -98,7 +98,7 @@ export class SpotifyProvider extends GenericProvider {
     return []
   }
 
-  public async spotifyToYoutube(item: Song) {
+  public async spotifyToYoutube(item: Song): Promise<YoutubeItem | undefined> {
     const term = `${(item.artists) ? item.artists.join(' ') : ''} ${item.title}`
     const ytItem = await window.SearchUtils.searchYT(term)
     if (ytItem.length > 0)
@@ -117,7 +117,7 @@ export class SpotifyProvider extends GenericProvider {
             album_coverPath: (i.track.album.images[0]) ? i.track.album.images[0].url : ''
           },
           artists: i.track.artists.map(artist => artist.name),
-          duration: i.track.duration_ms,
+          duration: i.track.duration_ms / 1000,
           type: 'SPOTIFY'
         })
     }
@@ -170,5 +170,12 @@ export class SpotifyProvider extends GenericProvider {
   private async setCachePlaylistContent(playlist_id: string, items: Song[]) {
     // Cache for 1hr
     await forageStore.setItem(`spotify-playlist-${playlist_id}`, { expires: Date.now() + 1 * 60 * 60 * 5 * 1000, data: items })
+  }
+
+  public async getPlaybackUrlAndDuration(song: Song) {
+    const ytItem = await this.spotifyToYoutube(song)
+    if (ytItem) {
+      return { url: ytItem._id, duration: ytItem.duration }
+    }
   }
 }

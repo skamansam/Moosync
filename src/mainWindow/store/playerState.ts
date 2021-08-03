@@ -31,6 +31,7 @@ export class PlayerStore extends VuexModule.With({ namespaced: 'player' }) {
   }
 
   set playerState(state: PlayerState) {
+    console.trace(state)
     this.state = state
   }
 
@@ -183,18 +184,6 @@ export class PlayerStore extends VuexModule.With({ namespaced: 'player' }) {
   }
 
   @action async loadSong(song: Song | null | undefined) {
-    if (song && song.type === 'SPOTIFY') {
-      const oldState = this.playerState
-      this.setPlayerState('LOADING')
-      const ytItem = await vxm.providers.spotifyProvider.spotifyToYoutube(song)
-      if (ytItem) {
-        song.url = ytItem._id
-        song.duration = ytItem.duration
-      } else {
-        throw new Error('Could not convert song')
-      }
-      this.setPlayerState(oldState)
-    }
     this.currentSong = song
   }
 

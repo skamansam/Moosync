@@ -38,11 +38,11 @@ export default class PlayerControls extends Vue {
   }
 
   public play() {
-    vxm.player.playerState = 'PLAYING'
+    if (vxm.player.playerState !== 'LOADING') vxm.player.playerState = 'PLAYING'
   }
 
   public pause() {
-    vxm.player.playerState = 'PAUSED'
+    if (vxm.player.playerState !== 'LOADING') vxm.player.playerState = 'PAUSED'
   }
 
   public shuffle() {

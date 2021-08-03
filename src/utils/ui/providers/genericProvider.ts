@@ -27,4 +27,6 @@ export abstract class GenericProvider {
   public abstract getUserPlaylists(): Promise<Playlist[]>
 
   public abstract getPlaylistContent(id: string): AsyncGenerator<Song[]>
+
+  public abstract getPlaybackUrlAndDuration(song: Song): Promise<{ url: string, duration: number } | undefined>
 }

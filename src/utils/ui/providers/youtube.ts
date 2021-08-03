@@ -173,4 +173,9 @@ export class YoutubeProvider extends GenericProvider {
     }
     return []
   }
+
+  public async getPlaybackUrlAndDuration(song: Song) {
+    if (song.url)
+      return { url: song.url!, duration: song.duration }
+  }
 }

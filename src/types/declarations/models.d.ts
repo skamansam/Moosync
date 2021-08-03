@@ -61,6 +61,7 @@ interface Song {
   inode?: string
   deviceno?: string
   url?: string
+  playbackUrl?: string
   type: 'LOCAL' | 'YOUTUBE' | 'SPOTIFY'
 }
 
@@ -91,6 +92,7 @@ interface marshaledSong {
   inode?: string
   deviceno?: string
   url?: string
+  playbackUrl?: string
   type: 'LOCAL' | 'YOUTUBE' | 'SPOTIFY'
 }
 
