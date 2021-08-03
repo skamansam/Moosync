@@ -55,8 +55,12 @@ export class DBUtils {
   }
 
   protected marshalSong(song: Song): marshaledSong {
+    if (!song._id) {
+      throw new Error("song _id cannot be null")
+    }
+
     return {
-      _id: song._id ? song._id : v4(),
+      _id: song._id,
       path: song.path,
       size: song.size,
       title: song.title,

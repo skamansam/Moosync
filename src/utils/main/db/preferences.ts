@@ -38,7 +38,7 @@ export async function setInitialInterfaceSettings() {
 }
 
 export async function onPreferenceChanged(key: string, value: any) {
-  if (key === 'interface') {
+  if (key === 'interface' && value) {
     for (const val of value) {
       if (val.key === 'startOnStartup') {
         val.enabled !== undefined && enableStartup(val.enabled)

@@ -37,11 +37,12 @@ class SongDBInstance extends DBUtils {
     const albumID = newDoc.album ? this.storeAlbum(newDoc.album) : ''
     const genreID = this.storeGenre(newDoc.genre)
     const marshaledSong = this.marshalSong(newDoc)
-    if (this.db.query(`SELECT _id from allsongs WHERE _id = ?`, marshaledSong._id).length === 0)
+    if (this.db.query(`SELECT _id from allsongs WHERE _id = ?`, marshaledSong._id).length === 0) {
       this.db.insert('allsongs', marshaledSong)
-    this.storeArtistBridge(artistID, marshaledSong._id)
-    this.storeGenreBridge(genreID, marshaledSong._id)
-    this.storeAlbumBridge(albumID, marshaledSong._id)
+      this.storeArtistBridge(artistID, marshaledSong._id)
+      this.storeGenreBridge(genreID, marshaledSong._id)
+      this.storeAlbumBridge(albumID, marshaledSong._id)
+    }
     return
   }
 
@@ -57,35 +58,34 @@ class SongDBInstance extends DBUtils {
         song_id
       ) as { count: number, artist: string }
 
+      const songCoverPath = this.db.queryFirstCell(`SELECT song_coverPath from allsongs WHERE _id = ?`, song_id)
+
+      try {
+        if (songCoverPath) await fsP.rm(songCoverPath, { force: true })
+      } catch (e) {
+        undefined
+      }
+
       this.db.delete('artists_bridge', { song: song_id })
       this.db.delete('album_bridge', { song: song_id })
       this.db.delete('genre_bridge', { song: song_id })
       this.db.delete('playlist_bridge', { song: song_id })
       this.db.delete('allsongs', { _id: song_id })
 
-      try {
-        if (album_ids.count == 1) {
-          const album = await this.getAlbumByID(album_ids.album)
-          if (album?.album_coverPath) fsP.unlink(album.album_coverPath).catch(err => console.error(err))
-          this.db.delete('albums', { album_id: album_ids.album })
-
+      if (album_ids.count == 1) {
+        const album = await this.getAlbumByID(album_ids.album)
+        this.db.delete('albums', { album_id: album_ids.album })
+        try {
+          if (album?.album_coverPath) await fsP.rm(album.album_coverPath, { force: true }).catch(err => console.error(err))
+        } catch (err) {
+          undefined
         }
-
-      } catch (err) {
-        console.error(err)
       }
-
-      try {
-        if (artist_ids.count == 1) {
-          const artist = await this.getArtistsByID(artist_ids.artist)
-          if (artist?.artist_coverPath) fsP.unlink(artist.artist_coverPath).catch(err => console.error(err))
-          this.db.delete('artists', { artist_id: artist_ids.artist })
-        }
-      } catch (err) {
-        console.error(err)
+      if (artist_ids.count == 1) {
+        const artist = await this.getArtistsByID(artist_ids.artist)
+        this.db.delete('artists', { artist_id: artist_ids.artist })
+        if (artist?.artist_coverPath) await fsP.rm(artist.artist_coverPath, { force: true }).catch(err => console.error(err))
       }
-
-
     })(song_id)
   }
 
@@ -179,14 +179,8 @@ class SongDBInstance extends DBUtils {
       )
       if (!id) {
         id = v4()
-        this.db.insert('albums', {
-          album_id: id,
-          album_name: album.album_name.trim(),
-          album_coverPath: album.album_coverPath,
-          album_artist: album.album_artist,
-          year: album.year,
-        })
       }
+      this.db.run(`INSERT OR REPLACE INTO albums (album_id, album_name, album_coverPath, album_artist) VALUES(?, ?, ?, ?)`, id, album.album_name, album.album_coverPath, album.album_artist)
     }
     return id as string
   }

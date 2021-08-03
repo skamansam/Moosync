@@ -1,27 +1,18 @@
-import * as mm from 'music-metadata'
+import { TransferDescriptor, expose } from 'threads';
 
 import Jimp from 'jimp'
-import { expose } from 'threads'
 
 expose({
-  async writeCover(songPath: string, coverPath: string) {
-    return writeBuffer(songPath, coverPath)
+  async writeCover(buffer: TransferDescriptor<Buffer>, coverPath: string) {
+    return writeBuffer(buffer, coverPath)
   },
 })
 
-async function getCover(filePath: string | undefined): Promise<Buffer | undefined> {
-  if (filePath) {
-    const data = await mm.parseFile(filePath)
-    if (data.common.picture) {
-      return data.common.picture[0].data
-    }
-  }
-}
-
-async function writeBuffer(songPath: string, coverPath: string) {
-  const buffer = await getCover(songPath)
-  if (buffer) {
-    (await Jimp.read(buffer)).cover(800, 800).quality(80).writeAsync(coverPath)
+async function writeBuffer(bufferDesc: TransferDescriptor<Buffer>, coverPath: string) {
+  try {
+    await (await Jimp.read(Buffer.from(bufferDesc.send))).cover(800, 800).quality(80).writeAsync(coverPath)
     return coverPath
+  } catch (e) {
+    console.error(e)
   }
 }

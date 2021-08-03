@@ -1,10 +1,10 @@
 import * as mm from 'music-metadata'
 
 import { Observable, SubscriptionObserver } from 'observable-fns'
+import { Transfer, TransferDescriptor, expose } from 'threads'
 import fs, { promises as fsP } from 'fs'
 
 import crypto from 'crypto'
-import { expose } from 'threads'
 import path from 'path'
 import { v4 } from 'uuid'
 
@@ -18,7 +18,7 @@ expose({
   },
 })
 
-async function scanFile(filePath: string): Promise<Song> {
+async function scanFile(filePath: string): Promise<{ song: Song, cover: Buffer | undefined }> {
   const fsStats = await fsP.stat(filePath)
   const hash = await generateChecksum(filePath)
 
@@ -31,11 +31,11 @@ async function scanFile(filePath: string): Promise<Song> {
   })
 }
 
-async function processFile(stat: stats): Promise<Song> {
+async function processFile(stat: stats): Promise<{ song: Song, cover: Buffer | undefined }> {
   const metadata = await mm.parseFile(stat.path)
-  // const cover = getCover(metadata, stat.path, v4())
   const info = await getInfo(metadata, stat)
-  return info
+  const cover = metadata.common.picture && metadata.common.picture[0].data
+  return { song: info, cover }
 }
 
 async function getInfo(data: mm.IAudioMetadata, stats: stats): Promise<Song> {
@@ -75,7 +75,7 @@ async function getInfo(data: mm.IAudioMetadata, stats: stats): Promise<Song> {
   }
 }
 
-async function scanDir(directory: string, observer: SubscriptionObserver<Song>) {
+async function scanDir(directory: string, observer: SubscriptionObserver<{ song: Song, cover: TransferDescriptor<Buffer> | undefined }>) {
   if (fs.existsSync(directory)) {
     const files = fs.readdirSync(directory)
     for (const file of files) {
@@ -84,9 +84,13 @@ async function scanDir(directory: string, observer: SubscriptionObserver<Song>) 
         await scanDir(path.join(directory, file), observer)
       }
       if (audioPatterns.exec(path.extname(file)) !== null) {
-        const filePath = path.join(directory, file)
-        const result = await scanFile(filePath)
-        observer.next(result)
+        try {
+          const filePath = path.join(directory, file)
+          const result = await scanFile(filePath)
+          observer.next({ song: result.song, cover: result.cover && Transfer(result.cover) })
+        } catch (e) {
+          console.error(e)
+        }
       }
     }
   } else {

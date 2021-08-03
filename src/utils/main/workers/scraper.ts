@@ -1,14 +1,11 @@
 import { Observable, SubscriptionObserver } from 'observable-fns'
+import { Transfer, TransferDescriptor, expose } from 'threads'
 
-import Jimp from 'jimp'
 import axios from 'axios'
 import axiosRetry from 'axios-retry'
 import { createHash } from 'crypto'
-import { expose } from 'threads'
 import fs from 'fs'
-import path from 'path'
 import rateLimit from 'axios-rate-limit'
-import { v4 } from 'uuid'
 
 expose({
   fetchMBID(artists: artists[]) {
@@ -17,9 +14,9 @@ expose({
     })
   },
 
-  fetchArtworks(artists: artists[], basePath: string) {
+  fetchArtworks(artists: artists[]) {
     return new Observable((observer) => {
-      fetchArtworks(artists, basePath, observer)
+      fetchArtworks(artists, observer)
     })
   },
 })
@@ -67,27 +64,27 @@ async function queryArtistUrls(id: string) {
   return musicbrainz.get(`/${id}?inc=url-rels`)
 }
 
-async function fetchImagesRemote(a: artists, coverPath: string) {
+async function fetchImagesRemote(a: artists) {
   if (a.artist_mbid) {
     const data = await queryArtistUrls(a.artist_mbid)
     if (data.data.relations) {
       for (const r of data.data.relations) {
         if (r.type == 'image') {
-          return downloadImage(r.url.resource, coverPath)
+          return downloadImage(r.url.resource)
         }
       }
     }
 
     try {
       const url = await fetchFanartTv(a.artist_mbid)
-      if (url) return downloadImage(url, coverPath)
+      if (url) return downloadImage(url)
     } catch (e) {
-      console.info(`Fanart.tv not found for ${a.artist_name}`)
+      undefined
     }
   }
   if (a.artist_name) {
     const url = await fetchTheAudioDB(a.artist_name)
-    if (url) return downloadImage(url, coverPath)
+    if (url) return downloadImage(url)
   }
 }
 
@@ -141,21 +138,17 @@ async function parseScrapeUrl(url: string) {
   return url
 }
 
-async function downloadImage(url: string, coverPath: string) {
+async function downloadImage(url: string): Promise<ArrayBuffer | undefined> {
   const parsed = await parseScrapeUrl(url)
   if (parsed) {
     const data = await axios.get(parsed, { responseType: 'arraybuffer' })
-    if (data.data) {
-      const cover = path.join(coverPath, `${v4()}.jpg`)
-      await writeBuffer(data.data, cover)
-      return cover
-    }
+    return data.data
   }
 }
 
-async function queryArtwork(a: artists, coverPath: string) {
-  const data = await fetchImagesRemote(a, coverPath)
-  return data ? data : 'default'
+async function queryArtwork(a: artists) {
+  const data = await fetchImagesRemote(a)
+  return data
 }
 
 async function checkCoverExists(coverPath: string | undefined): Promise<boolean> {
@@ -164,31 +157,29 @@ async function checkCoverExists(coverPath: string | undefined): Promise<boolean>
       await fs.promises.access(coverPath)
       return true
     } catch (e) {
-      console.error(`${coverPath} not accessible`)
+      console.info(`${coverPath} not accessible`)
       return false
     }
   }
   return false
 }
 
-export async function fetchArtworks(artists: artists[], coverPath: string, observer: SubscriptionObserver<artists>) {
-  const promises: Promise<void>[] = []
+
+// Await for each download to complete
+// This way we can avoid being rate limited unless ofc you are at nasa and got 10gbps with real low latency
+// Even then axios will handle rate limits
+export async function fetchArtworks(artists: artists[], observer: SubscriptionObserver<{ artist: artists, cover: TransferDescriptor<Buffer> | undefined }>) {
   for (const a of artists) {
     const coverExists = await checkCoverExists(a.artist_coverPath)
     if (!coverExists) {
-      promises.push(
-        queryArtwork(a, coverPath).then((result) => observer.next({ artist_id: a.artist_id, artist_coverPath: result }))
-      )
+      try {
+        const result = await queryArtwork(a)
+        observer.next({ artist: a, cover: result && Transfer(result) })
+      } catch (e) {
+        console.error(e)
+        observer.next({ artist: a, cover: undefined })
+      }
     }
   }
-  Promise.all(promises).then(() => observer.complete())
-}
-
-async function writeBuffer(data: Buffer, path: string) {
-  try {
-    const jimp = await Jimp.read(data)
-    jimp.cover(800, 800).quality(80).writeAsync(path)
-  } catch (e) {
-    console.error(e)
-  }
+  observer.complete()
 }

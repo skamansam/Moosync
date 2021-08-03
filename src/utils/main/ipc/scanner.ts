@@ -1,8 +1,7 @@
 import { IpcEvents, ScannerEvents } from './constants'
-import { Worker, spawn } from 'threads'
+import { Pool, Thread, TransferDescriptor, Worker, spawn } from 'threads'
 
 import { IpcMainEvent } from 'electron'
-import { ObservablePromise } from 'threads/dist/observable-promise'
 import { SongDB } from '@/utils/main/db/index'
 import fs from 'fs'
 import { loadPreferences } from '@/utils/main/db/preferences'
@@ -19,35 +18,53 @@ enum scanning {
 export class ScannerChannel implements IpcChannelInterface {
   name = IpcEvents.SCANNER
   private scanStatus: scanning = scanning.UNDEFINED
+
+  private coverPool = Pool(() => spawn(new Worker('@/utils/main/workers/covers.ts', { type: 'module' })))
+  private scannerWorker: any
+  private scraperWorker: any
+
   handle(event: IpcMainEvent, request: IpcRequest) {
     switch (request.type) {
       case ScannerEvents.SCAN_MUSIC:
-        if (this.scanStatus == scanning.SCANNING || this.scanStatus == scanning.QUEUED) {
-          console.info('scan queued')
-          this.scanStatus = scanning.QUEUED
-          return
-        }
-        this.scanStatus = scanning.SCANNING
         this.ScanSongs(event, request)
         break
     }
   }
-  private async storeSong(song: Song): Promise<void> {
-    return SongDB.store(song)
-  }
 
-  private async checkDuplicate(song: Song) {
+  private async checkDuplicate(song: Song, cover: TransferDescriptor<Buffer> | undefined) {
     notifyRenderer({ id: 'scan-status', message: `Scanned ${song.title}`, type: 'info' })
+
     const count = await SongDB.countByHash(song.hash!)
     if (count == 0) {
-      this.storeSong(song)
+      const coverPath = cover && await this.storeCover(song._id!, cover)
+      if (!song.album?.album_coverPath || (await this.checkCoverExists(song.album.album_coverPath))) {
+        song.album = {
+          ...song.album,
+          album_coverPath: coverPath
+        }
+      }
+      song.song_coverPath = coverPath
+
+      await SongDB.store(song)
     }
   }
 
-  private scanSongs(preferences: Preferences, scan: (paths: togglePaths) => ObservablePromise<Song>): Promise<void> {
+  private async storeCover(id: string, cover: TransferDescriptor<Buffer> | undefined) {
+    if (cover) {
+      const thumbPath = (await loadPreferences()).thumbnailPath
+      const coverPath = path.join(thumbPath, id + '.jpg')
+      if (this.coverPool) {
+        return new Promise<string>((resolve, reject) => {
+          this.coverPool.queue(coverTask => coverTask.writeCover(cover, coverPath).then((val: string) => resolve(val)).catch((e) => reject(e)))
+        })
+      }
+    }
+  }
+
+  private scanSongs(preferences: Preferences): Promise<void> {
     return new Promise((resolve, reject) => {
-      scan(preferences.musicPaths).subscribe(
-        (result) => this.checkDuplicate(result),
+      this.scannerWorker.start(preferences.musicPaths).subscribe(
+        (result: { song: Song, cover: TransferDescriptor<Buffer> }) => this.checkDuplicate(result.song, result.cover),
         (err: Error) => reject(err),
         () =>
           resolve()
@@ -55,32 +72,34 @@ export class ScannerChannel implements IpcChannelInterface {
     })
   }
 
-  private fetchMBID(allArtists: artists[], fetch: (artist: artists[]) => ObservablePromise<artists>) {
+  private fetchMBID(allArtists: artists[]) {
     return new Promise((resolve, reject) => {
-      fetch(allArtists).subscribe(
-        (result) => (result ? SongDB.updateArtists(result) : null),
-        (err) => reject(err),
+      this.scraperWorker.fetchMBID(allArtists).subscribe(
+        (result: artists) => (result ? SongDB.updateArtists(result) : null),
+        (err: Error) => reject(err),
         () => resolve(undefined)
       )
     })
   }
 
-  private async updateArtwork(result: artists) {
-    if (result) {
-      notifyRenderer({ id: 'artwork-status', message: `Found artwork for ${result.artist_name}`, type: 'info' })
-      if (result.artist_coverPath == 'default') {
-        result.artist_coverPath = await SongDB.getDefaultCoverByArtist(result.artist_id)
-      }
-      SongDB.updateArtists(result)
+  private async updateArtwork(artist: artists, cover: TransferDescriptor<Buffer> | undefined) {
+    const ret: artists = artist
+    notifyRenderer({ id: 'artwork-status', message: `Found artwork for ${artist.artist_name}`, type: 'info' })
+    if (cover) {
+      ret.artist_coverPath = await this.storeCover(artist.artist_id, cover)
+    } else {
+      ret.artist_coverPath = await SongDB.getDefaultCoverByArtist(artist.artist_id)
     }
+
+    await SongDB.updateArtists(ret)
   }
 
-  private async fetchArtworks(allArtists: artists[], fetch: (artist: artists[], path: string) => ObservablePromise<artists>) {
+  private async fetchArtworks(allArtists: artists[]) {
     const artworkPath = (await loadPreferences()).artworkPath
     return new Promise((resolve) => {
-      fetch(allArtists, artworkPath).subscribe(
-        this.updateArtwork,
-        (err) => console.error(err),
+      this.scraperWorker.fetchArtworks(allArtists, artworkPath).subscribe(
+        (result: { artist: artists, cover: TransferDescriptor<Buffer> }) => this.updateArtwork(result.artist, result.cover),
+        console.error,
         () => resolve(undefined)
       )
     })
@@ -99,33 +118,7 @@ export class ScannerChannel implements IpcChannelInterface {
     return false
   }
 
-  private async extractCovers(cover: (songPath: string, coverPath: string) => ObservablePromise<string | undefined>) {
-    const songs = await SongDB.getAllSongs()
-    const thumbPath = (await loadPreferences()).thumbnailPath
-    for (const s of songs) {
-      const coverExists = await this.checkCoverExists(s.song_coverPath)
-      if (s.type === 'LOCAL' && !coverExists) {
-        const coverPath = path.join(thumbPath, s._id! + '.jpg')
-        const coverStatus = await cover(s.path!, coverPath)
-        if (coverStatus) {
-          await SongDB.updateSongCover(s._id!, coverPath)
-
-          if (s.album && s.album.album_name) {
-            const existingAlbum = await SongDB.getAlbumByName(s.album.album_name)
-            if (!existingAlbum!.album_coverPath) {
-              await SongDB.updateAlbum({ album_id: existingAlbum!.album_id, album_coverPath: coverPath })
-            }
-          }
-        } else {
-          if (s.album && s.album.album_coverPath) {
-            await SongDB.updateSongCover(s._id!, s.album.album_coverPath)
-          }
-        }
-      }
-    }
-  }
-
-  private async updateCounts() {
+  private updateCounts() {
     SongDB.updateSongCountAlbum()
     SongDB.updateSongCountArtists()
     SongDB.updateSongCountGenre()
@@ -137,11 +130,12 @@ export class ScannerChannel implements IpcChannelInterface {
     const regex = new RegExp(paths.join('|'))
     for (const s of allSongs) {
       if (s.type == 'LOCAL') {
+        if (paths.length == 0 || !(s.path && s.path.match(regex)) || !s.path) {
+          await SongDB.removeSong(s._id!)
+          continue
+        }
+
         try {
-          if (paths.length == 0 || !(s.path && s.path.match(regex)) || !s.path) {
-            await SongDB.removeSong(s._id!)
-            continue
-          }
           await fs.promises.access(s.path!, fs.constants.F_OK)
         } catch (e) {
           await SongDB.removeSong(s._id!)
@@ -150,37 +144,77 @@ export class ScannerChannel implements IpcChannelInterface {
     }
   }
 
-  private async scanAll(event?: IpcMainEvent, request?: IpcRequest) {
-    console.log('scanning')
+  // TODO: Add queueing for scraping artworks
+  private async scrapeArtists() {
+    this.scraperWorker = await spawn(new Worker('@/utils/main/workers/scraper.ts', { type: 'module' }))
+    const allArtists = await SongDB.getAllArtists()
+    await this.fetchMBID(allArtists)
 
-    const scanner = await spawn(new Worker('@/utils/main/workers/scanner.ts', { type: 'module' }))
-    const cover = await spawn(new Worker('@/utils/main/workers/covers.ts', { type: 'module' }))
+    await this.fetchArtworks(allArtists)
+
+    await this.coverPool.completed()
+    await Thread.terminate(this.scraperWorker)
+    this.scraperWorker = undefined
+  }
+
+  private isScanning() {
+    return this.scanStatus == scanning.SCANNING || this.scanStatus == scanning.QUEUED
+  }
+
+  private isScanQueued() {
+    return this.scanStatus == scanning.QUEUED
+  }
+
+  private setScanning() {
+    this.scanStatus = scanning.SCANNING
+  }
+
+  private setIdle() {
+    this.scanStatus = scanning.UNDEFINED
+  }
+
+  private setQueued() {
+    this.scanStatus = scanning.QUEUED
+  }
+
+  private async scanAll(event?: IpcMainEvent, request?: IpcRequest) {
+    if (this.isScanning()) {
+      this.setQueued()
+      return
+    }
+    this.setScanning()
 
     const preferences = await loadPreferences()
-
     notifyRenderer({ id: v4(), message: 'Starting scanning files', type: 'info' })
 
+    if (this.scannerWorker) {
+      await Thread.terminate(this.scannerWorker)
+      this.scannerWorker = undefined
+    }
+    this.scannerWorker = await spawn(new Worker('@/utils/main/workers/scanner.ts', { type: 'module' }))
+
     await this.destructiveScan(preferences.musicPaths)
-    await this.scanSongs(preferences, scanner.start)
+    await this.scanSongs(preferences)
 
     this.updateCounts()
 
-    this.extractCovers(cover.writeCover)
+    this.setIdle()
 
-    const scraper = await spawn(new Worker('@/utils/main/workers/scraper.ts', { type: 'module' }))
-
-    const allArtists = await SongDB.getAllArtists()
-    await this.fetchMBID(allArtists, scraper.fetchMBID)
-
-    await this.fetchArtworks(allArtists, scraper.fetchArtworks)
+    Thread.terminate(this.scannerWorker)
 
     notifyRenderer({ id: v4(), message: 'Scanning Completed', type: 'info' })
 
-    if (this.scanStatus == scanning.QUEUED) {
-      this.scanAll(event, request)
+    if (this.isScanQueued()) {
+      await this.scanAll(event, request)
     }
+
+    // Run scraping task only if all subsequent scanning tasks are completed
+    // And if no other scraping task is ongoing
+    if (!this.isScanning() && !this.scraperWorker) {
+      await this.scrapeArtists()
+    }
+
     if (event && request) event.reply(request.responseChannel)
-    this.scanStatus = scanning.UNDEFINED
   }
 
   public async ScanSongs(event?: IpcMainEvent, request?: IpcRequest) {
