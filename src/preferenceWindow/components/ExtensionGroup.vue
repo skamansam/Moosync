@@ -108,7 +108,7 @@ export default class ExtensionGroup extends Vue {
 // .container
 //   max-width: 720px
 .title
-  font-size: 26px
+  font-size: 20px
 
 .new-directories
   font-size: 16px

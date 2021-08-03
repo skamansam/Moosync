@@ -29,7 +29,7 @@ export default class PreferenceHeader extends Vue {
 .preference-title
   font-weight: normal
   font-size: 20px
-  color: var(--textSecondary)
+  color: var(--textPrimary)
 
 .tooltip-pos
   margin-top: 2px

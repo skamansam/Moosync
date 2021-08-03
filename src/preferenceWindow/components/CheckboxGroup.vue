@@ -1,6 +1,6 @@
 <template>
   <b-container fluid class="path-container w-100" v-if="Array.isArray(value)">
-    <PreferenceHeader :title="title" :tooltip="tooltip" />
+    <PreferenceHeader v-if="title" :title="title" :tooltip="tooltip" />
     <b-row no-gutters class="item w-100" v-for="(checkbox, index) in value" :key="checkbox.key">
       <b-col cols="auto" align-self="center">
         <b-checkbox
@@ -56,7 +56,7 @@ export default class CheckboxGroup extends Mixins(ExtensionPreferenceMixin) {
 
 .item-text
   font-size: 18px
-  color: var(--textSecondary)
+  color: var(--textPrimary)
   min-width: 0
   text-align: left
 </style>

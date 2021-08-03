@@ -1,6 +1,6 @@
 <template>
   <b-container fluid class="path-container w-100">
-    <b-row no-gutters>
+    <b-row no-gutters v-if="title">
       <b-col cols="auto" align-self="center" class="title d-flex">
         <div>{{ title }}</div>
         <div class="ml-3">
@@ -96,7 +96,7 @@ export default class DirectoryGroup extends Mixins(ExtensionPreferenceMixin) {
 // .container
 //   max-width: 720px
 .title
-  font-size: 26px
+  font-size: 20px
 
 .new-directories
   font-size: 16px

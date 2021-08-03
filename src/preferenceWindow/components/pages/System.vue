@@ -5,7 +5,7 @@
         <div class="path-selector w-100">
           <CheckboxGroup
             title="System Settings"
-            tooltip=""
+            tooltip="Settings which are related to your system"
             :isExtension="false"
             :defaultValue="checkboxValues"
             prefKey="system"
