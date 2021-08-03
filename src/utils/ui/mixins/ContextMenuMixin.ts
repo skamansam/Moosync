@@ -144,15 +144,6 @@ export default class ContextMenuMixin extends mixins(PlayerControls, RemoteSong)
         },
       },
       {
-        label: 'Remove from Library',
-        handler: async () => {
-          try {
-            await window.DBUtils.removeSongs([item])
-          } catch (e) { console.error(e) }
-          refreshCallback()
-        }
-      },
-      {
         label: 'Add To Playlist',
         children: this.populatePlaylistMenu([item], undefined),
       },
@@ -161,6 +152,16 @@ export default class ContextMenuMixin extends mixins(PlayerControls, RemoteSong)
       items.push({
         label: 'Add Song to Library',
         handler: () => this.addSongsToLibrary(item),
+      })
+    } else {
+      items.push({
+        label: 'Remove from Library',
+        handler: async () => {
+          try {
+            await window.DBUtils.removeSongs([item])
+          } catch (e) { console.error(e) }
+          refreshCallback()
+        }
       })
     }
     return items
