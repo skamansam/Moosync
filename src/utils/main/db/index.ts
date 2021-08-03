@@ -24,15 +24,6 @@ class SongDBInstance extends DBUtils {
                 ALLSONGS
      ============================= */
 
-  public async getAllSongs(exclude?: string[]): Promise<Song[]> {
-    const marshaled: marshaledSong[] = this.db.query(
-      `SELECT *, ${this.addGroupConcatClause()} FROM allsongs
-      ${this.addLeftJoinClause(undefined, 'allsongs')}
-      ${this.addExcludeWhereClause(true, exclude)} GROUP BY allsongs._id`
-    )
-    return this.batchUnmarshal(marshaled)
-  }
-
   public async store(newDoc: Song): Promise<void> {
     const artistID = newDoc.artists ? this.storeArtists(...newDoc.artists) : []
     const albumID = newDoc.album ? this.storeAlbum(newDoc.album) : ''
@@ -90,21 +81,6 @@ class SongDBInstance extends DBUtils {
     })(song_id)
   }
 
-  public async searchSongsCompact(term: string, exclude?: string[]): Promise<SearchResult> {
-    const songs: marshaledSong[] = this.db.query(
-      `SELECT *, ${this.addGroupConcatClause()} FROM allsongs 
-      ${this.addLeftJoinClause(undefined, 'allsongs')}
-        WHERE allsongs.path LIKE ? 
-        OR albums.album_name LIKE ?
-        OR artists.artist_name LIKE ?
-        ${this.addExcludeWhereClause(false, exclude)} GROUP BY allsongs._id`,
-      `%${term}%`,
-      `%${term}%`,
-      `%${term}%`
-    )
-    return { songs: this.batchUnmarshal(songs) }
-  }
-
   public async searchAll(term: string, exclude?: string[]): Promise<SearchResult> {
     const songs: marshaledSong[] = this.db.query(
       `SELECT *, ${this.addGroupConcatClause()} FROM allsongs 
@@ -120,43 +96,46 @@ class SongDBInstance extends DBUtils {
     return { songs: this.batchUnmarshal(songs), albums: albums, artists: artists, genres: genre }
   }
 
-  private populateWhereQuery(options: SongAPIOptions) {
-    let where = ''
-    const args: string[] = []
-    let isFirst = true
+  private populateWhereQuery(options?: SongAPIOptions) {
+    if (options && (options.album || options.artist || options.name || options.id)) {
+      let where = 'WHERE '
+      const args: string[] = []
+      let isFirst = true
 
-    const addANDorOR = () => {
-      const str = (!isFirst ? ((options.inclusive ? 'AND' : 'OR')) : '')
-      isFirst = false
-      return str
+      const addANDorOR = () => {
+        const str = (!isFirst ? ((options.inclusive ? 'AND' : 'OR')) : '')
+        isFirst = false
+        return str
+      }
+
+      if (options.name) {
+        where += `${addANDorOR()} allsongs.path LIKE ?`
+        args.push(`%${options.name}%`)
+      }
+
+      if (options.album) {
+        where += `${addANDorOR()} albums.album_name LIKE ?`
+        args.push(`%${options.album}%`)
+      }
+
+      if (options.artist) {
+        where += `${addANDorOR()} artists.artist_name LIKE ?`
+        args.push(`%${options.artist}%`)
+      }
+
+      return { where, args }
     }
-
-    if (options.name) {
-      where += `${addANDorOR()} allsongs.path LIKE ?`
-      args.push(options.name)
-    }
-
-    if (options.album) {
-      where += `${addANDorOR()} albums.album_name LIKE ?`
-      args.push(options.album)
-    }
-
-    if (options.artist) {
-      where += `${addANDorOR()} artists.artist_name LIKE ?`
-      args.push(options.artist)
-    }
-
-    return { where, args }
+    return { where: '', args: [] }
   }
 
-  public async getSongByOptions(options: SongAPIOptions) {
+  public async getSongByOptions(options?: SongAPIOptions, exclude?: string[]) {
     const { where, args } = this.populateWhereQuery(options)
 
     const songs: marshaledSong[] = this.db.query(
       `SELECT *, ${this.addGroupConcatClause()} FROM allsongs
       ${this.addLeftJoinClause(undefined, 'allsongs')}
-        WHERE ${where}
-        ${this.addExcludeWhereClause(false, [])} GROUP BY allsongs._id`,
+        ${where}
+        ${this.addExcludeWhereClause(false, exclude)} GROUP BY allsongs._id`,
       ...args
     )
     return this.batchUnmarshal(songs)

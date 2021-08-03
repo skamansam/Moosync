@@ -36,7 +36,7 @@ export class SongsChannel implements IpcChannelInterface {
 
   private async getAllSongs(event: Electron.IpcMainEvent, request: IpcRequest) {
     const preferences = await loadPreferences()
-    SongDB.getAllSongs(getDisabledPaths(preferences.musicPaths))
+    SongDB.getSongByOptions(undefined, getDisabledPaths(preferences.musicPaths))
       .then((data) => event.reply(request.responseChannel, data))
       .catch((e) => console.error(e))
   }

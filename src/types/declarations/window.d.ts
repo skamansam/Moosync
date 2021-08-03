@@ -29,7 +29,7 @@ interface providerUtils {
 }
 
 interface searchUtils {
-  searchCompact: (term: string) => Promise<SearchResult>
+  searchCompact: (term: string) => Promise<Song[]>
   searchAll: (term: string) => Promise<SearchResult>
   searchYT: (term: string) => Promise<YoutubeItem[]>
 }

@@ -16,10 +16,10 @@
       />
     </div>
     <div class="search-results d-flex" :class="showSearchResults ? 'search-visible' : 'search-invisible'">
-      <div v-if="results && results.songs.length !== 0" class="w-100">
+      <div v-if="results && results.length !== 0" class="w-100">
         <RecycleScroller
           class="scroller"
-          :items="results.songs"
+          :items="results"
           :item-size="83"
           key-field="_id"
           v-slot="{ item, index }"
@@ -30,13 +30,13 @@
             :title="item.title"
             :subtitle="item.artists ? item.artists.join(', ') : ''"
             :coverImg="item.album ? item.album.album_coverPath : ''"
-            :divider="index != results.songs.length - 1"
+            :divider="index != results.length - 1"
             :id="index"
             @imgClick="handleClick"
           />
         </RecycleScroller>
       </div>
-      <div class="w-100 text-center" v-if="results && results.songs.length == 0">No Results found</div>
+      <div class="w-100 text-center" v-else>No Results found</div>
     </div>
   </div>
 </template>
@@ -57,7 +57,7 @@ import PlayerControls from '@/utils/ui/mixins/PlayerControls'
 })
 export default class Sidebar extends mixins(Colors, PlayerControls) {
   private showSearchResults: boolean = false
-  private results: SearchResult | null = null
+  private results: Song[] = []
   private inputText: string = ''
 
   private handleInputFocus(event: FocusEvent) {
@@ -72,7 +72,7 @@ export default class Sidebar extends mixins(Colors, PlayerControls) {
   }
 
   private handleClick(index: any) {
-    this.playTop([this.results!.songs![index]])
+    this.playTop([this.results![index]])
   }
 
   private openSearchPage() {
@@ -92,7 +92,7 @@ export default class Sidebar extends mixins(Colors, PlayerControls) {
       this.results = await window.SearchUtils.searchCompact(value)
     } else {
       this.showSearchResults = false
-      this.results = null
+      this.results = []
     }
   }
 }

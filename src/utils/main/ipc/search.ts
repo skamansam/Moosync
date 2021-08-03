@@ -43,7 +43,13 @@ export class SearchChannel implements IpcChannelInterface {
   private async searchCompact(event: Electron.IpcMainEvent, request: IpcRequest) {
     if (request.params && request.params.searchTerm) {
       const preferences = await loadPreferences()
-      SongDB.searchSongsCompact(request.params.searchTerm, getDisabledPaths(preferences.musicPaths))
+      SongDB.getSongByOptions(
+        {
+          album: request.params.searchTerm,
+          artist: request.params.searchTerm,
+          name: request.params.searchTerm,
+          inclusive: false
+        }, getDisabledPaths(preferences.musicPaths))
         .then((data) => event.reply(request.responseChannel, data))
         .catch((e) => console.error(e))
     }
