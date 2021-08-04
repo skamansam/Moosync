@@ -49,7 +49,7 @@ class MainHostIPCHandler {
   }
 
   public async installExtension(zipPaths: string[]): Promise<installMessage> {
-    const resp = await this.extensionResourceHandler.installExtension(zipPaths)
+    const resp = await this.extensionResourceHandler.installExtension(zipPaths, this.extensionResourceHandler.uninstallExtension)
     await this.mainRequestGenerator.findNewExtensions()
     return resp
   }
@@ -204,7 +204,7 @@ class ExtensionHandler {
     }
   }
 
-  public async installExtension(zipPaths: string[]): Promise<installMessage> {
+  public async installExtension(zipPaths: string[], uninstallMethod: (P: string) => Promise<void>): Promise<installMessage> {
     for (const filePath of zipPaths) {
       const zip = new async({ file: filePath })
       const manifestRaw = await zip.entryData('package.json')
@@ -215,10 +215,11 @@ class ExtensionHandler {
           if (!(await this.checkVersion(existingVersion, manifest.version))) {
             return {
               success: false,
-              message: `Duplicate extension ${manifest.packageName}. Can not install`
+              message: `Duplicate extension ${manifest.name}. Can not install`
             }
           }
-          this.uninstallExtension(manifest.name)
+          await uninstallMethod(manifest.name)
+          await this.uninstallExtension(manifest.name)
         }
         const installPath = path.join(defaultExtensionPath, manifest.name)
         await this.createDirIfNotExists(installPath)
