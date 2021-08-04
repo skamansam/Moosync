@@ -6,7 +6,7 @@
 
     <b-row no-gutters align-h="end">
       <b-col cols="auto">
-        <div class="titlebar-buttons" @click="onMinimize()">
+        <div class="titlebar-buttons minimize-button" @click="onMinimize()">
           <svg width="13" height="2" viewBox="0 0 17 2" fill="none" xmlns="http://www.w3.org/2000/svg">
             <path
               d="M15.9375 0H1.0625C0.474805 0 0 0.446875 0 1C0 1.55313 0.474805 2 1.0625 2H15.9375C16.5252 2 17 1.55313 17 1C17 0.446875 16.5252 0 15.9375 0Z"
@@ -17,7 +17,7 @@
       </b-col>
 
       <b-col cols="auto">
-        <div @click="onMaximize()" class="titlebar-buttons">
+        <div @click="onMaximize()" class="titlebar-buttons maximize-button">
           <svg
             v-if="isMaximized"
             width="13"
@@ -93,11 +93,11 @@ export default class Sidebar extends Vue {
 
 <style lang="sass" scoped>
 .titlebar
-  // position: relative
   z-index: 999 !important
   width: 100%
-  // height: 22px
   -webkit-app-region: drag
+  padding-left: 0 !important
+  padding-right: 0 !important
   .titlebar-resize-handle
     position: absolute
     top: 0
@@ -120,11 +120,15 @@ export default class Sidebar extends Vue {
 
 
 .titlebar-buttons
-  padding-left: 13px
-  padding-right: 13px
+  padding-left: 17px
+  padding-right: 17px
   -webkit-app-region: no-drag
 
 .close-button
   &:hover
-    background: red
+    background: rgba(255, 0, 0, 0.73)
+
+.maximize-button, .minimize-button
+  &:hover
+    background: rgba(255, 255, 255, 0.1)
 </style>
