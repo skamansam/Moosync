@@ -49,10 +49,13 @@
           <b-row no-gutters align-v="end" class="flex-fill mt-2">
             <b-col>
               <div v-if="buttonGroup.enableContainer" class="button-group d-flex">
-                <PlainPlay title="Play Song" @click.native="playAll" />
-                <AddToQueue title="Add Song to queue" @click.native="addToQueue" />
+                <PlainPlay :title="`Play ${currentTitle ? currentTitle : defaultTitle}`" @click.native="playAll" />
+                <AddToQueue
+                  :title="`Add ${currentTitle ? currentTitle : defaultTitle} to queue`"
+                  @click.native="addToQueue"
+                />
                 <AddToLibrary
-                  title="Add Song to library"
+                  :title="`Add ${currentTitle ? currentTitle : defaultTitle} to library`"
                   @click.native="addToLibrary"
                   v-if="buttonGroup.enableLibraryStore"
                 />

@@ -30,6 +30,7 @@
         @onRowDoubleClicked="queueSong"
         @onRowContext="getSongContextMenu"
         @onRowSelected="updateCoverDetails"
+        @onRowSelectionClear="clearSelection"
       />
     </b-row>
   </b-container>
@@ -43,6 +44,7 @@ import Colors from '@/utils/ui/mixins/Colors'
 import { mixins } from 'vue-class-component'
 import PlayerControls from '@/utils/ui/mixins/PlayerControls'
 import ModelHelper from '@/utils/ui/mixins/ModelHelper'
+import RemoteSong from '@/utils/ui/mixins/remoteSongMixin'
 
 @Component({
   components: {
@@ -50,12 +52,15 @@ import ModelHelper from '@/utils/ui/mixins/ModelHelper'
     SongDetails
   }
 })
-export default class AllSongs extends mixins(Colors, PlayerControls, ModelHelper) {
+export default class AllSongs extends mixins(Colors, PlayerControls, ModelHelper, RemoteSong) {
   @Prop({ default: () => [] })
   private songList!: Song[]
 
   @Prop({ default: false })
   private tableBusy!: boolean
+
+  private selected: Song[] | null = null
+  private selectedCopy: Song[] | null = null
 
   private currentSong: Song | null | undefined = null
 
@@ -76,8 +81,16 @@ export default class AllSongs extends mixins(Colors, PlayerControls, ModelHelper
   })
   private detailsButtonGroup!: SongDetailButtons
 
-  private updateCoverDetails(item: Song | undefined) {
-    this.currentSong = item
+  private clearSelection() {
+    this.currentSong = null
+    this.selected = this.selectedCopy
+    this.selectedCopy = null
+  }
+
+  private updateCoverDetails(items: Song[]) {
+    if (items) this.currentSong = items[items.length - 1]
+    this.selected = items
+    this.selectedCopy = items
   }
 
   private getSongContextMenu(event: Event, item: Song) {
@@ -85,15 +98,18 @@ export default class AllSongs extends mixins(Colors, PlayerControls, ModelHelper
   }
 
   private playAll() {
-    this.$emit('playAll')
+    this.playTop(this.selected ?? this.songList)
+    this.selected = this.selectedCopy
   }
 
   private addToQueue() {
-    this.$emit('addToQueue')
+    this.queueSong(this.selected ?? this.songList)
+    this.selected = this.selectedCopy
   }
 
   private addToLibrary() {
-    this.$emit('addToLibrary')
+    this.addSongsToLibrary(...(this.selected ?? this.songList))
+    this.selected = this.selectedCopy
   }
 }
 </script>

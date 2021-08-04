@@ -81,8 +81,8 @@ export default class SongList extends mixins(Colors) {
 
   // Clear selection after table loses focus
   private clearSelection() {
+    this.$emit('onRowSelectionClear')
     this.selected = []
-    this.$emit('onRowSelected', null)
   }
 
   private keyPressed: 'Control' | 'Shift' | undefined
@@ -257,7 +257,10 @@ export default class SongList extends mixins(Colors) {
         this.selected = Array.from({ length: max - min + 1 }, (_, i) => min + i)
       }
     } else this.selected = [index]
-    this.$emit('onRowSelected', this.songList[index])
+    this.$emit(
+      'onRowSelected',
+      this.selected.map((val) => this.songList[val])
+    )
   }
 
   private sortContent(): void {
