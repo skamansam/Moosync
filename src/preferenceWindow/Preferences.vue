@@ -30,10 +30,6 @@ import Sidebar from '@/preferenceWindow/components/Sidebar.vue'
   }
 })
 export default class App extends mixins(ThemeHandler) {
-  created() {
-    this.loadPreferences()
-  }
-
   mounted() {
     this.registerDevTools()
   }
@@ -48,23 +44,8 @@ export default class App extends mixins(ThemeHandler) {
     })
   }
 
-  private loadPreferences() {
-    window.PreferenceUtils.load().then((data) => {
-      vxm.preferences.Preferences = data
-    })
-  }
-
   private closeWindow() {
     window.WindowUtils.closeWindow(false)
-  }
-
-  private async writePreferences() {
-    if (vxm.preferences.Preferences) {
-      await window.PreferenceUtils.save(vxm.preferences.Preferences)
-      if (vxm.preferences.PathsChanged) {
-        Vue.nextTick(() => window.FileUtils.scan())
-      }
-    }
   }
 }
 </script>
