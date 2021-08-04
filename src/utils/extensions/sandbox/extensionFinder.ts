@@ -31,7 +31,7 @@ export class ExtensionFinder extends AbstractExtensionFinder {
             const manifest = await this.parseJson(path.join(searchPath, folder.name, possibleManifests[0].name))
             if (manifest.moosyncExtension) {
               const modulePath = path.join(searchPath, folder.name, manifest.extensionEntry)
-              yield { name: manifest.displayName, packageName: manifest.name, desc: manifest.description, version: manifest.version, entry: modulePath }
+              yield { name: manifest.displayName, packageName: manifest.name, desc: manifest.description, author: manifest.author, version: manifest.version, entry: modulePath }
             }
           }
         }

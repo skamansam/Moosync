@@ -17,7 +17,8 @@
           <b-checkbox @change="togglePath(index)" :id="`ext-${index}`" :checked="ext.hasStarted" />
         </b-col>
         <b-col col md="8" lg="9" align-self="center" class="ml-3 justify-content-start">
-          <div class="item-text text-truncate">{{ ext.name }}</div>
+          <div class="item-text text-truncate">{{ ext.name }} - {{ ext.version }}</div>
+          <div class="item-text-subtitle text-truncate">{{ ext.author }}</div>
         </b-col>
         <b-col cols="auto" align-self="center" class="ml-auto">
           <div class="remove-button w-100" @click="removePath(index)">Remove</div>
@@ -135,6 +136,12 @@ export default class ExtensionGroup extends Vue {
 
 .item-text
   font-size: 18px
+  color: var(--textPrimary)
+  min-width: 0
+  text-align: left
+
+.item-text-subtitle
+  font-size: 14px
   color: var(--textSecondary)
   min-width: 0
   text-align: left

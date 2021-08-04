@@ -31,18 +31,9 @@ type mainReplyMessage = mainRequestMessage
 
 type mainHostMessage = mainReplyMessage | extensionRequestMessage
 
-interface installedExtensionDesc {
-  name: string
-  desc: string
-  packageName: string
-  ver: string
-  path: string
-
-}
 interface installMessage {
   success: boolean
   message?: string
-  extensionDescription?: installedExtensionDesc
 }
 
 type mainHostMessage = {
@@ -57,6 +48,7 @@ interface ExtensionDetails {
   name: string
   packageName: string
   desc: string
+  author: string
   version: string
   hasStarted: boolean
   entry: string
@@ -73,6 +65,7 @@ interface UnInitializedExtensionItem {
   name: string,
   packageName: string,
   desc: string,
+  author: string
   version: string
   entry: string
 }

@@ -103,6 +103,7 @@ export class ExtensionManager extends AbstractExtensionManager {
       this.register({
         name: extension.name,
         desc: extension.desc,
+        author: extension.author,
         packageName: extension.packageName,
         version: extension.version,
         hasStarted: false,

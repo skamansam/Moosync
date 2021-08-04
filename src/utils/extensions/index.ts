@@ -227,13 +227,6 @@ class ExtensionHandler {
         return {
           success: true,
           message: "Extension installed successfully",
-          extensionDescription: {
-            name: manifest.displayName,
-            desc: manifest.description,
-            packageName: manifest.name,
-            ver: manifest.version,
-            path: installPath
-          }
         }
       }
     }

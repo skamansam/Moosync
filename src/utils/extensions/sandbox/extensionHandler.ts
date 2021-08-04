@@ -96,6 +96,7 @@ export class ExtensionHandler {
     return {
       name: item.name,
       desc: item.desc,
+      author: item.author,
       packageName: item.packageName,
       version: item.version,
       hasStarted: item.hasStarted,
