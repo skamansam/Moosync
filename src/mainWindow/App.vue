@@ -117,7 +117,8 @@ export default class App extends mixins(ThemeHandler, PlayerControls) {
 
   private getFileName(path: string) {
     let li = Math.max(path.lastIndexOf('/'), path.lastIndexOf('\\'))
-    return path.substring(li + 1)
+    const fileName = path.substring(li + 1)
+    return fileName.split('.')[0]
   }
 
   private getDuration(src: string): Promise<number> {
@@ -131,6 +132,11 @@ export default class App extends mixins(ThemeHandler, PlayerControls) {
   }
 
   private async getSongFromPath(path: string): Promise<Song> {
+    const results = await window.SearchUtils.searchCompact(path)
+    if (results.length > 0) {
+      return results[0]
+    }
+
     const duration = await this.getDuration(path)
     return {
       _id: v1(),

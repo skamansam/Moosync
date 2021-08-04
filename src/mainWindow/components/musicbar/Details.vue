@@ -4,12 +4,12 @@
       fluid
       ref="cover"
       class="coverimg"
-      v-if="getImgSrc(imgSrc) && !forceEmptyImg"
-      :src="getImgSrc(imgSrc)"
+      v-if="imgSrc && !forceEmptyImg"
+      :src="imgSrc"
       alt="cover art"
       @error="handlerImageError(arguments[0], handleError)"
     />
-    <SongDefault v-if="!getImgSrc(imgSrc) || forceEmptyImg" class="coverimg" />
+    <SongDefault v-if="!imgSrc || forceEmptyImg" class="coverimg" />
     <div class="text-container">
       <div :title="title" class="text song-title text-truncate">
         {{ title }}

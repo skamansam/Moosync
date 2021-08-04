@@ -50,13 +50,11 @@ class SongDBInstance extends DBUtils {
         song_id
       ) as { count: number, artist: string }
 
-      const songCoverPath = this.db.queryFirstCell(`SELECT song_coverPath from allsongs WHERE _id = ?`, song_id)
+      const songCoverPath_low = this.db.queryFirstCell(`SELECT song_coverPath_low from allsongs WHERE _id = ?`, song_id)
+      const songCoverPath_high = this.db.queryFirstCell(`SELECT song_coverPath_high from allsongs WHERE _id = ?`, song_id)
 
-      try {
-        if (songCoverPath) await fsP.rm(songCoverPath, { force: true })
-      } catch (e) {
-        undefined
-      }
+      if (songCoverPath_low) await fsP.rm(songCoverPath_low, { force: true })
+      if (songCoverPath_high) await fsP.rm(songCoverPath_high, { force: true })
 
       this.db.delete('artists_bridge', { song: song_id })
       this.db.delete('album_bridge', { song: song_id })
@@ -67,11 +65,9 @@ class SongDBInstance extends DBUtils {
       if (album_ids.count == 1) {
         const album = await this.getAlbumByID(album_ids.album)
         this.db.delete('albums', { album_id: album_ids.album })
-        try {
-          if (album?.album_coverPath) await fsP.rm(album.album_coverPath, { force: true }).catch(err => console.error(err))
-        } catch (err) {
-          undefined
-        }
+        if (album?.album_coverPath_low) await fsP.rm(album.album_coverPath_low, { force: true }).catch(err => console.error(err))
+        if (album?.album_coverPath_high) await fsP.rm(album.album_coverPath_high, { force: true }).catch(err => console.error(err))
+
       }
       if (artist_ids.count == 1) {
         const artist = await this.getArtistsByID(artist_ids.artist)
@@ -202,7 +198,7 @@ class SongDBInstance extends DBUtils {
       if (!id) {
         id = v4()
       }
-      this.db.run(`INSERT OR REPLACE INTO albums (album_id, album_name, album_coverPath, album_artist) VALUES(?, ?, ?, ?)`, id, album.album_name, album.album_coverPath, album.album_artist)
+      this.db.run(`INSERT OR REPLACE INTO albums (album_id, album_name, album_coverPath_low, album_coverPath_high, album_artist) VALUES(?, ?, ?, ?, ?)`, id, album.album_name, album.album_coverPath_low, album.album_coverPath_high, album.album_artist)
     }
     return id as string
   }
@@ -353,9 +349,9 @@ class SongDBInstance extends DBUtils {
 
   public async getDefaultCoverByArtist(id: string): Promise<string | undefined> {
     return (this.db.queryFirstRow(
-      `SELECT album_coverPath from albums WHERE album_id = (SELECT album FROM album_bridge WHERE song = (SELECT song FROM artists_bridge WHERE artist = ?))`,
+      `SELECT album_coverPath_high from albums WHERE album_id = (SELECT album FROM album_bridge WHERE song = (SELECT song FROM artists_bridge WHERE artist = ?))`,
       id
-    ) as marshaledSong)?.album_coverPath
+    ) as marshaledSong)?.album_coverPath_high
   }
 
   public updateSongCountArtists() {
@@ -407,12 +403,13 @@ class SongDBInstance extends DBUtils {
   }
 
   public async addToPlaylist(playlist_id: string, ...songs: Song[]) {
+    // TODO: Regenerate cover instead of using existing from song
     const coverExists = this.isPlaylistCoverExists(playlist_id)
     this.db.transaction((songs: Song[]) => {
       for (const s of songs) {
         if (!coverExists) {
-          if (s.album?.album_coverPath) {
-            this.updatePlaylistCoverPath(playlist_id, s.album.album_coverPath)
+          if (s.album?.album_coverPath_high) {
+            this.updatePlaylistCoverPath(playlist_id, s.album.album_coverPath_high)
           }
         }
         this.db.insert('playlist_bridge', { playlist: playlist_id, song: s._id })

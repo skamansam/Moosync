@@ -101,7 +101,7 @@ export default class NewPlaylistModal extends mixins(Colors, ImgLoader) {
   private getValidImages() {
     let mergableImages: string[] = []
     for (const song of this.songs) {
-      const cover = this.getValidImage(song)
+      const cover = this.getValidImageHigh(song)
       if (cover) mergableImages.push(cover)
     }
     return mergableImages.slice(0, 4)
@@ -111,7 +111,7 @@ export default class NewPlaylistModal extends mixins(Colors, ImgLoader) {
     let img = new Image()
     img.onload = () => this.drawImage(quad, len, ctx, img)
     img.crossOrigin = ''
-    img.src = src.startsWith('http') ? src : 'media://' + src
+    img.src = this.getImgSrc(src)
   }
 
   private isExpandedImage(quad: number, len: number) {
@@ -148,7 +148,7 @@ export default class NewPlaylistModal extends mixins(Colors, ImgLoader) {
 
   private drawWholeImage(ctx: CanvasRenderingContext2D, src: string) {
     let img = new Image()
-    img.src = 'media://' + src
+    img.src = this.getImgSrc(src)
     img.onload = () => ctx.drawImage(img, 0, 0, 800, 800)
   }
 
@@ -164,11 +164,6 @@ export default class NewPlaylistModal extends mixins(Colors, ImgLoader) {
           this.createImage(mergableImages[i], i, mergableImages.length, ctx!)
       }
     }
-  }
-
-  private computeImgSrc(value: string): string {
-    if (!value.startsWith('http')) return `media://${value}`
-    return value
   }
 
   private async addToPlaylist(playlist_id: string, songs: Song[]) {

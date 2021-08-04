@@ -7,7 +7,15 @@
             <Play2 />
           </div>
         </div>
-        <img ref="cover" class="coverimg me-auto d-flex align-items-center" alt="cover img" :src="getCoverImg()" />
+        <img
+          v-if="!forceEmptyImg"
+          ref="cover"
+          class="coverimg me-auto d-flex align-items-center"
+          alt="cover img"
+          :src="coverImg"
+          @error="handleCoverError"
+        />
+        <SongDefault v-else class="h-100" />
       </b-col>
       <b-col class="text-container text-truncate my-auto">
         <b-link class="song-title text-truncate" @click="emitTitleClick">{{ title }}</b-link>
@@ -27,14 +35,16 @@
 </template>
 
 <script lang="ts">
-import { Component, Prop } from 'vue-property-decorator'
+import { Component, Prop, Watch } from 'vue-property-decorator'
 import Play2 from '@/mainWindow/components/icons/Play2.vue'
 import { mixins } from 'vue-class-component'
 import PlayerControls from '@/utils/ui/mixins/PlayerControls'
+import SongDefault from '@/mainWindow/components/icons/SongDefault.vue'
 
 @Component({
   components: {
-    Play2
+    Play2,
+    SongDefault
   }
 })
 export default class SingleSearchResult extends mixins(PlayerControls) {
@@ -56,14 +66,14 @@ export default class SingleSearchResult extends mixins(PlayerControls) {
   @Prop({ default: false })
   showButtons!: boolean
 
-  private getCoverImg() {
-    if (this.coverImg) {
-      if (this.coverImg.startsWith('http')) {
-        return this.coverImg
-      }
-      return `media://${this.coverImg}`
-    }
-    return ''
+  private forceEmptyImg = false
+
+  private handleCoverError() {
+    this.forceEmptyImg = true
+  }
+
+  @Watch('cover') onCoverChange() {
+    this.forceEmptyImg = false
   }
 
   private emitImgClick() {

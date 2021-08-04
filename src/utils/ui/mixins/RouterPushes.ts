@@ -9,7 +9,7 @@ export default class PlayerControls extends Vue {
         album_id: album.album_id!,
         album_name: album.album_name!,
         album_artist: album.album_artist!,
-        album_coverPath: album.album_coverPath ? album.album_coverPath : '',
+        album_coverPath: album.album_coverPath_high ? album.album_coverPath_high : '',
         album_song_count: album.album_song_count!.toString()!,
       },
     })

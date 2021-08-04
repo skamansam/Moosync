@@ -59,8 +59,8 @@ export default class SyncMixin extends mixins(ModelHelper, ImgLoader) {
   }
 
   private async checkYoutubeCover(event: Song) {
-    if (event.album && event.album.album_coverPath && event.album.album_coverPath.startsWith('http'))
-      vxm.sync.setCover(event.album.album_coverPath)
+    if (event.album && event.album.album_coverPath_low && event.album.album_coverPath_low.startsWith('http'))
+      vxm.sync.setCover(event.album.album_coverPath_low)
     else
       vxm.sync.setCover('')
 
@@ -101,7 +101,7 @@ export default class SyncMixin extends mixins(ModelHelper, ImgLoader) {
   private async getLocalCover(songID: string) {
     const song = vxm.sync.localQueue.find((song) => song._id == songID)
     if (song) {
-      const cover = this.getValidImage(song)
+      const cover = this.getValidImageLow(song)
       if (cover) {
         const resp = await fetch(this.getImgSrc(cover))
         const buf = await resp.arrayBuffer()

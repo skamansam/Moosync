@@ -144,7 +144,7 @@ export const migrations = [
   // 02-07-2021
   `
   -- Up
-  ALTER TABLE allsongs ADD song_coverPath TEXT
+  ALTER TABLE allsongs ADD song_coverPath TEXT;
 
   -- Down
   `,
@@ -154,6 +154,17 @@ export const migrations = [
   -- Up
   ALTER TABLE allsongs ADD playbackUrl TEXT;
 
+  -- Down
+  `,
+
+  // 04-08-2021
+  `
+  -- Up
+  ALTER TABLE allsongs RENAME COLUMN song_coverPath TO song_coverPath_high;
+  ALTER TABLE allsongs ADD song_coverPath_low TEXT;
+
+  ALTER TABLE albums RENAME COLUMN album_coverPath TO album_coverPath_high;
+  ALTER TABLE albums ADD album_coverPath_low TEXT;
   -- Down
   `,
 

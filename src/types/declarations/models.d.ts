@@ -1,7 +1,8 @@
 interface Album {
   album_id?: string
   album_name?: string
-  album_coverPath?: string
+  album_coverPath_high?: string
+  album_coverPath_low?: string
   album_song_count?: number
   album_artist?: string
   year?: number
@@ -44,7 +45,8 @@ interface Song {
   path?: string
   size?: number
   title: string
-  song_coverPath?: string
+  song_coverPath_low?: string
+  song_coverPath_high?: string
   album?: Album
   artists?: string[]
   date?: string
@@ -70,10 +72,12 @@ interface marshaledSong {
   path?: string
   size?: number
   title: string
-  song_coverPath?: string
+  song_coverPath_low?: string
+  song_coverPath_high?: string
   album_id?: string
   album_name?: string
-  album_coverPath?: string
+  album_coverPath_high?: string
+  album_coverPath_low?: string
   album_song_count?: number
   lyrics?: string
   artist_name?: string

@@ -7,7 +7,7 @@
         :currentsubTitle="getAlbumName(currentSong)"
         :currentSubSubTitle="defaultDetails.defaultSubSubtitle"
         :currentType="currentSong ? currentSong.type : 'LOCAL'"
-        :imgSrc="getImg(currentSong)"
+        :imgSrc="getImgSrc(getValidImageHigh(currentSong))"
         :defaultTitle="defaultDetails.defaultTitle"
         :defaultsubTitle="defaultDetails.defaultSubtitle"
         :defaultImgSrc="defaultDetails.defaultCover"
@@ -45,6 +45,7 @@ import { mixins } from 'vue-class-component'
 import PlayerControls from '@/utils/ui/mixins/PlayerControls'
 import ModelHelper from '@/utils/ui/mixins/ModelHelper'
 import RemoteSong from '@/utils/ui/mixins/remoteSongMixin'
+import ImgLoader from '@/utils/ui/mixins/ImageLoader'
 
 @Component({
   components: {
@@ -52,7 +53,7 @@ import RemoteSong from '@/utils/ui/mixins/remoteSongMixin'
     SongDetails
   }
 })
-export default class AllSongs extends mixins(Colors, PlayerControls, ModelHelper, RemoteSong) {
+export default class AllSongs extends mixins(Colors, PlayerControls, ModelHelper, RemoteSong, ImgLoader) {
   @Prop({ default: () => [] })
   private songList!: Song[]
 

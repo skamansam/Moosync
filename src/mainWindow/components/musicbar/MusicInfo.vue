@@ -108,7 +108,7 @@ export default class MusicInfo extends mixins(Colors, ImageLoader, ModelHelper) 
   }
 
   get computedImg() {
-    return this.getImgSrc(this.imgSrc)
+    return this.getImgSrc(this.getValidImageHigh(this.currentSong))
   }
 
   private clear() {
@@ -149,17 +149,8 @@ export default class MusicInfo extends mixins(Colors, ImageLoader, ModelHelper) 
     }
   }
 
-  @Prop({ default: '' })
-  private imgSrc!: string
-
   @Prop({ default: () => {} })
   private currentSong!: Song
-
-  private forceEmptyImg: boolean = false
-
-  @Watch('imgSrc') onImgSrcChange() {
-    this.forceEmptyImg = false
-  }
 
   private formattedDuration = convertDuration
 }

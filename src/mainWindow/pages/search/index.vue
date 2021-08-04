@@ -140,9 +140,9 @@ export default class SearchPage extends mixins(RouterPushes, ContextMenuMixin) {
     if (item) {
       switch (tab) {
         case 'Songs':
-          return (item as Song).album ? (item as Song).album!.album_coverPath : ''
+          return (item as Song).song_coverPath_low ?? (item as Song).album?.album_coverPath_low
         case 'Albums':
-          return (item as Album).album_coverPath
+          return (item as Album).album_coverPath_low
         case 'Artists':
           return (item as artists).artist_coverPath
         case 'Genres':

@@ -5,7 +5,7 @@
         <b-img
           class="h-100 image"
           v-if="!forceEmptyImg"
-          :src="getImgSrc(getValidImage(song))"
+          :src="getImgSrc(getValidImageLow(song))"
           @error="handlerImageError(arguments[0], handlerError)"
         />
         <SongDefault v-else class="h-100" />
@@ -109,7 +109,7 @@ export default class MusicInfo extends mixins(Colors, ImgLoader, PlayerControls,
 
   private forceEmptyImg: boolean = false
 
-  private handlerError() {
+  private handlerError(e: any) {
     this.forceEmptyImg = true
   }
 }

@@ -146,7 +146,8 @@ export class YoutubeProvider extends GenericProvider {
           _id: v.id,
           title: v.snippet.title,
           artists: [v.snippet.channelTitle.replace('-', '').replace('Topic', '').trim()],
-          song_coverPath: (v.snippet.thumbnails.maxres ?? v.snippet.thumbnails.high ?? v.snippet.thumbnails.default).url,
+          song_coverPath_high: (v.snippet.thumbnails.maxres ?? v.snippet.thumbnails.high ?? v.snippet.thumbnails.default).url,
+          song_coverPath_low: (v.snippet.thumbnails.standard ?? v.snippet.thumbnails.standard ?? v.snippet.thumbnails.default).url,
           album: {
             album_name: 'Misc',
           },

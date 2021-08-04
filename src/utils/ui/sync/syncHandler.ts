@@ -558,10 +558,10 @@ export class SyncHolder {
   private stripSong(song: Song): Song {
     const tmp: Song = JSON.parse(JSON.stringify(song))
     delete tmp.path
-    if (tmp.album && tmp.album.album_coverPath) {
+    if (tmp.album && tmp.album.album_coverPath_low) {
       // If the image is hosted somewhere then surely the client on the other end can load it... right?
-      if (!tmp.album.album_coverPath.startsWith('http'))
-        delete tmp.album.album_coverPath
+      if (!tmp.album.album_coverPath_low.startsWith('http'))
+        delete tmp.album.album_coverPath_low
     }
     return tmp
   }

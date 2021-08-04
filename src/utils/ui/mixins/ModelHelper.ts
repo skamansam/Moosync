@@ -10,12 +10,6 @@ export default class ModelHelper extends Vue {
     return song && song.artists
   }
 
-  public getImg(song: Song | null | undefined): string | undefined | null {
-    if (song)
-      return song.song_coverPath ?? (this.isAlbumExists(song) && song!.album!.album_coverPath)
-    return ''
-  }
-
   public getAlbumName(song: Song | null | undefined): String {
     return this.isAlbumExists(song) ? song!.album!.album_name! : ''
   }

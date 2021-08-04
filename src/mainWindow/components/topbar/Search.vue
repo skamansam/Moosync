@@ -29,7 +29,7 @@
             class="single-result"
             :title="item.title"
             :subtitle="item.artists ? item.artists.join(', ') : ''"
-            :coverImg="item.album ? item.album.album_coverPath : ''"
+            :coverImg="getImgSrc(getValidImageLow(item))"
             :divider="index != results.length - 1"
             :id="index"
             @imgClick="handleClick"
@@ -48,6 +48,7 @@ import SingleSearchResult from '@/mainWindow/components/generic/SingleSearchResu
 import Colors from '@/utils/ui/mixins/Colors'
 import { mixins } from 'vue-class-component'
 import PlayerControls from '@/utils/ui/mixins/PlayerControls'
+import ImgLoader from '@/utils/ui/mixins/ImageLoader'
 
 @Component({
   components: {
@@ -55,7 +56,7 @@ import PlayerControls from '@/utils/ui/mixins/PlayerControls'
     SingleSearchResult
   }
 })
-export default class Sidebar extends mixins(Colors, PlayerControls) {
+export default class Sidebar extends mixins(Colors, PlayerControls, ImgLoader) {
   private showSearchResults: boolean = false
   private results: Song[] = []
   private inputText: string = ''

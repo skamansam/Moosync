@@ -36,14 +36,18 @@ export class ScannerChannel implements IpcChannelInterface {
 
     const count = await SongDB.countByHash(song.hash!)
     if (count == 0) {
-      const coverPath = cover && await this.storeCover(song._id!, cover)
-      if (!song.album?.album_coverPath || (await this.checkCoverExists(song.album.album_coverPath))) {
-        song.album = {
-          ...song.album,
-          album_coverPath: coverPath
+      const res = cover && await this.storeCover(song._id!, cover)
+      if (res) {
+        if (!(song.album?.album_coverPath_low && song.album?.album_coverPath_high) || !((await this.checkCoverExists(song.album.album_coverPath_low) && (await this.checkCoverExists(song.album.album_coverPath_high))))) {
+          song.album = {
+            ...song.album,
+            album_coverPath_high: res.high,
+            album_coverPath_low: res.low
+          }
         }
+        song.song_coverPath_high = res.high
+        song.song_coverPath_low = res.low
       }
-      song.song_coverPath = coverPath
 
       await SongDB.store(song)
     }
@@ -52,10 +56,21 @@ export class ScannerChannel implements IpcChannelInterface {
   private async storeCover(id: string, cover: TransferDescriptor<Buffer> | undefined) {
     if (cover) {
       const thumbPath = (await loadPreferences()).thumbnailPath
+      if (this.coverPool) {
+        return new Promise<{ high: string, low: string }>((resolve, reject) => {
+          this.coverPool.queue(coverTask => coverTask.writeCover(cover, thumbPath, id, true).then((val) => resolve(val)).catch((e) => reject(e)))
+        })
+      }
+    }
+  }
+
+  private async storeCoverSIngle(id: string, cover: TransferDescriptor<Buffer> | undefined) {
+    if (cover) {
+      const thumbPath = (await loadPreferences()).thumbnailPath
       const coverPath = path.join(thumbPath, id + '.jpg')
       if (this.coverPool) {
-        return new Promise<string>((resolve, reject) => {
-          this.coverPool.queue(coverTask => coverTask.writeCover(cover, coverPath).then((val: string) => resolve(val)).catch((e) => reject(e)))
+        return new Promise<{ high: string }>((resolve, reject) => {
+          this.coverPool.queue(coverTask => coverTask.writeCover(cover, thumbPath, id, false).then((val) => resolve(val)).catch((e) => reject(e)))
         })
       }
     }
@@ -86,7 +101,7 @@ export class ScannerChannel implements IpcChannelInterface {
     const ret: artists = artist
     notifyRenderer({ id: 'artwork-status', message: `Found artwork for ${artist.artist_name}`, type: 'info' })
     if (cover) {
-      ret.artist_coverPath = await this.storeCover(artist.artist_id, cover)
+      ret.artist_coverPath = (await this.storeCover(artist.artist_id, cover))?.high
     } else {
       ret.artist_coverPath = await SongDB.getDefaultCoverByArtist(artist.artist_id)
     }
