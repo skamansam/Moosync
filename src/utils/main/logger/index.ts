@@ -20,7 +20,7 @@ function generatePrefix(level: string, loggerName: string | symbol) {
   return `[${getTimestamp()}] [${getLevel(level)}] [${String(loggerName) ?? 'Main'}]: `
 }
 
-function generateMessage(...messages: any[]) {
+function concatArgs(...messages: any[]) {
   let ret = ''
   for (const m of messages) ret += ((typeof m === 'object') ? JSON.stringify(m) : m) + ' '
 
@@ -46,8 +46,9 @@ async function streamToFile(basePath: string, message: string) {
 export function prefixLogger(basePath: string, logger: log.RootLogger | log.Logger) {
   logger.methodFactory = (methodName, logLevel, loggerName) => {
     return (...args: any[]) => {
-      const final = generateMessage(generatePrefix(methodName, loggerName), ...args)
-      console.log(final);
+      const prefix = generatePrefix(methodName, loggerName)
+      console.log(prefix, ...args);
+      const final = concatArgs(prefix, ...args)
       streamToFile(basePath, final)
     };
   };
