@@ -8,7 +8,7 @@
           :src="getImgSrc(getValidImageLow(song))"
           @error="handlerImageError(arguments[0], handlerError)"
         />
-        <SongDefault v-else class="h-100" />
+        <SongDefault v-else class="h-100 image" />
         <div @click="playSong" class="play-button d-flex justify-content-center">
           <Play2 class="align-self-center" />
         </div>

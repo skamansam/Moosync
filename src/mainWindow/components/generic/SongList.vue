@@ -133,7 +133,7 @@ export default class SongList extends mixins(Colors) {
     await this.loadWidths()
     if (this.columnWidths.length === 0) {
       for (const index in this.extrafields) {
-        this.columnWidths[index] = 100 / this.extrafields.length - 1
+        this.columnWidths[index] = 100 / this.extrafields.length - 8
       }
     }
   }
