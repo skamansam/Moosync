@@ -7,10 +7,6 @@
         <router-view></router-view>
       </transition>
     </div>
-    <div class="footer-buttons">
-      <b-button v-on:click="closeWindow">Close</b-button>
-      <b-button v-on:click="writePreferences">Apply</b-button>
-    </div>
   </div>
 </template>
 

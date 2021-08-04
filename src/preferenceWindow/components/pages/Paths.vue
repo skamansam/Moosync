@@ -33,7 +33,6 @@
 import { Component } from 'vue-property-decorator'
 import Vue from 'vue'
 import FilePicker from '../FilePicker.vue'
-import { vxm } from '@/preferenceWindow/store'
 import DirectoryGroup from '../DirectoryGroup.vue'
 
 @Component({
