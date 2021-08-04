@@ -13,37 +13,53 @@
         </div>
       </b-col>
       <b-col class="text-container text-truncate">
-        <div class="d-flex">
-          <div :title="currentTitle ? currentTitle : defaultTitle" class="title text-truncate">
-            {{ currentTitle ? currentTitle : defaultTitle }}
-          </div>
-          <YoutubeIcon
-            v-if="currentType === 'YOUTUBE'"
-            :color="'#E62017'"
-            :filled="true"
-            :dropShadow="true"
-            class="ml-2 align-self-center provider-icon"
-          />
-          <SpotifyIcon
-            v-if="currentType === 'SPOTIFY'"
-            :color="'#07C330'"
-            :filled="true"
-            :dropShadow="true"
-            class="ml-2 align-self-center provider-icon"
-          />
-        </div>
-        <div :title="currentsubTitle ? currentsubTitle : defaultsubTitle" class="subtitle text-truncate">
-          {{ currentsubTitle ? currentsubTitle : defaultsubTitle }}
-        </div>
-        <div :title="currentSubSubTitle ? currentSubSubTitle : ''" class="subtitle text-truncate">
-          {{ currentSubSubTitle ? currentSubSubTitle : '' }}
-        </div>
+        <b-container fluid class="h-100 d-flex flex-column">
+          <b-row no-gutters>
+            <b-col :title="currentTitle ? currentTitle : defaultTitle" class="title text-truncate">
+              {{ currentTitle ? currentTitle : defaultTitle }}
+            </b-col>
+            <b-col cols="auto" align-self="center">
+              <YoutubeIcon
+                v-if="currentType === 'YOUTUBE'"
+                :color="'#E62017'"
+                :filled="true"
+                :dropShadow="true"
+                class="ml-2 align-self-center provider-icon"
+              />
+              <SpotifyIcon
+                v-if="currentType === 'SPOTIFY'"
+                :color="'#07C330'"
+                :filled="true"
+                :dropShadow="true"
+                class="ml-2 align-self-center provider-icon"
+              />
+            </b-col>
+          </b-row>
 
-        <div v-if="buttonGroup.enableContainer" class="button-group d-flex">
-          <PlainPlay @click.native="playAll" />
-          <AddToQueue @click.native="addToQueue" />
-          <AddToLibrary @click.native="addToLibrary" v-if="buttonGroup.enableLibraryStore" />
-        </div>
+          <b-row no-gutters>
+            <div class="d-flex">
+              <div :title="currentsubTitle ? currentsubTitle : defaultsubTitle" class="subtitle text-truncate">
+                {{ currentsubTitle ? currentsubTitle : defaultsubTitle }}
+              </div>
+              <div :title="currentSubSubTitle ? currentSubSubTitle : ''" class="subtitle text-truncate">
+                {{ currentSubSubTitle ? currentSubSubTitle : '' }}
+              </div>
+            </div>
+          </b-row>
+          <b-row no-gutters align-v="end" class="flex-fill mt-2">
+            <b-col>
+              <div v-if="buttonGroup.enableContainer" class="button-group d-flex">
+                <PlainPlay title="Play Song" @click.native="playAll" />
+                <AddToQueue title="Add Song to queue" @click.native="addToQueue" />
+                <AddToLibrary
+                  title="Add Song to library"
+                  @click.native="addToLibrary"
+                  v-if="buttonGroup.enableLibraryStore"
+                />
+              </div>
+            </b-col>
+          </b-row>
+        </b-container>
       </b-col>
     </b-row>
   </b-container>
@@ -157,6 +173,7 @@ export default class SongDetails extends mixins(Colors, ImageLoader, ErrorHandle
 .title
   font-size: 24px
   text-align: left
+  max-width: fit-content
 
 .dummy
   margin-top: 75%
@@ -167,8 +184,6 @@ export default class SongDetails extends mixins(Colors, ImageLoader, ErrorHandle
   font-size: 14px
 
 .button-group
-  position: absolute
-  bottom: 0
   svg
     margin-right: 16px
 
