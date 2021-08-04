@@ -54,9 +54,13 @@ export class ExtensionHandler {
   public startAll() {
     if (this.initialized) {
       for (const ext of this.extensionManager.getExtensions({ started: false })) {
-        if (ext.instance.onStarted)
-          ext.instance.onStarted()
-        this.extensionManager.setStarted(ext.packageName, true)
+        try {
+          if (ext.instance.onStarted)
+            ext.instance.onStarted()
+          this.extensionManager.setStarted(ext.packageName, true)
+        } catch (e) {
+          console.error(e)
+        }
       }
     } else {
       this.preInitializedCalls.push({ func: this.startAll })
@@ -65,15 +69,19 @@ export class ExtensionHandler {
 
   public toggleExtStatus(packageName: string, enabled: boolean) {
     const ext = this.extensionManager.getExtensions({ packageName })
-    for (const e of ext) {
-      if (enabled) {
-        if (e.instance.onStarted)
-          e.instance.onStarted()
-      } else {
-        if (e.instance.onStopped)
-          e.instance.onStopped()
+    try {
+      for (const e of ext) {
+        if (enabled) {
+          if (e.instance.onStarted)
+            e.instance.onStarted()
+        } else {
+          if (e.instance.onStopped)
+            e.instance.onStopped()
+        }
+        this.extensionManager.setStarted(packageName, enabled)
       }
-      this.extensionManager.setStarted(packageName, enabled)
+    } catch (e) {
+      console.error(e)
     }
   }
 
@@ -116,8 +124,12 @@ export class ExtensionHandler {
 
   public sendToExtensions(packageName: string | undefined, method: keyof MoosyncExtensionTemplate, args: any) {
     for (const ext of this.extensionManager.getExtensions({ started: true, packageName })) {
-      if (ext.instance[method])
-        (ext.instance[method] as Function)(args)
+      try {
+        if (ext.instance[method])
+          (ext.instance[method] as Function)(args)
+      } catch (e) {
+        console.error(e)
+      }
     }
   }
 }
