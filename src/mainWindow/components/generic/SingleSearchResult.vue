@@ -15,7 +15,7 @@
           :src="coverImg"
           @error="handleCoverError"
         />
-        <SongDefault v-else class="h-100" />
+        <SongDefault v-else class="coverimg me-auto d-flex align-items-center" />
       </b-col>
       <b-col class="text-container text-truncate my-auto">
         <b-link class="song-title text-truncate" @click="emitTitleClick">{{ title }}</b-link>
