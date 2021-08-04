@@ -9,8 +9,9 @@ import path, { resolve } from 'path';
 import EventEmitter from 'events';
 import { OAuthHandler } from '@/utils/main/oauth/handler';
 import { createProtocol } from 'vue-cli-plugin-electron-builder/lib';
-import { extensionHost } from '@/utils/extensions/index';
-import { logger } from './utils/main/logger/index';
+import { extensionHost } from '@/utils/extensions';
+import log from 'loglevel'
+import { prefixLogger } from './utils/main/logger';
 import { registerIpcChannels } from '@/utils/main/ipc'; // Import for side effects
 import { setInitialInterfaceSettings } from './utils/main/db/preferences';
 import { setupScanTask } from '@/utils/main/scheduler/index';
@@ -181,19 +182,14 @@ function handleSecondInstance(_: Event, argv: string[]) {
 }
 
 function overrideConsole() {
-  const preservedConsoleInfo = console.info;
-  const preservedConsoleError = console.error;
-
+  const child = log.getLogger('Main')
+  prefixLogger(app.getPath('logs'), child)
   console.info = (...args: any[]) => {
-    if (process.env.NODE_ENV !== 'production')
-      preservedConsoleInfo.apply(console, args);
-    logger.log('info', '%j', args, { label: 'Main' })
+    child.info(...args)
   }
 
   console.error = (...args: any[]) => {
-    if (process.env.NODE_ENV !== 'production')
-      preservedConsoleError.apply(console, args);
-    logger.log('error', '%j', args, { label: 'Main' })
+    child.error(...args)
   }
 }
 

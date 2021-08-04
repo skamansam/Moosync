@@ -1,23 +1,55 @@
-import DailyRotateFile from "winston-daily-rotate-file";
-import { app } from "electron";
-import path from "path";
-import winston from "winston";
+import { WriteStream, createWriteStream } from 'fs'
 
-export const logger = winston.createLogger({
-  format: winston.format.combine(
-    winston.format.timestamp({ format: 'DD-MM-YYYY hh:mm:ss A' }),
-    winston.format.align(),
-    winston.format.splat(),
-    winston.format.json(),
-    winston.format.printf(info => `[${info.timestamp}] [${info.level}] [${info.label}]: ${info.message}`)
-  ),
-  transports: [
-    new DailyRotateFile({
-      filename: path.join(app.getPath('logs'), 'moosync-%DATE%.log'),
-      datePattern: 'YYYY-MM-DD',
-      zippedArchive: true,
-      maxSize: '20m',
-      maxFiles: '14d'
-    })
-  ]
-});
+import log from 'loglevel';
+import path from "path";
+
+let fileName: string
+let fileStream: WriteStream
+
+function getLevel(method: string) {
+  return method.charAt(0).toUpperCase() + method.slice(1);
+}
+
+function getTimestamp() {
+  const dt = new Date();
+
+  return `${(dt.getMonth() + 1).toString().padStart(2, '0')}-${dt.getDate().toString().padStart(2, '0')}-${dt.getFullYear().toString().padStart(4, '0')} ${dt.getHours().toString().padStart(2, '0')}:${dt.getMinutes().toString().padStart(2, '0')}:${dt.getSeconds().toString().padStart(2, '0')}`
+}
+
+function generatePrefix(level: string, loggerName: string | symbol) {
+  return `[${getTimestamp()}] [${getLevel(level)}] [${String(loggerName) ?? 'Main'}]: `
+}
+
+function generateMessage(...messages: any[]) {
+  let ret = ''
+  for (const m of messages) ret += ((typeof m === 'object') ? JSON.stringify(m) : m) + ' '
+
+  return ret.trim() + '\n'
+}
+
+function createFile(basePath: string) {
+  const newFile = `moosync-${new Date().toLocaleDateString('en-GB').replaceAll('/', '-')}.log`
+  if (fileName !== newFile) {
+    fileName = newFile
+    fileStream && fileStream.end()
+
+    const newPath = path.join(basePath, newFile)
+    fileStream = createWriteStream(newPath, { flags: 'a' })
+  }
+}
+
+async function streamToFile(basePath: string, message: string) {
+  createFile(basePath)
+  fileStream.write(message)
+}
+
+export function prefixLogger(basePath: string, logger: log.RootLogger | log.Logger) {
+  logger.methodFactory = (methodName, logLevel, loggerName) => {
+    return (...args: any[]) => {
+      const final = generateMessage(generatePrefix(methodName, loggerName), ...args)
+      console.log(final);
+      streamToFile(basePath, final)
+    };
+  };
+  logger.setLevel(logger.getLevel());
+}

@@ -2,7 +2,9 @@ import { ExtensionFactory } from '@moosync/moosync-types';
 import { ExtensionRequestGenerator } from './api';
 import { InMemoryRegistry } from './extensionRegistry';
 import { NodeVM } from 'vm2';
+import log from 'loglevel'
 import path from 'path';
+import { prefixLogger } from '../../main/logger/index';
 
 export abstract class AbstractExtensionManager {
   abstract instantiateAndRegister(extension: UnInitializedExtensionItem): Promise<void>
@@ -13,6 +15,12 @@ export abstract class AbstractExtensionManager {
 
 export class ExtensionManager extends AbstractExtensionManager {
   private extensionRegistry = new InMemoryRegistry();
+  private logsPath: string
+
+  constructor(logsPath: string) {
+    super()
+    this.logsPath = logsPath
+  }
 
   private register(extensionItem: ExtensionItem) {
     this.extensionRegistry.register(extensionItem)
@@ -42,7 +50,9 @@ export class ExtensionManager extends AbstractExtensionManager {
   }
 
   private getGlobalObject(packageName: string, entryFilePath: string) {
-    const child = global.logger.child({ label: packageName })
+    const child = log.getLogger(packageName)
+    prefixLogger(this.logsPath, child)
+
     return {
       __dirname: path.dirname(entryFilePath),
       __filename: entryFilePath,

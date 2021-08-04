@@ -1,10 +1,17 @@
 import { IpcEvents, LoggerEvents } from './constants';
 
-import { logger } from './../logger/index';
+import { app } from 'electron';
+import log from 'loglevel'
+import { prefixLogger } from '@/utils/main/logger/index';
 
 export class LoggerChannel implements IpcChannelInterface {
   name = IpcEvents.LOGGER
-  private customLogger = logger.child({ label: 'Renderer' })
+  private customLogger = log.getLogger('Renderer')
+
+  constructor() {
+    prefixLogger(app.getPath('logs'), this.customLogger)
+  }
+
   handle(event: Electron.IpcMainEvent, request: IpcRequest): void {
     switch (request.type) {
       case LoggerEvents.INFO:

@@ -11,9 +11,9 @@ export class ExtensionHandler {
   private initialized: boolean = false
   private preInitializedCalls: { func: Function, args?: any[] }[]
 
-  constructor(searchPaths: string[]) {
+  constructor(searchPaths: string[], logsPath: string) {
     this.preInitializedCalls = []
-    this.extensionManager = new ExtensionManager()
+    this.extensionManager = new ExtensionManager(logsPath)
     this.extensionFinder = new ExtensionFinder(searchPaths)
 
     this.registerPlugins().then(() => {

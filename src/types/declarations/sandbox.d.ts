@@ -82,12 +82,6 @@ interface getExtensionOptions {
   packageName?: string
 }
 
-declare module NodeJS {
-  interface Global {
-    logger: import('winston').Logger
-  }
-}
-
 interface NodeRequire {
   (dependencies: string[], callback: (...args: any[]) => any, errorback?: (err: any) => void): any;
   config(data: any): any;

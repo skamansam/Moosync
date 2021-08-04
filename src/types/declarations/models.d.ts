@@ -40,7 +40,7 @@ interface SearchResult {
 }
 
 interface Song {
-  _id?: string
+  _id: string
   path?: string
   size?: number
   title: string
