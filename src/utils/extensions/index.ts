@@ -34,6 +34,16 @@ class MainHostIPCHandler {
 
   private registerListeners() {
     this.sandboxProcess.on("message", this.parseMessage.bind(this))
+    this.sandboxProcess.on("error", console.error)
+    this.sandboxProcess.on('close', () => {
+      try {
+        this.sandboxProcess.kill()
+        this.sandboxProcess = this.createExtensionHost()
+        this.registerListeners()
+      } catch (e) {
+        console.error(e)
+      }
+    })
   }
 
   private createExtensionHost() {
