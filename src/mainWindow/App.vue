@@ -56,8 +56,7 @@ export default class App extends mixins(ThemeHandler, PlayerControls) {
       if (e.code === 'F12') {
         window.WindowUtils.toggleDevTools(true)
       } else if (e.code === 'F5') {
-        // location.reload()
-        console.log(this.$route)
+        location.reload()
       }
     })
   }
