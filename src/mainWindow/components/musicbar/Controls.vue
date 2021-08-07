@@ -24,11 +24,11 @@
 
 <script lang="ts">
 import { Component, Prop } from 'vue-property-decorator'
-import LastTrack from '@/mainWindow/components/icons/LastTrack.vue'
-import NextTrack from '@/mainWindow/components/icons/NextTrack.vue'
-import Play from '@/mainWindow/components/icons/Play.vue'
-import Repeat from '@/mainWindow/components/icons/Repeat.vue'
-import Shuffle from '@/mainWindow/components/icons/Shuffle.vue'
+import LastTrack from '@/icons/LastTrack.vue'
+import NextTrack from '@/icons/NextTrack.vue'
+import Play from '@/icons/Play.vue'
+import Repeat from '@/icons/Repeat.vue'
+import Shuffle from '@/icons/Shuffle.vue'
 import { mixins } from 'vue-class-component'
 import PlayerControls from '@/utils/ui/mixins/PlayerControls'
 import { vxm } from '@/mainWindow/store'

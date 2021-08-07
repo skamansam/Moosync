@@ -36,10 +36,10 @@
 
 <script lang="ts">
 import { Component, Prop, Watch } from 'vue-property-decorator'
-import Play2 from '@/mainWindow/components/icons/Play2.vue'
+import Play2 from '@/icons/Play2.vue'
 import { mixins } from 'vue-class-component'
 import PlayerControls from '@/utils/ui/mixins/PlayerControls'
-import SongDefault from '@/mainWindow/components/icons/SongDefault.vue'
+import SongDefault from '@/icons/SongDefault.vue'
 
 @Component({
   components: {

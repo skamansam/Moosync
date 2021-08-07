@@ -18,7 +18,7 @@ import CardView from '@/mainWindow/components/generic/CardView.vue'
 import { mixins } from 'vue-class-component'
 import { Component } from 'vue-property-decorator'
 import RouterPushes from '@/utils/ui/mixins/RouterPushes'
-import AlbumDefault from '@/mainWindow/components/icons/AlbumDefault.vue'
+import AlbumDefault from '@/icons/AlbumDefault.vue'
 
 @Component({
   components: {

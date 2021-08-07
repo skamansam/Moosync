@@ -21,7 +21,7 @@ import Colors from '@/utils/ui/mixins/Colors'
 import ImageLoader from '@/utils/ui/mixins/ImageLoader'
 import { mixins } from 'vue-class-component'
 import { Component, Prop } from 'vue-property-decorator'
-import Youtube from '@/mainWindow/components/icons/Youtube.vue'
+import Youtube from '@/icons/Youtube.vue'
 
 @Component({
   components: {

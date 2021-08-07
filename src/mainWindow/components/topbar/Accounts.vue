@@ -28,10 +28,10 @@
 </template>
 <script lang="ts">
 import IconButton from '@/mainWindow/components/generic/IconButton.vue'
-import YoutubeIcon from '@/mainWindow/components/icons/Youtube.vue'
-import SpotifyIcon from '@/mainWindow/components/icons/Spotify.vue'
-import GearIcon from '@/mainWindow/components/icons/Gears.vue'
-import Person from '@/mainWindow/components/icons/Person.vue'
+import YoutubeIcon from '@/icons/Youtube.vue'
+import SpotifyIcon from '@/icons/Spotify.vue'
+import GearIcon from '@/icons/Gears.vue'
+import Person from '@/icons/Person.vue'
 import { mixins } from 'vue-class-component'
 import Colors from '@/utils/ui/mixins/Colors'
 import { Component } from 'vue-property-decorator'

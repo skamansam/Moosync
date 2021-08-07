@@ -51,10 +51,10 @@
 </template>
 
 <script lang="ts">
-import Rooms from '@/mainWindow/components/icons/Rooms.vue'
-import Toggle from '@/mainWindow/components/icons/Toggle.vue'
+import Rooms from '@/icons/Rooms.vue'
+import Toggle from '@/icons/Toggle.vue'
 import Tabs from '@/mainWindow/components/sidebar/Tabs.vue'
-import Gears from '@/mainWindow/components/icons/Gears.vue'
+import Gears from '@/icons/Gears.vue'
 import { PeerMode } from '@/mainWindow/store/syncState'
 import { Component } from 'vue-property-decorator'
 import Colors from '@/utils/ui/mixins/Colors'

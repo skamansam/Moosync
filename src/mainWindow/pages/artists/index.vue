@@ -16,7 +16,7 @@ import { Component } from 'vue-property-decorator'
 import CardView from '@/mainWindow/components/generic/CardView.vue'
 import { mixins } from 'vue-class-component'
 import RouterPushes from '@/utils/ui/mixins/RouterPushes'
-import ArtistDefault from '@/mainWindow/components/icons/ArtistDefault.vue'
+import ArtistDefault from '@/icons/ArtistDefault.vue'
 
 @Component({
   components: {

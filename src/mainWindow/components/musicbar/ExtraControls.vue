@@ -27,8 +27,8 @@
 
 <script lang="ts">
 import { Component } from 'vue-property-decorator'
-import VolumeIcon from '@/mainWindow/components/icons/Volume.vue'
-import ExpandIcon from '@/mainWindow/components/icons/Expand.vue'
+import VolumeIcon from '@/icons/Volume.vue'
+import ExpandIcon from '@/icons/Expand.vue'
 import Colors from '@/utils/ui/mixins/Colors'
 import { mixins } from 'vue-class-component'
 import { vxm } from '@/mainWindow/store'

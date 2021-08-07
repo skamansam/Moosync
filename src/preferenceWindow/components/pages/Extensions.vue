@@ -66,8 +66,8 @@ import EditText from '../EditText.vue'
 import DirectoryGroup from '../DirectoryGroup.vue'
 import FilePicker from '../FilePicker.vue'
 import CheckboxGroup from '../CheckboxGroup.vue'
-import PrevIcon from '../icons/prevIcon.vue'
-import NextIcon from '../icons/nextIcon.vue'
+import PrevIcon from '@/icons/prevIcon.vue'
+import NextIcon from '@/icons/nextIcon.vue'
 import ExtensionGroup from '../ExtensionGroup.vue'
 
 @Component({

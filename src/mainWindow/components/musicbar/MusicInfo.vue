@@ -77,7 +77,7 @@
 import Colors from '@/utils/ui/mixins/Colors'
 import { mixins } from 'vue-class-component'
 import { Component, Prop, Watch } from 'vue-property-decorator'
-import SongDefault from '@/mainWindow/components/icons/SongDefault.vue'
+import SongDefault from '@/icons/SongDefault.vue'
 import ImageLoader from '@/utils/ui/mixins/ImageLoader'
 import ModelHelper from '@/utils/ui/mixins/ModelHelper'
 import { vxm } from '@/mainWindow/store'

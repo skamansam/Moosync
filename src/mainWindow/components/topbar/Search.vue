@@ -43,7 +43,7 @@
 
 <script lang="ts">
 import { Component } from 'vue-property-decorator'
-import Search from '@/mainWindow/components/icons/Search.vue'
+import Search from '@/icons/Search.vue'
 import SingleSearchResult from '@/mainWindow/components/generic/SingleSearchResult.vue'
 import Colors from '@/utils/ui/mixins/Colors'
 import { mixins } from 'vue-class-component'

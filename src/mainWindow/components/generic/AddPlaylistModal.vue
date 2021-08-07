@@ -29,7 +29,7 @@ import Colors from '@/utils/ui/mixins/Colors'
 import { mixins } from 'vue-class-component'
 import { bus } from '@/mainWindow/main'
 import { vxm } from '@/mainWindow/store'
-import SongDefault from '@/mainWindow/components/icons/SongDefault.vue'
+import SongDefault from '@/icons/SongDefault.vue'
 @Component({
   components: {
     SongDefault

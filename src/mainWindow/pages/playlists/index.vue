@@ -42,9 +42,9 @@ import { mixins } from 'vue-class-component'
 import RouterPushes from '@/utils/ui/mixins/RouterPushes'
 import ContextMenuMixin from '@/utils/ui/mixins/ContextMenuMixin'
 import { vxm } from '@/mainWindow/store'
-import SpotifyIcon from '@/mainWindow/components/icons/Spotify.vue'
-import YoutubeIcon from '@/mainWindow/components/icons/Youtube.vue'
-import PlaylistDefault from '@/mainWindow/components/icons/PlaylistDefault.vue'
+import SpotifyIcon from '@/icons/Spotify.vue'
+import YoutubeIcon from '@/icons/Youtube.vue'
+import PlaylistDefault from '@/icons/PlaylistDefault.vue'
 import DeleteModal from '../../../commonComponents/DeleteModal.vue'
 
 @Component({

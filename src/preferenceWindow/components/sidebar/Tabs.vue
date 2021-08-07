@@ -28,9 +28,9 @@
 <script lang="ts">
 import { Component } from 'vue-property-decorator'
 import { ActiveTab } from '@/utils/ui/enums'
-import Extensions from '@/preferenceWindow/components/icons/Extensions.vue'
-import Paths from '@/preferenceWindow/components/icons/Paths.vue'
-import System from '@/preferenceWindow/components/icons/System.vue'
+import Extensions from '@//icons/Extensions.vue'
+import Paths from '@/icons/Paths.vue'
+import System from '@/icons/System.vue'
 import Colors from '@/utils/ui/mixins/Colors'
 import { mixins } from 'vue-class-component'
 

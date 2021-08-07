@@ -72,7 +72,7 @@
 
 <script lang="ts">
 import { Component, Prop, Vue } from 'vue-property-decorator'
-import Logo from '@/mainWindow/components/icons/Logo.vue'
+import Logo from '@/icons/Logo.vue'
 @Component({
   components: {
     Logo

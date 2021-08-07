@@ -17,7 +17,7 @@ import { Component } from 'vue-property-decorator'
 import { mixins } from 'vue-class-component'
 import Colors from '@/utils/ui/mixins/Colors'
 import { vxm } from '@/mainWindow/store'
-import NotificationIcon from '@/mainWindow/components/icons/Notification.vue'
+import NotificationIcon from '@/icons/Notification.vue'
 @Component({
   components: {
     NotificationIcon
