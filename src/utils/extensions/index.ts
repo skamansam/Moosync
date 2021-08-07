@@ -59,7 +59,7 @@ class MainHostIPCHandler {
   }
 
   public async installExtension(zipPaths: string[]): Promise<installMessage> {
-    const resp = await this.extensionResourceHandler.installExtension(zipPaths, this.extensionResourceHandler.uninstallExtension)
+    const resp = await this.extensionResourceHandler.installExtension(zipPaths, this.extensionResourceHandler.uninstallExtension.bind(this.extensionResourceHandler))
     await this.mainRequestGenerator.findNewExtensions()
     return resp
   }
@@ -219,7 +219,7 @@ class ExtensionHandler {
       const zip = new async({ file: filePath })
       const manifestRaw = await zip.entryData('package.json')
       const manifest = JSON.parse((manifestRaw.toString('utf-8')))
-      if (this.validateManifest(manifest)) {
+      if (manifest.moosyncExtension && manifest.displayName && manifest.extensionEntry && manifest.name && manifest.version) {
         const existingVersion = await this.isExistingExtension(manifest.name)
         if (existingVersion) {
           if (!(await this.checkVersion(existingVersion, manifest.version))) {
@@ -229,7 +229,7 @@ class ExtensionHandler {
             }
           }
           await uninstallMethod(manifest.name)
-          await this.uninstallExtension(manifest.name)
+          await this.uninstallExtension.bind(this)(manifest.name)
         }
         const installPath = path.join(defaultExtensionPath, manifest.name)
         await this.createDirIfNotExists(installPath)
@@ -249,10 +249,6 @@ class ExtensionHandler {
     if (await this.isExistingExtension(packageName)) {
       await fsP.rm(path.join(defaultExtensionPath, packageName), { recursive: true, force: true })
     }
-  }
-
-  private validateManifest(manifest: any) {
-    return !!(manifest.moosyncExtension && manifest.displayName && manifest.extensionEntry && manifest.name && manifest.version)
   }
 }
 

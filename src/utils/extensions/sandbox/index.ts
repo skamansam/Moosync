@@ -1,7 +1,6 @@
 import { extensionEventsKeys, mainRequestsKeys } from '@/utils/extensions/constants';
 
 import { ExtensionHandler } from '@/utils/extensions/sandbox/extensionHandler';
-import { prefixLogger } from '@/utils/main/logger/index';
 
 class ExtensionHostIPCHandler {
   private extensionHandler: ExtensionHandler
@@ -21,8 +20,6 @@ class ExtensionHostIPCHandler {
         }
       }
     }
-
-    // prefixLogger(logsPath)
 
     this.extensionHandler = new ExtensionHandler([extensionPath], logsPath)
     this.mainRequestHandler = new MainRequestHandler(this.extensionHandler)
