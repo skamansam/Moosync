@@ -1,25 +1,15 @@
+import { EntityApiOptions, SongAPIOptions } from '@moosync/moosync-types';
+
 import { DBUtils } from './utils'
-import { SongAPIOptions } from '@moosync/moosync-types';
 import { promises as fsP } from 'fs'
 import { v4 } from 'uuid'
 
+type KeysOfUnion<T> = T extends T ? keyof T : never;
+// AvailableKeys will basically be keyof Foo | keyof Bar 
+// so it will be  "foo" | "bar"
+type EntityKeys = KeysOfUnion<EntityApiOptions>;
+
 class SongDBInstance extends DBUtils {
-  private getMetaCommon(
-    term: string | undefined,
-    tableName: string,
-    bridgeTable: string,
-    rowName: string,
-    exclude?: string[]
-  ) {
-    return this.db.query(
-      `SELECT * FROM ${tableName}
-      INNER JOIN ${bridgeTable} ON ${tableName}.${rowName}_id = ${bridgeTable}.${rowName}
-      INNER JOIN allsongs ON ${bridgeTable}.song = allsongs._id
-      ${this.addExcludeWhereClause(true, exclude)}
-      ${term ? `WHERE ${tableName}.${rowName}_name LIKE ?` : ''} GROUP BY ${tableName}.${rowName}_id`,
-      `%${term}%`
-    )
-  }
   /* ============================= 
                 ALLSONGS
      ============================= */
@@ -63,14 +53,22 @@ class SongDBInstance extends DBUtils {
       this.db.delete('allsongs', { _id: song_id })
 
       if (album_ids.count == 1) {
-        const album = await this.getAlbumByID(album_ids.album)
+        const album: Album = (await this.getEntityByOptions({
+          album: {
+            album_id: album_ids.album
+          }
+        }) as Album[])[0]
         this.db.delete('albums', { album_id: album_ids.album })
         if (album?.album_coverPath_low) await fsP.rm(album.album_coverPath_low, { force: true }).catch(err => console.error(err))
         if (album?.album_coverPath_high) await fsP.rm(album.album_coverPath_high, { force: true }).catch(err => console.error(err))
 
       }
       if (artist_ids.count == 1) {
-        const artist = await this.getArtistsByID(artist_ids.artist)
+        const artist = (await this.getEntityByOptions({
+          artist: {
+            artist_id: artist_ids.artist
+          }
+        }) as artists[])[0]
         this.db.delete('artists', { artist_id: artist_ids.artist })
         if (artist?.artist_coverPath) await fsP.rm(artist.artist_coverPath, { force: true }).catch(err => console.error(err))
       }
@@ -78,22 +76,35 @@ class SongDBInstance extends DBUtils {
   }
 
   public async searchAll(term: string, exclude?: string[]): Promise<SearchResult> {
-    const songs: marshaledSong[] = this.db.query(
-      `SELECT *, ${this.addGroupConcatClause()} FROM allsongs 
-      ${this.addLeftJoinClause(undefined, 'allsongs')} 
-      WHERE allsongs.path LIKE ? ${this.addExcludeWhereClause(false, exclude)} 
-      GROUP BY allsongs._id`,
-      `%${term}%`
-    )
-    const albums: Album[] = this.getMetaCommon(term, 'albums', 'album_bridge', 'album', exclude) as Album[]
-    const artists: artists[] = this.getMetaCommon(term, 'artists', 'artists_bridge', 'artist', exclude) as artists[]
-    const genre: Genre[] = this.getMetaCommon(term, 'genre', 'genre_bridge', 'genre', exclude) as Genre[]
+    const songs = await this.getSongByOptions({
+      song: {
+        path: term
+      }
+    }, exclude)
 
-    return { songs: this.batchUnmarshal(songs), albums: albums, artists: artists, genres: genre }
+    const albums: Album[] = await this.getEntityByOptions({
+      album: {
+        album_name: term
+      }
+    })
+
+    const artists: artists[] = await this.getEntityByOptions({
+      artist: {
+        artist_name: term
+      }
+    })
+
+    const genre: Genre[] = await this.getEntityByOptions({
+      genre: {
+        genre_name: term
+      }
+    })
+
+    return { songs: songs, albums: albums, artists: artists, genres: genre }
   }
 
   private populateWhereQuery(options?: SongAPIOptions) {
-    if (options && (options.album || options.artist || options.name || options.id)) {
+    if (options) {
       let where = 'WHERE '
       const args: string[] = []
       let isFirst = true
@@ -104,21 +115,15 @@ class SongDBInstance extends DBUtils {
         return str
       }
 
-      if (options.name) {
-        where += `${addANDorOR()} allsongs.path LIKE ?`
-        args.push(`%${options.name}%`)
+      for (const [key, _] of Object.entries(options)) {
+        if (key != 'inclusive') {
+          const tableName = this.getTableByProperty(key as keyof SongAPIOptions)
+          for (const [innerKey, innerValue] of Object.entries(options[key as keyof SongAPIOptions]!)) {
+            where += `${addANDorOR()} ${tableName}.${innerKey} LIKE ?`
+            args.push(`%${innerValue}%`)
+          }
+        }
       }
-
-      if (options.album) {
-        where += `${addANDorOR()} albums.album_name LIKE ?`
-        args.push(`%${options.album}%`)
-      }
-
-      if (options.artist) {
-        where += `${addANDorOR()} artists.artist_name LIKE ?`
-        args.push(`%${options.artist}%`)
-      }
-
       return { where, args }
     }
     return { where: '', args: [] }
@@ -127,14 +132,66 @@ class SongDBInstance extends DBUtils {
   public async getSongByOptions(options?: SongAPIOptions, exclude?: string[]) {
     const { where, args } = this.populateWhereQuery(options)
 
+    console.log(`SELECT *, ${this.addGroupConcatClause()} FROM allsongs
+      ${this.addLeftJoinClause(undefined, 'allsongs')}
+        ${where}
+        ${this.addExcludeWhereClause(args.length === 0, exclude)} GROUP BY allsongs._id`)
+
     const songs: marshaledSong[] = this.db.query(
       `SELECT *, ${this.addGroupConcatClause()} FROM allsongs
       ${this.addLeftJoinClause(undefined, 'allsongs')}
         ${where}
-        ${this.addExcludeWhereClause(false, exclude)} GROUP BY allsongs._id`,
+        ${this.addExcludeWhereClause(args.length === 0, exclude)} GROUP BY allsongs._id`,
       ...args
     )
     return this.batchUnmarshal(songs)
+  }
+
+  private getTableByProperty(key: string) {
+    switch (key) {
+      case 'song':
+        return 'allsongs'
+      case 'album':
+        return 'albums'
+      case 'artist':
+        return 'artists'
+      case 'genre':
+        return 'genre'
+      case 'playlist':
+        return 'playlists'
+    }
+  }
+
+  public async getEntityByOptions<T>(options: EntityApiOptions): Promise<T[]> {
+    let isFirst = true
+    const addANDorOR = () => {
+      const str = (!isFirst ? ((options.inclusive ? 'AND' : 'OR')) : '')
+      isFirst = false
+      return str
+    }
+
+    let query = `SELECT * FROM `
+    let where = `WHERE `
+    const args = []
+    for (const [key, value] of Object.entries(options)) {
+      const tableName = this.getTableByProperty(key as EntityKeys)
+      if (tableName) {
+        query += `${tableName} `
+
+        if (typeof value === 'boolean' && value === true) {
+          break
+        }
+
+        if (typeof value === 'object') {
+          for (const [innerKey, innerValue] of Object.entries(options[key as keyof EntityApiOptions]!)) {
+            where += `${addANDorOR()} ${innerKey} LIKE ? `
+            args.push(innerValue)
+          }
+          break
+        }
+      }
+    }
+    return this.db.query(`${query} ${args.length > 0 ? where : ''}`, ...args) as T[]
   }
 
   public async countByHash(hash: string): Promise<number> {
@@ -158,35 +215,6 @@ class SongDBInstance extends DBUtils {
   /* ============================= 
                 ALBUMS
      ============================= */
-
-  public async getAllAlbums(exclude?: string[]): Promise<Album[]> {
-    return this.db.query(
-      `SELECT * from albums A
-        INNER JOIN album_bridge B ON A.album_id = B.album
-        INNER JOIN allsongs C ON B.song = C._id
-        ${this.addExcludeWhereClause(true, exclude)}
-        GROUP BY A.album_id`
-    )
-  }
-
-  public async getAlbumByID(id: string): Promise<Album | undefined> {
-    return this.db.queryFirstRow(`SELECT * FROM albums WHERE albums.album_id = ?`, id)
-  }
-
-  public async getAlbumByName(name: string): Promise<Album | undefined> {
-    return this.db.queryFirstRow(`SELECT * FROM albums WHERE albums.album_name = ?`, name)
-  }
-
-  public async getAlbumSongs(id: string, exclude?: string[]): Promise<Song[]> {
-    const marshaled: marshaledSong[] = this.db.query(
-      `SELECT *, ${this.addGroupConcatClause()} FROM album_bridge
-      ${this.addLeftJoinClause('album_bridge', 'album')} 
-      WHERE album_bridge.album = ? 
-      ${this.addExcludeWhereClause(false, exclude)} GROUP BY allsongs._id`,
-      id
-    )
-    return this.batchUnmarshal(marshaled)
-  }
 
   private storeAlbum(album: Album): string {
     let id: string | undefined
@@ -227,27 +255,6 @@ class SongDBInstance extends DBUtils {
                 GENRE
      ============================= */
 
-  public async getAllGenres(exclude?: string[]): Promise<Genre[]> {
-    return this.db.query(
-      `SELECT * from genre A
-        INNER JOIN genre_bridge B ON A.genre_id = B.genre
-        INNER JOIN allsongs C ON B.song = C._id
-        ${this.addExcludeWhereClause(true, exclude)}
-        GROUP BY A.genre_id`
-    )
-  }
-
-  public async getGenreSongs(id: string, exclude?: string[]) {
-    const marshaled: marshaledSong[] = this.db.query(
-      `SELECT *, ${this.addGroupConcatClause()} FROM genre_bridge 
-      ${this.addLeftJoinClause('genre_bridge', 'genre')}
-      WHERE genre_bridge.genre = ? 
-      ${this.addExcludeWhereClause(false, exclude)} GROUP BY allsongs._id`,
-      id
-    )
-    return this.batchUnmarshal(marshaled)
-  }
-
   public updateSongCountGenre() {
     this.db.transaction(() => {
       for (const row of this.db.query(`SELECT genre_id FROM genre`)) {
@@ -282,37 +289,9 @@ class SongDBInstance extends DBUtils {
     }
   }
 
-  public async getGenres() {
-    return this.db.query(`SELECT * FROM genre`)
-  }
-
   /* ============================= 
                 ARTISTS
      ============================= */
-
-  public async getAllArtists(exclude?: string[]): Promise<artists[]> {
-    return this.db.query(
-      `SELECT * FROM artists A
-        INNER JOIN artists_bridge B ON A.artist_id = B.artist
-        ${this.addExcludeWhereClause(true, exclude)}
-        GROUP BY A.artist_id`
-    )
-  }
-
-  public async getArtistsByID(id: string): Promise<artists | undefined> {
-    return this.db.queryFirstRow(`SELECT * FROM artists WHERE artist_id = ?`, id)
-  }
-
-  public async getArtistSongs(id: string, exclude?: string[]): Promise<Song[]> {
-    const marshaled: marshaledSong[] = this.db.query(
-      `SELECT *, ${this.addGroupConcatClause()} FROM artists_bridge 
-      ${this.addLeftJoinClause('artists_bridge', 'artists')}  
-      WHERE artists_bridge.artist = ? 
-      ${this.addExcludeWhereClause(false, exclude)} GROUP BY allsongs._id`,
-      id
-    )
-    return this.batchUnmarshal(marshaled)
-  }
 
   public async updateArtists(artist: artists) {
     return new Promise((resolve) => {
@@ -369,21 +348,6 @@ class SongDBInstance extends DBUtils {
   /* ============================= 
                 PLAYLISTS
      ============================= */
-
-  public async getPlaylistSongs(id: string, exclude?: string[]) {
-    const marshaled: marshaledSong[] = this.db.query(
-      `SELECT *, ${this.addGroupConcatClause()} FROM playlist_bridge 
-      ${this.addLeftJoinClause('playlist_bridge')} 
-      WHERE playlist_bridge.playlist = ? 
-      ${this.addExcludeWhereClause(false, exclude)} GROUP BY allsongs._id`,
-      id
-    )
-    return this.batchUnmarshal(marshaled)
-  }
-
-  public async getPlaylists(): Promise<Playlist[]> {
-    return this.db.query(`SELECT * FROM playlists`)
-  }
 
   public async createPlaylist(name: string, desc: string, imgSrc: string): Promise<string> {
     const id = v4()

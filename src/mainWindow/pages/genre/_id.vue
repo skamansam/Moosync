@@ -31,29 +31,7 @@ import { arrayDiff } from '@/utils/common'
 })
 export default class SingleAlbumView extends mixins(ContextMenuMixin) {
   private songList: Song[] = []
-
-  @Prop({ default: '' })
-  private genre_id!: string
-
-  @Prop({ default: '' })
-  private genre_name!: string
-
-  @Prop({ default: '' })
-  private genre_coverPath!: string
-
-  @Prop({ default: '' })
-  private genre_song_count!: string
-
-  mounted() {
-    this.fetchgenre()
-  }
-
-  private defaultDetails: SongDetailDefaults = {
-    defaultTitle: this.genre_name,
-    defaultSubtitle: `${this.genre_song_count} Songs`,
-    defaultSubSubtitle: '',
-    defaultCover: this.genre_coverPath
-  }
+  private genre: Genre | null = null
 
   get buttonGroups(): SongDetailButtons {
     return {
@@ -62,8 +40,34 @@ export default class SingleAlbumView extends mixins(ContextMenuMixin) {
     }
   }
 
-  private async fetchgenre() {
-    this.songList = await window.DBUtils.getSingleGenre(this.genre_id)
+  get defaultDetails(): SongDetailDefaults {
+    return {
+      defaultTitle: this.genre?.genre_name,
+      defaultSubSubtitle: `${this.genre?.genre_song_count} Songs`
+    }
+  }
+
+  created() {
+    this.fetchAlbum()
+    this.fetchSongList()
+  }
+
+  private async fetchAlbum() {
+    this.genre = (
+      await window.SearchUtils.searchEntityByOptions({
+        genre: {
+          genre_id: this.$route.params.id
+        }
+      })
+    )[0]
+  }
+
+  private async fetchSongList() {
+    this.songList = await window.SearchUtils.searchSongsByOptions({
+      genre: {
+        genre_id: this.$route.params.id
+      }
+    })
   }
 
   private getSongMenu(event: Event, songs: Song[], exclude: string | undefined) {

@@ -27,7 +27,9 @@ import ArtistDefault from '@/mainWindow/components/icons/ArtistDefault.vue'
 export default class Artists extends mixins(RouterPushes) {
   private artistList: artists[] = []
   private async getArtists() {
-    this.artistList = await window.DBUtils.getAllArtists()
+    this.artistList = await window.SearchUtils.searchEntityByOptions({
+      artist: true
+    })
   }
 
   mounted() {

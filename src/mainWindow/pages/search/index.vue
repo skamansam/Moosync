@@ -206,28 +206,44 @@ export default class SearchPage extends mixins(RouterPushes, ContextMenuMixin) {
   }
 
   private async playAlbum(item: Album) {
-    let songs = await window.DBUtils.getSingleAlbum(item.album_id!)
+    let songs = await window.SearchUtils.searchSongsByOptions({
+      album: {
+        album_id: item.album_id
+      }
+    })
     songs.forEach((value) => {
       this.queueSong(value)
     })
   }
 
   private async playArtist(item: artists) {
-    let songs = await window.DBUtils.getSingleArtist(item.artist_id)
+    let songs = await window.SearchUtils.searchSongsByOptions({
+      artist: {
+        artist_id: item.artist_id
+      }
+    })
     songs.forEach((value) => {
       this.queueSong(value)
     })
   }
 
   private async playGenre(item: Genre) {
-    let songs = await window.DBUtils.getSingleGenre(item.genre_id)
+    let songs = await window.SearchUtils.searchSongsByOptions({
+      genre: {
+        genre_id: item.genre_id
+      }
+    })
     songs.forEach((value) => {
       this.queueSong(value)
     })
   }
 
   private async playPlaylist(item: Playlist) {
-    let songs = await window.DBUtils.getSinglePlaylist(item.playlist_id)
+    let songs = await window.SearchUtils.searchSongsByOptions({
+      playlist: {
+        playlist_id: item.playlist_id
+      }
+    })
     songs.forEach((value) => {
       this.queueSong(value)
     })

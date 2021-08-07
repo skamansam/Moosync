@@ -23,7 +23,9 @@ import RouterPushes from '@/utils/ui/mixins/RouterPushes'
 export default class Genres extends mixins(RouterPushes) {
   private genres: Genre[] = []
   private async getgenres() {
-    this.genres = await window.DBUtils.getAllGenres()
+    this.genres = await window.SearchUtils.searchEntityByOptions({
+      genre: true
+    })
   }
 
   mounted() {

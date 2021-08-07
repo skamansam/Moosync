@@ -52,11 +52,12 @@ export default class App extends mixins(ThemeHandler, PlayerControls) {
   }
 
   private registerDevTools() {
-    document.addEventListener('keydown', function (e) {
+    document.addEventListener('keydown', (e) => {
       if (e.code === 'F12') {
         window.WindowUtils.toggleDevTools(true)
       } else if (e.code === 'F5') {
-        location.reload()
+        // location.reload()
+        console.log(this.$route)
       }
     })
   }
@@ -82,7 +83,9 @@ export default class App extends mixins(ThemeHandler, PlayerControls) {
   }
 
   private async populatePlaylists() {
-    let RawPlaylists = await window.DBUtils.getAllPlaylists()
+    let RawPlaylists = await window.SearchUtils.searchEntityByOptions({
+      playlist: true
+    })
     let playlists: playlistInfo = {}
     for (let p of RawPlaylists) {
       playlists[p.playlist_id] = p.playlist_name
@@ -132,7 +135,11 @@ export default class App extends mixins(ThemeHandler, PlayerControls) {
   }
 
   private async getSongFromPath(path: string): Promise<Song> {
-    const results = await window.SearchUtils.searchCompact(path)
+    const results = await window.SearchUtils.searchSongsByOptions({
+      song: {
+        path: path
+      }
+    })
     if (results.length > 0) {
       return results[0]
     }

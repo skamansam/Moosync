@@ -1,8 +1,8 @@
 interface SongDetailDefaults {
-  defaultTitle: string
-  defaultSubtitle: any
-  defaultCover: string
-  defaultSubSubtitle: string
+  defaultTitle?: string
+  defaultSubtitle?: any
+  defaultCover?: string
+  defaultSubSubtitle?: string
 }
 
 interface SongDetailButtons {

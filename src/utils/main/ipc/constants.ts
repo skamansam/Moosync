@@ -25,7 +25,8 @@ export enum StoreEvents {
 }
 
 export enum SearchEvents {
-  SEARCH_SONGS_COMPACT = 'searchCompact',
+  SEARCH_SONGS_BY_OPTIONS = 'searchSongsByOptions',
+  SEARCH_ENTITY_BY_OPTIONS = 'searchEntityByOptions',
   SEARCH_ALL = 'searchAll',
   SEARCH_YT = 'searchYT'
 }

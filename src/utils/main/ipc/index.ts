@@ -1,8 +1,5 @@
-import { AlbumsChannel } from './albums'
-import { ArtistsChannel } from './artists'
 import { BrowserWindowChannel } from './window'
 import { ExtensionHostChannel } from './extensionHost'
-import { GenreChannel } from './genre'
 import { IpcEvents } from './constants'
 import { LoggerChannel } from './logger'
 import { PlaylistsChannel } from './playlists'
@@ -19,11 +16,8 @@ export const scannerChannel = new ScannerChannel()
 export function registerIpcChannels() {
   const ipcChannels = [
     new SongsChannel(),
-    new AlbumsChannel(),
     scannerChannel,
     new PlaylistsChannel(),
-    new ArtistsChannel(),
-    new GenreChannel(),
     new BrowserWindowChannel(),
     new PreferenceChannel(),
     new SearchChannel(),

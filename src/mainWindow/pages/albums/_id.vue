@@ -36,25 +36,6 @@ export default class SingleAlbumView extends mixins(ContextMenuMixin, PlayerCont
   private album: Album | null = null
   private songList: Song[] = []
 
-  @Prop({ default: '' })
-  private album_id!: string
-
-  @Prop({ default: '' })
-  private album_name!: string
-
-  @Prop({ default: '' })
-  private album_artist!: string
-
-  @Prop({ default: '' })
-  private album_coverPath!: string
-
-  @Prop({ default: '' })
-  private album_song_count!: string
-
-  get playlists() {
-    return vxm.playlist.playlists
-  }
-
   get buttonGroups(): SongDetailButtons {
     return {
       enableContainer: true,
@@ -62,19 +43,36 @@ export default class SingleAlbumView extends mixins(ContextMenuMixin, PlayerCont
     }
   }
 
-  private defaultDetails: SongDetailDefaults = {
-    defaultTitle: this.album_name,
-    defaultSubtitle: this.album_artist,
-    defaultSubSubtitle: `${this.album_song_count} Songs`,
-    defaultCover: this.album_coverPath
+  get defaultDetails(): SongDetailDefaults {
+    return {
+      defaultTitle: this.album?.album_name,
+      defaultSubtitle: this.album?.album_artist,
+      defaultSubSubtitle: `${this.album?.album_song_count} Songs`,
+      defaultCover: this.album?.album_coverPath_high
+    }
   }
 
-  mounted() {
+  created() {
     this.fetchAlbum()
+    this.fetchSongList()
   }
 
   private async fetchAlbum() {
-    this.songList = await window.DBUtils.getSingleAlbum(this.album_id)
+    this.album = (
+      await window.SearchUtils.searchEntityByOptions({
+        album: {
+          album_id: this.$route.params.id
+        }
+      })
+    )[0]
+  }
+
+  private async fetchSongList() {
+    this.songList = await window.SearchUtils.searchSongsByOptions({
+      album: {
+        album_id: this.$route.params.id
+      }
+    })
   }
 
   private getSongMenu(event: Event, songs: Song[], exclude: string | undefined) {

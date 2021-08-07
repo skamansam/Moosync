@@ -96,14 +96,14 @@ export class DBUtils {
   }
 
   protected registerRegexp() {
-    this.db.function('regexp', (pattern: string = '*', str: string) => {
+    this.db.function('regexp', (pattern: string, str: string) => {
       return str.match(new RegExp(pattern, 'i')) ? 1 : 0
     })
   }
 
   protected addExcludeWhereClause(where: boolean, exclude?: string[]): string {
     return exclude && exclude.length > 0
-      ? `${where ? 'WHERE' : 'AND '} allsongs.path NOT REGEXP '${exclude.join('|')}'`
+      ? `${where ? 'WHERE' : 'AND '} allsongs.path NOT REGEXP '${exclude.join('|').replaceAll('\\', '\\\\')}'`
       : ''
   }
 
@@ -135,6 +135,13 @@ export class DBUtils {
     return ''
   }
 
+  private leftJoinPLaylists(exclude_table?: string) {
+    if (exclude_table !== 'playlists') {
+      return ` LEFT JOIN playlist_bridge ON allsongs._id = playlist_bridge.song`
+    }
+    return ''
+  }
+
   private leftJoinCommon(tableName: string, rowName: string, bridgeTable?: string) {
     return ` LEFT JOIN ${tableName} ON ${bridgeTable}.${rowName} = ${tableName}.${rowName}_id`
   }
@@ -145,9 +152,11 @@ export class DBUtils {
       this.leftJoinAlbums(exclude_table) +
       this.leftJoinArtists(exclude_table) +
       this.leftJoinGenre(exclude_table) +
+      this.leftJoinPLaylists(exclude_table) +
       this.leftJoinCommon('albums', 'album', 'album_bridge') +
       this.leftJoinCommon('artists', 'artist', 'artists_bridge') +
-      this.leftJoinCommon('genre', 'genre', 'genre_bridge')
+      this.leftJoinCommon('genre', 'genre', 'genre_bridge') +
+      this.leftJoinCommon('playlists', 'playlist', 'playlist_bridge')
     )
   }
 

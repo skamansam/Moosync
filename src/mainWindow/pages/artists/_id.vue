@@ -31,28 +31,7 @@ import { arrayDiff } from '@/utils/common'
 })
 export default class SingleArtistView extends mixins(ContextMenuMixin) {
   private songList: Song[] = []
-
-  @Prop({ default: '' })
-  private artist_id!: string
-
-  @Prop({ default: '' })
-  private artist_name!: string
-
-  @Prop({ default: '' })
-  private artist_coverPath!: string
-
-  @Prop({ default: '' })
-  private artist_song_count!: string
-
-  mounted() {
-    this.fetchArtist()
-  }
-  private defaultDetails: SongDetailDefaults = {
-    defaultTitle: this.artist_name,
-    defaultSubtitle: `${this.artist_song_count} Songs`,
-    defaultSubSubtitle: '',
-    defaultCover: this.artist_coverPath
-  }
+  private artist: artists | null = null
 
   get buttonGroups(): SongDetailButtons {
     return {
@@ -61,8 +40,35 @@ export default class SingleArtistView extends mixins(ContextMenuMixin) {
     }
   }
 
-  private async fetchArtist() {
-    this.songList = await window.DBUtils.getSingleArtist(this.artist_id)
+  get defaultDetails(): SongDetailDefaults {
+    return {
+      defaultTitle: this.artist?.artist_name,
+      defaultSubSubtitle: `${this.artist?.artist_song_count} Songs`,
+      defaultCover: this.artist?.artist_coverPath
+    }
+  }
+
+  created() {
+    this.fetchAlbum()
+    this.fetchSongList()
+  }
+
+  private async fetchAlbum() {
+    this.artist = (
+      await window.SearchUtils.searchEntityByOptions({
+        artist: {
+          artist_id: this.$route.params.id
+        }
+      })
+    )[0]
+  }
+
+  private async fetchSongList() {
+    this.songList = await window.SearchUtils.searchSongsByOptions({
+      artist: {
+        artist_id: this.$route.params.id
+      }
+    })
   }
 
   private getSongMenu(event: Event, songs: Song[], exclude: string | undefined) {

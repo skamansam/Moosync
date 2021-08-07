@@ -10,9 +10,6 @@ export class SongsChannel implements IpcChannelInterface {
   name = IpcEvents.SONG
   handle(event: Electron.IpcMainEvent, request: IpcRequest): void {
     switch (request.type) {
-      case SongEvents.GET_ALL_SONGS:
-        this.getAllSongs(event, request)
-        break
       case SongEvents.STORE_SONG:
         this.storeSongs(event, request)
         break
@@ -32,13 +29,6 @@ export class SongsChannel implements IpcChannelInterface {
         this.fileExists(event, request, 'image')
         break
     }
-  }
-
-  private async getAllSongs(event: Electron.IpcMainEvent, request: IpcRequest) {
-    const preferences = await loadPreferences()
-    SongDB.getSongByOptions(undefined, getDisabledPaths(preferences.musicPaths))
-      .then((data) => event.reply(request.responseChannel, data))
-      .catch((e) => console.error(e))
   }
 
   private removeSongs(event: Electron.IpcMainEvent, request: IpcRequest) {

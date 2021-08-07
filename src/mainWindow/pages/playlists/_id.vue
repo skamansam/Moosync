@@ -37,72 +37,67 @@ export default class SinglePlaylistView extends mixins(ContextMenuMixin) {
 
   private tableBusy: boolean = false
 
-  @Prop({ default: '' })
-  private playlist_id!: string
-
-  @Prop({ default: '' })
-  private playlist_name!: string
-
-  @Prop({ default: '' })
-  private playlist_coverPath!: string
-
-  @Prop({ default: '' })
-  private playlist_song_count!: string
-
-  @Prop({ default: false })
-  private isYoutubePlaylist!: string
-
-  @Prop({ default: false })
-  private isSpotifyPlaylist!: string
-
-  mounted() {
-    this.fetchPlaylist()
-  }
-
-  private defaultDetails = {
-    defaultTitle: this.playlist_name,
-    defaultSubtitle: `${this.playlist_song_count} Songs`,
-    defaultSubSubtitle: '',
-    defaultCover: this.playlist_coverPath
-  }
+  private playlist: Playlist | null = null
 
   get buttonGroups(): SongDetailButtons {
     return {
       enableContainer: true,
-      enableLibraryStore: !!(this.isYoutubePlaylist || this.isSpotifyPlaylist)
+      enableLibraryStore: false
     }
+  }
+
+  get defaultDetails(): SongDetailDefaults {
+    return {
+      defaultTitle: this.playlist?.playlist_name,
+      defaultSubSubtitle: `${this.playlist?.playlist_song_count} Songs`,
+      defaultCover: this.playlist?.playlist_coverPath
+    }
+  }
+
+  created() {
+    this.fetchAlbum()
+    this.fetchSongList()
+  }
+
+  private async fetchAlbum() {
+    this.playlist = (
+      await window.SearchUtils.searchEntityByOptions({
+        playlist: {
+          playlist_id: this.$route.params.id
+        }
+      })
+    )[0]
+  }
+
+  private async fetchSongList() {
+    this.songList = await window.SearchUtils.searchSongsByOptions({
+      playlist: {
+        playlist_id: this.$route.params.id
+      }
+    })
   }
 
   private async fetchAsyncGen() {
-    let generator
-    if (this.isYoutubePlaylist === 'true')
-      generator = vxm.providers.youtubeProvider.getPlaylistContent(this.playlist_id.replace('youtube-', ''))
-    else if (this.isSpotifyPlaylist === 'true')
-      generator = vxm.providers.spotifyProvider.getPlaylistContent(this.playlist_id.replace('spotify-', ''))
-
-    if (generator)
-      for await (const items of generator) {
-        this.songList.push(...items)
-      }
-  }
-
-  private async fetchPlaylist() {
-    if (this.isYoutubePlaylist === 'true' || this.isSpotifyPlaylist === 'true') {
-      await this.fetchAsyncGen()
-    } else {
-      this.songList = await window.DBUtils.getSinglePlaylist(this.playlist_id)
-    }
+    // let generator
+    // if (this.isYoutubePlaylist === 'true')
+    //   generator = vxm.providers.youtubeProvider.getPlaylistContent(this.playlist_id.replace('youtube-', ''))
+    // else if (this.isSpotifyPlaylist === 'true')
+    //   generator = vxm.providers.spotifyProvider.getPlaylistContent(this.playlist_id.replace('spotify-', ''))
+    // if (generator)
+    //   for await (const items of generator) {
+    //     this.songList.push(...items)
+    //   }
   }
 
   private getSongMenu(event: Event, songs: Song[], exclude: string | undefined) {
-    this.getContextMenu(event, {
-      type: 'PLAYLIST_CONTENT',
-      args: {
-        songs: songs,
-        isRemote: this.isYoutubePlaylist === 'true' || this.isSpotifyPlaylist === 'true',
-        refreshCallback: () => (this.songList = arrayDiff(this.songList, songs))
-      }
-    })
+    // this.getContextMenu(event, {
+    //   type: 'PLAYLIST_CONTENT',
+    //   args: {
+    //     songs: songs,
+    //     isRemote: this.isYoutubePlaylist === 'true' || this.isSpotifyPlaylist === 'true',
+    //     refreshCallback: () => (this.songList = arrayDiff(this.songList, songs))
+    //   }
+    // })
   }
 
   private playPlaylist() {

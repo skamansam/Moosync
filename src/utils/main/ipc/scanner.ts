@@ -162,7 +162,10 @@ export class ScannerChannel implements IpcChannelInterface {
   // TODO: Add queueing for scraping artworks
   private async scrapeArtists() {
     this.scraperWorker = await spawn(new Worker('@/utils/main/workers/scraper.ts', { type: 'module' }))
-    const allArtists = await SongDB.getAllArtists()
+    const allArtists = await SongDB.getEntityByOptions<artists>({
+      artist: true
+    })
+
     await this.fetchMBID(allArtists)
 
     await this.fetchArtworks(allArtists)

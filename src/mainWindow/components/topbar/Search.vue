@@ -90,7 +90,23 @@ export default class Sidebar extends mixins(Colors, PlayerControls, ImgLoader) {
   private async onTextChange(value: string) {
     if (value) {
       this.showSearchResults = true
-      this.results = await window.SearchUtils.searchCompact(value)
+      this.results = await window.SearchUtils.searchSongsByOptions({
+        album: {
+          album_name: value
+        },
+        artist: {
+          artist_name: value
+        },
+        genre: {
+          genre_name: value
+        },
+        playlist: {
+          playlist_name: value
+        },
+        song: {
+          path: value
+        }
+      })
     } else {
       this.showSearchResults = false
       this.results = []

@@ -12,7 +12,6 @@ export default class ImgLoader extends Vue {
   }
 
   protected getImgSrc(imgSrc: string | null | undefined) {
-    console.log(imgSrc)
     if (imgSrc) {
       if (imgSrc.startsWith('http') || imgSrc.startsWith('media')) return imgSrc
       else return 'media://' + imgSrc

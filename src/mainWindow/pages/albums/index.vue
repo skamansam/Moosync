@@ -30,7 +30,9 @@ export default class Albums extends mixins(RouterPushes) {
   private albumList: Album[] = []
 
   private async getAlbums() {
-    this.albumList = await window.DBUtils.getAllAlbums()
+    this.albumList = await window.SearchUtils.searchEntityByOptions({
+      album: true
+    })
   }
 
   get filteredAlbumList() {

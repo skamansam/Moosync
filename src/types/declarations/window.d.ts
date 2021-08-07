@@ -5,20 +5,12 @@ import { Playlist } from '@/utils/models/playlists'
 import { SearchResult } from '@/utils/models/searchResult'
 import { Song } from '@/utils/models/songs'
 import { YoutubeItem } from '@/utils/models/youtube'
+import { SongAPIOptions, EntityApiOptions } from '@moosync/moosync-types';
 
 
 interface DBUtils {
-  getAllSongs: () => Promise<Song[]>
   removeSongs: (songs: Song[]) => Promise<void>
   storeSongs: (songs: Song[]) => Promise<void>
-  getAllAlbums: () => Promise<Album[]>
-  getSingleAlbum: (albumID: string) => Promise<Song[]>
-  getAllArtists: () => Promise<artists[]>
-  getSingleArtist: (artistID: string) => Promise<Song[]>
-  getAllGenres: () => Promise<Genre[]>
-  getSingleGenre: (genreID: string) => Promise<Song[]>
-  getAllPlaylists: () => Promise<Playlist[]>
-  getSinglePlaylist: (PlaylistID: string) => Promise<Song[]>
   createPlaylist: (name: string, desc: string, imgSrc: string) => Promise<string>
   addToPlaylist: (playlistID: string, ...songIDs: Song[]) => Promise<void>
   removePlaylist: (playlistID: string) => Promise<void>
@@ -29,7 +21,8 @@ interface providerUtils {
 }
 
 interface searchUtils {
-  searchCompact: (term: string) => Promise<Song[]>
+  searchSongsByOptions: (options?: SongAPIOptions) => Promise<Song[]>
+  searchEntityByOptions: (options: EntityApiOptions) => Promise<T[]>
   searchAll: (term: string) => Promise<SearchResult>
   searchYT: (term: string) => Promise<YoutubeItem[]>
 }

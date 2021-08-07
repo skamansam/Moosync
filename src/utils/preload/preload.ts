@@ -14,6 +14,7 @@ import {
   StoreEvents,
   WindowEvents
 } from '@/utils/main/ipc/constants';
+import { EntityApiOptions, SongAPIOptions } from '@moosync/moosync-types';
 import { contextBridge, ipcRenderer } from 'electron';
 
 import { IpcRendererHolder } from '@/utils/preload/ipc/index';
@@ -21,21 +22,6 @@ import { IpcRendererHolder } from '@/utils/preload/ipc/index';
 const ipcRendererHolder = new IpcRendererHolder(ipcRenderer)
 
 contextBridge.exposeInMainWorld('DBUtils', {
-  getAllAlbums: () => ipcRendererHolder.send(IpcEvents.ALBUM, { type: AlbumEvents.GET_ALL_ALBUMS }),
-  getSingleAlbum: (albumID: string) =>
-    ipcRendererHolder.send(IpcEvents.ALBUM, { type: AlbumEvents.GET_ALBUM, params: { id: albumID } }),
-
-  getAllArtists: () => ipcRendererHolder.send(IpcEvents.ARTIST, { type: ArtistEvents.GET_ALL_ARTISTS }),
-  getSingleArtist: (artistID: string) =>
-    ipcRendererHolder.send(IpcEvents.ARTIST, { type: ArtistEvents.GET_ARTIST, params: { id: artistID } }),
-
-  getAllGenres: () => ipcRendererHolder.send(IpcEvents.GENRE, { type: GenreEvents.GET_ALL_GENRE }),
-  getSingleGenre: (genreID: string) =>
-    ipcRendererHolder.send(IpcEvents.GENRE, { type: GenreEvents.GET_GENRE, params: { id: genreID } }),
-
-  getAllPlaylists: () => ipcRendererHolder.send(IpcEvents.PLAYLIST, { type: PlaylistEvents.GET_ALL_PLAYLISTS }),
-  getSinglePlaylist: (playlistID: string) =>
-    ipcRendererHolder.send(IpcEvents.PLAYLIST, { type: PlaylistEvents.GET_PLAYLIST, params: { id: playlistID } }),
   createPlaylist: (name: string, desc: string, imgSrc: string) =>
     ipcRendererHolder.send(IpcEvents.PLAYLIST, { type: PlaylistEvents.CREATE_PLAYLIST, params: { name: name, desc: desc, imgSrc: imgSrc } }),
   addToPlaylist: (playlistID: string, ...songIDs: Song[]) =>
@@ -44,7 +30,6 @@ contextBridge.exposeInMainWorld('DBUtils', {
       params: { playlist_id: playlistID, song_ids: songIDs },
     }),
   removePlaylist: (playlistID: string) => ipcRendererHolder.send(IpcEvents.PLAYLIST, { type: PlaylistEvents.REMOVE_PLAYLIST, params: { playlist_id: playlistID } }),
-  getAllSongs: () => ipcRendererHolder.send(IpcEvents.SONG, { type: SongEvents.GET_ALL_SONGS }),
   storeSongs: (songs: Song[]) =>
     ipcRendererHolder.send(IpcEvents.SONG, { type: SongEvents.STORE_SONG, params: { songs: songs } }),
   removeSongs: (songs: Song[]) =>
@@ -91,12 +76,15 @@ contextBridge.exposeInMainWorld('FileUtils', {
 })
 
 contextBridge.exposeInMainWorld('SearchUtils', {
-  searchCompact: (term: string) =>
-    ipcRendererHolder.send(IpcEvents.SEARCH, { type: SearchEvents.SEARCH_SONGS_COMPACT, params: { searchTerm: term } }),
+  searchSongsByOptions: (options?: SongAPIOptions) =>
+    ipcRendererHolder.send(IpcEvents.SEARCH, { type: SearchEvents.SEARCH_SONGS_BY_OPTIONS, params: { options } }),
+  searchEntityByOptions: (options: EntityApiOptions) =>
+    ipcRendererHolder.send(IpcEvents.SEARCH, { type: SearchEvents.SEARCH_ENTITY_BY_OPTIONS, params: { options } }),
   searchAll: (term: string) =>
     ipcRendererHolder.send(IpcEvents.SEARCH, { type: SearchEvents.SEARCH_ALL, params: { searchTerm: term } }),
   searchYT: (term: string) =>
     ipcRendererHolder.send(IpcEvents.SEARCH, { type: SearchEvents.SEARCH_YT, params: { searchTerm: term } }),
+
 })
 
 contextBridge.exposeInMainWorld('WindowUtils', {

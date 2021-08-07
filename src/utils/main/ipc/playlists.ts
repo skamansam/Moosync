@@ -16,12 +16,6 @@ export class PlaylistsChannel implements IpcChannelInterface {
       case PlaylistEvents.CREATE_PLAYLIST:
         this.createPlaylist(event, request)
         break
-      case PlaylistEvents.GET_ALL_PLAYLISTS:
-        this.getAllPlaylists(event, request)
-        break
-      case PlaylistEvents.GET_PLAYLIST:
-        this.getPlaylist(event, request)
-        break
       case PlaylistEvents.SAVE_COVER:
         this.saveCoverToFile(event, request)
         break
@@ -29,25 +23,6 @@ export class PlaylistsChannel implements IpcChannelInterface {
         this.removePlaylist(event, request)
         break
     }
-  }
-
-  private async getPlaylist(event: Electron.IpcMainEvent, request: IpcRequest) {
-    if (request.params.id) {
-      const preferences = await loadPreferences()
-      SongDB.getPlaylistSongs(request.params.id, getDisabledPaths(preferences.musicPaths))
-        .then((data) => {
-          event.reply(request.responseChannel, data)
-        })
-        .catch((e) => console.error(e))
-    }
-  }
-
-  private getAllPlaylists(event: Electron.IpcMainEvent, request: IpcRequest) {
-    SongDB.getPlaylists()
-      .then((data) => {
-        event.reply(request.responseChannel, data)
-      })
-      .catch((e) => console.error(e))
   }
 
   private createPlaylist(event: Electron.IpcMainEvent, request: IpcRequest) {
