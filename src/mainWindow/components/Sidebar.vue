@@ -114,7 +114,7 @@ export default class Sidebar extends mixins(Colors) {
 .gradient
   background: linear-gradient(176.27deg, var(--secondary) 1.69%, var(--primary) 72.01%)
   border-radius: 0px 30px 0px 0px
-  top: 32px !important
+  top: 34px !important
 
 .b-sidebar
   transition: 0.2s
