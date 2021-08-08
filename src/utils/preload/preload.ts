@@ -34,16 +34,9 @@ contextBridge.exposeInMainWorld('DBUtils', {
 })
 
 contextBridge.exposeInMainWorld('PreferenceUtils', {
-  load: () => ipcRendererHolder.send(IpcEvents.PREFERENCES, { type: PreferenceEvents.LOAD_PREFERENCES }),
-  save: (preferences: Preferences) =>
-    ipcRendererHolder.send(IpcEvents.PREFERENCES, {
-      type: PreferenceEvents.SAVE_PREFERENCES,
-      params: { preferences: preferences },
-    }),
   saveSelective: (key: string, value: any, isExtension?: boolean) => ipcRendererHolder.send(IpcEvents.PREFERENCES, { type: PreferenceEvents.SAVE_SELECTIVE_PREFERENCES, params: { key, value, isExtension } }),
   loadSelective: (key: string, isExtension?: boolean) => ipcRendererHolder.send(IpcEvents.PREFERENCES, { type: PreferenceEvents.LOAD_SELECTIVE_PREFERENCES, params: { key, isExtension } }),
   notifyPreferenceChanged: (key: string, value: any) => ipcRendererHolder.send(IpcEvents.PREFERENCES, { type: PreferenceEvents.PREFERENCE_REFRESH, params: { key, value } }),
-
 })
 
 contextBridge.exposeInMainWorld('ProviderUtils', {

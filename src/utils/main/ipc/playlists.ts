@@ -42,7 +42,7 @@ export class PlaylistsChannel implements IpcChannelInterface {
 
   private async saveCoverToFile(event: Electron.IpcMainEvent, request: IpcRequest) {
     if (request.params.b64) {
-      const cacheDir = (await loadPreferences()).thumbnailPath
+      const cacheDir = loadPreferences()!.thumbnailPath
       const filePath = path.join(cacheDir, v4() + ".png")
       if (fs.existsSync(cacheDir)) {
         if (fs.existsSync(filePath)) {

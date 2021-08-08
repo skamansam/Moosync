@@ -1,5 +1,5 @@
 import { IpcEvents, PreferenceEvents } from './constants';
-import { getActiveTheme, loadAllThemes, loadPreferences, loadSelectivePreference, loadTheme, onPreferenceChanged, savePreferences, saveSelectivePreference, saveTheme, setActiveTheme } from '../db/preferences';
+import { getActiveTheme, loadAllThemes, loadSelectivePreference, loadTheme, onPreferenceChanged, savePreferences, saveSelectivePreference, saveTheme, setActiveTheme } from '../db/preferences';
 
 import { WindowHandler } from '../windowManager';
 
@@ -7,12 +7,6 @@ export class PreferenceChannel implements IpcChannelInterface {
   name = IpcEvents.PREFERENCES
   handle(event: Electron.IpcMainEvent, request: IpcRequest): void {
     switch (request.type) {
-      case PreferenceEvents.LOAD_PREFERENCES:
-        this.loadPreferences(event, request)
-        break
-      case PreferenceEvents.SAVE_PREFERENCES:
-        this.savePreferences(event, request)
-        break
       case PreferenceEvents.SAVE_SELECTIVE_PREFERENCES:
         this.saveSelective(event, request)
         break
@@ -37,16 +31,6 @@ export class PreferenceChannel implements IpcChannelInterface {
       case PreferenceEvents.GET_ALL_THEMES:
         this.getAllThemes(event, request)
         break
-    }
-  }
-
-  private loadPreferences(event: Electron.IpcMainEvent, request: IpcRequest) {
-    event.reply(request.responseChannel, loadPreferences())
-  }
-
-  private savePreferences(event: Electron.IpcMainEvent, request: IpcRequest) {
-    if (request.params.preferences) {
-      event.reply(request.responseChannel, savePreferences(request.params.preferences))
     }
   }
 
@@ -98,8 +82,4 @@ export class PreferenceChannel implements IpcChannelInterface {
   private getActiveTheme(event: Electron.IpcMainEvent, request: IpcRequest) {
     event.reply(request.responseChannel, getActiveTheme())
   }
-}
-
-export function preferencesChanged() {
-  WindowHandler.getWindow(true)?.webContents.send(PreferenceEvents.PREFERENCE_REFRESH)
 }

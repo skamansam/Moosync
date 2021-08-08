@@ -2,26 +2,23 @@ import Store from 'electron-store';
 import { app } from 'electron';
 import { enableStartup } from '../autoLaunch';
 import path from 'path';
-import { preferencesChanged } from '@/utils/main/ipc/preferences';
 import { scannerChannel } from '../ipc';
 import { setMinimizeToTray } from '@/utils/main/windowManager';
 
-const store = new Store()
-
-export const defaultPreferences: Preferences = {
+const defaultPreferences: Preferences = {
   musicPaths: [],
   thumbnailPath: path.join(app.getPath('appData'), app.getName(), '.thumbnails'),
   artworkPath: path.join(app.getPath('appData'), app.getName(), '.thumbnails'),
   systemSettings: []
 }
 
+const store = new Store({
+  defaults: defaultPreferences,
+  serialize: value => JSON.stringify(value)
+})
 
 export function savePreferences(prefs: Preferences) {
-  const jsonStr = JSON.stringify(prefs)
-  store.set('prefs', jsonStr)
-
-  // Notify the mainwindow of preference changes
-  preferencesChanged()
+  store.set('prefs', prefs)
 }
 
 export function saveTheme(theme: ThemeDetails) {
@@ -49,8 +46,6 @@ export function getActiveTheme() {
 
 export function saveSelectivePreference(key: string, value: any, isExtension?: boolean) {
   store.set(`prefs.${isExtension ? 'extension.' : ''}${key}`, value)
-  if (!isExtension)
-    preferencesChanged()
 }
 
 export function loadSelectivePreference(key?: string, isExtension?: boolean, defaultValue?: any) {
@@ -64,7 +59,7 @@ export function loadSelectivePreference(key?: string, isExtension?: boolean, def
 }
 
 export function setInitialInterfaceSettings() {
-  onPreferenceChanged('system', (loadPreferences()).systemSettings)
+  onPreferenceChanged('system', loadPreferences()?.systemSettings)
 }
 
 export async function onPreferenceChanged(key: string, value: any) {
@@ -88,16 +83,18 @@ export async function onPreferenceChanged(key: string, value: any) {
 }
 
 function validatePrefs(prefs: Preferences): Preferences {
-  if (!prefs.musicPaths) {
-    prefs.musicPaths = defaultPreferences.musicPaths
-  }
+  if (prefs) {
+    if (!prefs.musicPaths) {
+      prefs.musicPaths = defaultPreferences.musicPaths
+    }
 
-  if (!prefs.thumbnailPath) {
-    prefs.thumbnailPath = defaultPreferences.thumbnailPath
-  }
+    if (!prefs.thumbnailPath) {
+      prefs.thumbnailPath = defaultPreferences.thumbnailPath
+    }
 
-  if (!prefs.artworkPath) {
-    prefs.artworkPath = defaultPreferences.artworkPath
+    if (!prefs.artworkPath) {
+      prefs.artworkPath = defaultPreferences.artworkPath
+    }
   }
 
   return prefs
@@ -149,4 +146,5 @@ function setupDefaultThemes() {
   }
 }
 
+savePreferences(loadPreferences())
 setupDefaultThemes()

@@ -29,9 +29,6 @@
       <b-row no-gutters class="mt-3 content-row flex-grow-1">
         <b-col>
           <b-container fluid>
-            <b-row no-gutters>
-              <div class="ext-title">Summary</div>
-            </b-row>
             <b-row no-gutters class="single-pref-row">
               <ExtensionGroup @extensionsChanged="onExtensionChanged" :extensions="extensions" />
             </b-row>

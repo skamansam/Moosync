@@ -13,14 +13,12 @@
             title="Downloaded Artwork Path"
             tooltip="Directory where downloaded artworks are stored"
             prefKey="artworkPath"
-            defaultValue="''"
             class="mt-5"
           />
           <FilePicker
             title="Generated Thumbnail Path"
             tooltip="Directory where generated thumbnails are stored"
             prefKey="thumbnailPath"
-            defaultValue="''"
             class="mt-5"
           />
         </div>
