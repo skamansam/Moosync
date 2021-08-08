@@ -17,8 +17,9 @@ declare namespace YoutubeResponses {
 
   type PlaylistRequest = {
     params: {
+      id?: string
       part: ['id', 'contentDetails', 'snippet'?]
-      mine: true
+      mine?: true
       maxResults?: number
       pageToken?: string | undefined
     }

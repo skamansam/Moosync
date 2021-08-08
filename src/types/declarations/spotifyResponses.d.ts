@@ -3,6 +3,7 @@ declare module SpotifyResponses {
   enum ApiResources {
     USER_DETAILS = 'me',
     PLAYLISTS = 'me/playlists',
+    PLAYLIST = 'playlists/{playlist_id}',
     PLAYLIST_ITEMS = 'playlists/{playlist_id}/tracks',
     VIDEO_DETAILS = 'videos'
   }
@@ -27,6 +28,13 @@ declare module SpotifyResponses {
     }
   }
 
+  type PlaylistItemRequest = {
+    params: {
+      playlist_id: string,
+      fields?: string[]
+    }
+  }
+
   type VideoDetailsRequest = {
     params: {
       part: ['contentDetails', 'snippet']
@@ -43,6 +51,8 @@ declare module SpotifyResponses {
     ? PlaylistItemsRequest
     : T extends ApiResources.VIDEO_DETAILS
     ? VideoDetailsRequest
+    : T extends ApiResources.PLAYLIST
+    ? PlaylistItemRequest
     : undefined
 
   interface Image {
@@ -236,7 +246,7 @@ declare module SpotifyResponses {
     ? UserPlaylists.UserPlaylists
     : T extends ApiResources.PLAYLIST_ITEMS
     ? PlaylistItems.PlaylistItems
-    // : T extends ApiResources.VIDEO_DETAILS
-    // ? VideoDetails.VideoDetails
+    : T extends ApiResources.PLAYLIST
+    ? UserPlaylists.Item
     : undefined
 }

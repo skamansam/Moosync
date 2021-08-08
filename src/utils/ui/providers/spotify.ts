@@ -11,6 +11,7 @@ const BASE_URL = 'https://api.spotify.com/v1/'
 enum ApiResources {
   USER_DETAILS = 'me',
   PLAYLISTS = 'me/playlists',
+  PLAYLIST = 'playlists/{playlist_id}',
   PLAYLIST_ITEMS = 'playlists/{playlist_id}/tracks',
   VIDEO_DETAILS = 'videos'
 }
@@ -21,7 +22,7 @@ export class SpotifyProvider extends GenericProvider {
   private api = axios.create({
     adapter: cache.adapter,
     baseURL: BASE_URL,
-    paramsSerializer: (params) => qs.stringify(params, { arrayFormat: 'repeat' })
+    paramsSerializer: (params) => qs.stringify(params, { arrayFormat: 'comma' })
   })
 
   public get loggedIn() {
@@ -49,7 +50,7 @@ export class SpotifyProvider extends GenericProvider {
 
     let url: string = resource
 
-    if (resource === ApiResources.PLAYLIST_ITEMS) {
+    if (resource === ApiResources.PLAYLIST_ITEMS || resource === ApiResources.PLAYLIST) {
       url = resource.replace('{playlist_id}', (search as SpotifyResponses.PlaylistItemsRequest).params.playlist_id)
     }
 
@@ -178,6 +179,19 @@ export class SpotifyProvider extends GenericProvider {
     const ytItem = await this.spotifyToYoutube(song)
     if (ytItem) {
       return { url: ytItem._id, duration: ytItem.duration }
+    }
+  }
+
+  public async getUserPlaylist(id: string) {
+    const validRefreshToken = await this.auth.hasValidRefreshToken()
+    if (this.auth.loggedIn() || validRefreshToken) {
+      const resp = await this.populateRequest(ApiResources.PLAYLIST, {
+        params: {
+          playlist_id: id,
+        }
+      })
+
+      return this.parsePlaylists([resp])[0]
     }
   }
 }

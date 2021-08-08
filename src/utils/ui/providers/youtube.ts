@@ -179,4 +179,16 @@ export class YoutubeProvider extends GenericProvider {
     if (song.url)
       return { url: song.url!, duration: song.duration }
   }
+
+  public async getUserPlaylist(id: string) {
+    const resp = await this.populateRequest(ApiResources.PLAYLISTS, {
+      params: {
+        id,
+        part: ['id', 'contentDetails', 'snippet'],
+        maxResults: 1,
+      }
+    })
+
+    return (await this.parsePlaylists(resp.items))[0]
+  }
 }

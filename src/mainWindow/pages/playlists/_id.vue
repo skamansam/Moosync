@@ -48,25 +48,42 @@ export default class SinglePlaylistView extends mixins(ContextMenuMixin) {
 
   get defaultDetails(): SongDetailDefaults {
     return {
-      defaultTitle: this.playlist?.playlist_name,
-      defaultSubSubtitle: `${this.playlist?.playlist_song_count} Songs`,
-      defaultCover: this.playlist?.playlist_coverPath
+      defaultTitle: this.playlist?.playlist_name ?? '',
+      defaultSubSubtitle: `${this.playlist?.playlist_song_count ?? 0} Songs`,
+      defaultCover: this.playlist?.playlist_coverPath ?? ''
     }
   }
 
-  created() {
-    this.fetchAlbum()
-    this.fetchSongList()
+  async created() {
+    this.fetchPlaylist()
+    await this.fetchSongList()
+    await this.fetchAsyncGen()
   }
 
-  private async fetchAlbum() {
-    this.playlist = (
-      await window.SearchUtils.searchEntityByOptions({
-        playlist: {
-          playlist_id: this.$route.params.id
-        }
-      })
-    )[0]
+  private async fetchPlaylist() {
+    if (this.$route.params.id.startsWith('youtube-')) {
+      await this.fetchPlaylistYoutube()
+    } else if (this.$route.params.id.startsWith('spotify-')) {
+      await this.fetchPlaylistSpotify()
+    } else {
+      this.playlist = (
+        await window.SearchUtils.searchEntityByOptions({
+          playlist: {
+            playlist_id: this.$route.params.id
+          }
+        })
+      )[0]
+    }
+  }
+
+  private async fetchPlaylistYoutube() {
+    this.playlist = await vxm.providers.youtubeProvider.getUserPlaylist(this.$route.params.id.replace('youtube-', ''))
+  }
+
+  private async fetchPlaylistSpotify() {
+    this.playlist = (await vxm.providers.spotifyProvider.getUserPlaylist(
+      this.$route.params.id.replace('spotify-', '')
+    ))!
   }
 
   private async fetchSongList() {
@@ -78,26 +95,27 @@ export default class SinglePlaylistView extends mixins(ContextMenuMixin) {
   }
 
   private async fetchAsyncGen() {
-    // let generator
-    // if (this.isYoutubePlaylist === 'true')
-    //   generator = vxm.providers.youtubeProvider.getPlaylistContent(this.playlist_id.replace('youtube-', ''))
-    // else if (this.isSpotifyPlaylist === 'true')
-    //   generator = vxm.providers.spotifyProvider.getPlaylistContent(this.playlist_id.replace('spotify-', ''))
-    // if (generator)
-    //   for await (const items of generator) {
-    //     this.songList.push(...items)
-    //   }
+    let generator
+    if (this.$route.params.id.startsWith('youtube-'))
+      generator = vxm.providers.youtubeProvider.getPlaylistContent(this.$route.params.id.replace('youtube-', ''))
+    else if (this.$route.params.id.startsWith('spotify-'))
+      generator = vxm.providers.spotifyProvider.getPlaylistContent(this.$route.params.id.replace('spotify-', ''))
+
+    if (generator)
+      for await (const items of generator) {
+        this.songList.push(...items)
+      }
   }
 
   private getSongMenu(event: Event, songs: Song[], exclude: string | undefined) {
-    // this.getContextMenu(event, {
-    //   type: 'PLAYLIST_CONTENT',
-    //   args: {
-    //     songs: songs,
-    //     isRemote: this.isYoutubePlaylist === 'true' || this.isSpotifyPlaylist === 'true',
-    //     refreshCallback: () => (this.songList = arrayDiff(this.songList, songs))
-    //   }
-    // })
+    this.getContextMenu(event, {
+      type: 'PLAYLIST_CONTENT',
+      args: {
+        songs: songs,
+        isRemote: this.$route.params.id.startsWith('youtube-') || this.$route.params.id.startsWith('spotify-'),
+        refreshCallback: () => (this.songList = arrayDiff(this.songList, songs))
+      }
+    })
   }
 
   private playPlaylist() {

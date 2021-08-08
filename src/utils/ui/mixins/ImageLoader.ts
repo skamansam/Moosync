@@ -4,11 +4,11 @@ import { Component, Vue } from 'vue-property-decorator'
 export default class ImgLoader extends Vue {
 
   protected getValidImageLow(song: Song | null | undefined) {
-    return song?.song_coverPath_low ?? song?.album?.album_coverPath_low
+    return song?.song_coverPath_low ?? song?.album?.album_coverPath_low ?? song?.song_coverPath_high ?? song?.album?.album_coverPath_high
   }
 
   protected getValidImageHigh(song: Song | null | undefined) {
-    return song?.song_coverPath_high ?? song?.album?.album_coverPath_high
+    return song?.song_coverPath_high ?? song?.album?.album_coverPath_high ?? song?.song_coverPath_low ?? song?.album?.album_coverPath_low
   }
 
   protected getImgSrc(imgSrc: string | null | undefined) {
