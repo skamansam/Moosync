@@ -38,6 +38,7 @@ export default class App extends mixins(ThemeHandler, PlayerControls) {
   created() {
     this.registerLogger()
     this.registerNotifier()
+    this.listenThemeChanges()
     this.listenExtensionEvents()
     this.listenExtensionRequests()
   }
@@ -278,6 +279,10 @@ export default class App extends mixins(ThemeHandler, PlayerControls) {
       })
     )
   }
+
+  private listenThemeChanges() {
+    window.ThemeUtils.listenThemeChanged((theme) => this.setColorsToRoot(theme))
+  }
 }
 </script>
 
@@ -300,8 +305,6 @@ export default class App extends mixins(ThemeHandler, PlayerControls) {
 body
   background-color: var(--primary) !important
   color: var(--textPrimary) !important
-  width: 100vw
-  height: 100vh
 
 .appContainer
   width: 100%

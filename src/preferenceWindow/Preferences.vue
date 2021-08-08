@@ -1,5 +1,5 @@
 <template>
-  <div id="app" :style="rootColors">
+  <div id="app">
     <Titlebar windowType="preference-window" />
     <Sidebar />
     <div class="main-content">
@@ -11,10 +11,8 @@
 </template>
 
 <script lang="ts">
-import Vue from 'vue'
 import { Component } from 'vue-property-decorator'
 import Titlebar from '@/commonComponents/Titlebar.vue'
-import { vxm } from '@/preferenceWindow/store'
 import { mixins } from 'vue-class-component'
 import ThemeHandler from '@/utils/ui/mixins/ThemeHandler'
 import Sidebar from '@/preferenceWindow/components/Sidebar.vue'
@@ -27,6 +25,7 @@ import Sidebar from '@/preferenceWindow/components/Sidebar.vue'
 })
 export default class App extends mixins(ThemeHandler) {
   mounted() {
+    this.$root.$on('themeChanged', this.fetchThemeFromID)
     this.registerDevTools()
   }
 

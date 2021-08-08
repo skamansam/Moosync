@@ -1,5 +1,5 @@
 import { IpcEvents, PreferenceEvents } from './constants';
-import { loadPreferences, loadSelectivePreference, onPreferenceChanged, savePreferences, saveSelectivePreference } from '../db/preferences';
+import { getActiveTheme, loadAllThemes, loadPreferences, loadSelectivePreference, loadTheme, onPreferenceChanged, savePreferences, saveSelectivePreference, saveTheme, setActiveTheme } from '../db/preferences';
 
 import { WindowHandler } from '../windowManager';
 
@@ -22,30 +22,43 @@ export class PreferenceChannel implements IpcChannelInterface {
       case PreferenceEvents.PREFERENCE_REFRESH:
         this.onPreferenceChanged(event, request)
         break
+      case PreferenceEvents.SET_THEME:
+        this.setTheme(event, request)
+        break
+      case PreferenceEvents.GET_THEME:
+        this.getTheme(event, request)
+        break
+      case PreferenceEvents.SET_ACTIVE_THEME:
+        this.setActiveTheme(event, request)
+        break
+      case PreferenceEvents.GET_ACTIVE_THEME:
+        this.getActiveTheme(event, request)
+        break
+      case PreferenceEvents.GET_ALL_THEMES:
+        this.getAllThemes(event, request)
+        break
     }
   }
 
   private loadPreferences(event: Electron.IpcMainEvent, request: IpcRequest) {
-    loadPreferences()
-      .then((data) => event.reply(request.responseChannel, data))
-      .catch((e) => console.error(e))
+    event.reply(request.responseChannel, loadPreferences())
   }
 
   private savePreferences(event: Electron.IpcMainEvent, request: IpcRequest) {
     if (request.params.preferences) {
-      savePreferences(request.params.preferences).then((data) => event.reply(request.responseChannel, data))
+      event.reply(request.responseChannel, savePreferences(request.params.preferences))
     }
   }
 
   private saveSelective(event: Electron.IpcMainEvent, request: IpcRequest) {
     if (request.params.key && request.params.value) {
-      saveSelectivePreference(request.params.key, request.params.value, request.params.isExtension).then((data) => event.reply(request.responseChannel, data))
+      event.reply(request.responseChannel, saveSelectivePreference(request.params.key, request.params.value, request.params.isExtension))
     }
   }
 
   private loadSelective(event: Electron.IpcMainEvent, request: IpcRequest) {
     if (request.params.key) {
-      loadSelectivePreference(request.params.key, request.params.isExtension).then((data) => event.reply(request.responseChannel, data))
+      event.reply(request.responseChannel, loadSelectivePreference(request.params.key, request.params.isExtension))
     }
   }
 
@@ -54,6 +67,36 @@ export class PreferenceChannel implements IpcChannelInterface {
       onPreferenceChanged(request.params.key, request.params.value)
     }
     event.reply(request.responseChannel)
+  }
+
+  private setTheme(event: Electron.IpcMainEvent, request: IpcRequest) {
+    if (request.params.theme) {
+      saveTheme(request.params.theme)
+    }
+    event.reply(request.responseChannel)
+  }
+
+  private getTheme(event: Electron.IpcMainEvent, request: IpcRequest) {
+    event.reply(request.responseChannel, loadTheme(request.params.id))
+  }
+
+  private getAllThemes(event: Electron.IpcMainEvent, request: IpcRequest) {
+    event.reply(request.responseChannel, loadAllThemes())
+  }
+
+  private setActiveTheme(event: Electron.IpcMainEvent, request: IpcRequest) {
+    if (request.params.id) {
+      const theme = loadTheme(request.params.id)
+      if (theme || request.params.id === 'default') {
+        setActiveTheme(request.params.id)
+        WindowHandler.getWindow(true)?.webContents.send(PreferenceEvents.THEME_REFRESH, theme)
+      }
+    }
+    event.reply(request.responseChannel)
+  }
+
+  private getActiveTheme(event: Electron.IpcMainEvent, request: IpcRequest) {
+    event.reply(request.responseChannel, getActiveTheme())
   }
 }
 

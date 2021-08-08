@@ -54,14 +54,11 @@
 </template>
 
 <script lang="ts">
-import Colors from '@/utils/ui/mixins/Colors'
-import { mixins } from 'vue-class-component'
-import { Component, Prop, Ref } from 'vue-property-decorator'
-import Vue from 'vue'
+import { Component, Prop, Ref, Vue } from 'vue-property-decorator'
 import { max } from 'moment'
 
 @Component({})
-export default class SongList extends mixins(Colors) {
+export default class SongList extends Vue {
   private refreshKey: boolean = false
 
   private lastSelect: string = ''
@@ -321,11 +318,11 @@ export default class SongList extends mixins(Colors) {
 
 .field-content
   height: 64px
-  border-bottom: 1px solid var(--textSecondary)
+  border-bottom: 1px solid var(--divider)
   border-top: 1px solid transparent
 
 .headers
-  border-bottom: 1px solid var(--textSecondary)
+  border-bottom: 1px solid var(--divider)
   div
     font-weight: bold
     font-size: 16px

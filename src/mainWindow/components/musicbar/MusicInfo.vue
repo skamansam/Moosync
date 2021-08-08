@@ -74,7 +74,6 @@
 </template>
 
 <script lang="ts">
-import Colors from '@/utils/ui/mixins/Colors'
 import { mixins } from 'vue-class-component'
 import { Component, Prop, Watch } from 'vue-property-decorator'
 import SongDefault from '@/icons/SongDefault.vue'
@@ -94,7 +93,7 @@ import { EventBus } from '@/utils/main/ipc/constants'
     draggable
   }
 })
-export default class MusicInfo extends mixins(Colors, ImageLoader, ModelHelper) {
+export default class MusicInfo extends mixins(ImageLoader, ModelHelper) {
   get queueOrder() {
     return vxm.player.queueOrder
   }

@@ -13,9 +13,7 @@
 </template>
 
 <script lang="ts">
-import { Component } from 'vue-property-decorator'
-import { mixins } from 'vue-class-component'
-import Colors from '@/utils/ui/mixins/Colors'
+import { Component, Vue } from 'vue-property-decorator'
 import { vxm } from '@/mainWindow/store'
 import NotificationIcon from '@/icons/Notification.vue'
 @Component({
@@ -23,7 +21,7 @@ import NotificationIcon from '@/icons/Notification.vue'
     NotificationIcon
   }
 })
-export default class Notifications extends mixins(Colors) {
+export default class Notifications extends Vue {
   get notifications() {
     return vxm.notifier.notifications
   }

@@ -45,7 +45,6 @@
 import { Component } from 'vue-property-decorator'
 import Search from '@/icons/Search.vue'
 import SingleSearchResult from '@/mainWindow/components/generic/SingleSearchResult.vue'
-import Colors from '@/utils/ui/mixins/Colors'
 import { mixins } from 'vue-class-component'
 import PlayerControls from '@/utils/ui/mixins/PlayerControls'
 import ImgLoader from '@/utils/ui/mixins/ImageLoader'
@@ -56,7 +55,7 @@ import ImgLoader from '@/utils/ui/mixins/ImageLoader'
     SingleSearchResult
   }
 })
-export default class Sidebar extends mixins(Colors, PlayerControls, ImgLoader) {
+export default class Sidebar extends mixins(PlayerControls, ImgLoader) {
   private showSearchResults: boolean = false
   private results: Song[] = []
   private inputText: string = ''

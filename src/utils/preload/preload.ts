@@ -1,8 +1,6 @@
+import { EntityApiOptions, SongAPIOptions } from '@moosync/moosync-types';
 import {
-  AlbumEvents,
-  ArtistEvents,
   ExtensionHostEvents,
-  GenreEvents,
   IpcEvents,
   LoggerEvents,
   PlaylistEvents,
@@ -14,7 +12,6 @@ import {
   StoreEvents,
   WindowEvents
 } from '@/utils/main/ipc/constants';
-import { EntityApiOptions, SongAPIOptions } from '@moosync/moosync-types';
 import { contextBridge, ipcRenderer } from 'electron';
 
 import { IpcRendererHolder } from '@/utils/preload/ipc/index';
@@ -46,6 +43,7 @@ contextBridge.exposeInMainWorld('PreferenceUtils', {
   saveSelective: (key: string, value: any, isExtension?: boolean) => ipcRendererHolder.send(IpcEvents.PREFERENCES, { type: PreferenceEvents.SAVE_SELECTIVE_PREFERENCES, params: { key, value, isExtension } }),
   loadSelective: (key: string, isExtension?: boolean) => ipcRendererHolder.send(IpcEvents.PREFERENCES, { type: PreferenceEvents.LOAD_SELECTIVE_PREFERENCES, params: { key, isExtension } }),
   notifyPreferenceChanged: (key: string, value: any) => ipcRendererHolder.send(IpcEvents.PREFERENCES, { type: PreferenceEvents.PREFERENCE_REFRESH, params: { key, value } }),
+
 })
 
 contextBridge.exposeInMainWorld('ProviderUtils', {
@@ -53,9 +51,6 @@ contextBridge.exposeInMainWorld('ProviderUtils', {
 })
 
 contextBridge.exposeInMainWorld('Store', {
-  get: (key: string) => ipcRendererHolder.send(IpcEvents.STORE, { type: StoreEvents.GET_DATA, params: { key: key } }),
-  set: (key: string, value: any) =>
-    ipcRendererHolder.send(IpcEvents.STORE, { type: StoreEvents.SET_DATA, params: { key: key, value: value } }),
   getSecure: (key: string) => ipcRendererHolder.send(IpcEvents.STORE, { type: StoreEvents.GET_SECURE, params: { service: key } }),
   setSecure: (key: string, value: string) => ipcRendererHolder.send(IpcEvents.STORE, { type: StoreEvents.SET_SECURE, params: { service: key, token: value } }),
   removeSecure: (key: string) => ipcRendererHolder.send(IpcEvents.STORE, { type: StoreEvents.REMOVE_SECURE, params: { service: key } }),
@@ -84,7 +79,15 @@ contextBridge.exposeInMainWorld('SearchUtils', {
     ipcRendererHolder.send(IpcEvents.SEARCH, { type: SearchEvents.SEARCH_ALL, params: { searchTerm: term } }),
   searchYT: (term: string) =>
     ipcRendererHolder.send(IpcEvents.SEARCH, { type: SearchEvents.SEARCH_YT, params: { searchTerm: term } }),
+})
 
+contextBridge.exposeInMainWorld('ThemeUtils', {
+  saveTheme: (theme: ThemeDetails) => ipcRendererHolder.send(IpcEvents.PREFERENCES, { type: PreferenceEvents.SET_THEME, params: { theme } }),
+  getTheme: (id?: string) => ipcRendererHolder.send(IpcEvents.PREFERENCES, { type: PreferenceEvents.GET_THEME, params: { id } }),
+  getAllThemes: () => ipcRendererHolder.send(IpcEvents.PREFERENCES, { type: PreferenceEvents.GET_ALL_THEMES }),
+  setActiveTheme: (id: string) => ipcRendererHolder.send(IpcEvents.PREFERENCES, { type: PreferenceEvents.SET_ACTIVE_THEME, params: { id } }),
+  getActiveTheme: () => ipcRendererHolder.send(IpcEvents.PREFERENCES, { type: PreferenceEvents.GET_ACTIVE_THEME }),
+  listenThemeChanged: (callback: (themeId: ThemeDetails) => void) => ipcRendererHolder.on(PreferenceEvents.THEME_REFRESH, callback),
 })
 
 contextBridge.exposeInMainWorld('WindowUtils', {

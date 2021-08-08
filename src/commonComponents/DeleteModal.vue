@@ -18,12 +18,11 @@
 </template>
 
 <script lang="ts">
-import { Component, Prop } from 'vue-property-decorator'
-import Colors from '@/utils/ui/mixins/Colors'
+import { Component, Prop, Vue } from 'vue-property-decorator'
 import { mixins } from 'vue-class-component'
 
 @Component({})
-export default class DeleteModal extends mixins(Colors) {
+export default class DeleteModal extends Vue {
   @Prop({ default: 'DeleteDialog' })
   private id!: string
 

@@ -40,7 +40,6 @@
 import { Component, Prop } from 'vue-property-decorator'
 import SongList from '@/mainWindow/components/generic/SongList.vue'
 import SongDetails from '@/mainWindow/components/generic/SongDetails.vue'
-import Colors from '@/utils/ui/mixins/Colors'
 import { mixins } from 'vue-class-component'
 import PlayerControls from '@/utils/ui/mixins/PlayerControls'
 import ModelHelper from '@/utils/ui/mixins/ModelHelper'
@@ -53,7 +52,7 @@ import ImgLoader from '@/utils/ui/mixins/ImageLoader'
     SongDetails
   }
 })
-export default class AllSongs extends mixins(Colors, PlayerControls, ModelHelper, RemoteSong, ImgLoader) {
+export default class AllSongs extends mixins(PlayerControls, ModelHelper, RemoteSong, ImgLoader) {
   @Prop({ default: () => [] })
   private songList!: Song[]
 

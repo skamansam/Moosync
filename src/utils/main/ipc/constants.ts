@@ -21,7 +21,7 @@ export enum StoreEvents {
   GET_DATA = 'getData',
   SET_SECURE = 'setSecure',
   GET_SECURE = 'getSecure',
-  REMOVE_SECURE = 'removeSecure'
+  REMOVE_SECURE = 'removeSecure',
 }
 
 export enum SearchEvents {
@@ -36,7 +36,13 @@ export enum PreferenceEvents {
   SAVE_SELECTIVE_PREFERENCES = 'saveSelectivePreferences',
   LOAD_SELECTIVE_PREFERENCES = 'loadSelectivePreferences',
   LOAD_PREFERENCES = 'loadPreferences',
-  PREFERENCE_REFRESH = 'preferenceRefresh'
+  PREFERENCE_REFRESH = 'preferenceRefresh',
+  SET_THEME = 'setTheme',
+  GET_THEME = 'getTheme',
+  SET_ACTIVE_THEME = 'setActiveTheme',
+  GET_ACTIVE_THEME = 'getActiveTheme',
+  GET_ALL_THEMES = 'getAllThemes',
+  THEME_REFRESH = 'themeRefresh',
 }
 
 export enum WindowEvents {

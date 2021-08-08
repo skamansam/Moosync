@@ -20,16 +20,14 @@
 
 <script lang="ts">
 import Tabs from '@/preferenceWindow/components/sidebar/Tabs.vue'
-import { Component } from 'vue-property-decorator'
-import Colors from '@/utils/ui/mixins/Colors'
-import { mixins } from 'vue-class-component'
+import { Component, Vue } from 'vue-property-decorator'
 
 @Component({
   components: {
     Tabs
   }
 })
-export default class Sidebar extends mixins(Colors) {}
+export default class Sidebar extends Vue {}
 </script>
 
 <style lang="sass">

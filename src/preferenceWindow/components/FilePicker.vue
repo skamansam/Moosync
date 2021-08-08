@@ -29,7 +29,6 @@
 <script lang="ts">
 import { Component, Mixins, Prop } from 'vue-property-decorator'
 import PreferenceHeader from './PreferenceHeader.vue'
-import { vxm } from '@/preferenceWindow/store'
 import { ExtensionPreferenceMixin } from '../mixins/extensionPreferenceMixin'
 
 @Component({

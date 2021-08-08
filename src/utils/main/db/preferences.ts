@@ -6,7 +6,7 @@ import { preferencesChanged } from '@/utils/main/ipc/preferences';
 import { scannerChannel } from '../ipc';
 import { setMinimizeToTray } from '@/utils/main/windowManager';
 
-export const store = new Store()
+const store = new Store()
 
 export const defaultPreferences: Preferences = {
   musicPaths: [],
@@ -15,7 +15,8 @@ export const defaultPreferences: Preferences = {
   systemSettings: []
 }
 
-export async function savePreferences(prefs: Preferences) {
+
+export function savePreferences(prefs: Preferences) {
   const jsonStr = JSON.stringify(prefs)
   store.set('prefs', jsonStr)
 
@@ -23,18 +24,47 @@ export async function savePreferences(prefs: Preferences) {
   preferencesChanged()
 }
 
-export async function saveSelectivePreference(key: string, value: any, isExtension?: boolean) {
+export function saveTheme(theme: ThemeDetails) {
+  store.set(`themes.${theme.id}`, theme)
+}
+
+export function loadTheme(id: string): ThemeDetails | undefined {
+  return store.get(`themes.${id}`) as ThemeDetails | undefined
+}
+
+export function loadAllThemes(): { [key: string]: ThemeDetails } | undefined {
+  return store.get(`themes`) as { [key: string]: ThemeDetails } | undefined
+}
+
+export function setActiveTheme(id: string) {
+  saveSelectivePreference('activeTheme', id, false)
+}
+
+export function getActiveTheme() {
+  const id = loadSelectivePreference('activeTheme', false) as string
+  if (id) {
+    return loadTheme(id)
+  }
+}
+
+export function saveSelectivePreference(key: string, value: any, isExtension?: boolean) {
   store.set(`prefs.${isExtension ? 'extension.' : ''}${key}`, value)
   if (!isExtension)
     preferencesChanged()
 }
 
-export async function loadSelectivePreference(key?: string, isExtension?: boolean, defaultValue?: any) {
-  return store.get(`prefs.${isExtension ? 'extension.' : ''}${key}`, defaultValue)
+export function loadSelectivePreference(key?: string, isExtension?: boolean, defaultValue?: any) {
+  try {
+    const pref = store.get(`prefs.${isExtension ? 'extension.' : ''}${key}`, defaultValue)
+    return pref
+  } catch (e) {
+    console.error(e)
+  }
+  return ''
 }
 
-export async function setInitialInterfaceSettings() {
-  onPreferenceChanged('system', (await loadPreferences()).systemSettings)
+export function setInitialInterfaceSettings() {
+  onPreferenceChanged('system', (loadPreferences()).systemSettings)
 }
 
 export async function onPreferenceChanged(key: string, value: any) {
@@ -73,10 +103,14 @@ function validatePrefs(prefs: Preferences): Preferences {
   return prefs
 }
 
-export async function loadPreferences(): Promise<Preferences> {
-  const tmp = store.get('prefs') as Preferences
-  if (tmp) {
-    return validatePrefs(tmp)
+export function loadPreferences(): Preferences {
+  try {
+    const tmp = store.get('prefs') as Preferences
+    if (tmp) {
+      return validatePrefs(tmp)
+    }
+  } catch (e) {
+    console.error(e)
   }
   return defaultPreferences
 }
@@ -88,3 +122,31 @@ export function getDisabledPaths(paths: togglePaths): string[] {
   }
   return disablePaths
 }
+
+function setupDefaultThemes() {
+  const themes: { [key: string]: ThemeDetails } = {
+    '809b7310-f852-11eb-82e2-0985b6365ce4': {
+      id: "809b7310-f852-11eb-82e2-0985b6365ce4",
+      name: "Fluid",
+      author: "Androbuddy",
+      theme: {
+        primary: "#202125",
+        secondary: "#2D2F36",
+        tertiary: "#27292E",
+        textPrimary: "#FFFFFF",
+        textSecondary: "rgba(255, 255, 255, 0.32)",
+        textInverse: "#000000",
+        accent: "#72BBFF",
+        divider: "rgba(79, 79, 79, 0.67)"
+      }
+    }
+  }
+
+  for (const key in themes) {
+    if (!store.has(`themes.${key}`)) {
+      saveTheme(themes[key])
+    }
+  }
+}
+
+setupDefaultThemes()

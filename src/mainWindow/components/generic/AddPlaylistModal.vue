@@ -24,9 +24,7 @@
 
 <script lang="ts">
 import { EventBus } from '@/utils/main/ipc/constants'
-import { Component, Prop } from 'vue-property-decorator'
-import Colors from '@/utils/ui/mixins/Colors'
-import { mixins } from 'vue-class-component'
+import { Component, Prop, Vue } from 'vue-property-decorator'
 import { bus } from '@/mainWindow/main'
 import { vxm } from '@/mainWindow/store'
 import SongDefault from '@/icons/SongDefault.vue'
@@ -35,7 +33,7 @@ import SongDefault from '@/icons/SongDefault.vue'
     SongDefault
   }
 })
-export default class NewPlaylistModal extends mixins(Colors) {
+export default class NewPlaylistModal extends Vue {
   @Prop({ default: 'PlaylistFromURL' })
   private id!: string
 

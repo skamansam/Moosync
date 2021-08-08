@@ -22,7 +22,6 @@
 </template>
 
 <script lang="ts">
-import Colors from '@/utils/ui/mixins/Colors'
 import { mixins } from 'vue-class-component'
 import { Component, Prop, Watch } from 'vue-property-decorator'
 import SongDefault from '@/icons/SongDefault.vue'
@@ -34,7 +33,7 @@ import ErrorHandler from '@/utils/ui/mixins/errorHandler'
     SongDefault
   }
 })
-export default class MusicBar extends mixins(Colors, ImageLoader, ErrorHandler) {
+export default class MusicBar extends mixins(ImageLoader, ErrorHandler) {
   @Prop({ default: '-' })
   title!: string
 

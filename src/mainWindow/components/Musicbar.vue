@@ -56,7 +56,6 @@ import Details from '@/mainWindow/components/musicbar/Details.vue'
 import ExtraControls from '@/mainWindow/components/musicbar/ExtraControls.vue'
 import MusicInfo from '@/mainWindow/components/musicbar/MusicInfo.vue'
 import { Component } from 'vue-property-decorator'
-import Colors from '@/utils/ui/mixins/Colors'
 import { mixins } from 'vue-class-component'
 import { vxm } from '../store'
 import { bus } from '@/mainWindow/main'
@@ -71,7 +70,7 @@ import ImgLoader from '@/utils/ui/mixins/ImageLoader'
     MusicInfo
   }
 })
-export default class MusicBar extends mixins(Colors, ImgLoader) {
+export default class MusicBar extends mixins(ImgLoader) {
   private forceSeek: number = 0
   private PlayerState: PlayerState = 'PAUSED'
   private sliderPosition: boolean = false

@@ -26,12 +26,11 @@
 </template>
 
 <script lang="ts">
-import { Component } from 'vue-property-decorator'
+import { Component, Vue } from 'vue-property-decorator'
 import VolumeIcon from '@/icons/Volume.vue'
 import ExpandIcon from '@/icons/Expand.vue'
-import Colors from '@/utils/ui/mixins/Colors'
-import { mixins } from 'vue-class-component'
 import { vxm } from '@/mainWindow/store'
+import ThemeHandler from '@/utils/ui/mixins/ThemeHandler'
 
 @Component({
   components: {
@@ -39,7 +38,7 @@ import { vxm } from '@/mainWindow/store'
     ExpandIcon
   }
 })
-export default class MusicBar extends mixins(Colors) {
+export default class MusicBar extends Vue {
   private sliderOpen: boolean = false
 
   get volume() {
@@ -56,7 +55,7 @@ export default class MusicBar extends mixins(Colors) {
   }
 
   get ComputedGradient(): string {
-    return `linear-gradient(90deg, ${this.rootColors['--accent']} 0%, ${this.rootColors['--accent']} ${this.volume}%, ${this.rootColors['--textSecondary']} 0%)`
+    return `linear-gradient(90deg, var(--accent) 0%, var(--accent) ${this.volume}%, var(--textSecondary) 0%)`
   }
 }
 </script>

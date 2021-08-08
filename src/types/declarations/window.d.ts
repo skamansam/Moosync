@@ -46,8 +46,6 @@ interface preferenceUtils {
 }
 
 interface store {
-  get: (key: string) => Promise<any>
-  set: (key: string, value: string) => Promise<void>
   getSecure: (key: string) => Promise<string | null>
   setSecure: (key: string, value: string) => Promise<void>
   removeSecure: (key: string) => Promise<void>
@@ -86,6 +84,15 @@ interface extensionUtils {
   toggleExtStatus: (packageName: string, enabled: boolean) => Promise<void>
 }
 
+interface themeUtils {
+  saveTheme: (theme: ThemeDetails) => Promise<void>
+  getTheme: (id?: string) => Promise<ThemeDetails>
+  getAllThemes: (id?: string) => Promise<{ [key: string]: ThemeDetails } | undefined>
+  setActiveTheme: (id: string) => Promise<void>
+  getActiveTheme: () => Promise<ThemeDetails | undefined>
+  listenThemeChanged: (callback: (themeId: ThemeDetails) => void) => Promise<void>
+}
+
 declare global {
   interface Window {
     DBUtils: DBUtils
@@ -98,5 +105,6 @@ declare global {
     LoggerUtils: loggerUtils
     NotifierUtils: notifierUtils
     ExtensionUtils: extensionUtils
+    ThemeUtils: themeUtils
   }
 }

@@ -50,7 +50,6 @@
 </template>
 
 <script lang="ts">
-import Colors from '@/utils/ui/mixins/Colors'
 import { mixins } from 'vue-class-component'
 import { Component, Prop } from 'vue-property-decorator'
 import SongDefault from '@/icons/SongDefault.vue'
@@ -74,7 +73,7 @@ import ErrorHandler from '@/utils/ui/mixins/errorHandler'
     AnimatedEqualizer
   }
 })
-export default class MusicInfo extends mixins(Colors, ImgLoader, PlayerControls, ContextMenuMixin, ErrorHandler) {
+export default class MusicInfo extends mixins(ImgLoader, PlayerControls, ContextMenuMixin, ErrorHandler) {
   @Prop({ default: () => {} })
   private songID!: string
 

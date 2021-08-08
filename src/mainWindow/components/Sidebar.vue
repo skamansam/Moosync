@@ -56,9 +56,7 @@ import Toggle from '@/icons/Toggle.vue'
 import Tabs from '@/mainWindow/components/sidebar/Tabs.vue'
 import Gears from '@/icons/Gears.vue'
 import { PeerMode } from '@/mainWindow/store/syncState'
-import { Component } from 'vue-property-decorator'
-import Colors from '@/utils/ui/mixins/Colors'
-import { mixins } from 'vue-class-component'
+import { Component, Vue } from 'vue-property-decorator'
 import { vxm } from '../store'
 
 @Component({
@@ -69,7 +67,7 @@ import { vxm } from '../store'
     Gears
   }
 })
-export default class Sidebar extends mixins(Colors) {
+export default class Sidebar extends Vue {
   private roomInput: String = ''
   private isOpen: boolean = true
   private showRoomsButton: boolean = true

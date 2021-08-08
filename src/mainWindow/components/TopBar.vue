@@ -18,9 +18,7 @@
 <script lang="ts">
 import Navigation from '@/mainWindow/components/topbar/Navigation.vue'
 import Search from '@/mainWindow/components/topbar/Search.vue'
-import Colors from '@/utils/ui/mixins/Colors'
-import { mixins } from 'vue-class-component'
-import { Component } from 'vue-property-decorator'
+import { Component, Vue } from 'vue-property-decorator'
 import Accounts from '@/mainWindow/components/topbar/Accounts.vue'
 import Notifications from '@/mainWindow/components/topbar/Notifications.vue'
 
@@ -32,7 +30,7 @@ import Notifications from '@/mainWindow/components/topbar/Notifications.vue'
     Notifications
   }
 })
-export default class TopBar extends mixins(Colors) {}
+export default class TopBar extends Vue {}
 </script>
 
 <style lang="sass" scoped>

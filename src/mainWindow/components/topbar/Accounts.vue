@@ -32,9 +32,7 @@ import YoutubeIcon from '@/icons/Youtube.vue'
 import SpotifyIcon from '@/icons/Spotify.vue'
 import GearIcon from '@/icons/Gears.vue'
 import Person from '@/icons/Person.vue'
-import { mixins } from 'vue-class-component'
-import Colors from '@/utils/ui/mixins/Colors'
-import { Component } from 'vue-property-decorator'
+import { Component, Vue } from 'vue-property-decorator'
 import { vxm } from '@/mainWindow/store'
 @Component({
   components: {
@@ -45,7 +43,7 @@ import { vxm } from '@/mainWindow/store'
     Person
   }
 })
-export default class TopBar extends mixins(Colors) {
+export default class TopBar extends Vue {
   private youtubeName = ''
   private loggedInYoutube = false
 

@@ -122,5 +122,22 @@ interface YoutubeItem {
   duration: number
 }
 
+interface ThemeDetails {
+  id: string
+  name: string
+  author: string
+  theme: ThemeItem
+}
+
+interface ThemeItem {
+  primary: string
+  secondary: string
+  tertiary: string
+  textPrimary: string
+  textSecondary: string
+  textInverse: string
+  accent: string
+  divider: string
+}
 
 

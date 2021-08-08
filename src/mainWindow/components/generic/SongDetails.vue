@@ -69,7 +69,6 @@
 </template>
 
 <script lang="ts">
-import Colors from '@/utils/ui/mixins/Colors'
 import { mixins } from 'vue-class-component'
 import { Component, Prop, Ref, Watch } from 'vue-property-decorator'
 import SongDefault from '@/icons/SongDefault.vue'
@@ -91,7 +90,7 @@ import ImageLoader from '@/utils/ui/mixins/ImageLoader'
     SpotifyIcon
   }
 })
-export default class SongDetails extends mixins(Colors, ImageLoader, ErrorHandler) {
+export default class SongDetails extends mixins(ImageLoader, ErrorHandler) {
   @Prop({ default: '' })
   private currentTitle!: string
 

@@ -10,7 +10,6 @@
 <script lang="ts">
 import { Component, Prop, Ref, Watch } from 'vue-property-decorator'
 import YTPlayer from 'yt-player'
-import Colors from '@/utils/ui/mixins/Colors'
 import { mixins } from 'vue-class-component'
 import { Player } from '@/utils/ui/players/player'
 import { YoutubePlayer } from '@/utils/ui/players/youtube'
@@ -22,7 +21,7 @@ import PlayerControls from '@/utils/ui/mixins/PlayerControls'
 import Vue from 'vue'
 
 @Component({})
-export default class AudioStream extends mixins(Colors, SyncMixin, PlayerControls, ErrorHandler) {
+export default class AudioStream extends mixins(SyncMixin, PlayerControls, ErrorHandler) {
   @Ref('audio') audioElement!: HTMLAudioElement
 
   @Prop({ default: '' })
@@ -124,7 +123,7 @@ export default class AudioStream extends mixins(Colors, SyncMixin, PlayerControl
   }
 
   private registerPlayerListeners() {
-    this.activePlayer.onEnded = () => this.onSongEnded()
+    this.activePlayer.onEnded = this.onSongEnded.bind(this)
     this.activePlayer.onTimeUpdate = (time) => this.$emit('onTimeUpdate', time)
     this.activePlayer.onError = this.handlerFileError
 

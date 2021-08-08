@@ -17,7 +17,6 @@
 </template>
 
 <script lang="ts">
-import Colors from '@/utils/ui/mixins/Colors'
 import ImageLoader from '@/utils/ui/mixins/ImageLoader'
 import { mixins } from 'vue-class-component'
 import { Component, Prop } from 'vue-property-decorator'
@@ -28,7 +27,7 @@ import Youtube from '@/icons/Youtube.vue'
     Youtube
   }
 })
-export default class IconButton extends mixins(Colors, ImageLoader) {
+export default class IconButton extends mixins(ImageLoader) {
   @Prop({ default: '' })
   private title!: string
 

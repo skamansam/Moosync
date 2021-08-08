@@ -28,7 +28,6 @@
 </template>
 
 <script lang="ts">
-import Colors from '@/utils/ui/mixins/Colors'
 import ImageLoader from '@/utils/ui/mixins/ImageLoader'
 import { mixins } from 'vue-class-component'
 import { Component, Prop, Ref, Watch } from 'vue-property-decorator'
@@ -37,7 +36,7 @@ import ErrorHandler from '@/utils/ui/mixins/errorHandler'
 @Component({
   components: {}
 })
-export default class SongDetails extends mixins(Colors, ImageLoader, ErrorHandler) {
+export default class SongDetails extends mixins(ImageLoader, ErrorHandler) {
   @Prop({ default: '' })
   private title!: string
 

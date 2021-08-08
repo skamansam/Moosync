@@ -2,7 +2,7 @@
   <div class="d-flex flex-column">
     <router-link
       v-for="item in componentNames"
-      v-bind:key="item.component"
+      v-bind:key="item.link"
       :to="{ path: item.link }"
       custom
       v-slot="{ navigate, isActive }"
@@ -26,13 +26,11 @@
 </template>
 
 <script lang="ts">
-import { Component } from 'vue-property-decorator'
+import { Component, Vue } from 'vue-property-decorator'
 import { ActiveTab } from '@/utils/ui/enums'
 import Extensions from '@//icons/Extensions.vue'
 import Paths from '@/icons/Paths.vue'
 import System from '@/icons/System.vue'
-import Colors from '@/utils/ui/mixins/Colors'
-import { mixins } from 'vue-class-component'
 
 @Component({
   components: {
@@ -41,12 +39,12 @@ import { mixins } from 'vue-class-component'
     System
   }
 })
-export default class Sidebar extends mixins(Colors) {
+export default class Sidebar extends Vue {
   private componentNames = [
     { component: 'Paths', title: 'Paths', link: '/paths' },
     { component: 'Extensions', title: 'Extensions', link: '/extensions' },
-    { component: 'System', title: 'System', link: '/system' }
-    // { component: 'Artists', title: 'System', link: '/system' }
+    { component: 'System', title: 'System', link: '/system' },
+    { component: 'System', title: 'Themes', link: '/themes' }
   ]
 
   private active: ActiveTab = ActiveTab.ALLSONGS

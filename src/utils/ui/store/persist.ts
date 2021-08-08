@@ -3,11 +3,13 @@ import * as shvl from 'shvl'
 import { Store } from 'vuex'
 import merge from 'deepmerge'
 
+let hasLoaded = false
+
 export function createPersist(paths: string[]) {
   return (store: Store<any>) => {
     setInitialState(store).then(() => {
       store.subscribe((mutation, state) => {
-        setState('persisted', reducer(state, paths))
+        setState(reducer(state, paths))
       })
     })
   }
@@ -22,18 +24,19 @@ function reducer(state: Object, paths: string[]) {
 }
 
 async function setInitialState(store: Store<any>) {
-  const savedState = await window.Store.get('persisted')
+  const savedState = await window.PreferenceUtils.loadSelective('persisted', false)
   if (savedState) {
-    const parsed = JSON.parse(savedState)
     store.replaceState(
-      merge(store.state, parsed, {
+      merge(store.state, savedState, {
         arrayMerge: (_, saved) => saved,
         clone: false,
       })
     )
   }
+  hasLoaded = true
 }
 
-async function setState(key: string, state: any) {
-  await window.Store.set(key, JSON.stringify(state))
+async function setState(state: any) {
+  if (hasLoaded)
+    await window.PreferenceUtils.saveSelective('persisted', state, false)
 }

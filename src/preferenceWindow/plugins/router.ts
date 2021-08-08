@@ -2,6 +2,7 @@ import Extensions from '@/preferenceWindow/components/pages/Extensions.vue';
 import Paths from '@/preferenceWindow/components/pages/Paths.vue';
 import Router from 'vue-router';
 import System from '../components/pages/System.vue'
+import Themes from '../components/pages/Themes.vue'
 import Vue from 'vue';
 
 Vue.use(Router)
@@ -25,6 +26,11 @@ const routes = [
     name: 'system',
     path: '/system',
     component: System,
+  },
+  {
+    name: 'themes',
+    path: '/themes',
+    component: Themes,
   },
 ]
 
