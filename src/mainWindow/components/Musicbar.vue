@@ -4,11 +4,11 @@
       <div class="musicbar h-100">
         <VueSlider
           :min="0"
-          :max="currentSong ? parseFloat(currentSong.duration.toFixed(3)) : 0"
+          :max="currentSong ? currentSong.duration * 1000 + 1 : 0"
           class="timeline"
-          :interval="0.001"
+          :interval="1"
           :dotSize="10"
-          :value="parseFloat(timestamp.toFixed(3))"
+          :value="timestamp * 1000"
           :duration="0.1"
           :tooltip="'none'"
           @change="updateTimestmp"
@@ -84,8 +84,8 @@ export default class MusicBar extends mixins(ImgLoader) {
   }
 
   private updateTimestmp(value: number) {
-    bus.$emit('forceSeek', value)
-    this.forceSeek = value
+    bus.$emit('forceSeek', value / 1000)
+    this.forceSeek = value / 1000
   }
 
   get currentSong() {
