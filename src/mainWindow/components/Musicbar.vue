@@ -4,15 +4,14 @@
       <div class="musicbar h-100">
         <VueSlider
           :min="0"
-          :max="currentSong ? currentSong.duration * 1000 + 1 : 0"
+          :max="currentSong ? Math.ceil((currentSong.duration + 1) * 1000) : 0"
           class="timeline"
           :interval="1"
           :dotSize="10"
-          :value="timestamp * 1000"
+          :value="Math.ceil(timestamp * 1000)"
           :duration="0.1"
           :tooltip="'none'"
           @change="updateTimestmp"
-          @error="errorHandler"
         />
         <b-container fluid class="d-flex bar-container h-100 pb-2">
           <b-row align-h="center" align-content="center" class="d-flex no-gutters w-100 control-row">
@@ -77,10 +76,6 @@ export default class MusicBar extends mixins(ImgLoader) {
 
   get timestamp() {
     return vxm.player.currentTime
-  }
-
-  private errorHandler(e: Event) {
-    console.error(e)
   }
 
   private updateTimestmp(value: number) {

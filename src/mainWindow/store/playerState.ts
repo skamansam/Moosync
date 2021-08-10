@@ -144,6 +144,7 @@ export class PlayerStore extends VuexModule.With({ namespaced: 'player' }) {
 
   @action
   async nextSong() {
+    vxm.player.currentTime = 0
     this.incrementQueue()
     this.loadSong(this.queueTop)
   }

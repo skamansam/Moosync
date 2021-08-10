@@ -4,11 +4,12 @@
       <rect
         x="4.00002"
         y="1.38674"
+        :id="`bg_rect_${id}`"
         width="393.713"
         height="222.613"
         rx="7.35912"
         :fill="colors.primary"
-        stroke="#6B6B6B"
+        :stroke="`${selected ? 'var(--accent)' : '#696969'}`"
         stroke-width="1.22652"
       />
       <path
@@ -179,12 +180,12 @@ export default class ThemeComponent extends Vue {
 
   @Prop({ default: () => {} })
   private colors!: ThemeItem
+
+  @Prop({ default: false })
+  private selected!: boolean
+
+  mounted() {
+    console.log(this.selected)
+  }
 }
 </script>
-
-<style lang="sass" scoped>
-.mini-container
-  width: 700px
-  height: 400px
-  background: red
-</style>

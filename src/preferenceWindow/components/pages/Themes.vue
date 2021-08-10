@@ -1,12 +1,25 @@
 <template>
   <div>
     <b-container fluid>
+      <b-row>
+        <PreferenceHeader title="Themes" tooltip="Customize the colors" class="mb-3" />
+      </b-row>
       <b-row no-gutters class="w-100">
-        <b-col cols="auto" class="mr-3">
-          <ThemeComponent @click.native="setTheme('default')" :id="getRandomID()" :colors="defaultTheme" />
+        <b-col cols="auto" class="mr-3 mb-3">
+          <ThemeComponent
+            @click.native="setTheme('default')"
+            :selected="isThemeActive('default')"
+            :id="getRandomID()"
+            :colors="defaultTheme"
+          />
         </b-col>
-        <b-col cols="auto" class="mr-3" v-for="(value, key) in allThemes" :key="key">
-          <ThemeComponent @click.native="setTheme(value.id)" :id="value.id" :colors="value.theme" />
+        <b-col cols="auto" class="mr-3 mb-3" v-for="(value, key) in allThemes" :key="key">
+          <ThemeComponent
+            @click.native="setTheme(value.id)"
+            :selected="isThemeActive(value.id)"
+            :id="value.id"
+            :colors="value.theme"
+          />
         </b-col>
       </b-row>
     </b-container>
@@ -18,10 +31,12 @@ import { Component } from 'vue-property-decorator'
 import Vue from 'vue'
 import ThemeComponent from '../ThemeComponent.vue'
 import { v1 } from 'uuid'
+import PreferenceHeader from '../PreferenceHeader.vue'
 
 @Component({
   components: {
-    ThemeComponent
+    ThemeComponent,
+    PreferenceHeader
   }
 })
 export default class Themes extends Vue {
@@ -29,6 +44,12 @@ export default class Themes extends Vue {
 
   private async getAllThemes() {
     this.allThemes = (await window.ThemeUtils.getAllThemes()) ?? {}
+  }
+
+  private activeTheme: string = 'default'
+
+  private isThemeActive(themeId: string) {
+    return themeId === this.activeTheme
   }
 
   get defaultTheme() {
@@ -50,11 +71,13 @@ export default class Themes extends Vue {
 
   private async setTheme(id: string) {
     window.ThemeUtils.setActiveTheme(id)
+    this.activeTheme = id
     this.$root.$emit('themeChanged')
   }
 
-  created() {
-    this.getAllThemes()
+  async created() {
+    this.activeTheme = (await window.ThemeUtils.getActiveTheme())?.id ?? 'default'
+    await this.getAllThemes()
   }
 }
 </script>
