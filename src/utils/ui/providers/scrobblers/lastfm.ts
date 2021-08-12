@@ -115,6 +115,11 @@ export class LastFMProvider {
     }
   }
 
+  public async signOut() {
+    window.Store.removeSecure(KeytarService)
+    this._session = undefined
+  }
+
   private serializeBody(body: any) {
     const newBody: any = {}
     for (const [key, value] of Object.entries(body)) {

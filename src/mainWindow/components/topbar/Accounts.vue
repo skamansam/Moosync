@@ -94,7 +94,13 @@ export default class TopBar extends Vue {
       this.loginLastFM()
       return
     }
-    this.signOutSpotify()
+    this.signOutLastFM()
+  }
+
+  private async signOutLastFM() {
+    await this.lastFm.signOut()
+    this.lastFmName = ''
+    this.loggedInLastFm = false
   }
 
   private async loginLastFM() {
