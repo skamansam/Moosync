@@ -159,6 +159,7 @@ if (isDevelopment && process.platform === 'win32') {
 app.on('second-instance', handleSecondInstance)
 
 function findOAuthArg(argv: string[]) {
+  console.log(argv)
   return argv.find((arg) => arg.startsWith('com.moosync'))
 }
 

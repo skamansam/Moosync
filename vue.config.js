@@ -24,8 +24,12 @@ module.exports = {
         'process.browser': 'true',
         'process.env.YoutubeClientID': JSON.stringify(dotenv.parsed['YOUTUBECLIENTID']),
         'process.env.SpotifyClientID': JSON.stringify(dotenv.parsed['SPOTIFYCLIENTID']),
-        'process.env.SpotifyClientSecret': JSON.stringify(dotenv.parsed['SPOTIFYCLIENTSECRET'])
+        'process.env.SpotifyClientSecret': JSON.stringify(dotenv.parsed['SPOTIFYCLIENTSECRET']),
+        'process.env.LastFmApiKey': JSON.stringify(dotenv.parsed['LASTFMAPIKEY']),
+        'process.env.LastFmSecret': JSON.stringify(dotenv.parsed['LASTFMSECRET'])
+
       }),
+
     ],
     externals: { 'better-sqlite3': 'commonjs better-sqlite3', "vm2": "require('vm2')" },
     devtool: 'source-map'

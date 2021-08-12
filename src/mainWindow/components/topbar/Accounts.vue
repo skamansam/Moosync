@@ -19,6 +19,14 @@
         >
           <template slot="icon"> <SpotifyIcon /> </template>
         </IconButton>
+        <IconButton
+          @click.native="handleLastFmClick"
+          bgColor="#BA0000"
+          :title="lastFmName ? lastFmName : 'Connect'"
+          :hoverText="loggedInLastFm ? 'Sign Out' : 'LastFM'"
+        >
+          <template slot="icon"> <LastFMIcon /> </template>
+        </IconButton>
         <IconButton bgColor="#737373" title="Settings" @click.native="openSettings">
           <template slot="icon"> <GearIcon /> </template>
         </IconButton>
@@ -30,6 +38,7 @@
 import IconButton from '@/mainWindow/components/generic/IconButton.vue'
 import YoutubeIcon from '@/icons/Youtube.vue'
 import SpotifyIcon from '@/icons/Spotify.vue'
+import LastFMIcon from '@/icons/LastFM.vue'
 import GearIcon from '@/icons/Gears.vue'
 import Person from '@/icons/Person.vue'
 import { Component, Vue } from 'vue-property-decorator'
@@ -39,6 +48,7 @@ import { vxm } from '@/mainWindow/store'
     IconButton,
     YoutubeIcon,
     SpotifyIcon,
+    LastFMIcon,
     GearIcon,
     Person
   }
@@ -50,9 +60,13 @@ export default class TopBar extends Vue {
   private spotifyName = ''
   private loggedInSpotify = false
 
+  private lastFmName = ''
+  private loggedInLastFm = false
+
   mounted() {
     this.getUserDetailsYoutube()
     this.getUserDetailsSpotify()
+    this.getUserDetailsLastFM()
   }
 
   get youtube() {
@@ -63,12 +77,30 @@ export default class TopBar extends Vue {
     return vxm.providers.spotifyProvider
   }
 
+  get lastFm() {
+    return vxm.providers.lastfmProvider
+  }
+
   private handleSpotifyClick() {
     if (!this.loggedInSpotify) {
       this.loginSpotify()
       return
     }
     this.signOutSpotify()
+  }
+
+  private async handleLastFmClick() {
+    if (!this.loggedInLastFm) {
+      this.loginLastFM()
+      return
+    }
+    this.signOutSpotify()
+  }
+
+  private async loginLastFM() {
+    await this.lastFm.login()
+    this.getUserDetailsSpotify()
+    this.lastFm.scrobble(vxm.player.currentSong)
   }
 
   private async loginSpotify() {
@@ -89,6 +121,18 @@ export default class TopBar extends Vue {
         if (name) {
           this.spotifyName = name
           this.loggedInSpotify = true
+        }
+      })
+      .catch((err) => console.error(err))
+  }
+
+  private getUserDetailsLastFM() {
+    this.lastFm
+      .getUserDetails()
+      .then((name) => {
+        if (name) {
+          this.lastFmName = name
+          this.loggedInLastFm = true
         }
       })
       .catch((err) => console.error(err))

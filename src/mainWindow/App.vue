@@ -249,6 +249,8 @@ export default class App extends mixins(ThemeHandler, PlayerControls) {
         type: 'onSongChanged',
         data: newVal
       })
+
+      vxm.providers.lastfmProvider.scrobble(newVal)
     })
 
     vxm.player.$watch('playerState', (newVal: PlayerState) =>
