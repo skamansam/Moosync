@@ -185,6 +185,7 @@ export default class TopBar extends Vue {
 .accounts-popover
   background-color: var(--tertiary)
   border-radius: 16px
+  width: 300px
   border: none
   .arrow
     &::after
@@ -199,7 +200,7 @@ export default class TopBar extends Vue {
 
 .buttons
   > div
-    margin-bottom: 15px
+    margin-bottom: 8px
     &:first-child
       margin-top: 15px
 </style>

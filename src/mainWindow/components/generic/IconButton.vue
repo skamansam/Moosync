@@ -2,14 +2,14 @@
   <div
     @mouseover="hover = true"
     @mouseleave="hover = false"
-    class="button-bg d-flex ripple"
+    class="button-bg d-flex ripple w-100"
     :style="{ backgroundColor: bgColor }"
   >
     <div class="d-flex w-100 h-100">
       <div class="icon-wrapper d-flex my-auto">
         <slot name="icon"></slot>
       </div>
-      <div class="title-wrapper d-flex my-auto">
+      <div class="title-wrapper flex-grow-1 my-auto">
         {{ hover && hoverText ? hoverText : title }}
       </div>
     </div>
@@ -54,7 +54,7 @@ export default class IconButton extends mixins(ImageLoader) {
   color: white
   text-align: center
   user-select: none
-  margin-left: 25px
+  margin-right: 25px
 
 .icon-wrapper
   width: 26px
