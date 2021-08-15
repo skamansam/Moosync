@@ -29,6 +29,7 @@ export class WindowHandler {
       titleBarStyle: 'hidden',
       frame: false,
       show: true,
+      icon: path.join(__static, 'logo.png'),
       webPreferences: {
         contextIsolation: true,
         // Use pluginOptions.nodeIntegration, leave this alone
