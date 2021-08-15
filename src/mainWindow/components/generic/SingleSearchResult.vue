@@ -1,6 +1,6 @@
 <template>
   <b-container fluid class="single-result-container" @contextmenu.prevent="emitContextMenu($event)">
-    <b-row align-h="around" class="no-gutters">
+    <b-row align-h="around">
       <b-col cols="1" class="img-container justify-content-around ms-auto" @click="emitImgClick">
         <div class="play-button me-auto justify-content-center d-flex align-items-center">
           <div class="play-icon">

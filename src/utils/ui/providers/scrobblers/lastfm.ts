@@ -164,6 +164,6 @@ export class LastFMProvider {
 
   public async getUserDetails() {
     const resp = await this.populateRequest('GET', 'user.getInfo')
-    return resp.user.name
+    return resp?.user?.name
   }
 }

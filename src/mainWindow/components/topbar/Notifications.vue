@@ -41,8 +41,7 @@ export default class Notifications extends Vue {
 <style lang="sass" scoped>
 .notification-icon
   height: 26px
-  width: 28px
-  margin-left: 0.5rem
+  width: 26px
 
 .default, .event-body
   color: var(--textPrimary)
