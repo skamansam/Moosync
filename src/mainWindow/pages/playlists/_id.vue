@@ -42,7 +42,7 @@ export default class SinglePlaylistView extends mixins(ContextMenuMixin) {
   get buttonGroups(): SongDetailButtons {
     return {
       enableContainer: true,
-      enableLibraryStore: false
+      enableLibraryStore: this.isRemote
     }
   }
 
@@ -54,6 +54,18 @@ export default class SinglePlaylistView extends mixins(ContextMenuMixin) {
     }
   }
 
+  private get isYoutube() {
+    return this.$route.params.id.startsWith('youtube-')
+  }
+
+  private get isSpotify() {
+    return this.$route.params.id.startsWith('spotify-')
+  }
+
+  private get isRemote() {
+    return this.isYoutube || this.isSpotify
+  }
+
   async created() {
     this.fetchPlaylist()
     await this.fetchSongList()
@@ -61,9 +73,9 @@ export default class SinglePlaylistView extends mixins(ContextMenuMixin) {
   }
 
   private async fetchPlaylist() {
-    if (this.$route.params.id.startsWith('youtube-')) {
+    if (this.isYoutube) {
       await this.fetchPlaylistYoutube()
-    } else if (this.$route.params.id.startsWith('spotify-')) {
+    } else if (this.isSpotify) {
       await this.fetchPlaylistSpotify()
     } else {
       this.playlist = (
@@ -96,9 +108,9 @@ export default class SinglePlaylistView extends mixins(ContextMenuMixin) {
 
   private async fetchAsyncGen() {
     let generator
-    if (this.$route.params.id.startsWith('youtube-'))
+    if (this.isYoutube)
       generator = vxm.providers.youtubeProvider.getPlaylistContent(this.$route.params.id.replace('youtube-', ''))
-    else if (this.$route.params.id.startsWith('spotify-'))
+    else if (this.isSpotify)
       generator = vxm.providers.spotifyProvider.getPlaylistContent(this.$route.params.id.replace('spotify-', ''))
 
     if (generator)
@@ -112,7 +124,7 @@ export default class SinglePlaylistView extends mixins(ContextMenuMixin) {
       type: 'PLAYLIST_CONTENT',
       args: {
         songs: songs,
-        isRemote: this.$route.params.id.startsWith('youtube-') || this.$route.params.id.startsWith('spotify-'),
+        isRemote: this.isRemote,
         refreshCallback: () => (this.songList = arrayDiff(this.songList, songs))
       }
     })
