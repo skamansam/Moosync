@@ -197,9 +197,9 @@ class ExtensionHandler {
     return newV > oldV
   }
 
-  private async createDirIfNotExists(path: string) {
+  private async createDir(path: string) {
     await fsP.rm(path, { recursive: true, force: true })
-    await fsP.mkdir(path)
+    await fsP.mkdir(path, { recursive: true })
   }
 
   private async isExistingExtension(packageName: string): Promise<string | undefined> {
@@ -232,7 +232,7 @@ class ExtensionHandler {
           await this.uninstallExtension.bind(this)(manifest.name)
         }
         const installPath = path.join(defaultExtensionPath, manifest.name)
-        await this.createDirIfNotExists(installPath)
+        await this.createDir(installPath)
         await zip.extract(null, installPath)
         return {
           success: true,
