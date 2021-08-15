@@ -48,10 +48,10 @@ export class AuthStateEmitter extends EventEmitter {
 const requestor = new NodeRequestor()
 
 export class AuthFlow {
-  private notifier: AuthorizationNotifier
-  private authorizationHandler: AuthorizationRequestHandler
-  private tokenHandler: TokenRequestHandler
-  readonly authStateEmitter: AuthStateEmitter
+  private notifier?: AuthorizationNotifier
+  private authorizationHandler?: AuthorizationRequestHandler
+  private tokenHandler?: TokenRequestHandler
+  authStateEmitter?: AuthStateEmitter
 
   // state
   private configuration: AuthorizationServiceConfiguration | undefined
@@ -59,51 +59,53 @@ export class AuthFlow {
   private refreshToken: string | undefined
   private accessTokenResponse: TokenResponse | undefined
 
-  private config: config
+  config?: config
 
-  private fetchedToken: Promise<void>
+  private fetchedToken?: Promise<void>
 
   constructor(type: oauthType) {
-    this.config = this.generateConfig(type)
+    this.generateConfig(type).then((config) => {
+      this.config = config
 
-    this.notifier = new AuthorizationNotifier()
-    this.authStateEmitter = new AuthStateEmitter()
+      this.notifier = new AuthorizationNotifier()
+      this.authStateEmitter = new AuthStateEmitter()
 
-    this.authorizationHandler = new AuthFlowRequestHandler()
+      this.authorizationHandler = new AuthFlowRequestHandler(config.oAuthChannel)
 
-    if (type === 'spotify') {
-      this.tokenHandler = new SpotifyTokenRequestHandler(requestor)
-    } else {
-      this.tokenHandler = new BaseTokenRequestHandler(requestor)
-    }
-
-    // set notifier to deliver responses
-    this.authorizationHandler.setAuthorizationNotifier(this.notifier)
-
-    // set a listener to listen for authorization responses
-    // make refresh and access token requests.
-
-    this.fetchedToken = new Promise<void>(resolve => {
-      this.fetchRefreshToken().then(resolve)
-    })
-
-    this.notifier.setAuthorizationListener((request, response) => {
-      if (response) {
-        let codeVerifier: string | undefined
-        if (request.internal && request.internal.code_verifier) {
-          codeVerifier = request.internal.code_verifier
-        }
-
-        this.makeRefreshTokenRequest(response.code, codeVerifier)
-          .then(() => this.performWithFreshTokens())
-          .then(() => {
-            this.authStateEmitter.emit(AuthStateEmitter.ON_TOKEN_RESPONSE)
-          })
+      if (type === 'spotify') {
+        this.tokenHandler = new SpotifyTokenRequestHandler(requestor)
+      } else {
+        this.tokenHandler = new BaseTokenRequestHandler(requestor)
       }
+
+      // set notifier to deliver responses
+      this.authorizationHandler.setAuthorizationNotifier(this.notifier)
+
+      // set a listener to listen for authorization responses
+      // make refresh and access token requests.
+
+      this.fetchedToken = new Promise<void>(resolve => {
+        this.fetchRefreshToken().then(resolve)
+      })
+
+      this.notifier.setAuthorizationListener((request, response) => {
+        if (response) {
+          let codeVerifier: string | undefined
+          if (request.internal && request.internal.code_verifier) {
+            codeVerifier = request.internal.code_verifier
+          }
+
+          this.makeRefreshTokenRequest(response.code, codeVerifier)
+            .then(() => this.performWithFreshTokens())
+            .then(() => {
+              this.authStateEmitter!.emit(AuthStateEmitter.ON_TOKEN_RESPONSE)
+            })
+        }
+      })
     })
   }
 
-  private generateConfig(type: oauthType): config {
+  private async generateConfig(type: oauthType): Promise<config> {
     switch (type) {
       case 'youtube':
       default:
@@ -113,6 +115,7 @@ export class AuthFlow {
           redirectUri: "com.moosync:ytoauth2callback/",
           scope: "https://www.googleapis.com/auth/youtube.readonly",
           keytarService: 'MoosyncYoutubeRefreshToken',
+          oAuthChannel: await window.WindowUtils.registerOAuthCallback('ytoauth2callback'),
           type: 'youtube'
         }
       case 'spotify':
@@ -122,35 +125,41 @@ export class AuthFlow {
           redirectUri: "com.moosync://spotifyoauthcallback",
           scope: "playlist-read-private",
           keytarService: 'MoosyncSpotifyRefreshToken',
+          oAuthChannel: await window.WindowUtils.registerOAuthCallback('spotifyoauthcallback'),
           type: 'spotify'
         }
     }
   }
 
   private async fetchRefreshToken() {
-    this.refreshToken = (await window.Store.getSecure(this.config.keytarService)) ?? undefined
+    if (this.config)
+      this.refreshToken = (await window.Store.getSecure(this.config.keytarService)) ?? undefined
   }
 
   private async storeRefreshToken() {
-    if (this.refreshToken)
+    if (this.config && this.refreshToken)
       return window.Store.setSecure(this.config.keytarService, this.refreshToken)
   }
 
   private async fetchServiceConfiguration() {
-    if (this.config.type === 'spotify') {
-      return new AuthorizationServiceConfiguration({
-        authorization_endpoint: this.config.openIdConnectUrl,
-        token_endpoint: 'https://accounts.spotify.com/api/token',
-        revocation_endpoint: this.config.openIdConnectUrl
-      })
+    if (this.config) {
+      if (this.config.type === 'spotify') {
+        return new AuthorizationServiceConfiguration({
+          authorization_endpoint: this.config.openIdConnectUrl,
+          token_endpoint: 'https://accounts.spotify.com/api/token',
+          revocation_endpoint: this.config.openIdConnectUrl
+        })
+      }
+      const configuration = await AuthorizationServiceConfiguration.fetchFromIssuer(
+        this.config.openIdConnectUrl,
+        requestor)
+      return configuration
     }
-    const configuration = await AuthorizationServiceConfiguration.fetchFromIssuer(
-      this.config.openIdConnectUrl,
-      requestor)
-    return configuration
   }
 
   public async makeAuthorizationRequest(username?: string) {
+    if (!this.config) throw new AppAuthError('config not yet initialized')
+
     if (!this.fetchedToken) throw new AppAuthError('service not yet initialized')
 
     if (!this.configuration) {
@@ -172,13 +181,15 @@ export class AuthFlow {
     }, new WebCrypto())
 
 
-    this.authorizationHandler.performAuthorizationRequest(
+    this.authorizationHandler!.performAuthorizationRequest(
       this.configuration!,
       request
     )
   }
 
   private async makeRefreshTokenRequest(code: string, codeVerifier: string | undefined): Promise<void> {
+    if (!this.config) throw new AppAuthError('config not yet initialized')
+
     if (!this.fetchedToken) throw new AppAuthError('service not yet initialized')
 
     if (!this.configuration) {
@@ -201,7 +212,7 @@ export class AuthFlow {
     })
 
     try {
-      const response = await this.tokenHandler.performTokenRequest(this.configuration, request)
+      const response = await this.tokenHandler!.performTokenRequest(this.configuration, request)
       this.refreshToken = response.refreshToken
       this.accessTokenResponse = response
       this.storeRefreshToken()
@@ -216,6 +227,8 @@ export class AuthFlow {
   }
 
   signOut() {
+    if (!this.config) throw new AppAuthError('config not yet initialized')
+
     // forget all cached token state
     window.Store.removeSecure(this.config.keytarService)
     this.accessTokenResponse = undefined
@@ -228,6 +241,8 @@ export class AuthFlow {
   }
 
   async performWithFreshTokens(): Promise<string | undefined> {
+    if (!this.config) throw new AppAuthError('config not yet initialized')
+
     if (!this.fetchedToken) return Promise.reject("Service not initialized")
 
     if (!this.configuration) {
@@ -248,7 +263,7 @@ export class AuthFlow {
     })
 
     try {
-      const response = await this.tokenHandler.performTokenRequest(this.configuration, request)
+      const response = await this.tokenHandler!.performTokenRequest(this.configuration!, request)
       this.accessTokenResponse = response
       return response.accessToken
     } catch (err) {

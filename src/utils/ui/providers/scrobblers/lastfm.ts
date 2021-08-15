@@ -24,6 +24,7 @@ export class LastFMProvider {
   })
   private initialized = false
   private scrobbleTimeout: ReturnType<typeof setTimeout> | undefined
+  private oAuthChannel: string | undefined
 
   constructor() {
     this.fetchStoredToken().then((data) => {
@@ -97,9 +98,12 @@ export class LastFMProvider {
 
   public async login() {
     if (!this._session) {
+      if (!this.oAuthChannel) {
+        this.oAuthChannel = await window.WindowUtils.registerOAuthCallback('lastfm')
+      }
+
       return new Promise<boolean>((resolve) => {
-        window.WindowUtils.registerOAuthCallback(async (data) => {
-          const url = new URL(data)
+        window.WindowUtils.listenOAuth(this.oAuthChannel!, async (url) => {
           const token = url.searchParams.get('token')
           this._session = (await this.populateRequest('GET', 'auth.getSession', undefined, token!))?.session?.key
           if (this._session) {

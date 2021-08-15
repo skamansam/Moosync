@@ -56,8 +56,8 @@ export enum WindowEvents {
   MAX_WIN = 'maxPref',
   MIN_WIN = 'minPref',
   OPEN_URL_EXTERNAL = 'openUrlExternal',
-  LISTEN_OAUTH_EVENT = 'listenOauthEvent',
-
+  REGISTER_OAUTH_CALLBACK = 'registerOAuthCallback',
+  DEREGISTER_OAUTH_CALLBACK = 'deregisterOAuthCallback',
   MAIN_WINDOW_HAS_MOUNTED = 'mainWindowsHasMounted',
 
   IS_MAXIMIZED = 'isMaximized'

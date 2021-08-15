@@ -37,7 +37,7 @@ export class SpotifyProvider extends GenericProvider {
         return
       }
       this.auth.makeAuthorizationRequest()
-      return once(this.auth.authStateEmitter, AuthStateEmitter.ON_TOKEN_RESPONSE)
+      return once(this.auth.authStateEmitter!, AuthStateEmitter.ON_TOKEN_RESPONSE)
     }
   }
 

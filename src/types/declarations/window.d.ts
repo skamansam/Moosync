@@ -59,8 +59,9 @@ interface windowUtils {
   openFileBrowser: (file: boolean, filters?: Electron.FileFilter[]) => Promise<Electron.OpenDialogReturnValue>
   toggleDevTools: (isMainWindow: boolean) => Promise<void>
   openExternal: (url: string) => Promise<void>
-  registerOAuthCallback: (callback: (data: string) => void) => void
-  deregisterOAuthCallback: () => void
+  registerOAuthCallback: (path: string) => Promise<string>
+  deregisterOAuthCallback: (path: string) => Promise<void>
+  listenOAuth: (channelID: string, callback: (data: URL) => void) => void
   mainWindowHasMounted: () => Promise<void>
   isWindowMaximized: (isMainWindow: boolean) => Promise<boolean>
 }

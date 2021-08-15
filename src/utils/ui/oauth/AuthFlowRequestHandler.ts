@@ -9,11 +9,14 @@ class ServerEventsEmitter extends EventEmitter {
 
 export class AuthFlowRequestHandler extends AuthorizationRequestHandler {
   private authorizationPromise: Promise<AuthorizationRequestResponse | null> | null = null
+  private channelID: string
 
   constructor(
+    channel: string,
     utils: QueryStringUtils = new BasicQueryStringUtils(),
-    crypto: Crypto = new WebCrypto()) {
+    crypto: Crypto = new WebCrypto(),) {
     super(utils, crypto)
+    this.channelID = channel
   }
 
 
@@ -21,8 +24,8 @@ export class AuthFlowRequestHandler extends AuthorizationRequestHandler {
 
     const emitter = new ServerEventsEmitter()
 
-    window.WindowUtils.registerOAuthCallback((data) => {
-      const searchParams = new URL(data).searchParams
+    window.WindowUtils.listenOAuth(this.channelID, (data) => {
+      const searchParams = data.searchParams
 
       const state = searchParams.get('state') || undefined
       const code = searchParams.get('code')
@@ -54,7 +57,6 @@ export class AuthFlowRequestHandler extends AuthorizationRequestHandler {
 
     this.authorizationPromise = new Promise<AuthorizationRequestResponse>((resolve) => {
       emitter.once(ServerEventsEmitter.ON_AUTHORIZATION_RESPONSE, (result: AuthorizationRequestResponse) => {
-        window.WindowUtils.deregisterOAuthCallback()
         // resolve pending promise
         resolve(result)
         // complete authorization flow

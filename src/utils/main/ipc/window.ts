@@ -1,7 +1,7 @@
 import { IpcEvents, WindowEvents } from './constants';
+import { _windowHandler, oauthHandler } from './../../../background';
 
 import { WindowHandler } from '../windowManager';
-import { _windowHandler } from './../../../background';
 import { mainWindowHasMounted } from '../../../background';
 import { shell } from 'electron';
 
@@ -36,6 +36,12 @@ export class BrowserWindowChannel implements IpcChannelInterface {
         break
       case WindowEvents.IS_MAXIMIZED:
         this.isMaximized(event, request)
+        break
+      case WindowEvents.REGISTER_OAUTH_CALLBACK:
+        this.registerOauth(event, request)
+        break
+      case WindowEvents.DEREGISTER_OAUTH_CALLBACK:
+        this.deregisterOauth(event, request)
         break
     }
   }
@@ -85,5 +91,20 @@ export class BrowserWindowChannel implements IpcChannelInterface {
   private isMaximized(event: Electron.IpcMainEvent, request: IpcRequest) {
     const window = WindowHandler.getWindow(request.params.isMainWindow)
     event.reply(request.responseChannel, window?.isMaximized())
+  }
+
+  private registerOauth(event: Electron.IpcMainEvent, request: IpcRequest) {
+    let channelID
+    if (request.params.path) {
+      channelID = oauthHandler.registerHandler(request.params.path)
+    }
+    event.reply(request.responseChannel, channelID)
+  }
+
+  private deregisterOauth(event: Electron.IpcMainEvent, request: IpcRequest) {
+    if (request.params.path) {
+      oauthHandler.deregisterHandler(request.params.path)
+    }
+    event.reply(request.responseChannel)
   }
 }

@@ -29,14 +29,14 @@ export class YoutubeProvider extends GenericProvider {
   }
 
   public async login() {
-    if (!this.loggedIn) {
+    if (!this.loggedIn && this.auth.config) {
       const validRefreshToken = await this.auth.hasValidRefreshToken()
       if (validRefreshToken) {
         await this.auth.performWithFreshTokens()
         return
       }
       this.auth.makeAuthorizationRequest()
-      return once(this.auth.authStateEmitter, AuthStateEmitter.ON_TOKEN_RESPONSE)
+      return once(this.auth.authStateEmitter!, AuthStateEmitter.ON_TOKEN_RESPONSE)
     }
   }
 

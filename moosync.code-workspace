@@ -34,6 +34,7 @@
       "initalize",
       "inode",
       "keytar",
+      "lastfm",
       "localforage",
       "maximizable",
       "minimizable",
@@ -44,10 +45,12 @@
       "preloads",
       "scrobble",
       "shvl",
+      "spotifyoauthcallback",
       "unintercept",
       "unmarshaled",
       "vuesax",
-      "ytdl"
+      "ytdl",
+      "ytoauth"
     ],
     "sqltools.connections": [
       {
