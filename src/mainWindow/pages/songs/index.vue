@@ -1,5 +1,5 @@
 <template>
-  <div class="w-100">
+  <div class="w-100" @contextmenu="getGeneralSongsMenu">
     <SongView :songList="songList" @onRowContext="getSongMenu(arguments[0], arguments[1], undefined)" />
   </div>
 </template>

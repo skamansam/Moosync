@@ -63,6 +63,7 @@ export default class SongDetails extends mixins(ImageLoader, ErrorHandler) {
   }
 
   private emitContext(event: Event) {
+    event.stopPropagation()
     this.$emit('CardContextMenu', event)
   }
 }

@@ -94,6 +94,7 @@ export default class AllSongs extends mixins(PlayerControls, ModelHelper, Remote
   }
 
   private getSongContextMenu(event: Event, item: Song) {
+    event.stopPropagation()
     this.$emit('onRowContext', event, item)
   }
 

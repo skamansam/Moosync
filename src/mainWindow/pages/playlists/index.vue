@@ -72,17 +72,12 @@ export default class Albums extends mixins(RouterPushes, ContextMenuMixin) {
   }
 
   private contextHandler(event: MouseEvent) {
-    if (
-      !['img', 'svg', 'rect', 'path'].includes((event.target as HTMLElement).localName) &&
-      !(event.target as HTMLElement).id
-    ) {
-      this.getContextMenu(event, {
-        type: 'GENERAL_PLAYLIST',
-        args: {
-          refreshCallback: this.refresh
-        }
-      })
-    }
+    this.getContextMenu(event, {
+      type: 'GENERAL_PLAYLIST',
+      args: {
+        refreshCallback: this.refresh
+      }
+    })
   }
 
   private deletePlaylist() {
