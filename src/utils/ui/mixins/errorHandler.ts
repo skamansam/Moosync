@@ -9,7 +9,7 @@ export default class ErrorHandler extends Vue {
   }
 
   protected handlerFileError(err: ErrorEvent) {
-    if (!(err.target as HTMLImageElement).src.startsWith('http'))
+    if (!(err?.target as HTMLImageElement)?.src?.startsWith('http'))
       window.FileUtils.scan()
   }
 }

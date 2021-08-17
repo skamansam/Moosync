@@ -32,7 +32,6 @@ export default class AllSongs extends mixins(ContextMenuMixin) {
 
   private async requestSongs() {
     this.songList = await window.SearchUtils.searchSongsByOptions()
-    console.log(this.songList.length)
   }
 
   private getSongMenu(event: Event, songs: Song[], exclude: string | undefined) {

@@ -55,7 +55,6 @@
 
 <script lang="ts">
 import { Component, Prop, Ref, Vue } from 'vue-property-decorator'
-import { max } from 'moment'
 
 @Component({})
 export default class SongList extends Vue {

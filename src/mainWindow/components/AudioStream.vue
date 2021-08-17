@@ -125,7 +125,11 @@ export default class AudioStream extends mixins(SyncMixin, PlayerControls, Error
   private registerPlayerListeners() {
     this.activePlayer.onEnded = this.onSongEnded.bind(this)
     this.activePlayer.onTimeUpdate = (time) => this.$emit('onTimeUpdate', time)
-    this.activePlayer.onError = this.handlerFileError
+    this.activePlayer.onError = (err) => {
+      console.error(`${this.currentSong?._id}: ${this.currentSong?.title} unplayable, skipping.`)
+      this.nextSong()
+      this.handlerFileError(err)
+    }
 
     vxm.player.$watch('volume', this.onVolumeChanged)
   }

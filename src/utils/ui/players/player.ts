@@ -33,6 +33,7 @@ export abstract class Player {
 
   set onError(callback: (err: ErrorEvent) => void) {
     this.onErrorCallback = callback
+    this.listenOnError()
   }
 
   protected abstract listenOnEnded(): void
