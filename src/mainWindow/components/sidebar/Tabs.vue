@@ -58,8 +58,8 @@ export default class Sidebar extends Vue {
     { component: 'Playlists', title: 'Playlists', link: '/playlists' },
     { component: 'Albums', title: 'Albums', link: '/albums' },
     { component: 'Artists', title: 'Artists', link: '/artists' },
-    { component: 'Genre', title: 'Genre', link: '/genre' },
-    { component: 'Fav', title: 'Favourites', link: '/favs' }
+    { component: 'Genre', title: 'Genre', link: '/genre' }
+    // { component: 'Fav', title: 'Favourites', link: '/favs' }
   ]
 
   private active: ActiveTab = ActiveTab.ALLSONGS
