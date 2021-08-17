@@ -65,6 +65,8 @@ export class AuthFlow {
 
   constructor(type: oauthType) {
     this.generateConfig(type).then((config) => {
+      if (!config.oAuthChannel && process.env.NODE_ENV === 'production') throw new Error('oAuth callback failed to register')
+
       this.config = config
 
       this.notifier = new AuthorizationNotifier()

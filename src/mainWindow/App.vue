@@ -5,8 +5,9 @@
     <div class="appContainer">
       <router-view></router-view>
     </div>
-    <NewPlaylistModal :id="'NewPlaylistModal'" />
-    <AddPlaylistModal />
+    <NewPlaylistModal />
+    <SongFromUrlModal />
+    <PlaylistFromUrlModal />
   </div>
 </template>
 
@@ -17,7 +18,8 @@ import { mixins } from 'vue-class-component'
 import ThemeHandler from '@/utils/ui/mixins/ThemeHandler'
 import ContextMenu from './components/generic/Context.vue'
 import NewPlaylistModal from '@/mainWindow/components/generic/NewPlaylistModal.vue'
-import AddPlaylistModal from '@/mainWindow/components/generic/AddPlaylistModal.vue'
+import SongFromUrlModal from './components/generic/SongFromURLModal.vue'
+import PlaylistFromUrlModal from './components/generic/PlaylistFromURLModal.vue'
 
 import { vxm } from './store'
 import { bus } from './main'
@@ -31,7 +33,8 @@ const stun = require('stun')
     Titlebar,
     ContextMenu,
     NewPlaylistModal,
-    AddPlaylistModal
+    SongFromUrlModal,
+    PlaylistFromUrlModal
   }
 })
 export default class App extends mixins(ThemeHandler, PlayerControls) {

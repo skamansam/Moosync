@@ -42,6 +42,16 @@ export default class ContextMenuMixin extends mixins(PlayerControls, RemoteSong)
     return menu
   }
 
+  private getGeneralSongsContextMenu(refreshCallback: () => void) {
+    const items = [
+      {
+        label: 'Add from URL',
+        handler: () => bus.$emit(EventBus.SHOW_SONG_FROM_URL_MODAL, refreshCallback)
+      }
+    ]
+    return items
+  }
+
   private getSongContextMenu(exclude: string | undefined, refreshCallback: () => void, ...item: Song[]) {
     const items = [
       {
@@ -64,6 +74,10 @@ export default class ContextMenuMixin extends mixins(PlayerControls, RemoteSong)
           } catch (e) { console.error(e) }
           refreshCallback()
         }
+      },
+      {
+        label: 'Add from URL',
+        handler: () => bus.$emit(EventBus.SHOW_SONG_FROM_URL_MODAL, refreshCallback)
       },
       {
         label: 'Add To Playlist',
@@ -123,12 +137,12 @@ export default class ContextMenuMixin extends mixins(PlayerControls, RemoteSong)
     return items
   }
 
-  private getGeneralPlaylistMenu() {
+  private getGeneralPlaylistMenu(refreshCallback: () => void) {
     const items = [
       {
         label: 'Add Playlist from URL',
         handler: () => {
-          bus.$emit(EventBus.SHOW_ADD_PLAYLIST_MODAL)
+          bus.$emit(EventBus.SHOW_PLAYLIST_FROM_URL_MODAL, refreshCallback)
         },
       }
     ]
@@ -173,6 +187,9 @@ export default class ContextMenuMixin extends mixins(PlayerControls, RemoteSong)
       case 'SONGS':
         items = this.getSongContextMenu(options.args.exclude, options.args.refreshCallback, ...options.args.songs)
         break
+      case 'GENERAL_SONGS':
+        items = this.getGeneralSongsContextMenu(options.args.refreshCallback)
+        break
       case 'YOUTUBE':
         items = this.getYoutubeContextMenu(...options.args.ytItems)
         break
@@ -180,7 +197,7 @@ export default class ContextMenuMixin extends mixins(PlayerControls, RemoteSong)
         items = this.getPlaylistContextMenu(options.args.playlist, options.args.deleteCallback)
         break
       case 'GENERAL_PLAYLIST':
-        items = this.getGeneralPlaylistMenu()
+        items = this.getGeneralPlaylistMenu(options.args.refreshCallback)
         break
       case 'PLAYLIST_CONTENT':
         items = this.getPlaylistContentContextMenu(options.args.isRemote, options.args.refreshCallback, ...options.args.songs)

@@ -103,7 +103,8 @@ export class LastFMProvider {
       }
 
       return new Promise<boolean>((resolve) => {
-        window.WindowUtils.listenOAuth(this.oAuthChannel!, async (url) => {
+        window.WindowUtils.listenOAuth(this.oAuthChannel!, async (data) => {
+          const url = new URL(data)
           const token = url.searchParams.get('token')
           this._session = (await this.populateRequest('GET', 'auth.getSession', undefined, token!))?.session?.key
           if (this._session) {

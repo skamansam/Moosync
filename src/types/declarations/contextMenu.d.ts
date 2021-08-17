@@ -6,6 +6,11 @@ type ContextMenuArgs = {
     songs: Song[]
   }
 } | {
+  type: 'GENERAL_SONGS'
+  args: {
+    refreshCallback: () => void
+  }
+} | {
   type: 'YOUTUBE'
   args: {
     ytItems: YoutubeItem[]
@@ -18,7 +23,10 @@ type ContextMenuArgs = {
   }
 } |
 {
-  type: 'GENERAL_PLAYLIST'
+  type: 'GENERAL_PLAYLIST',
+  args: {
+    refreshCallback: () => void
+  }
 } | {
   type: 'PLAYLIST_CONTENT',
   args: {

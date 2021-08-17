@@ -5,7 +5,7 @@ declare module SpotifyResponses {
     PLAYLISTS = 'me/playlists',
     PLAYLIST = 'playlists/{playlist_id}',
     PLAYLIST_ITEMS = 'playlists/{playlist_id}/tracks',
-    VIDEO_DETAILS = 'videos'
+    SONG_DETAILS = 'tracks/{song_id}'
   }
 
 
@@ -35,11 +35,9 @@ declare module SpotifyResponses {
     }
   }
 
-  type VideoDetailsRequest = {
+  type TrackItemRequest = {
     params: {
-      part: ['contentDetails', 'snippet']
-      id: string[]
-      maxResults: number
+      song_id: string
     }
   }
 
@@ -49,8 +47,8 @@ declare module SpotifyResponses {
     ? PlaylistRequest
     : T extends ApiResources.PLAYLIST_ITEMS
     ? PlaylistItemsRequest
-    : T extends ApiResources.VIDEO_DETAILS
-    ? VideoDetailsRequest
+    : T extends ApiResources.SONG_DETAILS
+    ? TrackItemRequest
     : T extends ApiResources.PLAYLIST
     ? PlaylistItemRequest
     : undefined
@@ -248,5 +246,7 @@ declare module SpotifyResponses {
     ? PlaylistItems.PlaylistItems
     : T extends ApiResources.PLAYLIST
     ? UserPlaylists.Item
+    : T extends ApiResources.SONG_DETAILS
+    ? PlaylistItems.Track
     : undefined
 }

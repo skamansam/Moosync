@@ -61,7 +61,7 @@ interface windowUtils {
   openExternal: (url: string) => Promise<void>
   registerOAuthCallback: (path: string) => Promise<string>
   deregisterOAuthCallback: (path: string) => Promise<void>
-  listenOAuth: (channelID: string, callback: (data: URL) => void) => void
+  listenOAuth: (channelID: string, callback: (data: string) => void) => void
   mainWindowHasMounted: () => Promise<void>
   isWindowMaximized: (isMainWindow: boolean) => Promise<boolean>
 }

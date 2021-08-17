@@ -26,9 +26,13 @@ export abstract class GenericProvider {
 
   public abstract getUserPlaylists(): Promise<Playlist[]>
 
-  public abstract getUserPlaylist(id: string): Promise<Playlist | undefined>
+  public abstract getUserPlaylist(str: string, isUrl?: boolean): Promise<Playlist | undefined>
 
-  public abstract getPlaylistContent(id: string): AsyncGenerator<Song[]>
+  public abstract getPlaylistContent(id: string, isUrl?: boolean): AsyncGenerator<Song[]>
+
+  public abstract matchPlaylist(str: string): boolean
 
   public abstract getPlaybackUrlAndDuration(song: Song): Promise<{ url: string, duration: number } | undefined>
+
+  public abstract getSongDetails(url: string): Promise<Song | undefined>
 }

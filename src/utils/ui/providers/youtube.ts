@@ -111,31 +111,48 @@ export class YoutubeProvider extends GenericProvider {
     const songs: Song[] = []
     if (items.length > 0) {
       const ids = items.map(s => s.snippet!.resourceId.videoId)
-      const details = await this.getSongDetails(...ids)
+      const details = await this.getSongDetailsFromID(...ids)
       songs.push(...details)
     }
     return songs
   }
 
-  public async * getPlaylistContent(id: string): AsyncGenerator<Song[]> {
-    const validRefreshToken = await this.auth.hasValidRefreshToken()
-    if (this.auth.loggedIn() || validRefreshToken) {
-      let nextPageToken: string | undefined
-      do {
-        const resp = await this.populateRequest(ApiResources.PLAYLIST_ITEMS, {
-          params: {
-            part: ['id', 'snippet'],
-            playlistId: id,
-            maxResults: 50,
-            pageToken: nextPageToken
-          }
-        })
-        nextPageToken = resp.nextPageToken
-        const parsed = await this.parsePlaylistItems(resp.items)
-        yield parsed
-      } while (nextPageToken)
+  public matchPlaylist(str: string) {
+    return !!str.match(/^((?:https?:)?\/\/)?((?:www|m|music)\.)?((?:youtube\.com|youtu.be))(\/(?:[\w-]+\?v=|embed\/|v\/)?)([\w-]+)(\S+)?$/)
+  }
+
+  private getIDFromURL(url: string) {
+    return new URL(url)?.searchParams?.get('list') ?? undefined
+  }
+
+  public async * getPlaylistContent(str: string, isUrl = false): AsyncGenerator<Song[]> {
+    let id: string | undefined = str
+
+    if (isUrl) {
+      id = this.getIDFromURL(str)
     }
-    yield []
+
+    if (id) {
+      const validRefreshToken = await this.auth.hasValidRefreshToken()
+      if (this.auth.loggedIn() || validRefreshToken) {
+        let nextPageToken: string | undefined
+        do {
+          const resp = await this.populateRequest(ApiResources.PLAYLIST_ITEMS, {
+            params: {
+              part: ['id', 'snippet'],
+              playlistId: id,
+              maxResults: 50,
+              pageToken: nextPageToken
+            }
+          })
+          nextPageToken = resp.nextPageToken
+          const parsed = await this.parsePlaylistItems(resp.items)
+          yield parsed
+        } while (nextPageToken)
+      }
+      yield []
+    }
+    return
   }
 
   private async parseVideo(items: YoutubeResponses.VideoDetails.Item[]) {
@@ -160,7 +177,7 @@ export class YoutubeProvider extends GenericProvider {
     return songs
   }
 
-  private async getSongDetails(...id: string[]) {
+  private async getSongDetailsFromID(...id: string[]) {
     const validRefreshToken = await this.auth.hasValidRefreshToken()
     if (this.auth.loggedIn() || validRefreshToken) {
       const resp = await this.populateRequest(ApiResources.VIDEO_DETAILS, {
@@ -180,15 +197,36 @@ export class YoutubeProvider extends GenericProvider {
       return { url: song.url!, duration: song.duration }
   }
 
-  public async getUserPlaylist(id: string) {
-    const resp = await this.populateRequest(ApiResources.PLAYLISTS, {
-      params: {
-        id,
-        part: ['id', 'contentDetails', 'snippet'],
-        maxResults: 1,
-      }
-    })
+  public async getUserPlaylist(str: string, isUrl = false) {
+    let id: string | undefined = str
+    if (isUrl) {
+      id = this.getIDFromURL(str)
+    }
 
-    return (await this.parsePlaylists(resp.items))[0]
+    if (id) {
+      const resp = await this.populateRequest(ApiResources.PLAYLISTS, {
+        params: {
+          id,
+          part: ['id', 'contentDetails', 'snippet'],
+          maxResults: 1,
+        }
+      })
+      return (await this.parsePlaylists(resp.items))[0]
+    }
+  }
+
+  public async getSongDetails(url: string): Promise<Song | undefined> {
+    if (url.match(/^((?:https?:)?\/\/)?((?:www|m|music)\.)?((?:youtube\.com|youtu.be))(\/(?:[\w-]+\?v=|embed\/|v\/)?)([\w-]+)(\S+)?$/)) {
+      const parsedUrl = new URL(url)
+      const videoID = parsedUrl.searchParams.get('v')
+
+      if (videoID) {
+        const details = await this.getSongDetailsFromID(videoID)
+        if (details && details.length > 0) {
+          return details[0]
+        }
+      }
+      return
+    }
   }
 }

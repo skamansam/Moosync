@@ -13,7 +13,7 @@ enum ApiResources {
   PLAYLISTS = 'me/playlists',
   PLAYLIST = 'playlists/{playlist_id}',
   PLAYLIST_ITEMS = 'playlists/{playlist_id}/tracks',
-  VIDEO_DETAILS = 'videos'
+  SONG_DETAILS = 'tracks/{song_id}'
 }
 
 export class SpotifyProvider extends GenericProvider {
@@ -30,7 +30,7 @@ export class SpotifyProvider extends GenericProvider {
   }
 
   public async login() {
-    if (!this.auth.loggedIn()) {
+    if (!this.auth.loggedIn() && this.auth.config) {
       const validRefreshToken = await this.auth.hasValidRefreshToken()
       if (validRefreshToken) {
         await this.auth.performWithFreshTokens()
@@ -52,6 +52,10 @@ export class SpotifyProvider extends GenericProvider {
 
     if (resource === ApiResources.PLAYLIST_ITEMS || resource === ApiResources.PLAYLIST) {
       url = resource.replace('{playlist_id}', (search as SpotifyResponses.PlaylistItemsRequest).params.playlist_id)
+    }
+
+    if (resource === ApiResources.SONG_DETAILS) {
+      url = resource.replace('{song_id}', (search as SpotifyResponses.TrackItemRequest).params.song_id)
     }
 
     const resp = await this.api(url, {
@@ -106,61 +110,82 @@ export class SpotifyProvider extends GenericProvider {
       return ytItem[0]
   }
 
+  private parseSong(track: SpotifyResponses.PlaylistItems.Track): Song {
+    return {
+      _id: track.id,
+      title: track.name,
+      album: {
+        album_name: track.album.name,
+        album_coverPath_high: (track.album.images[0]) ? track.album.images[0].url : ''
+      },
+      url: track.id,
+      song_coverPath_high: (track.album.images[0]) ? track.album.images[0].url : '',
+      artists: track.artists.map(artist => artist.name),
+      duration: track.duration_ms / 1000,
+      type: 'SPOTIFY'
+    }
+  }
+
   private async parsePlaylistItems(items: SpotifyResponses.PlaylistItems.Item[]) {
     const parsed: Song[] = []
     for (const i of items) {
       if (!i.is_local && parsed.findIndex((val) => val._id === i.track.id) === -1)
-        parsed.push({
-          _id: i.track.id,
-          title: i.track.name,
-          album: {
-            album_name: i.track.album.name,
-            album_coverPath_high: (i.track.album.images[0]) ? i.track.album.images[0].url : ''
-          },
-          url: i.track.id,
-          song_coverPath_high: (i.track.album.images[0]) ? i.track.album.images[0].url : '',
-          artists: i.track.artists.map(artist => artist.name),
-          duration: i.track.duration_ms / 1000,
-          type: 'SPOTIFY'
-        })
+        parsed.push(this.parseSong(i.track))
     }
     return parsed
   }
 
-  public async * getPlaylistContent(id: string): AsyncGenerator<Song[]> {
-    const validRefreshToken = await this.auth.hasValidRefreshToken()
-    if (this.auth.loggedIn() || validRefreshToken) {
+  public matchPlaylist(str: string) {
+    return !!str.match(/^(https:\/\/open.spotify.com\/playlist\/|spotify:playlist:)([a-zA-Z0-9]+)(.*)$/)
+  }
 
-      // Return directly from cache
-      const content = await this.getCachePlaylistContent(id)
-      if (content) {
-        yield content
-        return;
-      }
+  private getIDFromURL(url: string) {
+    const split = new URL(url).pathname.split('/')
+    return split[split.length - 1]
+  }
 
-      let nextOffset: number = 0
-      let isNext = false
-      const limit = 100
-      const parsed: Song[] = []
-      do {
-        const resp = await this.populateRequest(ApiResources.PLAYLIST_ITEMS, {
-          params: {
-            playlist_id: id,
-            limit: limit,
-            offset: nextOffset
-          }
-        })
-        const items = await this.parsePlaylistItems(resp.items)
-        parsed.push(...items)
-        isNext = !!resp.next
-        if (resp.next) {
-          nextOffset += limit
-        }
-        yield items;
-      } while (isNext)
-      this.setCachePlaylistContent(id, parsed)
+  public async * getPlaylistContent(str: string, isUrl = false): AsyncGenerator<Song[]> {
+    let id: string | undefined = str
+
+    if (isUrl) {
+      id = this.getIDFromURL(str)
     }
-    return []
+
+    if (id) {
+      const validRefreshToken = await this.auth.hasValidRefreshToken()
+      if (this.auth.loggedIn() || validRefreshToken) {
+
+        // Return directly from cache
+        const content = await this.getCachePlaylistContent(id)
+        if (content) {
+          yield content
+          return
+        }
+
+        let nextOffset: number = 0
+        let isNext = false
+        const limit = 100
+        const parsed: Song[] = []
+        do {
+          const resp = await this.populateRequest(ApiResources.PLAYLIST_ITEMS, {
+            params: {
+              playlist_id: id,
+              limit: limit,
+              offset: nextOffset
+            }
+          })
+          const items = await this.parsePlaylistItems(resp.items)
+          parsed.push(...items)
+          isNext = !!resp.next
+          if (resp.next) {
+            nextOffset += limit
+          }
+          yield items;
+        } while (isNext)
+        this.setCachePlaylistContent(id, parsed)
+      }
+    }
+    return
   }
 
   private async getCachePlaylistContent(playlist_id: string) {
@@ -182,16 +207,53 @@ export class SpotifyProvider extends GenericProvider {
     }
   }
 
-  public async getUserPlaylist(id: string) {
-    const validRefreshToken = await this.auth.hasValidRefreshToken()
-    if (this.auth.loggedIn() || validRefreshToken) {
-      const resp = await this.populateRequest(ApiResources.PLAYLIST, {
-        params: {
-          playlist_id: id,
-        }
-      })
+  public async getUserPlaylist(str: string, isUrl = false) {
+    let id: string | undefined = str
+    if (isUrl) {
+      id = this.getIDFromURL(str)
+    }
 
-      return this.parsePlaylists([resp])[0]
+    if (id) {
+      const validRefreshToken = await this.auth.hasValidRefreshToken()
+      if (this.auth.loggedIn() || validRefreshToken) {
+        const resp = await this.populateRequest(ApiResources.PLAYLIST, {
+          params: {
+            playlist_id: id,
+          }
+        })
+
+        return this.parsePlaylists([resp])[0]
+      }
+    }
+  }
+
+  public async getSongDetails(url: string): Promise<Song | undefined> {
+    if (url.match(/^(https:\/\/open.spotify.com\/track\/|spotify:track:)([a-zA-Z0-9]+)(.*)$/)) {
+      const parsedURL = new URL(url)
+      const split = parsedURL.pathname.split('/')
+      const songID = split[split.length - 1]
+
+      const validRefreshToken = await this.auth.hasValidRefreshToken()
+
+      console.log(this.auth.loggedIn() || validRefreshToken)
+      if (this.auth.loggedIn() || validRefreshToken) {
+        const resp = await this.populateRequest(ApiResources.SONG_DETAILS, {
+          params: {
+            song_id: songID,
+          }
+        })
+        if (resp) {
+          const song = this.parseSong(resp)
+          const yt = await this.spotifyToYoutube(song)
+          if (yt) {
+            song.playbackUrl = yt?._id
+            return song
+          } else {
+            console.error('Couldn\'t find song on youtube')
+          }
+        }
+        return
+      }
     }
   }
 }

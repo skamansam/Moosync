@@ -25,7 +25,9 @@ export class AuthFlowRequestHandler extends AuthorizationRequestHandler {
     const emitter = new ServerEventsEmitter()
 
     window.WindowUtils.listenOAuth(this.channelID, (data) => {
-      const searchParams = data.searchParams
+      const url = new URL(data)
+
+      const searchParams = url.searchParams
 
       const state = searchParams.get('state') || undefined
       const code = searchParams.get('code')

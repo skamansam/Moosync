@@ -89,13 +89,13 @@ export default class SinglePlaylistView extends mixins(ContextMenuMixin) {
   }
 
   private async fetchPlaylistYoutube() {
-    this.playlist = await vxm.providers.youtubeProvider.getUserPlaylist(this.$route.params.id.replace('youtube-', ''))
+    this.playlist =
+      (await vxm.providers.youtubeProvider.getUserPlaylist(this.$route.params.id.replace('youtube-', ''))) ?? null
   }
 
   private async fetchPlaylistSpotify() {
-    this.playlist = (await vxm.providers.spotifyProvider.getUserPlaylist(
-      this.$route.params.id.replace('spotify-', '')
-    ))!
+    this.playlist =
+      (await vxm.providers.spotifyProvider.getUserPlaylist(this.$route.params.id.replace('spotify-', ''))) ?? null
   }
 
   private async fetchSongList() {
