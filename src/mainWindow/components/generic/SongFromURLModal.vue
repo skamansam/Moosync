@@ -20,7 +20,7 @@
                     v-model="url"
                     id="song-url-title"
                     class="song-url-title"
-                    placeholder="song-url Name..."
+                    placeholder="Song url..."
                     debounce="500"
                     @update="parseURL"
                     onkeypress="this.style.width = this.value.length + 'ch'"
