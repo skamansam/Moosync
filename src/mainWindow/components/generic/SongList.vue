@@ -54,6 +54,7 @@
 </template>
 
 <script lang="ts">
+import { getEventListener } from 'stream'
 import { Component, Prop, Ref, Vue } from 'vue-property-decorator'
 
 @Component({})
@@ -108,6 +109,7 @@ export default class SongList extends Vue {
 
   beforeDestroy() {
     this.destroyMouseEvents()
+    this.destroyKeyEvents()
   }
 
   private handlerMap: {
@@ -214,17 +216,24 @@ export default class SongList extends Vue {
       ((await window.PreferenceUtils.loadSelective('UI.columnHeaders.widths', false)) as number[]) ?? []
   }
 
+  private onKeyUp(e: KeyboardEvent) {
+    if (e.key === 'Shift' && this.keyPressed === 'Shift') this.keyPressed = undefined
+    else if (e.key === 'Control' && this.keyPressed === 'Control') this.keyPressed = undefined
+  }
+
+  private onKeyDown(e: KeyboardEvent) {
+    if (e.shiftKey || e.ctrlKey) this.keyPressed = e.key as 'Shift' | 'Control'
+    if (e.ctrlKey && e.key === 'a') this.selectAll()
+  }
+
   private setupKeyEvents() {
-    document.addEventListener('keydown', (e) => {
-      if (e.shiftKey || e.ctrlKey) this.keyPressed = e.key as 'Shift' | 'Control'
+    document.addEventListener('keydown', this.onKeyDown)
+    document.addEventListener('keyup', this.onKeyUp)
+  }
 
-      if (e.ctrlKey && e.key === 'a') this.selectAll()
-    })
-
-    document.addEventListener('keyup', (e) => {
-      if (e.key === 'Shift' && this.keyPressed === 'Shift') this.keyPressed = undefined
-      else if (e.key === 'Control' && this.keyPressed === 'Control') this.keyPressed = undefined
-    })
+  private destroyKeyEvents() {
+    document.removeEventListener('keydown', this.onKeyDown)
+    document.removeEventListener('keyup', this.onKeyUp)
   }
 
   private onRowContext(event: Event, item: Song) {
@@ -244,6 +253,7 @@ export default class SongList extends Vue {
   }
 
   private onRowSelected(index: number) {
+    console.log(this.keyPressed)
     if (this.keyPressed === 'Control') this.selected.push(index)
     else if (this.keyPressed === 'Shift') {
       if (this.selected.length > 0) {
