@@ -2,6 +2,7 @@ import axios, { Method } from 'axios';
 
 import { cache } from '@/utils/ui/providers/genericProvider';
 import md5 from 'md5'
+import { session } from 'electron';
 
 const AUTH_BASE_URL = 'http://www.last.fm/api/'
 const API_BASE_URL = 'http://ws.audioscrobbler.com/2.0'
@@ -66,7 +67,7 @@ export class LastFMProvider {
       if (token) {
         defaultParams.token = token
       } else {
-        if (!this._session || !this._session) {
+        if (!this._session) {
           return
         } else {
           defaultParams.sk = this._session
@@ -99,7 +100,7 @@ export class LastFMProvider {
   public async login() {
     if (!this._session) {
       if (!this.oAuthChannel) {
-        this.oAuthChannel = await window.WindowUtils.registerOAuthCallback('lastfm')
+        this.oAuthChannel = await window.WindowUtils.registerOAuthCallback('lastfmCallback')
       }
 
       return new Promise<boolean>((resolve) => {
@@ -109,6 +110,7 @@ export class LastFMProvider {
           this._session = (await this.populateRequest('GET', 'auth.getSession', undefined, token!))?.session?.key
           if (this._session) {
             window.Store.setSecure(KeytarService, this._session).then(() => resolve(true))
+            return
           }
           resolve(false)
         })

@@ -104,9 +104,10 @@ export default class TopBar extends Vue {
   }
 
   private async loginLastFM() {
-    await this.lastFm.login()
-    this.getUserDetailsSpotify()
-    this.lastFm.scrobble(vxm.player.currentSong)
+    if (await this.lastFm.login()) {
+      this.getUserDetailsLastFM()
+      this.lastFm.scrobble(vxm.player.currentSong)
+    }
   }
 
   private async loginSpotify() {
