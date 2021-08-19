@@ -55,6 +55,8 @@
                     <QueueItem
                       v-for="(element, index) in queueOrder"
                       :key="element.id"
+                      :id="`queue-item-${element.id}`"
+                      :ref="`queue-item-${element.id}`"
                       :songID="element.songID"
                       :index="index"
                       :current="index === currentIndex"
@@ -96,6 +98,24 @@ import { EventBus } from '@/utils/main/ipc/constants'
 export default class MusicInfo extends mixins(ImageLoader, ModelHelper) {
   get queueOrder() {
     return vxm.player.queueOrder
+  }
+
+  private scrollToActive() {
+    const elem = this.$refs[`queue-item-${this.queueOrder[this.currentIndex].id}`]
+    if (elem) {
+      ;((elem as (Vue | Element)[])[0] as Vue).$el.scrollIntoView({
+        behavior: 'smooth'
+      })
+    }
+  }
+
+  mounted() {
+    this.scrollToActive()
+  }
+
+  @Watch('currentIndex')
+  onIndexChange() {
+    this.scrollToActive()
   }
 
   get currentIndex() {
