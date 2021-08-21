@@ -12,36 +12,31 @@
               @error="handleImageError"
             ></b-img>
           </b-col>
-          <b-col>
+          <b-col cols="9">
             <b-row no-gutters class="song-url-details">
-              <b-col cols="12">
-                <div class="d-flex">
-                  <b-input
-                    v-model="url"
-                    id="song-url-title"
-                    class="song-url-title"
-                    placeholder="Song url..."
-                    debounce="500"
-                    @update="parseURL"
-                    onkeypress="this.style.width = this.value.length + 'ch'"
-                  />
-                </div>
+              <b-col cols="12" class="w-100">
+                <b-row class="w-100">
+                  <div class="title text-truncate" :class="{ deactivated: !parsedSong }">
+                    {{ parsedSong ? parsedSong.title : 'New Song' }}
+                  </div>
+                </b-row>
+                <b-row class="w-100">
+                  <div class="subtitle text-truncate" :class="{ deactivated: !parsedSong }">
+                    {{ parsedSong ? parsedSong.artists && parsedSong.artists.join(', ') : 'Artist' }}
+                  </div>
+                </b-row>
               </b-col>
             </b-row>
-            <b-row class="song-url-details">
-              <b-col v-if="parsedSong">
-                <b-row>
-                  {{ parsedSong.title }}
-                </b-row>
-                <b-row>
-                  {{ parsedSong.artists && parsedSong.artists.join(', ') }}
-                </b-row>
+            <b-row no-gutters>
+              <b-col cols="12">
+                <InputGroup class="input-group" hint="Enter URL Here.. (Youtube or Spotify)" @update="parseURL" />
               </b-col>
             </b-row>
           </b-col>
         </b-row>
       </b-container>
-      <b-button class="create-button" @click="addToLibrary">Create</b-button>
+      <b-button class="close-button ml-3" @click="close">Close</b-button>
+      <b-button class="create-button" @click="addToLibrary">Add</b-button>
     </div>
   </b-modal>
 </template>
@@ -49,13 +44,15 @@
 <script lang="ts">
 import { Component, Prop, Vue } from 'vue-property-decorator'
 import SongDefault from '@/icons/SongDefault.vue'
+import InputGroup from './InputGroup.vue'
 import { bus } from '@/mainWindow/main'
 import { EventBus } from '@/utils/main/ipc/constants'
 import { vxm } from '@/mainWindow/store'
 
 @Component({
   components: {
-    SongDefault
+    SongDefault,
+    InputGroup
   }
 })
 export default class SongFromUrlModal extends Vue {
@@ -63,8 +60,6 @@ export default class SongFromUrlModal extends Vue {
   private id!: string
 
   private forceEmptyImg: boolean = false
-
-  private url: string = ''
 
   private parsedSong: Song | undefined | null = null
 
@@ -74,10 +69,10 @@ export default class SongFromUrlModal extends Vue {
     this.forceEmptyImg = true
   }
 
-  private async parseURL() {
+  private async parseURL(url: string) {
     this.parsedSong =
-      (await vxm.providers.youtubeProvider.getSongDetails(this.url)) ??
-      (await vxm.providers.spotifyProvider.getSongDetails(this.url)) ??
+      (await vxm.providers.youtubeProvider.getSongDetails(url)) ??
+      (await vxm.providers.spotifyProvider.getSongDetails(url)) ??
       null
   }
 
@@ -85,6 +80,10 @@ export default class SongFromUrlModal extends Vue {
     window.DBUtils.storeSongs([this.parsedSong])
 
     this.refreshCallback && this.refreshCallback()
+    this.close()
+  }
+
+  private close() {
     this.$bvModal.hide(this.id)
   }
 
@@ -98,6 +97,16 @@ export default class SongFromUrlModal extends Vue {
 </script>
 
 <style lang="sass" scoped>
+.title
+  font-size: 26px
+
+.subtitle
+  font-size: 14px
+  font-weight: normal
+
+.title.deactivated, .subtitle.deactivated
+  color: var(--textSecondary)
+
 .topbar-container
   background: var(--primary)
   height: 70px
@@ -131,6 +140,7 @@ export default class SongFromUrlModal extends Vue {
     margin-top: 0
 
 .song-url-details
+  margin-top: -10px
   margin-left: 40px
   max-width: 100%
 
@@ -163,8 +173,9 @@ export default class SongFromUrlModal extends Vue {
     outline: none
     -webkit-box-shadow: none
 
-.create-button
+.create-button, .close-button
   font-size: 16px
+  font-weight: 400
   color: var(--textInverse)
   background-color: var(--accent)
   border-radius: 6px
@@ -172,4 +183,12 @@ export default class SongFromUrlModal extends Vue {
   margin-bottom: 20px
   margin-top: 15px
   border: 0
+
+.close-button
+  background-color: var(--textPrimary)
+
+
+.input-group
+  margin-top: 15px
+  margin-left: 10px
 </style>

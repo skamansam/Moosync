@@ -12,25 +12,24 @@
               @error="handleImageError"
             ></b-img>
           </b-col>
-          <b-col>
+          <b-col cols="9">
             <b-row no-gutters class="playlist-url-details">
-              <b-col cols="12">
-                <div class="d-flex">
-                  <b-input
-                    v-model="url"
-                    id="playlist-url-title"
-                    class="playlist-url-title"
-                    placeholder="Playlist url..."
-                    debounce="500"
-                    @update="parseURL"
-                    onkeypress="this.style.width = this.value.length + 'ch'"
-                  />
-                </div>
+              <b-col cols="12" class="w-100">
+                <b-row class="w-100">
+                  <div class="title text-truncate" :class="{ deactivated: !playlist }">
+                    {{ playlist ? playlist.playlist_name : 'New Song' }}
+                  </div>
+                </b-row>
+                <b-row class="w-100">
+                  <div class="subtitle text-truncate" :class="{ deactivated: !playlist }">
+                    {{ playlist ? playlist.playlist_song_count + ' Songs' : '0 Songs' }}
+                  </div>
+                </b-row>
               </b-col>
             </b-row>
-            <b-row class="playlist-url-details">
-              <b-col v-if="songList && songList.length > 0">
-                <b-row> {{ songList.length }} Songs </b-row>
+            <b-row no-gutters>
+              <b-col cols="12">
+                <InputGroup class="input-group" hint="Enter URL Here.. (Youtube or Spotify)" @update="parseURL" />
               </b-col>
             </b-row>
           </b-col>
@@ -58,13 +57,14 @@
           </div>
         </b-row>
       </b-container>
-      <b-button class="create-button" @click="addToLibrary">Create</b-button>
+      <b-button class="close-button ml-3" @click="close">Close</b-button>
+      <b-button class="create-button" @click="addToLibrary">Add</b-button>
     </div>
   </b-modal>
 </template>
 
 <script lang="ts">
-import { Component, Prop, Vue } from 'vue-property-decorator'
+import { Component, Prop } from 'vue-property-decorator'
 import SongDefault from '@/icons/SongDefault.vue'
 import { bus } from '@/mainWindow/main'
 import { EventBus } from '@/utils/main/ipc/constants'
@@ -73,10 +73,12 @@ import { mixins } from 'vue-class-component'
 import ImgLoader from '@/utils/ui/mixins/ImageLoader'
 import SingleSearchResult from '@/mainWindow/components/generic/SingleSearchResult.vue'
 import PlayerControls from '@/utils/ui/mixins/PlayerControls'
+import InputGroup from './InputGroup.vue'
 
 @Component({
   components: {
     SongDefault,
+    InputGroup,
     SingleSearchResult
   }
 })
@@ -85,8 +87,6 @@ export default class PlaylistFromUrlModal extends mixins(PlayerControls, ImgLoad
   private id!: string
 
   private forceEmptyImg: boolean = false
-
-  private url: string = ''
 
   private songList: Song[] = []
   private playlist: Playlist | null = null
@@ -97,19 +97,23 @@ export default class PlaylistFromUrlModal extends mixins(PlayerControls, ImgLoad
 
   private refreshCallback?: () => void
 
-  private async parseURL() {
+  private close() {
+    this.$bvModal.hide(this.id)
+  }
+
+  private async parseURL(url: string) {
     let generator
     this.songList = []
     this.playlist = null
 
-    if (vxm.providers.youtubeProvider.matchPlaylist(this.url)) {
-      this.playlist = (await vxm.providers.youtubeProvider.getUserPlaylist(this.url, true)) ?? null
-      generator = vxm.providers.youtubeProvider.getPlaylistContent(this.url, true)
+    if (vxm.providers.youtubeProvider.matchPlaylist(url)) {
+      this.playlist = (await vxm.providers.youtubeProvider.getUserPlaylist(url, true)) ?? null
+      generator = vxm.providers.youtubeProvider.getPlaylistContent(url, true)
     }
 
-    if (vxm.providers.spotifyProvider.matchPlaylist(this.url)) {
-      this.playlist = (await vxm.providers.spotifyProvider.getUserPlaylist(this.url, true)) ?? null
-      generator = vxm.providers.spotifyProvider.getPlaylistContent(this.url, true)
+    if (vxm.providers.spotifyProvider.matchPlaylist(url)) {
+      this.playlist = (await vxm.providers.spotifyProvider.getUserPlaylist(url, true)) ?? null
+      generator = vxm.providers.spotifyProvider.getPlaylistContent(url, true)
     }
 
     if (generator) {
@@ -153,6 +157,16 @@ export default class PlaylistFromUrlModal extends mixins(PlayerControls, ImgLoad
 </script>
 
 <style lang="sass" scoped>
+.title
+  font-size: 26px
+
+.subtitle
+  font-size: 14px
+  font-weight: normal
+
+.title.deactivated, .subtitle.deactivated
+  color: var(--textSecondary)
+
 .topbar-container
   background: var(--primary)
   height: 70px
@@ -186,10 +200,11 @@ export default class PlaylistFromUrlModal extends mixins(PlayerControls, ImgLoad
     margin-top: 0
 
 .playlist-url-details
+  margin-top: -10px
   margin-left: 40px
   max-width: 100%
 
-.songs-count
+.playlists-count
   font-size: 14px
   text-align: start
 
@@ -218,8 +233,9 @@ export default class PlaylistFromUrlModal extends mixins(PlayerControls, ImgLoad
     outline: none
     -webkit-box-shadow: none
 
-.create-button
+.create-button, .close-button
   font-size: 16px
+  font-weight: 400
   color: var(--textInverse)
   background-color: var(--accent)
   border-radius: 6px
@@ -227,6 +243,14 @@ export default class PlaylistFromUrlModal extends mixins(PlayerControls, ImgLoad
   margin-bottom: 20px
   margin-top: 15px
   border: 0
+
+.close-button
+  background-color: var(--textPrimary)
+
+
+.input-group
+  margin-top: 15px
+  margin-left: 10px
 
 .playlist-content-recycler-row
   height: 200px

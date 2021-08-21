@@ -114,6 +114,7 @@ export default class SingleSearchResult extends mixins(PlayerControls) {
 .coverimg
   height: 56px
   width: 56px
+  object-fit: cover
 
 .text-container
   position: relative
