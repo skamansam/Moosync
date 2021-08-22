@@ -66,7 +66,7 @@ export default class Sidebar extends mixins(PlayerControls, ImgLoader) {
         this.showSearchResults = false
         break
       case 'focus':
-        this.showSearchResults = this.results ? true : false
+        this.showSearchResults = this.results.length > 0 ? true : false
         break
     }
   }
