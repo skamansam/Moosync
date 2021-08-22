@@ -130,6 +130,7 @@ export default class AudioStream extends mixins(SyncMixin, PlayerControls, Error
       this.nextSong()
       this.handlerFileError(err)
     }
+    this.activePlayer.onStateChange = (state) => (vxm.player.playerState = state)
 
     vxm.player.$watch('volume', this.onVolumeChanged)
   }

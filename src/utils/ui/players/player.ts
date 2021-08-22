@@ -3,6 +3,7 @@ export abstract class Player {
   protected onLoadCallback: (() => void) | undefined
   protected onTimeUpdateCallback: ((time: number) => void) | undefined
   protected onErrorCallback: OnErrorEventHandler | ((err: ErrorEvent) => void) | undefined
+  protected onStateChangeCallback: ((state: PlayerState) => void) | undefined
 
 
   abstract load(src?: string, volume?: number): void
@@ -36,9 +37,15 @@ export abstract class Player {
     this.listenOnError()
   }
 
+  set onStateChange(callback: (state: PlayerState) => void) {
+    this.onStateChangeCallback = callback
+    this.listenOnStateChange()
+  }
+
   protected abstract listenOnEnded(): void
   protected abstract listenOnTimeUpdate(): void
   protected abstract listenOnLoad(): void
   protected abstract listenOnError(): void
+  protected abstract listenOnStateChange(): void
   abstract removeAllListeners(): void
 }

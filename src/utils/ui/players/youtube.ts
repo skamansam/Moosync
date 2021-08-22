@@ -60,6 +60,14 @@ export class YoutubePlayer extends Player {
     this.playerInstance.on('unplayable', this.onErrorCallback as (err: any) => void)
   }
 
+  protected listenOnStateChange(): void {
+    if (this.onStateChangeCallback) {
+      this.playerInstance.on('playing', () => this.onStateChangeCallback!('PLAYING'))
+      this.playerInstance.on('paused', () => this.onStateChangeCallback!('PAUSED'))
+      this.playerInstance.on('ended', () => this.onStateChangeCallback!('STOPPED'))
+    }
+  }
+
   removeAllListeners(): void {
     this.playerInstance.removeAllListeners()
   }

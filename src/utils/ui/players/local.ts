@@ -58,6 +58,14 @@ export class LocalPlayer extends Player {
     this.playerInstance.onerror = this.onErrorCallback as OnErrorEventHandler
   }
 
+  protected listenOnStateChange(): void {
+    if (this.onStateChangeCallback) {
+      this.playerInstance.onplay = () => this.onStateChangeCallback!('PLAYING')
+      this.playerInstance.onpause = () => this.onStateChangeCallback!('PAUSED')
+      this.playerInstance.onended = () => this.onStateChangeCallback!('STOPPED')
+    }
+  }
+
   removeAllListeners(): void {
     this.playerInstance.onended = null
     this.playerInstance.ontimeupdate = null
