@@ -1,8 +1,6 @@
-import axios, { Method } from 'axios';
-
+import axios from 'axios';
 import { cache } from '@/utils/ui/providers/genericProvider';
 import md5 from 'md5'
-import { session } from 'electron';
 
 const AUTH_BASE_URL = 'http://www.last.fm/api/'
 const API_BASE_URL = 'http://ws.audioscrobbler.com/2.0'
@@ -27,11 +25,20 @@ export class LastFMProvider {
   private scrobbleTimeout: ReturnType<typeof setTimeout> | undefined
   private oAuthChannel: string | undefined
 
+  private uninitializedQueue: (() => Promise<any>)[] = []
+
   constructor() {
     this.fetchStoredToken().then((data) => {
       if (data)
         this._session = data
       this.initialized = true
+
+        ; (async () => {
+          for (const p of this.uninitializedQueue) {
+            console.log(p)
+            await p()
+          }
+        })()
     })
   }
 
@@ -90,6 +97,11 @@ export class LastFMProvider {
       })
 
       return resp.data
+    } else {
+      let resolveT: (value: any) => void
+      const promise = new Promise<any>(resolve => resolveT = resolve)
+      this.uninitializedQueue.push(() => this.populateRequest(axiosMethod, lastFmMethod, data, token).then(resolveT))
+      return promise
     }
   }
 
@@ -100,16 +112,22 @@ export class LastFMProvider {
   public async login() {
     if (!this._session) {
       if (!this.oAuthChannel) {
-        this.oAuthChannel = await window.WindowUtils.registerOAuthCallback('lastfmCallback')
+        this.oAuthChannel = await window.WindowUtils.registerOAuthCallback('lastfmcallback')
       }
 
       return new Promise<boolean>((resolve) => {
         window.WindowUtils.listenOAuth(this.oAuthChannel!, async (data) => {
           const url = new URL(data)
           const token = url.searchParams.get('token')
-          this._session = (await this.populateRequest('GET', 'auth.getSession', undefined, token!))?.session?.key
+          const resp = await this.populateRequest('GET', 'auth.getSession', undefined, token!)
+          this._session = resp?.session?.key
+          console.log(resp)
+
           if (this._session) {
-            window.Store.setSecure(KeytarService, this._session).then(() => resolve(true))
+            window.Store.setSecure(KeytarService, this._session).then(() => {
+              resolve(true)
+              console.log('resolved')
+            })
             return
           }
           resolve(false)
@@ -171,6 +189,7 @@ export class LastFMProvider {
 
   public async getUserDetails() {
     const resp = await this.populateRequest('GET', 'user.getInfo')
+    console.log(resp)
     return resp?.user?.name
   }
 }
