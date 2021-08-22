@@ -236,6 +236,10 @@ export class ScannerChannel implements IpcChannelInterface {
   }
 
   public async ScanSongs(event?: IpcMainEvent, request?: IpcRequest) {
-    return this.scanAll(event, request).catch((err) => console.error(err))
+    await this.scanAll(event, request).catch((err) => {
+      console.error(err)
+      event?.reply(request?.responseChannel)
+    })
+    event?.reply(request?.responseChannel)
   }
 }

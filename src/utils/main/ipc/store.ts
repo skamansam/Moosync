@@ -22,15 +22,15 @@ export class StoreChannel implements IpcChannelInterface {
   private async setKeytar(event: Electron.IpcMainEvent, request: IpcRequest) {
     if (request.params.token && request.params.service) {
       await keytar.setPassword(request.params.service, os.userInfo().username, request.params.token)
-      event.reply(request.responseChannel)
     }
+    event.reply(request.responseChannel)
   }
 
   private async removeKeytar(event: Electron.IpcMainEvent, request: IpcRequest) {
     if (request.params.service) {
       await keytar.deletePassword(request.params.service, os.userInfo().username)
-      event.reply(request.responseChannel)
     }
+    event.reply(request.responseChannel)
   }
 
   private async getKeytar(event: Electron.IpcMainEvent, request: IpcRequest) {
@@ -38,5 +38,6 @@ export class StoreChannel implements IpcChannelInterface {
       const token = await keytar.getPassword(request.params.service, os.userInfo().username)
       event.reply(request.responseChannel, token)
     }
+    event.reply(request.responseChannel)
   }
 }

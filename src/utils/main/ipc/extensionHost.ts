@@ -33,19 +33,26 @@ export class ExtensionHostChannel implements IpcChannelInterface {
   }
 
   private getAllExtensions(event: Electron.IpcMainEvent, request: IpcRequest) {
-    extensionHost.mainRequestGenerator.getInstalledExtensions().then((data) => event.reply(request.responseChannel, data))
+    extensionHost.mainRequestGenerator.getInstalledExtensions().then((data) => event.reply(request.responseChannel, data)).catch(e => {
+      console.log(e)
+      event.reply(request.responseChannel)
+    })
   }
 
   private toggleExtensionStatus(event: Electron.IpcMainEvent, request: IpcRequest) {
     if (request.params.packageName && request.params.enabled !== undefined) {
       extensionHost.mainRequestGenerator.toggleExtensionStatus(request.params.packageName, request.params.enabled).then(() => event.reply(request.responseChannel))
+      return
     }
+    event.reply(request.responseChannel)
   }
 
   private removeExtension(event: Electron.IpcMainEvent, request: IpcRequest) {
     if (request.params.packageName) {
       extensionHost.uninstallExtension(request.params.packageName).then(() => event.reply(request.responseChannel))
+      return
     }
+    event.reply(request.responseChannel)
   }
 
   private sendData(event: Electron.IpcMainEvent, request: IpcRequest) {

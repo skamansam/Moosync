@@ -38,12 +38,14 @@ export class PreferenceChannel implements IpcChannelInterface {
     if (request.params.key && request.params.value) {
       event.reply(request.responseChannel, saveSelectivePreference(request.params.key, request.params.value, request.params.isExtension))
     }
+    event.reply(request.responseChannel)
   }
 
   private loadSelective(event: Electron.IpcMainEvent, request: IpcRequest) {
     if (request.params.key) {
       event.reply(request.responseChannel, loadSelectivePreference(request.params.key, request.params.isExtension))
     }
+    event.reply(request.responseChannel)
   }
 
   private onPreferenceChanged(event: Electron.IpcMainEvent, request: IpcRequest) {

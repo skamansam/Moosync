@@ -30,14 +30,20 @@ export class PlaylistsChannel implements IpcChannelInterface {
       .then((data) => {
         event.reply(request.responseChannel, data)
       })
-      .catch((e) => console.error(e))
+      .catch((e) => {
+        console.error(e)
+        event.reply(request.responseChannel)
+      })
   }
   private addToPlaylist(event: Electron.IpcMainEvent, request: IpcRequest) {
     SongDB.addToPlaylist(request.params.playlist_id, ...request.params.song_ids)
       .then((data) => {
         event.reply(request.responseChannel, data)
       })
-      .catch((e) => console.error(e))
+      .catch((e) => {
+        console.error(e)
+        event.reply(request.responseChannel)
+      })
   }
 
   private async saveCoverToFile(event: Electron.IpcMainEvent, request: IpcRequest) {
@@ -54,13 +60,15 @@ export class PlaylistsChannel implements IpcChannelInterface {
       fs.writeFile(filePath, request.params.b64.replace(/^data:image\/png;base64,/, ""), 'base64', () => {
         event.reply(request.responseChannel, filePath)
       })
+      return
     }
+    event.reply(request.responseChannel)
   }
 
-  private removePlaylist(event: Electron.IpcMainEvent, request: IpcRequest) {
+  private async removePlaylist(event: Electron.IpcMainEvent, request: IpcRequest) {
     if (request.params.playlist_id) {
-      SongDB.removePlaylist(request.params.playlist_id).then(() => event.reply(request.responseChannel)
-      )
+      await SongDB.removePlaylist(request.params.playlist_id).then(() => event.reply(request.responseChannel))
     }
+    event.reply(request.responseChannel)
   }
 }

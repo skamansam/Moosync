@@ -134,8 +134,10 @@ export class AuthFlow {
   }
 
   private async fetchRefreshToken() {
+    console.log('fetching token')
     if (this.config)
       this.refreshToken = (await window.Store.getSecure(this.config.keytarService)) ?? undefined
+    console.log('fetched')
   }
 
   private async storeRefreshToken() {

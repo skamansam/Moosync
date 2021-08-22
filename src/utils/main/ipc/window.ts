@@ -79,8 +79,11 @@ export class BrowserWindowChannel implements IpcChannelInterface {
   }
 
   private openUrl(event: Electron.IpcMainEvent, request: IpcRequest) {
-    if (request.params.url)
+    if (request.params.url) {
       shell.openExternal(request.params.url).then(() => event.reply(request.responseChannel))
+      return
+    }
+    event.reply(request.responseChannel)
   }
 
   private mainWindowMounted(event: Electron.IpcMainEvent, request: IpcRequest) {

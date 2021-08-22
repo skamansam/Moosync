@@ -30,7 +30,10 @@ export class SearchChannel implements IpcChannelInterface {
         .then((data) => {
           event.reply(request.responseChannel, data)
         })
-        .catch((e) => console.error(e))
+        .catch((e) => {
+          console.error(e)
+          event.reply(request.responseChannel)
+        })
     }
   }
 
@@ -39,7 +42,10 @@ export class SearchChannel implements IpcChannelInterface {
       ytScraper
         .searchTerm(request.params.searchTerm)
         .then((data) => event.reply(request.responseChannel, data))
-        .catch((e) => console.error(e))
+        .catch((e) => {
+          console.error(e)
+          event.reply(request.responseChannel)
+        })
     }
   }
 
@@ -49,14 +55,20 @@ export class SearchChannel implements IpcChannelInterface {
       request.params.options,
       getDisabledPaths(preferences.musicPaths))
       .then((data) => event.reply(request.responseChannel, data))
-      .catch((e) => console.error(e))
+      .catch((e) => {
+        console.error(e)
+        event.reply(request.responseChannel)
+      })
   }
 
   private async searchEntityByOptions(event: Electron.IpcMainEvent, request: IpcRequest) {
     if (request.params && request.params.options) {
       SongDB.getEntityByOptions(request.params.options)
         .then((data) => event.reply(request.responseChannel, data))
-        .catch((e) => console.error(e))
+        .catch((e) => {
+          console.error(e)
+          event.reply(request.responseChannel)
+        })
     }
   }
 }

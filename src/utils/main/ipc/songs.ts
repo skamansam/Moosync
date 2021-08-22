@@ -43,7 +43,10 @@ export class SongsChannel implements IpcChannelInterface {
       .then((data) => {
         event.reply(request.responseChannel, data)
       })
-      .catch((e) => console.error(e))
+      .catch((e) => {
+        console.error(e)
+        event.reply(request.responseChannel)
+      })
   }
 
   private storeSongs(event: Electron.IpcMainEvent, request: IpcRequest) {
@@ -58,7 +61,10 @@ export class SongsChannel implements IpcChannelInterface {
       .then((data) => {
         event.reply(request.responseChannel, data)
       })
-      .catch((e) => console.error(e))
+      .catch((e) => {
+        console.error(e)
+        event.reply(request.responseChannel)
+      })
   }
 
   private saveAudioToFile(event: Electron.IpcMainEvent, request: IpcRequest) {
@@ -75,7 +81,9 @@ export class SongsChannel implements IpcChannelInterface {
       fs.writeFile(filePath, request.params.blob, () => {
         event.reply(request.responseChannel, filePath)
       })
+      return
     }
+    event.reply(request.responseChannel)
   }
 
   private saveImageToFile(event: Electron.IpcMainEvent, request: IpcRequest) {
@@ -92,7 +100,9 @@ export class SongsChannel implements IpcChannelInterface {
       fs.writeFile(filePath, request.params.blob, () => {
         event.reply(request.responseChannel, filePath)
       })
+      return
     }
+    event.reply(request.responseChannel)
   }
 
   private fileExists(event: Electron.IpcMainEvent, request: IpcRequest, type: 'audio' | 'image') {
@@ -108,5 +118,6 @@ export class SongsChannel implements IpcChannelInterface {
       }
       event.reply(request.responseChannel, fs.existsSync(filePath) ? filePath : undefined)
     }
+    event.reply(request.responseChannel)
   }
 }
