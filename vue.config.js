@@ -41,7 +41,15 @@ module.exports = {
       builderOptions: {
         productName: 'Moosync',
         publish: ['github'],
-        asarUnpack: ['*.worker.js', 'sandbox.js']
+        asarUnpack: ['*.worker.js', 'sandbox.js'],
+        protocols: [
+          {
+            name: "Default protocol",
+            schemes: [
+              "com.moosync"
+            ]
+          }
+        ]
       },
       nodeIntegration: false,
       disableMainProcessTypescript: false,
