@@ -253,7 +253,6 @@ export default class SongList extends Vue {
   }
 
   private onRowSelected(index: number) {
-    console.log(this.keyPressed)
     if (this.keyPressed === 'Control') this.selected.push(index)
     else if (this.keyPressed === 'Shift') {
       if (this.selected.length > 0) {

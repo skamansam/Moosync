@@ -235,7 +235,6 @@ export class SpotifyProvider extends GenericProvider {
 
       const validRefreshToken = await this.auth.hasValidRefreshToken()
 
-      console.log(this.auth.loggedIn() || validRefreshToken)
       if (this.auth.loggedIn() || validRefreshToken) {
         const resp = await this.populateRequest(ApiResources.SONG_DETAILS, {
           params: {
