@@ -103,9 +103,6 @@
     "vue-template-compiler": "^2.6.14",
     "webpack-bundle-analyzer": "^4.4.2"
   },
-  "optionalDependencies": {
-    "@nodert-win10-20h1/windows.media.transcoding": "^0.1.0"
-  },
   "resolutions": {
     "electron-builder": "22.11.7"
   },

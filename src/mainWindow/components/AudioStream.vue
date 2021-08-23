@@ -162,6 +162,32 @@ export default class AudioStream extends mixins(SyncMixin, PlayerControls, Error
     }
   }
 
+  private setMediaInfo(song: Song) {
+    if (navigator.mediaSession) {
+      const artwork: MediaImage[] = []
+      if (song.song_coverPath_low) {
+        artwork.push({ src: song.song_coverPath_low })
+      }
+      if (song.song_coverPath_high) {
+        artwork.push({ src: song.song_coverPath_high })
+      }
+      if (song.album?.album_coverPath_high) {
+        artwork.push({ src: song.album.album_coverPath_high })
+      }
+      if (song.album?.album_coverPath_low) {
+        artwork.push({ src: song.album.album_coverPath_low })
+      }
+
+      window.navigator.mediaDevices
+      navigator.mediaSession.metadata = new MediaMetadata({
+        title: song.title,
+        artist: song.artists && song.artists.join(', '),
+        album: song.album?.album_name,
+        artwork
+      })
+    }
+  }
+
   private async loadAudio(song: Song, loadedState: boolean) {
     // vxm.player.state = 'PLAYING'
     if (song.type === 'LOCAL') {
@@ -192,6 +218,8 @@ export default class AudioStream extends mixins(SyncMixin, PlayerControls, Error
     if (this.handleBroadcasterAudioLoad(song)) return
 
     this.handleFirstPlayback(loadedState)
+
+    this.setMediaInfo(song)
   }
 
   private unloadAudio() {
