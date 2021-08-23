@@ -35,6 +35,7 @@ export class ExtensionManager extends AbstractExtensionManager {
     const vm = new NodeVM({
       console: 'inherit',
       sandbox: {},
+      env: process.env,
       require: {
         external: true,
         context: 'sandbox',
@@ -42,7 +43,7 @@ export class ExtensionManager extends AbstractExtensionManager {
         root: path.dirname(entryFilePath),
         mock: {
           events
-        }
+        },
       }
     })
 
@@ -58,7 +59,7 @@ export class ExtensionManager extends AbstractExtensionManager {
       __dirname: path.dirname(entryFilePath),
       __filename: entryFilePath,
       api: new ExtensionRequestGenerator(packageName),
-      logger: child
+      logger: child,
     }
   }
 
