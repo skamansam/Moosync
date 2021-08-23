@@ -178,13 +178,14 @@ export default class AudioStream extends mixins(SyncMixin, PlayerControls, Error
         artwork.push({ src: song.album.album_coverPath_low })
       }
 
-      window.navigator.mediaDevices
       navigator.mediaSession.metadata = new MediaMetadata({
         title: song.title,
         artist: song.artists && song.artists.join(', '),
         album: song.album?.album_name,
         artwork
       })
+
+      navigator.mediaSession.setActionHandler('seekto', (data) => data.seekTime && (this.forceSeek = data.seekTime))
     }
   }
 
