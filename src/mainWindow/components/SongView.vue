@@ -59,6 +59,9 @@ export default class AllSongs extends mixins(PlayerControls, ModelHelper, Remote
   @Prop({ default: false })
   private tableBusy!: boolean
 
+  @Prop({ default: true })
+  private compactView!: boolean
+
   private selected: Song[] | null = null
   private selectedCopy: Song[] | null = null
 

@@ -113,24 +113,30 @@ export default class AudioStream extends mixins(SyncMixin, PlayerControls, Error
     this.$root.$on('create-room', () => this.createRoom())
   }
 
-  private onSongEnded() {
+  private async onSongEnded() {
     if (this.SongRepeat) {
       this.activePlayer.currentTime = 0
-      this.activePlayer.play()
+      this.onPlayerStateChanged('PLAYING')
     } else {
-      vxm.player.nextSong()
+      await vxm.player.nextSong()
+      this.onPlayerStateChanged('PLAYING')
     }
   }
 
   private registerPlayerListeners() {
-    this.activePlayer.onEnded = this.onSongEnded.bind(this)
     this.activePlayer.onTimeUpdate = (time) => this.$emit('onTimeUpdate', time)
     this.activePlayer.onError = (err) => {
       console.error(`${this.currentSong?._id}: ${this.currentSong?.title} unplayable, skipping.`)
       this.nextSong()
       this.handlerFileError(err)
     }
-    this.activePlayer.onStateChange = (state) => (vxm.player.playerState = state)
+    this.activePlayer.onStateChange = (state) => {
+      if (state === 'STOPPED') {
+        this.onSongEnded()
+      } else {
+        vxm.player.playerState = state
+      }
+    }
 
     vxm.player.$watch('volume', this.onVolumeChanged)
   }

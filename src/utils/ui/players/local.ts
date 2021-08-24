@@ -42,7 +42,7 @@ export class LocalPlayer extends Player {
   }
 
   protected listenOnEnded(): void {
-    this.playerInstance.onended = this.onEndedCallback!
+    this.playerInstance.addEventListener('ended', this.onEndedCallback!)
   }
 
   protected listenOnTimeUpdate(): void {
@@ -60,9 +60,9 @@ export class LocalPlayer extends Player {
 
   protected listenOnStateChange(): void {
     if (this.onStateChangeCallback) {
-      this.playerInstance.onplay = () => this.onStateChangeCallback!('PLAYING')
-      this.playerInstance.onpause = () => this.onStateChangeCallback!('PAUSED')
-      this.playerInstance.onended = () => this.onStateChangeCallback!('STOPPED')
+      this.playerInstance.addEventListener('play', () => this.onStateChangeCallback!('PLAYING'))
+      this.playerInstance.addEventListener('pause', () => this.onStateChangeCallback!('PAUSED'))
+      this.playerInstance.addEventListener('ended', () => this.onStateChangeCallback!('STOPPED'))
     }
   }
 

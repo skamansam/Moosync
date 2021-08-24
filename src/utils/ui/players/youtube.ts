@@ -44,27 +44,27 @@ export class YoutubePlayer extends Player {
   }
 
   protected listenOnEnded(): void {
-    this.playerInstance.on('ended', this.onEndedCallback!)
+    this.playerInstance.addListener('ended', this.onEndedCallback!)
   }
 
   protected listenOnTimeUpdate(): void {
-    this.playerInstance.on('timeupdate', this.onTimeUpdateCallback!)
+    this.playerInstance.addListener('timeupdate', this.onTimeUpdateCallback!)
   }
 
   protected listenOnLoad(): void {
-    this.playerInstance.on('cued', this.onLoadCallback!)
+    this.playerInstance.addListener('cued', this.onLoadCallback!)
   }
 
   protected listenOnError(): void {
-    this.playerInstance.on('error', this.onErrorCallback as (err: any) => void)
-    this.playerInstance.on('unplayable', this.onErrorCallback as (err: any) => void)
+    this.playerInstance.addListener('error', this.onErrorCallback as (err: any) => void)
+    this.playerInstance.addListener('unplayable', this.onErrorCallback as (err: any) => void)
   }
 
   protected listenOnStateChange(): void {
     if (this.onStateChangeCallback) {
-      this.playerInstance.on('playing', () => this.onStateChangeCallback!('PLAYING'))
-      this.playerInstance.on('paused', () => this.onStateChangeCallback!('PAUSED'))
-      this.playerInstance.on('ended', () => this.onStateChangeCallback!('STOPPED'))
+      this.playerInstance.addListener('playing', () => this.onStateChangeCallback!('PLAYING'))
+      this.playerInstance.addListener('paused', () => this.onStateChangeCallback!('PAUSED'))
+      this.playerInstance.addListener('ended', () => this.onStateChangeCallback!('STOPPED'))
     }
   }
 
