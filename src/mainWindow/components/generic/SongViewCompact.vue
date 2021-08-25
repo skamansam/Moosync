@@ -4,7 +4,7 @@
       <SongListCompact :songList="songList" v-on="$listeners" />
     </b-col>
     <b-col cols="4">
-      <SongDetailsCompact :currentSong="currentSong" />
+      <SongDetailsCompact :defaultDetails="defaultDetails" :currentSong="currentSong" />
     </b-col>
   </b-row>
 </template>

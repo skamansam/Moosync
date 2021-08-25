@@ -8,6 +8,7 @@
           :item-size="94"
           key-field="_id"
           :direction="'vertical'"
+          v-click-outside="clearSelection"
         >
           <template v-slot="{ item, index }">
             <b-container
@@ -48,7 +49,7 @@
                   </b-row>
                 </b-col>
                 <b-col cols="auto" align-self="center" offset="1" class="ml-auto timestamp">
-                  {{ item._id === currentSong._id ? 'Now Playing' : formattedDuration(item.duration) }}
+                  {{ item._id === currentSong && currentSong._id ? 'Now Playing' : formattedDuration(item.duration) }}
                 </b-col>
                 <b-col cols="auto" align-self="center" class="button-icon ml-5">
                   <AddToQueue @click.native="onRowDoubleClicked(item)"

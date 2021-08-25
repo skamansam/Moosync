@@ -1,6 +1,10 @@
 <template>
   <div class="w-100" @contextmenu="getGeneralSongsMenu">
-    <SongView :songList="songList" @onRowContext="getSongMenu(arguments[0], arguments[1], undefined)" />
+    <SongView
+      :detailsButtonGroup="buttonGroups"
+      :songList="songList"
+      @onRowContext="getSongMenu(arguments[0], arguments[1], undefined)"
+    />
   </div>
 </template>
 
@@ -24,6 +28,13 @@ export default class AllSongs extends mixins(ContextMenuMixin) {
 
   get playlists() {
     return vxm.playlist.playlists
+  }
+
+  get buttonGroups(): SongDetailButtons {
+    return {
+      enableContainer: true,
+      enableLibraryStore: false
+    }
   }
 
   mounted() {

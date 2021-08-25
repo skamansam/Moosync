@@ -10,6 +10,8 @@
           v-bind:is="songView"
           :songList="songList"
           :currentSong="currentSong"
+          :defaultDetails="defaultDetails"
+          :detailsButtonGroup="detailsButtonGroup"
           @onRowDoubleClicked="queueSong([arguments[0]])"
           @onRowContext="getSongContextMenu"
           @onRowSelected="updateCoverDetails"

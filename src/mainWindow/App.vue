@@ -244,8 +244,8 @@ export default class App extends mixins(ThemeHandler, PlayerControls) {
   }
 
   private listenExtensionEvents() {
-    vxm.player.$watch('currentSong', (newVal: Song) => {
-      if (newVal.type !== 'LOCAL' && !newVal.playbackUrl) {
+    vxm.player.$watch('currentSong', (newVal: Song | undefined | null) => {
+      if (newVal?.type !== 'LOCAL' && !newVal?.playbackUrl) {
         return
       }
       window.ExtensionUtils.sendEvent({

@@ -12,23 +12,16 @@
             </div>
           </div>
 
-          <div v-if="currentSong" class="song-info-container">
+          <div class="song-info-container">
             <div class="d-flex">
-              <div class="song-title text-truncate">{{ currentSong.title }}</div>
+              <div class="song-title text-truncate">
+                {{ title }}
+              </div>
             </div>
-            <div class="song-subtitle text-truncate">
-              {{ currentSong.artists && currentSong.artists.join(', ') }}
-              {{
-                currentSong.artists &&
-                currentSong.artists.length > 0 &&
-                currentSong.album &&
-                currentSong.album.album_name
-                  ? ' - '
-                  : ''
-              }}
-              {{ currentSong.album && currentSong.album.album_name }}
+            <div class="song-subtitle text-truncate">{{ subtitle }}</div>
+            <div class="song-timestamp">
+              {{ subSubTitle }}
             </div>
-            <!-- <div class="song-timestamp">{{ formattedDuration(currentSong.duration) }}</div> -->
           </div>
         </div>
       </b-col>
@@ -52,12 +45,48 @@ export default class SongDetailsCompact extends mixins(ImgLoader) {
   @Prop({ default: null })
   private currentSong!: Song | null | undefined
 
+  private subtitle: string = this.getConcatedSubtitle()
+
+  @Prop({ default: () => {} })
+  private defaultDetails!: SongDetailDefaults | undefined
+
   private forceEmptyImg = false
 
-  private formattedDuration = convertDuration
-
   get computedImg() {
-    return this.getImgSrc(this.getValidImageHigh(this.currentSong))
+    return this.getImgSrc(this.getValidImageHigh(this.currentSong) ?? this.defaultDetails?.defaultCover)
+  }
+
+  @Watch('defaultDetails')
+  @Watch('currentSong')
+  onSongchange() {
+    this.subtitle = this.getConcatedSubtitle()
+  }
+
+  get subSubTitle() {
+    return (
+      (this.currentSong && convertDuration(this.currentSong.duration)) ?? this.defaultDetails?.defaultSubSubtitle ?? ''
+    )
+  }
+
+  get title() {
+    return this.currentSong?.title ?? this.defaultDetails?.defaultTitle ?? ''
+  }
+
+  private isArtistAlbumNotEmpty() {
+    return !!(this.currentSong?.artists && this.currentSong.artists.length > 0 && this.currentSong?.album?.album_name)
+  }
+
+  private getParsedSubtitle() {
+    return (
+      this.currentSong &&
+      ((this.currentSong?.artists && this.currentSong?.artists?.join(', ')) ?? '') +
+        (this.isArtistAlbumNotEmpty() ? ' - ' : '') +
+        (this.currentSong?.album && this.currentSong.album.album_name)
+    )
+  }
+
+  private getConcatedSubtitle() {
+    return this.getParsedSubtitle() ?? this.defaultDetails?.defaultSubtitle ?? ''
   }
 
   @Watch('src')

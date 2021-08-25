@@ -43,7 +43,7 @@
       />
     </div>
     <div class="slider" :class="{ open: sliderPosition }">
-      <MusicInfo :currentSong="currentSong" />
+      <MusicInfo v-show="sliderPosition" :currentSong="currentSong" />
     </div>
   </div>
 </template>

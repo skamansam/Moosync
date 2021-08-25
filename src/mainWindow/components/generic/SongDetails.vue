@@ -37,7 +37,7 @@
           </b-row>
 
           <b-row no-gutters>
-            <div class="d-flex">
+            <div>
               <div :title="currentsubTitle ? currentsubTitle : defaultsubTitle" class="subtitle text-truncate">
                 {{ currentsubTitle ? currentsubTitle : defaultsubTitle }}
               </div>
