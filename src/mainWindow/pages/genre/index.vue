@@ -3,7 +3,9 @@
     <b-row class="title">Genres</b-row>
     <b-row class="d-flex">
       <b-col col xl="2" md="3" v-for="genre in genres" :key="genre.genre_id">
-        <CardView :title="genre.genre_name" :imgSrc="genre.genre_coverPath" @click.native="gotoGenre(genre)" />
+        <CardView :title="genre.genre_name" :imgSrc="genre.genre_coverPath" @click.native="gotoGenre(genre)">
+          <template #defaultCover> <SongDefault /></template>
+        </CardView>
       </b-col>
     </b-row>
   </b-container>
@@ -14,10 +16,12 @@ import { Component } from 'vue-property-decorator'
 import CardView from '@/mainWindow/components/generic/CardView.vue'
 import { mixins } from 'vue-class-component'
 import RouterPushes from '@/utils/ui/mixins/RouterPushes'
+import SongDefault from '@/icons/SongDefault.vue'
 
 @Component({
   components: {
-    CardView
+    CardView,
+    SongDefault
   }
 })
 export default class Genres extends mixins(RouterPushes) {
