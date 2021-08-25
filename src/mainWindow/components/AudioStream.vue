@@ -40,6 +40,8 @@ export default class AudioStream extends mixins(SyncMixin, PlayerControls, Error
 
   private isFirst: boolean = true
 
+  private ignoreStateChange = false
+
   get SongRepeat() {
     return vxm.player.Repeat
   }
@@ -73,6 +75,7 @@ export default class AudioStream extends mixins(SyncMixin, PlayerControls, Error
 
   @Watch('currentSong')
   onSongChanged(newSong: Song | null | undefined) {
+    this.ignoreStateChange = true
     if (newSong) this.loadAudio(newSong, false)
     else this.unloadAudio()
   }
@@ -114,6 +117,7 @@ export default class AudioStream extends mixins(SyncMixin, PlayerControls, Error
   }
 
   private async onSongEnded() {
+    this.ignoreStateChange = true
     if (this.SongRepeat) {
       this.activePlayer.currentTime = 0
       this.onPlayerStateChanged('PLAYING')
@@ -127,14 +131,19 @@ export default class AudioStream extends mixins(SyncMixin, PlayerControls, Error
     this.activePlayer.onTimeUpdate = (time) => this.$emit('onTimeUpdate', time)
     this.activePlayer.onError = (err) => {
       console.error(`${this.currentSong?._id}: ${this.currentSong?.title} unplayable, skipping.`)
+      this.removeFromQueue(vxm.player.queueIndex)
       this.nextSong()
       this.handlerFileError(err)
     }
     this.activePlayer.onStateChange = (state) => {
-      if (state === 'STOPPED') {
-        this.onSongEnded()
+      if (!this.ignoreStateChange) {
+        if (state === 'STOPPED') {
+          this.onSongEnded()
+        } else {
+          vxm.player.playerState = state
+        }
       } else {
-        vxm.player.playerState = state
+        this.ignoreStateChange = false
       }
     }
 

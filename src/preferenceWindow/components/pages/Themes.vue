@@ -2,11 +2,35 @@
   <div>
     <b-container fluid>
       <b-row>
-        <PreferenceHeader title="Themes" tooltip="Customize the colors" class="mb-3" />
+        <PreferenceHeader title="Songs View" tooltip="Customize the colors" class="mb-3" />
       </b-row>
+      <b-row no-gutters class="w-100"> </b-row>
       <b-row no-gutters class="w-100">
         <b-col cols="auto" class="mr-3 mb-3">
-          <ThemeComponent
+          <ThemeComponentClassic
+            @click.native="setSongView('classic')"
+            :selected="isSongView('classic')"
+            :id="getRandomID()"
+            :colors="currentTheme"
+          />
+        </b-col>
+        <b-col cols="auto" class="mr-3 mb-3">
+          <ThemeComponentCompact
+            @click.native="setSongView('compact')"
+            :selected="isSongView('compact')"
+            :id="getRandomID()"
+            :colors="currentTheme"
+          />
+        </b-col>
+      </b-row>
+      <b-row>
+        <PreferenceHeader title="Themes" tooltip="Customize the colors" class="mb-3" />
+      </b-row>
+      <b-row no-gutters class="w-100"> </b-row>
+      <b-row no-gutters class="w-100">
+        <b-col cols="auto" class="mr-3 mb-3">
+          <component
+            :is="themesComponent"
             @click.native="setTheme('default')"
             :selected="isThemeActive('default')"
             :id="getRandomID()"
@@ -14,7 +38,8 @@
           />
         </b-col>
         <b-col cols="auto" class="mr-3 mb-3" v-for="(value, key) in allThemes" :key="key">
-          <ThemeComponent
+          <component
+            :is="themesComponent"
             @click.native="setTheme(value.id)"
             :selected="isThemeActive(value.id)"
             :id="value.id"
@@ -29,13 +54,15 @@
 <script lang="ts">
 import { Component } from 'vue-property-decorator'
 import Vue from 'vue'
-import ThemeComponent from '../ThemeComponent.vue'
+import ThemeComponentClassic from '../ThemeComponentClassic.vue'
 import { v1 } from 'uuid'
 import PreferenceHeader from '../PreferenceHeader.vue'
+import ThemeComponentCompact from '../ThemeComponentCompact.vue'
 
 @Component({
   components: {
-    ThemeComponent,
+    ThemeComponentClassic,
+    ThemeComponentCompact,
     PreferenceHeader
   }
 })
@@ -47,9 +74,22 @@ export default class Themes extends Vue {
   }
 
   private activeTheme: string = 'default'
+  private activeView: songMenu = 'compact'
+
+  private get themesComponent() {
+    return this.activeView === 'compact' ? 'ThemeComponentCompact' : 'ThemeComponentClassic'
+  }
+
+  private get currentTheme() {
+    return this.allThemes[this.activeTheme] ?? this.defaultTheme
+  }
 
   private isThemeActive(themeId: string) {
     return themeId === this.activeTheme
+  }
+
+  private isSongView(id: songMenu) {
+    return id === this.activeView
   }
 
   get defaultTheme() {
@@ -75,8 +115,14 @@ export default class Themes extends Vue {
     this.$root.$emit('themeChanged')
   }
 
+  private async setSongView(id: songMenu) {
+    await window.ThemeUtils.setSongView(id)
+    this.activeView = id
+  }
+
   async created() {
     this.activeTheme = (await window.ThemeUtils.getActiveTheme())?.id ?? 'default'
+    this.activeView = (await window.ThemeUtils.getSongView()) ?? 'compact'
     await this.getAllThemes()
   }
 }

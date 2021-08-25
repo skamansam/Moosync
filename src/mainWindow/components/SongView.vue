@@ -1,55 +1,45 @@
 <template>
   <b-container fluid class="song-container h-100">
-    <b-row align-v="center" class="w-100 no-gutters details-background">
-      <SongDetails
-        class="details-container h-100"
-        :currentTitle="currentSong ? currentSong.title : ''"
-        :currentsubTitle="getAlbumName(currentSong)"
-        :currentSubSubTitle="defaultDetails.defaultSubSubtitle"
-        :currentType="currentSong ? currentSong.type : 'LOCAL'"
-        :imgSrc="getImgSrc(getValidImageHigh(currentSong))"
-        :defaultTitle="defaultDetails.defaultTitle"
-        :defaultsubTitle="defaultDetails.defaultSubtitle"
-        :defaultImgSrc="defaultDetails.defaultCover"
-        :buttonGroup="detailsButtonGroup"
-        @playAll="playAll"
-        @addToQueue="addToQueue"
-        @addToLibrary="addToLibrary"
-      />
-    </b-row>
-    <b-row class="no-gutters list-container">
-      <SongList
-        :songList="songList"
-        :extrafields="[
-          { key: 'index', label: 'Sr. No' },
-          { key: 'title', label: 'Title' },
-          { key: 'album_name', label: 'Album' },
-          { key: 'artist_name', label: 'Artists' }
-        ]"
-        :tableBusy="tableBusy"
-        @onRowDoubleClicked="queueSong"
-        @onRowContext="getSongContextMenu"
-        @onRowSelected="updateCoverDetails"
-        @onRowSelectionClear="clearSelection"
-      />
-    </b-row>
+    <transition name="list">
+      <transition
+        name="custom-classes-transition"
+        enter-active-class="animate__animated animate__slideInLeft animate__delay-1s"
+        leave-active-class="animate__animated animate__slideOutRight"
+      >
+        <component
+          v-bind:is="songView"
+          :songList="songList"
+          :currentSong="currentSong"
+          @onRowDoubleClicked="queueSong([arguments[0]])"
+          @onRowContext="getSongContextMenu"
+          @onRowSelected="updateCoverDetails"
+          @onRowSelectionClear="clearSelection"
+          @onRowPlayNowClicked="playTop([arguments[0]])"
+          @playAll="playAll"
+          @addToQueue="addToQueue"
+          @addToLibrary="addToLibrary"
+        ></component>
+      </transition>
+    </transition>
   </b-container>
 </template>
 
 <script lang="ts">
 import { Component, Prop } from 'vue-property-decorator'
-import SongList from '@/mainWindow/components/generic/SongList.vue'
-import SongDetails from '@/mainWindow/components/generic/SongDetails.vue'
 import { mixins } from 'vue-class-component'
 import PlayerControls from '@/utils/ui/mixins/PlayerControls'
 import ModelHelper from '@/utils/ui/mixins/ModelHelper'
 import RemoteSong from '@/utils/ui/mixins/remoteSongMixin'
 import ImgLoader from '@/utils/ui/mixins/ImageLoader'
+import { vxm } from '../store'
+import SongViewClassic from '@/mainWindow/components/generic/SongViewClassic.vue'
+import SongViewCompact from '@/mainWindow/components/generic/SongViewCompact.vue'
+import 'animate.css'
 
 @Component({
   components: {
-    SongList,
-    SongDetails
+    SongViewClassic,
+    SongViewCompact
   }
 })
 export default class AllSongs extends mixins(PlayerControls, ModelHelper, RemoteSong, ImgLoader) {
@@ -59,8 +49,9 @@ export default class AllSongs extends mixins(PlayerControls, ModelHelper, Remote
   @Prop({ default: false })
   private tableBusy!: boolean
 
-  @Prop({ default: true })
-  private compactView!: boolean
+  private get songView() {
+    return vxm.themes.songView === 'compact' ? 'SongViewCompact' : 'SongViewClassic'
+  }
 
   private selected: Song[] | null = null
   private selectedCopy: Song[] | null = null
@@ -91,6 +82,7 @@ export default class AllSongs extends mixins(PlayerControls, ModelHelper, Remote
   }
 
   private updateCoverDetails(items: Song[]) {
+    console.log(items)
     if (items) this.currentSong = items[items.length - 1]
     this.selected = items
     this.selectedCopy = items
@@ -120,7 +112,8 @@ export default class AllSongs extends mixins(PlayerControls, ModelHelper, Remote
 
 <style lang="sass" scoped>
 .song-container
-  overflow-y: hidden
+  padding-top: 10px
+  overflow: hidden
 
 .details-container
   width: 100%
@@ -137,4 +130,10 @@ export default class AllSongs extends mixins(PlayerControls, ModelHelper, Remote
   width: calc(100% - 30px)
   border-radius: 28px
   background: var(--secondary)
+
+.compact-container
+  padding-top: 25px
+
+.song-list-compact
+  padding-right: 30px
 </style>

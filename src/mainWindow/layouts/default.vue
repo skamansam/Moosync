@@ -6,7 +6,7 @@
 
     <div class="d-flex main-content" :class="{ 'is-open': isSidebarOpen }">
       <transition name="slide-fade">
-        <router-view :key="refreshRouter"></router-view>
+        <router-view></router-view>
       </transition>
     </div>
   </div>
@@ -28,11 +28,7 @@ import { mixins } from 'vue-class-component'
   }
 })
 export default class DefaultLayout extends mixins(ContextMenuMixin) {
-  private refreshRouter: boolean = false
   private isSidebarOpen: boolean = true
-  mounted() {
-    //TODO: Refresh Router on preference change
-  }
 
   toggleSidebar(isOpen: boolean) {
     this.isSidebarOpen = isOpen
@@ -76,15 +72,6 @@ export default class DefaultLayout extends mixins(ContextMenuMixin) {
 </style>
 
 <style lang="sass">
-.slide-fade-enter-active
-  transition: all .3s ease
-
-.slide-fade-leave-active
-  transition: all .2s ease
-.slide-fade-enter, .slide-fade-leave-to
-  transform: translateY(100px)
-  opacity: 0
-
 *::-webkit-scrollbar,
 *::-webkit-scrollbar-thumb
   width: 26px

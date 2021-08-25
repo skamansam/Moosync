@@ -9,7 +9,8 @@ export default class ErrorHandler extends Vue {
   }
 
   protected handlerFileError(err: ErrorEvent) {
-    if (!(err?.target as HTMLImageElement)?.src?.startsWith('http'))
-      window.FileUtils.scan()
+    // TODO: Need some kind of specific guidelines when to start scanning
+    // if (!(err?.target as HTMLImageElement)?.src?.startsWith('http'))
+    // window.FileUtils.scan()
   }
 }

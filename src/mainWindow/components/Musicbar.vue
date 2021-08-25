@@ -119,9 +119,9 @@ export default class MusicBar extends mixins(ImgLoader) {
 .timeline-container
   height: 1rem
   width: 100%
-  background-color: #ffffff
 
 .timeline
+  background: transparent
   height: 0.5rem !important
   padding: 0 !important
   width: 100%

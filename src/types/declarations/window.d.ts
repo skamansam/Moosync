@@ -91,7 +91,10 @@ interface themeUtils {
   getAllThemes: (id?: string) => Promise<{ [key: string]: ThemeDetails } | undefined>
   setActiveTheme: (id: string) => Promise<void>
   getActiveTheme: () => Promise<ThemeDetails | undefined>
-  listenThemeChanged: (callback: (themeId: ThemeDetails) => void) => Promise<void>
+  setSongView: (menu: songMenu) => Promise<void>
+  getSongView: () => Promise<songMenu>
+  listenThemeChanged: (callback: (themeId: ThemeDetails) => void) => void
+  listenSongViewChanged: (callback: (menu: songMenu) => void) => void
 }
 
 declare global {

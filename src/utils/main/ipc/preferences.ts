@@ -1,5 +1,5 @@
 import { IpcEvents, PreferenceEvents } from './constants';
-import { getActiveTheme, loadAllThemes, loadSelectivePreference, loadTheme, onPreferenceChanged, savePreferences, saveSelectivePreference, saveTheme, setActiveTheme } from '../db/preferences';
+import { getActiveTheme, getSongView, loadAllThemes, loadSelectivePreference, loadTheme, onPreferenceChanged, savePreferences, saveSelectivePreference, saveTheme, setActiveTheme, setSongView } from '../db/preferences';
 
 import { WindowHandler } from '../windowManager';
 
@@ -30,6 +30,12 @@ export class PreferenceChannel implements IpcChannelInterface {
         break
       case PreferenceEvents.GET_ALL_THEMES:
         this.getAllThemes(event, request)
+        break
+      case PreferenceEvents.GET_SONG_VIEW:
+        this.getSongView(event, request)
+        break
+      case PreferenceEvents.SET_SONG_VIEW:
+        this.setSongView(event, request)
         break
     }
   }
@@ -83,5 +89,17 @@ export class PreferenceChannel implements IpcChannelInterface {
 
   private getActiveTheme(event: Electron.IpcMainEvent, request: IpcRequest) {
     event.reply(request.responseChannel, getActiveTheme())
+  }
+
+  private setSongView(event: Electron.IpcMainEvent, request: IpcRequest) {
+    if (request.params.menu) {
+      setSongView(request.params.menu)
+      WindowHandler.getWindow(true)?.webContents.send(PreferenceEvents.SONG_VIEW_REFRESH, request.params.menu)
+    }
+    event.reply(request.responseChannel)
+  }
+
+  private getSongView(event: Electron.IpcMainEvent, request: IpcRequest) {
+    event.reply(request.responseChannel, getSongView())
   }
 }

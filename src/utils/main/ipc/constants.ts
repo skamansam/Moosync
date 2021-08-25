@@ -40,7 +40,10 @@ export enum PreferenceEvents {
   SET_ACTIVE_THEME = 'setActiveTheme',
   GET_ACTIVE_THEME = 'getActiveTheme',
   GET_ALL_THEMES = 'getAllThemes',
+  SET_SONG_VIEW = 'setSongView',
+  GET_SONG_VIEW = 'getSongView',
   THEME_REFRESH = 'themeRefresh',
+  SONG_VIEW_REFRESH = 'songViewRefresh'
 }
 
 export enum WindowEvents {

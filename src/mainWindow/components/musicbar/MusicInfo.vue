@@ -1,37 +1,13 @@
 <template>
   <div>
     <div v-if="computedImg" class="dark-overlay"></div>
-    <b-img class="bg-img" v-if="computedImg" :src="computedImg"></b-img>
+    <transition name="fade">
+      <b-img class="bg-img" v-if="computedImg" :src="computedImg" :key="computedImg"></b-img>
+    </transition>
     <b-container fluid class="w-100 h-100 main-container">
       <b-row no-gutters class="h-100 flex-nowrap">
-        <b-col class="h-100 position-relative" cols="4">
-          <div class="image-container w-100 h-100">
-            <div class="embed-responsive embed-responsive-1by1">
-              <div class="embed-responsive-item">
-                <b-img class="h-100 w-100 albumart" v-if="computedImg" :src="computedImg" />
-                <SongDefault class="albumart w-100" v-if="!computedImg" />
-              </div>
-            </div>
-
-            <div v-if="currentSong" class="song-info-container">
-              <div class="d-flex">
-                <div class="song-title text-truncate">{{ currentSong.title }}</div>
-              </div>
-              <div class="song-subtitle text-truncate">
-                {{ currentSong.artists && currentSong.artists.join(', ') }}
-                {{
-                  currentSong.artists &&
-                  currentSong.artists.length > 0 &&
-                  currentSong.album &&
-                  currentSong.album.album_name
-                    ? ' - '
-                    : ''
-                }}
-                {{ currentSong.album && currentSong.album.album_name }}
-              </div>
-              <div class="song-timestamp">{{ formattedDuration(currentSong.duration) }}</div>
-            </div>
-          </div>
+        <b-col cols="4">
+          <SongDetailsCompact :currentSong="currentSong" />
         </b-col>
         <b-col offset="1" cols="7" class="right-container h-100">
           <div class="h-100" v-if="queueOrder.length > 0">
@@ -87,12 +63,14 @@ import QueueItem from './QueueItem.vue'
 import draggable from 'vuedraggable'
 import { bus } from '@/mainWindow/main'
 import { EventBus } from '@/utils/main/ipc/constants'
+import SongDetailsCompact from '../generic/SongDetailsCompact.vue'
 
 @Component({
   components: {
     SongDefault,
     QueueItem,
-    draggable
+    draggable,
+    SongDetailsCompact
   }
 })
 export default class MusicInfo extends mixins(ImageLoader, ModelHelper) {
@@ -101,7 +79,7 @@ export default class MusicInfo extends mixins(ImageLoader, ModelHelper) {
   }
 
   private scrollToActive() {
-    const elem = this.$refs[`queue-item-${this.queueOrder[this.currentIndex].id}`]
+    const elem = this.$refs[`queue-item-${this.queueOrder[this.currentIndex]?.id}`]
     if (elem) {
       ;((elem as (Vue | Element)[])[0] as Vue).$el.scrollIntoView({
         behavior: 'smooth'
@@ -126,7 +104,14 @@ export default class MusicInfo extends mixins(ImageLoader, ModelHelper) {
     vxm.player.queueOrder = value
   }
 
+  private forceDefaultImg = false
+
+  private handleError() {
+    this.forceDefaultImg = true
+  }
+
   get computedImg() {
+    this.forceDefaultImg = false
     return this.getImgSrc(this.getValidImageHigh(this.currentSong))
   }
 

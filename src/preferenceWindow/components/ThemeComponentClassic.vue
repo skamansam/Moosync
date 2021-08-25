@@ -174,7 +174,7 @@ import { Component, Prop, Vue } from 'vue-property-decorator'
 @Component({
   components: {}
 })
-export default class ThemeComponent extends Vue {
+export default class ThemeComponentClassic extends Vue {
   @Prop({ default: 'theme' })
   private id!: string
 

@@ -1,5 +1,6 @@
 import { Component } from 'vue-property-decorator'
 import Vue from 'vue'
+import { vxm } from '../../../mainWindow/store/index';
 
 @Component
 export default class ThemeHandler extends Vue {
@@ -32,7 +33,12 @@ export default class ThemeHandler extends Vue {
     window.ThemeUtils.getActiveTheme().then(theme => this.setColorsToRoot(theme))
   }
 
+  public fetchSongView() {
+    window.ThemeUtils.getSongView().then((view) => vxm.themes.songView = view)
+  }
+
   mounted() {
+    this.fetchSongView()
     this.fetchThemeFromID()
   }
 }

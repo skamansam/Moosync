@@ -18,5 +18,5 @@ export default new Router({
       component: RouterLayout,
       children: routes,
     },
-  ],
+  ]
 })

@@ -57,7 +57,7 @@ export default class App extends mixins(ThemeHandler, PlayerControls) {
 
   private registerDevTools() {
     document.addEventListener('keydown', (e) => {
-      if (e.code === 'F12') {
+      if (e.code === 'F11') {
         window.WindowUtils.toggleDevTools(true)
       } else if (e.code === 'F5') {
         location.reload()
@@ -287,6 +287,7 @@ export default class App extends mixins(ThemeHandler, PlayerControls) {
 
   private listenThemeChanges() {
     window.ThemeUtils.listenThemeChanged((theme) => this.setColorsToRoot(theme))
+    window.ThemeUtils.listenSongViewChanged((menu) => (vxm.themes.songView = menu))
   }
 }
 </script>
@@ -314,4 +315,18 @@ body
 .appContainer
   width: 100%
   height: 100%
+
+.slide-fade-enter-active
+  transition: all .3s ease
+.slide-fade-leave-active
+  transition: all .2s ease
+.slide-fade-enter, .slide-fade-leave-to
+  transform: translateY(300px)
+  opacity: 0
+
+.animate__animated.animate__slideOutRight
+  --animate-duration: 0.5s
+
+.animate__animated.animate__slideInLeft
+  --animate-delay: 0.3s
 </style>

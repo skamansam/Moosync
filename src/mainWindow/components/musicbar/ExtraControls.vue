@@ -30,7 +30,6 @@ import { Component, Vue } from 'vue-property-decorator'
 import VolumeIcon from '@/icons/Volume.vue'
 import ExpandIcon from '@/icons/Expand.vue'
 import { vxm } from '@/mainWindow/store'
-import ThemeHandler from '@/utils/ui/mixins/ThemeHandler'
 
 @Component({
   components: {

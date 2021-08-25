@@ -1,6 +1,6 @@
 <template>
   <b-container fluid class="w-100">
-    <b-row class="d-flex h-100 no-gutters">
+    <b-row no-gutters class="d-flex h-100 main-container">
       <b-col class="h-100" cols="auto">
         <div class="h-100">
           <b-img
@@ -157,9 +157,6 @@ export default class SongDetails extends mixins(ImageLoader, ErrorHandler) {
   object-fit: cover
   aspect-ratio: 1 / 1
 
-.image-container
-  // max-width: 170px
-
 .text-container > .b-overlay > .bg-dark
   background-image: linear-gradient(0deg, rgba(0, 0, 0, 0.58), rgba(0, 0, 0, 0.58)), radial-gradient(50% 50% at 50% 50%, rgba(255, 255, 255, 0) 0%, rgba(0, 0, 0, 0.2) 100%) !important
   background-color: #00000000 !important
@@ -192,4 +189,7 @@ export default class SongDetails extends mixins(ImageLoader, ErrorHandler) {
 .provider-icon
   height: 20px
   width: 20px
+
+.main-container
+  padding: 15px
 </style>

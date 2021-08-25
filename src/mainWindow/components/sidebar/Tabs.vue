@@ -87,7 +87,7 @@ export default class Sidebar extends Vue {
   padding: 0.5rem 0rem 0.25rem 1rem
 
 .icon-transition
-  transition: 0.1s
+  transition: 0.2s
 
 .icon-padding-open.icon-transition:hover
   margin-left: 0.6rem

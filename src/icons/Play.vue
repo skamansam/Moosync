@@ -29,11 +29,3 @@ export default class PLayButton extends Vue {
   private play!: Boolean
 }
 </script>
-
-<style lang="sass" scoped>
-.fade-enter-active, .fade-leave-active
-  transition: opacity 0.2s
-
-.fade-enter, .fade-leave-to
-  opacity: 0
-</style>

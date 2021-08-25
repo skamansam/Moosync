@@ -52,7 +52,7 @@ export default class ContextMenuMixin extends mixins(PlayerControls, RemoteSong)
     return items
   }
 
-  private getSongContextMenu(exclude: string | undefined, refreshCallback: () => void, ...item: Song[]) {
+  private getSongContextMenu(exclude: string | undefined, refreshCallback: () => void, isRemote: boolean, ...item: Song[]) {
     const items = [
       {
         label: 'Play Now',
@@ -67,6 +67,13 @@ export default class ContextMenuMixin extends mixins(PlayerControls, RemoteSong)
         },
       },
       {
+        label: 'Add To Playlist',
+        children: this.populatePlaylistMenu(item, exclude),
+      },
+    ]
+
+    if (!isRemote) {
+      items.push(...[{
         label: 'Remove from Library',
         handler: async () => {
           try {
@@ -74,16 +81,11 @@ export default class ContextMenuMixin extends mixins(PlayerControls, RemoteSong)
           } catch (e) { console.error(e) }
           refreshCallback()
         }
-      },
-      {
+      }, {
         label: 'Add from URL',
         handler: () => bus.$emit(EventBus.SHOW_SONG_FROM_URL_MODAL, refreshCallback)
-      },
-      {
-        label: 'Add To Playlist',
-        children: this.populatePlaylistMenu(item, exclude),
-      },
-    ]
+      }])
+    }
     return items
   }
 
@@ -127,7 +129,7 @@ export default class ContextMenuMixin extends mixins(PlayerControls, RemoteSong)
   }
 
   private getPlaylistContentContextMenu(isRemote: boolean, refreshCallback: () => void, ...item: Song[]) {
-    const items = this.getSongContextMenu(undefined, refreshCallback, ...item)
+    const items = this.getSongContextMenu(undefined, refreshCallback, isRemote, ...item)
     if (isRemote) {
       items.push({
         label: 'Add Song to Library',
@@ -185,7 +187,7 @@ export default class ContextMenuMixin extends mixins(PlayerControls, RemoteSong)
     let items: { label: string, handler?: () => void }[] = []
     switch (options.type) {
       case 'SONGS':
-        items = this.getSongContextMenu(options.args.exclude, options.args.refreshCallback, ...options.args.songs)
+        items = this.getSongContextMenu(options.args.exclude, options.args.refreshCallback, false, ...options.args.songs)
         break
       case 'GENERAL_SONGS':
         items = this.getGeneralSongsContextMenu(options.args.refreshCallback)

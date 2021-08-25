@@ -5,6 +5,7 @@ import { PlayerStore } from './playerState'
 import { PlaylistStore } from '@/mainWindow/store/playlists'
 import { ProviderStore } from '@/mainWindow/store/providers'
 import { SyncStore } from '@/mainWindow/store/syncState'
+import { ThemeStore } from './themes';
 import Vue from 'vue'
 import Vuex from 'vuex'
 import { createPersist } from '@/utils/ui/store/persist'
@@ -20,6 +21,7 @@ export const store = new Vuex.Store({
     ...extractVuexModule(SyncStore),
     ...extractVuexModule(ProviderStore),
     ...extractVuexModule(NotifierStore),
+    ...extractVuexModule(ThemeStore),
   },
   plugins: [createPersist(paths)],
 })
@@ -30,4 +32,5 @@ export const vxm = {
   sync: createProxy(store, SyncStore),
   providers: createProxy(store, ProviderStore),
   notifier: createProxy(store, NotifierStore),
+  themes: createProxy(store, ThemeStore),
 }

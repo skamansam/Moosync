@@ -37,6 +37,14 @@ export function setActiveTheme(id: string) {
   saveSelectivePreference('activeTheme', id, false)
 }
 
+export function setSongView(menu: songMenu) {
+  saveSelectivePreference('songView', menu, false)
+}
+
+export function getSongView(): songMenu | undefined {
+  return loadSelectivePreference('songView', false, 'compact' as songMenu)
+}
+
 export function getActiveTheme() {
   const id = loadSelectivePreference('activeTheme', false) as string
   if (id) {
@@ -44,18 +52,18 @@ export function getActiveTheme() {
   }
 }
 
-export function saveSelectivePreference(key: string, value: any, isExtension?: boolean) {
+export function saveSelectivePreference(key: string, value: any, isExtension: boolean = false) {
   store.set(`prefs.${isExtension ? 'extension.' : ''}${key}`, value)
 }
 
-export function loadSelectivePreference(key?: string, isExtension?: boolean, defaultValue?: any) {
+export function loadSelectivePreference<T>(key?: string, isExtension: boolean = false, defaultValue?: T): T | undefined {
   try {
     const pref = store.get(`prefs.${isExtension ? 'extension.' : ''}${key}`, defaultValue)
     return pref
   } catch (e) {
     console.error(e)
   }
-  return ''
+  return undefined
 }
 
 export function setInitialInterfaceSettings() {

@@ -80,7 +80,10 @@ contextBridge.exposeInMainWorld('ThemeUtils', {
   getAllThemes: () => ipcRendererHolder.send(IpcEvents.PREFERENCES, { type: PreferenceEvents.GET_ALL_THEMES }),
   setActiveTheme: (id: string) => ipcRendererHolder.send(IpcEvents.PREFERENCES, { type: PreferenceEvents.SET_ACTIVE_THEME, params: { id } }),
   getActiveTheme: () => ipcRendererHolder.send(IpcEvents.PREFERENCES, { type: PreferenceEvents.GET_ACTIVE_THEME }),
+  setSongView: (menu: songMenu) => ipcRendererHolder.send(IpcEvents.PREFERENCES, { type: PreferenceEvents.SET_SONG_VIEW, params: { menu } }),
+  getSongView: () => ipcRendererHolder.send(IpcEvents.PREFERENCES, { type: PreferenceEvents.GET_SONG_VIEW }),
   listenThemeChanged: (callback: (themeId: ThemeDetails) => void) => ipcRendererHolder.on(PreferenceEvents.THEME_REFRESH, callback),
+  listenSongViewChanged: (callback: (menu: songMenu) => void) => ipcRendererHolder.on(PreferenceEvents.SONG_VIEW_REFRESH, callback),
 })
 
 contextBridge.exposeInMainWorld('WindowUtils', {
