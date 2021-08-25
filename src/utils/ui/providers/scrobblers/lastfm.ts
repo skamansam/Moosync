@@ -35,7 +35,6 @@ export class LastFMProvider {
 
         ; (async () => {
           for (const p of this.uninitializedQueue) {
-            console.log(p)
             await p()
           }
         })()
@@ -121,12 +120,10 @@ export class LastFMProvider {
           const token = url.searchParams.get('token')
           const resp = await this.populateRequest('GET', 'auth.getSession', undefined, token!)
           this._session = resp?.session?.key
-          console.log(resp)
 
           if (this._session) {
             window.Store.setSecure(KeytarService, this._session).then(() => {
               resolve(true)
-              console.log('resolved')
             })
             return
           }
@@ -189,7 +186,6 @@ export class LastFMProvider {
 
   public async getUserDetails() {
     const resp = await this.populateRequest('GET', 'user.getInfo')
-    console.log(resp)
     return resp?.user?.name
   }
 }

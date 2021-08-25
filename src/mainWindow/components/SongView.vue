@@ -82,7 +82,6 @@ export default class AllSongs extends mixins(PlayerControls, ModelHelper, Remote
   }
 
   private updateCoverDetails(items: Song[]) {
-    console.log(items)
     if (items) this.currentSong = items[items.length - 1]
     this.selected = items
     this.selectedCopy = items

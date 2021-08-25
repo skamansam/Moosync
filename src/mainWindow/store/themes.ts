@@ -8,7 +8,6 @@ export class ThemeStore extends VuexModule.With({ namespaced: 'themes' }) {
   }
 
   set songView(menu: songMenu) {
-    console.log(menu)
     this._songView = menu
   }
 }
