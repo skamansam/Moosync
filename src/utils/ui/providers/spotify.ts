@@ -122,6 +122,7 @@ export class SpotifyProvider extends GenericProvider {
       song_coverPath_high: (track.album.images[0]) ? track.album.images[0].url : '',
       artists: track.artists.map(artist => artist.name),
       duration: track.duration_ms / 1000,
+      date_added: Date.now().toString(),
       type: 'SPOTIFY'
     }
   }

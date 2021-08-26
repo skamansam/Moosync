@@ -53,6 +53,7 @@ export class DBUtils {
       deviceno: '',
       type: dbSong.type,
       url: dbSong.url,
+      date_added: dbSong.date_added,
       playbackUrl: dbSong.playbackUrl
     }
   }
@@ -83,7 +84,8 @@ export class DBUtils {
       deviceno: song.deviceno,
       type: song.type,
       url: song.url,
-      playbackUrl: song.playbackUrl
+      playbackUrl: song.playbackUrl,
+      date_added: Date.now().toString()
     }
   }
 

@@ -14,6 +14,7 @@ export function toSong(...item: YoutubeItem[]): Song[] {
       artists: s.yt_artist ? s.yt_artist.trim().split(/,|&/) : [],
       duration: s.duration,
       url: s._id.trim(),
+      date_added: Date.now().toString(),
       type: 'YOUTUBE',
     })
   }

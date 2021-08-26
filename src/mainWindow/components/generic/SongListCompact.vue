@@ -52,7 +52,7 @@
                   {{ item._id === currentSong && currentSong._id ? 'Now Playing' : formattedDuration(item.duration) }}
                 </b-col>
                 <b-col cols="auto" align-self="center" class="button-icon ml-5">
-                  <AddToQueue @click.native="onRowDoubleClicked(item)"
+                  <AddToQueue title="Add song to queue" @click.native="onRowDoubleClicked(item)"
                 /></b-col>
                 <b-col cols="auto" align-self="center" class="ml-5" @click="onRowContext(arguments[0], item)">
                   <Ellipsis

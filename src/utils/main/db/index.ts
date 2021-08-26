@@ -28,23 +28,29 @@ class SongDBInstance extends DBUtils {
     return
   }
 
+  private getCountBySong(bridge: string, column: string, song: string) {
+    const data = this.db.query(`SELECT ${column} FROM ${bridge} WHERE song = ?`, song) as any[]
+    const counts = []
+    for (const i of data) {
+      counts.push(...this.db.query(`SELECT count(id) as count, ${column} FROM ${bridge} WHERE ${column} = ?`, i[column]))
+    }
+
+    return counts
+  }
+
   public async removeSong(song_id: string) {
-    this.db.transaction(async (song_id: string) => {
-      // Selecting multiple times to also count occurrence
-      const album_ids: { count: number, album: string } = this.db.queryFirstRow(
-        'SELECT count(id) as count, album FROM album_bridge WHERE album = (SELECT album FROM album_bridge WHERE song = ?)',
-        song_id
-      ) as { count: number, album: string }
-      const artist_ids: { count: number, artist: string } = this.db.queryFirstRow(
-        'SELECT count(id) as count, artist FROM artists_bridge WHERE artist = (SELECT artist FROM artists_bridge WHERE song = ?)',
-        song_id
-      ) as { count: number, artist: string }
+    const pathsToRemove: string[] = []
+    this.db.transaction((song_id: string) => {
+      const album_ids = this.getCountBySong('album_bridge', 'album', song_id)
+      const artist_ids = this.getCountBySong('artists_bridge', 'artist', song_id)
+
+      console.log(artist_ids)
 
       const songCoverPath_low = this.db.queryFirstCell(`SELECT song_coverPath_low from allsongs WHERE _id = ?`, song_id)
       const songCoverPath_high = this.db.queryFirstCell(`SELECT song_coverPath_high from allsongs WHERE _id = ?`, song_id)
 
-      if (songCoverPath_low) await fsP.rm(songCoverPath_low, { force: true })
-      if (songCoverPath_high) await fsP.rm(songCoverPath_high, { force: true })
+      if (songCoverPath_low) pathsToRemove.push(songCoverPath_low)
+      if (songCoverPath_high) pathsToRemove.push(songCoverPath_high)
 
       this.db.delete('artists_bridge', { song: song_id })
       this.db.delete('album_bridge', { song: song_id })
@@ -52,27 +58,37 @@ class SongDBInstance extends DBUtils {
       this.db.delete('playlist_bridge', { song: song_id })
       this.db.delete('allsongs', { _id: song_id })
 
-      if (album_ids.count == 1) {
-        const album: Album = (await this.getEntityByOptions({
-          album: {
-            album_id: album_ids.album
-          }
-        }) as Album[])[0]
-        this.db.delete('albums', { album_id: album_ids.album })
-        if (album?.album_coverPath_low) await fsP.rm(album.album_coverPath_low, { force: true }).catch(err => console.error(err))
-        if (album?.album_coverPath_high) await fsP.rm(album.album_coverPath_high, { force: true }).catch(err => console.error(err))
+      for (const id of album_ids) {
+        if (id.count === 1) {
+          const album: Album = (this.getEntityByOptions({
+            album: {
+              album_id: id.album
+            }
+          }) as Album[])[0]
+          this.db.delete('albums', { album_id: id.album })
+          if (album?.album_coverPath_low) pathsToRemove.push(album.album_coverPath_low)
+          if (album?.album_coverPath_high) pathsToRemove.push(album.album_coverPath_high)
+        }
+      }
 
+      for (const id of artist_ids) {
+        if (id.count === 1) {
+          const artist = (this.getEntityByOptions({
+            artist: {
+              artist_id: id.artist
+            }
+          }) as artists[])[0]
+          this.db.delete('artists', { artist_id: id.artist })
+          if (artist?.artist_coverPath) pathsToRemove.push(artist.artist_coverPath)
+        } else {
+          console.log((artist_ids))
+        }
       }
-      if (artist_ids.count == 1) {
-        const artist = (await this.getEntityByOptions({
-          artist: {
-            artist_id: artist_ids.artist
-          }
-        }) as artists[])[0]
-        this.db.delete('artists', { artist_id: artist_ids.artist })
-        if (artist?.artist_coverPath) await fsP.rm(artist.artist_coverPath, { force: true }).catch(err => console.error(err))
-      }
-    })(song_id)
+    }).immediate(song_id)
+
+    for (const path of pathsToRemove) {
+      await fsP.rm(path, { force: true })
+    }
   }
 
   public async searchAll(term: string, exclude?: string[]): Promise<SearchResult> {
@@ -129,7 +145,7 @@ class SongDBInstance extends DBUtils {
     return { where: '', args: [] }
   }
 
-  public async getSongByOptions(options?: SongAPIOptions, exclude?: string[]) {
+  public getSongByOptions(options?: SongAPIOptions, exclude?: string[]) {
     const { where, args } = this.populateWhereQuery(options)
 
     const songs: marshaledSong[] = this.db.query(
@@ -157,7 +173,7 @@ class SongDBInstance extends DBUtils {
     }
   }
 
-  public async getEntityByOptions<T>(options: EntityApiOptions): Promise<T[]> {
+  public getEntityByOptions<T>(options: EntityApiOptions): T[] {
     let isFirst = true
     const addANDorOR = () => {
       const str = (!isFirst ? ((options.inclusive ? 'AND' : 'OR')) : '')

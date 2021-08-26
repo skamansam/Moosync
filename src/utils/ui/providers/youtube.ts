@@ -169,6 +169,7 @@ export class YoutubeProvider extends GenericProvider {
             album_name: 'Misc',
           },
           date: new Date(v.snippet.publishedAt).toISOString().slice(0, 10),
+          date_added: Date.now().toString(),
           duration: moment.duration(v.contentDetails.duration).asSeconds(),
           url: v.id,
           type: 'YOUTUBE'
