@@ -1,3 +1,4 @@
+import { Size } from 'electron/main';
 import Store from 'electron-store';
 import { app } from 'electron';
 import { enableStartup } from '../autoLaunch';
@@ -43,6 +44,15 @@ export function setSongView(menu: songMenu) {
 
 export function getSongView(): songMenu | undefined {
   return loadSelectivePreference('songView', false, 'compact' as songMenu)
+}
+
+export function setWindowSize(windowName: string, windowSize: { width: number, height: number }) {
+  store.set(`window.${windowName}`, windowSize)
+}
+
+export function getWindowSize(windowName: string, defaultValue: { width: number, height: number }) {
+  console.log(store.get(`window.${windowName}`))
+  return store.get(`window.${windowName}`, defaultValue)
 }
 
 export function getActiveTheme() {

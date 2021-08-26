@@ -1,4 +1,5 @@
 import { BrowserWindow, Menu, Tray, app, dialog, protocol } from 'electron';
+import { getWindowSize, setWindowSize } from './db/preferences';
 import installExtension, { VUEJS_DEVTOOLS } from 'electron-devtools-installer';
 
 import { BrowserWindowConstructorOptions } from 'electron/main';
@@ -42,8 +43,7 @@ export class WindowHandler {
 
   private get mainWindowProps(): BrowserWindowConstructorOptions {
     return {
-      width: 1016,
-      height: 653,
+      ...getWindowSize('mainWindow', { width: 1016, height: 653 }),
       minHeight: 653,
       minWidth: 1016,
       ...this.baseWindowProps
@@ -52,8 +52,7 @@ export class WindowHandler {
 
   private get prefWindowProps(): BrowserWindowConstructorOptions {
     return {
-      width: 840,
-      height: 653,
+      ...getWindowSize('prefWindow', { width: 840, height: 653 }),
       minHeight: 653,
       minWidth: 840,
       ...this.baseWindowProps
@@ -140,6 +139,9 @@ export class WindowHandler {
       window.webContents.closeDevTools()
     }
 
+    const [width, height] = window.getSize()
+    setWindowSize(isMainWindow ? 'mainWindow' : 'prefWindow', { width, height })
+
     if (isMainWindow) {
       event.preventDefault()
       if (!AppExitHandler._isQuitting && AppExitHandler._minimizeToTray) {
@@ -149,6 +151,8 @@ export class WindowHandler {
         app.exit()
       }
     }
+
+
   }
 
   private handleWindowShow(window: BrowserWindow) {

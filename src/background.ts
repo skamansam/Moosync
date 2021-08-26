@@ -110,7 +110,7 @@ app.on('before-quit', () => {
 // Some APIs can only be used after this event occurs.
 app.on('ready', async () => {
   registerIpcChannels()
-  await setInitialInterfaceSettings()
+  setInitialInterfaceSettings()
 
   await _windowHandler.installExtensions()
   _windowHandler.registerProtocol('media')
