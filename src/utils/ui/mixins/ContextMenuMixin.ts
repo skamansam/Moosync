@@ -19,6 +19,25 @@ export default class ContextMenuMixin extends mixins(PlayerControls, RemoteSong)
     await window.DBUtils.addToPlaylist(playlist_id, ...songs)
   }
 
+  private getSortByMenu(sortCallback: sortCallback, currentSort: sortOptions) {
+    const menu: MenuItem[] = [
+      {
+        label: 'Sort by',
+        children: [
+          {
+            label: `Name ${currentSort.type === 'name' ? (currentSort.asc ? '▲' : '▼') : ''}`,
+            handler: () => sortCallback({ type: 'name', asc: (currentSort.type === 'name' && !currentSort.asc) })
+          },
+          {
+            label: `Date added ${currentSort.type === 'date' ? (currentSort.asc ? '▲' : '▼') : ''}`,
+            handler: () => sortCallback({ type: 'date', asc: (currentSort.type === 'date' && !currentSort.asc) })
+          }
+        ]
+      }
+    ]
+    return menu
+  }
+
   private populatePlaylistMenu(item: Song[], exclude?: string): MenuItem[] {
     const menu: MenuItem[] = [
       {
@@ -42,18 +61,23 @@ export default class ContextMenuMixin extends mixins(PlayerControls, RemoteSong)
     return menu
   }
 
-  private getGeneralSongsContextMenu(refreshCallback: () => void) {
-    const items = [
-      {
-        label: 'Add from URL',
-        handler: () => bus.$emit(EventBus.SHOW_SONG_FROM_URL_MODAL, refreshCallback)
-      }
-    ]
+  private getGeneralSongsContextMenu(refreshCallback: () => void, sort?: sort) {
+    const items: MenuItem[] = []
+
+    if (sort) {
+      items.push(...this.getSortByMenu(sort.callback, sort.current))
+    }
+
+    items.push({
+      label: 'Add from URL',
+      handler: () => bus.$emit(EventBus.SHOW_SONG_FROM_URL_MODAL, refreshCallback)
+    })
+
     return items
   }
 
-  private getSongContextMenu(exclude: string | undefined, refreshCallback: () => void, isRemote: boolean, ...item: Song[]) {
-    const items = [
+  private getSongContextMenu(exclude: string | undefined, refreshCallback: () => void, isRemote: boolean, sort: sort | undefined, ...item: Song[]) {
+    const items: MenuItem[] = [
       {
         label: 'Play Now',
         handler: () => {
@@ -71,6 +95,10 @@ export default class ContextMenuMixin extends mixins(PlayerControls, RemoteSong)
         children: this.populatePlaylistMenu(item, exclude),
       },
     ]
+
+    if (sort) {
+      items.push(...this.getSortByMenu(sort.callback, sort.current))
+    }
 
     if (!isRemote) {
       items.push(...[{
@@ -128,8 +156,8 @@ export default class ContextMenuMixin extends mixins(PlayerControls, RemoteSong)
     return items
   }
 
-  private getPlaylistContentContextMenu(isRemote: boolean, refreshCallback: () => void, ...item: Song[]) {
-    const items = this.getSongContextMenu(undefined, refreshCallback, isRemote, ...item)
+  private getPlaylistContentContextMenu(isRemote: boolean, sort: sort | undefined, refreshCallback: () => void, ...item: Song[]) {
+    const items = this.getSongContextMenu(undefined, refreshCallback, isRemote, sort, ...item)
     if (isRemote) {
       items.push({
         label: 'Add Song to Library',
@@ -187,10 +215,10 @@ export default class ContextMenuMixin extends mixins(PlayerControls, RemoteSong)
     let items: { label: string, handler?: () => void }[] = []
     switch (options.type) {
       case 'SONGS':
-        items = this.getSongContextMenu(options.args.exclude, options.args.refreshCallback, false, ...options.args.songs)
+        items = this.getSongContextMenu(options.args.exclude, options.args.refreshCallback, false, options.args.sortOptions, ...options.args.songs)
         break
       case 'GENERAL_SONGS':
-        items = this.getGeneralSongsContextMenu(options.args.refreshCallback)
+        items = this.getGeneralSongsContextMenu(options.args.refreshCallback, options.args.sortOptions)
         break
       case 'YOUTUBE':
         items = this.getYoutubeContextMenu(...options.args.ytItems)
@@ -202,7 +230,7 @@ export default class ContextMenuMixin extends mixins(PlayerControls, RemoteSong)
         items = this.getGeneralPlaylistMenu(options.args.refreshCallback)
         break
       case 'PLAYLIST_CONTENT':
-        items = this.getPlaylistContentContextMenu(options.args.isRemote, options.args.refreshCallback, ...options.args.songs)
+        items = this.getPlaylistContentContextMenu(options.args.isRemote, options.args.sortOptions, options.args.refreshCallback, ...options.args.songs)
         break
       case 'QUEUE_ITEM':
         items = this.getQueueItemMenu(options.args.isRemote, options.args.refreshCallback, options.args.song)

@@ -24,7 +24,7 @@ export class SearchChannel implements IpcChannelInterface {
   }
 
   private async searchAll(event: Electron.IpcMainEvent, request: IpcRequest) {
-    const preferences = await loadPreferences()
+    const preferences = loadPreferences()
     if (request.params && request.params.searchTerm) {
       SongDB.searchAll(request.params.searchTerm, getDisabledPaths(preferences.musicPaths))
         .then((data) => {

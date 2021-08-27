@@ -42,7 +42,11 @@ export default class AllSongs extends mixins(ContextMenuMixin) {
   }
 
   private async requestSongs() {
-    this.songList = await window.SearchUtils.searchSongsByOptions()
+    this.songList = await window.SearchUtils.searchSongsByOptions({ sortBy: vxm.themes.sortBy })
+  }
+
+  private sort(options: sortOptions) {
+    vxm.themes.sortBy = options
   }
 
   private getSongMenu(event: Event, songs: Song[], exclude: string | undefined) {
@@ -51,6 +55,7 @@ export default class AllSongs extends mixins(ContextMenuMixin) {
       args: {
         songs: songs,
         exclude: exclude,
+        sortOptions: { callback: this.sort, current: vxm.themes.sortBy },
         refreshCallback: () => (this.songList = arrayDiff(this.songList, songs))
       }
     })

@@ -4,10 +4,12 @@ type ContextMenuArgs = {
     exclude: string | undefined
     refreshCallback: () => void
     songs: Song[]
+    sortOptions?: sort
   }
 } | {
   type: 'GENERAL_SONGS'
   args: {
+    sortOptions?: sort
     refreshCallback: () => void
   }
 } | {
@@ -32,6 +34,7 @@ type ContextMenuArgs = {
   args: {
     isRemote: boolean,
     refreshCallback: () => void
+    sortOptions?: sort
     songs: Song[]
   }
 } | {
@@ -42,3 +45,7 @@ type ContextMenuArgs = {
     song: Song
   }
 }
+
+type sortOptions = import('@moosync/moosync-types').sortOptions
+type sort = { callback: sortCallback, current: sortOptions }
+type sortCallback = (options: sortOptions) => void

@@ -23,6 +23,7 @@ import SongView from '@/mainWindow/components/SongView.vue'
 import { mixins } from 'vue-class-component'
 import ContextMenuMixin from '@/utils/ui/mixins/ContextMenuMixin'
 import { arrayDiff } from '@/utils/common'
+import { vxm } from '@/mainWindow/store'
 
 @Component({
   components: {
@@ -66,8 +67,13 @@ export default class SingleAlbumView extends mixins(ContextMenuMixin) {
     this.songList = await window.SearchUtils.searchSongsByOptions({
       genre: {
         genre_id: this.$route.params.id
-      }
+      },
+      sortBy: vxm.themes.sortBy
     })
+  }
+
+  private sort(options: sortOptions) {
+    vxm.themes.sortBy = options
   }
 
   private getSongMenu(event: Event, songs: Song[], exclude: string | undefined) {
@@ -76,6 +82,8 @@ export default class SingleAlbumView extends mixins(ContextMenuMixin) {
       args: {
         songs: songs,
         exclude: exclude,
+        sortOptions: { callback: this.sort, current: vxm.themes.sortBy },
+
         refreshCallback: () => (this.songList = arrayDiff(this.songList, songs))
       }
     })

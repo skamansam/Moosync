@@ -27,7 +27,7 @@
 </template>
 
 <script lang="ts">
-import { Component, Prop } from 'vue-property-decorator'
+import { Component, Prop, Watch } from 'vue-property-decorator'
 import { mixins } from 'vue-class-component'
 import PlayerControls from '@/utils/ui/mixins/PlayerControls'
 import ModelHelper from '@/utils/ui/mixins/ModelHelper'
@@ -37,6 +37,7 @@ import { vxm } from '../store'
 import SongViewClassic from '@/mainWindow/components/generic/SongViewClassic.vue'
 import SongViewCompact from '@/mainWindow/components/generic/SongViewCompact.vue'
 import 'animate.css'
+import { sortSongList } from '@/utils/common'
 
 @Component({
   components: {
@@ -48,8 +49,37 @@ export default class AllSongs extends mixins(PlayerControls, ModelHelper, Remote
   @Prop({ default: () => [] })
   private songList!: Song[]
 
+  private ignoreSort = false
+
   @Prop({ default: false })
   private tableBusy!: boolean
+
+  private sort(sortOptions: sortOptions) {
+    if (!this.ignoreSort) {
+      sortSongList(this.songList, sortOptions)
+      this.ignoreSort = true
+    } else {
+      this.ignoreSort = false
+    }
+  }
+
+  onSortChange() {
+    vxm.themes.$watch(
+      'sortBy',
+      (sortOptions: sortOptions) => {
+        this.sort(sortOptions)
+      },
+      { deep: true, immediate: true }
+    )
+  }
+
+  @Watch('songList') onSongListChange() {
+    this.sort(vxm.themes.sortBy)
+  }
+
+  mounted() {
+    this.onSortChange()
+  }
 
   private get songView() {
     return vxm.themes.songView === 'compact' ? 'SongViewCompact' : 'SongViewClassic'

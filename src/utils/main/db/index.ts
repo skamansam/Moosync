@@ -44,8 +44,6 @@ class SongDBInstance extends DBUtils {
       const album_ids = this.getCountBySong('album_bridge', 'album', song_id)
       const artist_ids = this.getCountBySong('artists_bridge', 'artist', song_id)
 
-      console.log(artist_ids)
-
       const songCoverPath_low = this.db.queryFirstCell(`SELECT song_coverPath_low from allsongs WHERE _id = ?`, song_id)
       const songCoverPath_high = this.db.queryFirstCell(`SELECT song_coverPath_high from allsongs WHERE _id = ?`, song_id)
 
@@ -132,7 +130,7 @@ class SongDBInstance extends DBUtils {
       }
 
       for (const [key, _] of Object.entries(options)) {
-        if (key != 'inclusive') {
+        if (key !== 'inclusive' && key !== 'sortBy') {
           const tableName = this.getTableByProperty(key as keyof SongAPIOptions)
           for (const [innerKey, innerValue] of Object.entries(options[key as keyof SongAPIOptions]!)) {
             where += `${addANDorOR()} ${tableName}.${innerKey} LIKE ?`
@@ -140,9 +138,21 @@ class SongDBInstance extends DBUtils {
           }
         }
       }
+
+      if (args.length === 0) {
+        return { where: '', args: [] }
+      }
+
       return { where, args }
     }
     return { where: '', args: [] }
+  }
+
+  private addOrderClause(sortBy?: sortOptions) {
+    if (sortBy) {
+      return `ORDER BY ${sortBy.type === 'name' ? 'title' : 'date_added'} ${sortBy.asc ? 'ASC' : 'DESC'}`
+    }
+    return ''
   }
 
   public getSongByOptions(options?: SongAPIOptions, exclude?: string[]) {
@@ -152,7 +162,7 @@ class SongDBInstance extends DBUtils {
       `SELECT *, ${this.addGroupConcatClause()} FROM allsongs
       ${this.addLeftJoinClause(undefined, 'allsongs')}
         ${where}
-        ${this.addExcludeWhereClause(args.length === 0, exclude)} GROUP BY allsongs._id`,
+        ${this.addExcludeWhereClause(args.length === 0, exclude)} GROUP BY allsongs._id ${this.addOrderClause(options?.sortBy)}`,
       ...args
     )
     return this.batchUnmarshal(songs)

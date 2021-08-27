@@ -197,10 +197,6 @@ export default class SongListCompact extends mixins(ImgLoader) {
     )
   }
 
-  private sortContent(): void {
-    // TODO: Sort content without b-table sort since we have table resizers
-  }
-
   // For some reason table isn't rerendered on window size change through maximize and minimize functions
   private rerenderTable() {
     this.refreshKey = !this.refreshKey

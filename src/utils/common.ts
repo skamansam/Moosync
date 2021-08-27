@@ -15,3 +15,19 @@ export function convertDuration(n: number) {
 export function getVersion(verS: string) {
   return verS.split('').map(x => x.charCodeAt(0)).reduce((a, b) => a + b)
 }
+
+export function sortSongList(songList: Song[], options: sortOptions) {
+  songList.sort((a, b) => {
+    let field: keyof Song = 'title'
+    if (options.type === 'name') {
+      field = 'title'
+    } else if (options.type === 'date') {
+      field = 'date_added'
+    }
+    let compare = a[field].localeCompare(b[field])
+    if (!options.asc) {
+      compare = -compare
+    }
+    return compare
+  })
+}
