@@ -10,18 +10,32 @@ import { vxm } from '@/mainWindow/store';
 @Component
 export default class SyncMixin extends mixins(ModelHelper, ImgLoader) {
   private isFetching: boolean = false
-  private peerHolder = new SyncHolder('http://retardnetwork.cf:4000')
+  private peerHolder: SyncHolder = new SyncHolder()
   private isRemoteStateChange: boolean = false
   private isRemoteTrackChange: boolean = false
   public setSongSrcCallback!: (src: string) => void
   public onSeekCallback!: (time: number) => void
 
+  private _resolve!: () => void
+  private _reject!: (r: any) => void
+  private initialized = new Promise<void>(this.attachPromise.bind(this))
+
+  private attachPromise(resolve: () => void, reject: (r: any) => void) {
+    this._resolve = resolve
+    this._reject = reject
+  }
+
   created() {
-    this.peerHolder.start()
+    // this.peerHolder.initialize().then(() => {
+    //   this.peerHolder.start()
+    //   this._resolve()
+    // }).catch(err => {
+    //   this._reject(err)
+    // })
   }
 
   mounted() {
-    this.syncListeners()
+    // this.initialized.then(this.syncListeners).catch(err => console.error(err))
   }
 
   get isWatching() {

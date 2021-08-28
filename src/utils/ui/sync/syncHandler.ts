@@ -16,11 +16,11 @@ export class SyncHolder {
       coverChannel?: RTCDataChannel
       streamChannel?: RTCDataChannel
     }
-  } = {}
-  private socketConnection: Socket
+  } = { }
+  private socketConnection?: Socket
   private mode: PeerMode = PeerMode.UNDEFINED
   private BroadcasterID: string = ''
-  private isNegotiating: { [id: string]: boolean } = {}
+  private isNegotiating: { [id: string]: boolean } = { }
   public socketID: string = ''
   private connectionOptions: Partial<ManagerOptions> = {
     forceNew: true,
@@ -30,6 +30,8 @@ export class SyncHolder {
     transports: ['websocket'],
   }
   private isListeningReady: boolean = false
+
+  private initialized: boolean = false
 
   private STUN = {
     urls: [
@@ -80,11 +82,52 @@ export class SyncHolder {
   private getLocalSong?: (songID: string) => Promise<ArrayBuffer | null>
   private getLocalCover?: (songID: string) => Promise<ArrayBuffer | null>
 
-  constructor(url?: string) {
-    this.socketConnection = io(url ? url : 'http://localhost:4000', this.connectionOptions)
-    this.socketConnection.on('connect', () => (this.socketID = this.socketConnection.id))
-    this.handleSocketError()
-    this.joinedRoom()
+  constructor() {
+    const handler = {
+      get: function (obj: any, methodName: any) {
+        return typeof obj[methodName] !== "function"
+          ? obj[methodName]
+          : function (...args: any[]) {
+            if (obj.isInitialized(methodName)) {
+              return obj[methodName].apply(obj, ...args);
+            }
+          };
+      },
+    };
+
+    return new Proxy(this, handler);
+  }
+
+  public isInitialized(methodName: keyof SyncHolder) {
+    if (methodName !== 'isInitialized' && methodName !== 'initialize') {
+      if (!this.socketConnection) {
+        throw new Error("Handler not initialized, call initialize()")
+      }
+
+      return this.initialized
+    }
+    return true
+  }
+
+  public async initialize(url?: string): Promise<boolean> {
+    return new Promise<boolean>((resolve, reject) => {
+      this.socketConnection = io(url ? url : 'http://localhost:4000', this.connectionOptions)
+      this.socketConnection.on('connect', () => {
+        this.socketID = this.socketConnection!.id
+        this.initialized = true
+        resolve(true)
+      })
+
+      let tries = 0
+
+      this.socketConnection?.on('connect_error', (error: Error) => {
+        tries++
+        if (tries === 3)
+          reject(error)
+      })
+
+      this.joinedRoom()
+    })
   }
 
   set onJoinedRoom(callback: (id: string) => void) {
@@ -171,13 +214,6 @@ export class SyncHolder {
     return this.mode
   }
 
-  private handleSocketError() {
-    // TODO: Display failure on UI
-    this.socketConnection.on('connect_error', (error: Error) => {
-      console.error(`Websocket failed to connect: ${error}`)
-    })
-  }
-
   private handleCoverChannel(channel: RTCDataChannel) {
     const fragmentReceiver = new FragmentReceiver(this.onRemoteCoverCallback)
 
@@ -195,7 +231,7 @@ export class SyncHolder {
   }
 
   private addRemoteCandidate() {
-    this.socketConnection.on('candidate', (id: string, candidate: RTCIceCandidate) => {
+    this.socketConnection?.on('candidate', (id: string, candidate: RTCIceCandidate) => {
       this.peerConnection[id].peer!.addIceCandidate(new RTCIceCandidate(candidate))
     })
   }
@@ -203,13 +239,13 @@ export class SyncHolder {
   private onLocalCandidate(id: string, peer: RTCPeerConnection) {
     peer.onicecandidate = (event) => {
       if (event.candidate) {
-        this.socketConnection.emit('candidate', id, event.candidate)
+        this.socketConnection?.emit('candidate', id, event.candidate)
       }
     }
   }
 
   private joinedRoom() {
-    this.socketConnection.on('joinedRoom', (roomID: string, isCreator: boolean) => {
+    this.socketConnection?.on('joinedRoom', (roomID: string, isCreator: boolean) => {
       this.onJoinedRoomCallback ? this.onJoinedRoomCallback(roomID) : null
       if (isCreator) {
         const song = this.getCurrentSong ? this.getCurrentSong() : null
@@ -260,7 +296,7 @@ export class SyncHolder {
   }
 
   public createRoom() {
-    this.socketConnection.emit('createRoom')
+    this.socketConnection?.emit('createRoom')
   }
 
   private onStream(id: string, peer: RTCPeerConnection) {
@@ -285,7 +321,7 @@ export class SyncHolder {
   }
 
   public joinRoom(id: string) {
-    this.socketConnection.emit('joinRoom', id)
+    this.socketConnection?.emit('joinRoom', id)
   }
 
   /**
@@ -299,7 +335,7 @@ export class SyncHolder {
       return
     }
     this.isListeningReady = true
-    this.socketConnection.emit('requestReady')
+    this.socketConnection?.emit('requestReady')
   }
 
   /**
@@ -308,17 +344,17 @@ export class SyncHolder {
    * [Watcher Method]
    */
   private listenReadyRequest() {
-    this.socketConnection.on('requestReady', () => {
+    this.socketConnection?.on('requestReady', () => {
       this.onReadyRequestedCallback ? this.onReadyRequestedCallback(true) : null
     })
   }
 
   private listenPrefetch() {
-    this.socketConnection.on('addToPrefetch', (prefetch: prefetchData) => {
+    this.socketConnection?.on('addToPrefetch', (prefetch: prefetchData) => {
       this.onPrefetchAddedCallback ? this.onPrefetchAddedCallback(prefetch) : null
     })
 
-    this.socketConnection.on('setPrefetch', (prefetch: prefetchData[]) => {
+    this.socketConnection?.on('setPrefetch', (prefetch: prefetchData[]) => {
       this.onPrefetchSetCallback ? this.onPrefetchSetCallback(prefetch) : null
     })
   }
@@ -339,11 +375,11 @@ export class SyncHolder {
    * Listen to events related to fetching of song and cover
    */
   private listenRequests() {
-    this.socketConnection.on('requestedSong', (id: string, songID: string) => {
+    this.socketConnection?.on('requestedSong', (id: string, songID: string) => {
       this.sendSongBuffer(id, songID)
     })
 
-    this.socketConnection.on('requestedCover', (id: string, songID: string) => {
+    this.socketConnection?.on('requestedCover', (id: string, songID: string) => {
       this.sendCoverBuffer(id, songID)
     })
   }
@@ -352,11 +388,11 @@ export class SyncHolder {
    * Listen to queue related events
    */
   private listenQueue() {
-    this.socketConnection.on('queueSet', (value: string[]) => {
+    this.socketConnection?.on('queueSet', (value: string[]) => {
       this.onQueueSetCallback ? this.onQueueSetCallback(value) : null
     })
 
-    this.socketConnection.on('queueAdd', (value: string) => {
+    this.socketConnection?.on('queueAdd', (value: string) => {
       this.onQueueAddCallback ? this.onQueueAddCallback(value) : null
     })
   }
@@ -367,7 +403,7 @@ export class SyncHolder {
    * [Broadcaster method]
    */
   private listenPlayRequests() {
-    this.socketConnection.on('requestedPlay', (songIndex: number) => {
+    this.socketConnection?.on('requestedPlay', (songIndex: number) => {
       this.playRequestedSongCallback ? this.playRequestedSongCallback(songIndex) : null
     })
   }
@@ -376,7 +412,7 @@ export class SyncHolder {
    * Listens for track change
    */
   private listenTrackChange() {
-    this.socketConnection.on('trackChange', (metadata: Song, from: string, song_index: number) => {
+    this.socketConnection?.on('trackChange', (metadata: Song, from: string, song_index: number) => {
       this.onRemoteTrackInfoCallback ? this.onRemoteTrackInfoCallback(metadata, from, song_index) : null
     })
   }
@@ -386,7 +422,7 @@ export class SyncHolder {
    * [Broadcaster Method]
    */
   private listenPeerReady() {
-    this.socketConnection.on('ready', (id: string) => {
+    this.socketConnection?.on('ready', (id: string) => {
       if (this.isListeningReady) {
         this.setPeerReady(id)
         this.checkAllReady()
@@ -399,7 +435,7 @@ export class SyncHolder {
    * [Watcher method]
    */
   private listenAllReady() {
-    this.socketConnection.on('allReady', () => {
+    this.socketConnection?.on('allReady', () => {
       this.onAllReadyCallback ? this.onAllReadyCallback() : null
       this.onPlayerStateChangeCallback ? this.onPlayerStateChangeCallback('PLAYING') : null
     })
@@ -412,7 +448,7 @@ export class SyncHolder {
    */
   private checkAllReady() {
     if (this.readyPeers.length == Object.keys(this.peerConnection).length) {
-      this.socketConnection.emit('allReady')
+      this.socketConnection?.emit('allReady')
       this.readyPeers = []
       this.isListeningReady = false
       this.onPlayerStateChangeCallback ? this.onPlayerStateChangeCallback('PLAYING') : null
@@ -424,7 +460,7 @@ export class SyncHolder {
    * Listens to websocket events for change in playerState
    */
   private listenPlayerState() {
-    this.socketConnection.on('playerStateChange', (state: PlayerState) => {
+    this.socketConnection?.on('playerStateChange', (state: PlayerState) => {
       this.onPlayerStateChangeCallback ? this.onPlayerStateChangeCallback(state) : null
     })
   }
@@ -433,7 +469,7 @@ export class SyncHolder {
    * Listens to websocket events for seek
    */
   private listenSeek() {
-    this.socketConnection.on('forceSeek', (time: number) => {
+    this.socketConnection?.on('forceSeek', (time: number) => {
       this.onSeekCallback ? this.onSeekCallback(time) : null
     })
   }
@@ -444,7 +480,7 @@ export class SyncHolder {
    * @param songID id of song
    */
   public requestSong(id: string, songID: string) {
-    this.socketConnection.emit('requestSong', id, songID)
+    this.socketConnection?.emit('requestSong', id, songID)
   }
 
   /**
@@ -453,7 +489,7 @@ export class SyncHolder {
    * @param songID id of song to which track belongs to
    */
   public requestCover(id: string, songID: string) {
-    this.socketConnection.emit('requestCover', id, songID)
+    this.socketConnection?.emit('requestCover', id, songID)
   }
 
   /**
@@ -465,7 +501,7 @@ export class SyncHolder {
    * @param song_index
    */
   public requestPlay(song_index: number) {
-    this.socketConnection.emit('requestPlay', song_index)
+    this.socketConnection?.emit('requestPlay', song_index)
   }
 
   /**
@@ -474,7 +510,7 @@ export class SyncHolder {
    * @param song to be added to queue
    */
   public addToQueue(song: Song) {
-    this.socketConnection.emit('prefetch', this.stripToPrefetch(song))
+    this.socketConnection?.emit('prefetch', this.stripToPrefetch(song))
   }
 
   /**
@@ -483,14 +519,14 @@ export class SyncHolder {
    * @param song to be played
    */
   public addToQueueAndPlay(song: Song) {
-    this.socketConnection.emit('prefetchAndPlay', this.stripToPrefetch(song))
+    this.socketConnection?.emit('prefetchAndPlay', this.stripToPrefetch(song))
   }
 
   /**
    * Emits ready
    */
   public emitReady() {
-    this.socketConnection.emit('ready')
+    this.socketConnection?.emit('ready')
     this.onReadyRequestedCallback ? this.onReadyRequestedCallback(false) : null
   }
 
@@ -500,7 +536,7 @@ export class SyncHolder {
    * @param state
    */
   public emitPlayerState(state: PlayerState) {
-    this.socketConnection.emit('playerStateChange', state)
+    this.socketConnection?.emit('playerStateChange', state)
   }
 
   /**
@@ -509,7 +545,7 @@ export class SyncHolder {
    * @param time
    */
   public emitSeek(time: number) {
-    this.socketConnection.emit('forceSeek', time)
+    this.socketConnection?.emit('forceSeek', time)
   }
 
   /**
@@ -519,7 +555,7 @@ export class SyncHolder {
    */
   private sendSongDetails(trackInfo: Song | null | undefined) {
     if (trackInfo) {
-      this.socketConnection.emit('trackMetadata', this.stripSong(trackInfo))
+      this.socketConnection?.emit('trackMetadata', this.stripSong(trackInfo))
     }
   }
 
@@ -545,7 +581,7 @@ export class SyncHolder {
       _id: song._id!,
       album: song.album ? song.album.album_name! : '',
       artist: song.artists ? song.artists?.join(',') : '-',
-      sender: this.socketConnection.id,
+      sender: this.socketConnection!.id,
       type: song.type
     }
   }
@@ -630,13 +666,13 @@ export class SyncHolder {
   }
 
   private onOffer() {
-    this.socketConnection.on('offer', (id: string, description: RTCSessionDescription) => {
+    this.socketConnection?.on('offer', (id: string, description: RTCSessionDescription) => {
       this.setupWatcher(id, description)
     })
   }
 
   private onUserJoined() {
-    this.socketConnection.on('userJoined', (id: string) => {
+    this.socketConnection?.on('userJoined', (id: string) => {
       this.playerStateHandler ? this.playerStateHandler('LOADING') : null
       this.setupInitiator(id)
       this.requestReadyStatus()
@@ -664,11 +700,11 @@ export class SyncHolder {
     peer
       .createOffer()
       .then((sdp) => peer.setLocalDescription(sdp))
-      .then(() => this.socketConnection.emit('offer', id, peer.localDescription))
+      .then(() => this.socketConnection?.emit('offer', id, peer.localDescription))
   }
 
   private onAnswer() {
-    this.socketConnection.on('answer', (id: string, description: RTCSessionDescription) => {
+    this.socketConnection?.on('answer', (id: string, description: RTCSessionDescription) => {
       if (this.isNegotiating[id]) this.peerConnection[id].peer!.setRemoteDescription(description)
     })
   }
@@ -696,7 +732,7 @@ export class SyncHolder {
       .setRemoteDescription(description)
       .then(() => peer.createAnswer())
       .then((sdp) => peer.setLocalDescription(sdp))
-      .then(() => this.socketConnection.emit('answer', id, peer.localDescription))
+      .then(() => this.socketConnection?.emit('answer', id, peer.localDescription))
 
     this.setPeer(id, peer)
   }

@@ -38,7 +38,6 @@ import Genre from '@/icons/Genre.vue'
 import Albums from '@/icons/Albums.vue'
 import Toggle from '@/icons/Toggle.vue'
 import Rooms from '@/icons/Rooms.vue'
-import { mixins } from 'vue-class-component'
 
 @Component({
   components: {
@@ -75,7 +74,6 @@ export default class Sidebar extends Vue {
 </script>
 
 <style lang="sass" scoped>
-
 .icon
   width: 38px
   height: 38px
