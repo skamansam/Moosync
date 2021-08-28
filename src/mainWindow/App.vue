@@ -119,6 +119,9 @@ export default class App extends mixins(ThemeHandler, PlayerControls) {
     window.NotifierUtils.registerMainProcessNotifier((obj) => {
       vxm.notifier.emit(obj)
       if (obj.id === 'started-scan' || obj.id === 'completed-scan') {
+        if (obj.id === 'completed-scan') {
+          vxm.themes.refreshPage = true
+        }
         this.$toasted.show(obj.message, {
           className: obj.id === 'completed-scan' ? 'success-toast' : 'custom-toast'
         })

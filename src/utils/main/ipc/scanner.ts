@@ -7,7 +7,6 @@ import fs from 'fs'
 import { loadPreferences } from '@/utils/main/db/preferences'
 import { notifyRenderer } from '.'
 import path from 'path'
-import { v4 } from 'uuid'
 
 enum scanning {
   UNDEFINED,
@@ -31,14 +30,22 @@ export class ScannerChannel implements IpcChannelInterface {
     }
   }
 
+  private async checkAlbumCovers(song: Song | undefined) {
+    return (await this.checkCoverExists(song?.album?.album_coverPath_low) && (await this.checkCoverExists(song?.album?.album_coverPath_high)))
+  }
+
+  private async checkSongCovers(song: Song | undefined) {
+    return (await this.checkCoverExists(song?.song_coverPath_high) && await this.checkCoverExists(song?.song_coverPath_low))
+  }
+
   private async checkDuplicate(song: Song, cover: TransferDescriptor<Buffer> | undefined) {
     notifyRenderer({ id: 'scan-status', message: `Scanned ${song.title}`, type: 'info' })
 
-    const count = await SongDB.countByHash(song.hash!)
-    if (count == 0) {
+    const existing = SongDB.getByHash(song.hash!)
+    if (!existing) {
       const res = cover && await this.storeCover(song._id!, cover)
       if (res) {
-        if (!(song.album?.album_coverPath_low && song.album?.album_coverPath_high) || !((await this.checkCoverExists(song.album.album_coverPath_low) && (await this.checkCoverExists(song.album.album_coverPath_high))))) {
+        if (!(await this.checkAlbumCovers(song))) {
           song.album = {
             ...song.album,
             album_coverPath_high: res.high,
@@ -50,6 +57,21 @@ export class ScannerChannel implements IpcChannelInterface {
       }
 
       await SongDB.store(song)
+    } else {
+      const albumCoverExists = await this.checkAlbumCovers(song)
+      const songCoverExists = await this.checkSongCovers(song)
+
+      console.log(albumCoverExists, songCoverExists)
+      if (!albumCoverExists || !songCoverExists) {
+        const res = cover && await this.storeCover(song._id!, cover)
+        if (res) {
+          if (!songCoverExists)
+            SongDB.updateSongCover(existing._id, res.high, res.low)
+
+          if (!albumCoverExists)
+            SongDB.updateAlbumCovers(existing._id, res.high, res.low)
+        }
+      }
     }
   }
 
@@ -66,8 +88,7 @@ export class ScannerChannel implements IpcChannelInterface {
 
   private async storeCoverSIngle(id: string, cover: TransferDescriptor<Buffer> | undefined) {
     if (cover) {
-      const thumbPath = (await loadPreferences()).thumbnailPath
-      const coverPath = path.join(thumbPath, id + '.jpg')
+      const thumbPath = loadPreferences().thumbnailPath
       if (this.coverPool) {
         return new Promise<{ high: string }>((resolve, reject) => {
           this.coverPool.queue(coverTask => coverTask.writeCover(cover, thumbPath, id, false).then((val) => resolve(val)).catch((e) => reject(e)))
@@ -110,7 +131,7 @@ export class ScannerChannel implements IpcChannelInterface {
   }
 
   private async fetchArtworks(allArtists: artists[]) {
-    const artworkPath = (await loadPreferences()).artworkPath
+    const artworkPath = loadPreferences().artworkPath
     return new Promise((resolve) => {
       this.scraperWorker.fetchArtworks(allArtists, artworkPath).subscribe(
         (result: { artist: artists, cover: TransferDescriptor<Buffer> }) => this.updateArtwork(result.artist, result.cover),

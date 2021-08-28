@@ -3,6 +3,7 @@ import { VuexModule } from './module';
 export class ThemeStore extends VuexModule.With({ namespaced: 'themes' }) {
   private _songView: songMenu = 'compact'
   private _sortBy: sortOptions = { type: 'date', asc: true }
+  private _refreshPage = false
 
   get sortBy() {
     return this._sortBy
@@ -18,5 +19,13 @@ export class ThemeStore extends VuexModule.With({ namespaced: 'themes' }) {
 
   set songView(menu: songMenu) {
     this._songView = menu
+  }
+
+  get refreshPage() {
+    return this._refreshPage
+  }
+
+  set refreshPage(val: boolean) {
+    this._refreshPage = val
   }
 }

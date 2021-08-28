@@ -215,10 +215,8 @@ class SongDBInstance extends DBUtils {
     return this.db.query(`${query} ${args.length > 0 ? where : ''}`, ...args) as T[]
   }
 
-  public async countByHash(hash: string): Promise<number> {
-    return new Promise((resolve) => {
-      resolve(this.db.queryFirstCell(`SELECT COUNT(*) FROM allsongs WHERE hash = ?`, hash)!)
-    })
+  public getByHash(hash: string) {
+    return this.db.queryFirstRow(`SELECT * FROM allsongs WHERE hash = ?`, hash)! as Song
   }
 
   public async getBySize(size: number): Promise<{ _id: string }[]> {
@@ -229,8 +227,11 @@ class SongDBInstance extends DBUtils {
     return this.db.query(`SELECT path, inode, deviceno FROM allsongs WHERE _id = ?`, id)
   }
 
-  public async updateSongCover(id: string, coverPath: string): Promise<void> {
-    this.db.update('allsongs', { song_coverPath: coverPath }, ['_id = ?', id])
+  public updateSongCover(id: string, coverHigh: string, coverLow: string) {
+    this.db.update('allsongs', {
+      song_coverPath_high: coverHigh,
+      song_coverPath_low: coverLow
+    }, ['_id = ?', id])
   }
 
   /* ============================= 
@@ -254,6 +255,24 @@ class SongDBInstance extends DBUtils {
 
   public async updateAlbum(album: Album): Promise<void> {
     this.db.updateWithBlackList('albums', album, ['album_id = ?', album.album_id], ['album_id', 'album_name'])
+  }
+
+  public updateAlbumCovers(songid: string, coverHigh: string, coverLow: string) {
+    this.db.transaction((songid, newHigh, newLow) => {
+      const { album_id } = this.db.queryFirstRowObject(`SELECT album as album_id FROM album_bridge WHERE song = ?`, songid) as { album_id: string }
+      if (album_id) {
+        const { high, low } = this.db.queryFirstRowObject(`SELECT album_coverPath_high as high, album_coverPath_low as low from albums WHERE album_id = ?`, album_id) as { high: string, low: string }
+        console.log(high, low)
+
+        if (!high) {
+          this.db.update('albums', { album_coverPath_high: newHigh }, ['album_id = ?', album_id])
+        }
+
+        if (!low) {
+          this.db.update('albums', { album_coverPath_low: newLow }, ['album_id = ?', album_id])
+        }
+      }
+    })(songid, coverHigh, coverLow)
   }
 
   public updateSongCountAlbum() {

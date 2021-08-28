@@ -6,7 +6,7 @@
 
     <div class="d-flex main-content" :class="{ 'is-open': isSidebarOpen }">
       <transition name="slide-fade">
-        <router-view></router-view>
+        <router-view :key="refreshPage"></router-view>
       </transition>
     </div>
   </div>
@@ -19,6 +19,7 @@ import TopBar from '@/mainWindow/components/TopBar.vue'
 import { Component } from 'vue-property-decorator'
 import ContextMenuMixin from '@/utils/ui/mixins/ContextMenuMixin'
 import { mixins } from 'vue-class-component'
+import { vxm } from '../store/index'
 
 @Component({
   components: {
@@ -29,9 +30,23 @@ import { mixins } from 'vue-class-component'
 })
 export default class DefaultLayout extends mixins(ContextMenuMixin) {
   private isSidebarOpen: boolean = true
+  private refreshPage = false
 
-  toggleSidebar(isOpen: boolean) {
+  private toggleSidebar(isOpen: boolean) {
     this.isSidebarOpen = isOpen
+  }
+
+  private listenRefreshPage() {
+    vxm.themes.$watch('_refreshPage', (refresh) => {
+      if (refresh) {
+        this.refreshPage = !this.refreshPage
+        vxm.themes.refreshPage = false
+      }
+    })
+  }
+
+  mounted() {
+    this.listenRefreshPage()
   }
 }
 </script>

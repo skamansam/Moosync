@@ -9,6 +9,7 @@
             :defaultValue="[]"
             prefKey="musicPaths"
           />
+          <button @click="forceRescan">Force rescan</button>
           <FilePicker
             title="Downloaded Artwork Path"
             tooltip="Directory where downloaded artworks are stored"
@@ -39,7 +40,11 @@ import DirectoryGroup from '../DirectoryGroup.vue'
     FilePicker
   }
 })
-export default class Paths extends Vue {}
+export default class Paths extends Vue {
+  private forceRescan() {
+    window.FileUtils.scan()
+  }
+}
 </script>
 
 <style lang="sass" scoped>
