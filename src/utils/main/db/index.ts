@@ -90,7 +90,7 @@ class SongDBInstance extends DBUtils {
   }
 
   public async searchAll(term: string, exclude?: string[]): Promise<SearchResult> {
-    const songs = await this.getSongByOptions({
+    const songs = this.getSongByOptions({
       song: {
         path: term
       }

@@ -161,8 +161,9 @@ export class ScannerChannel implements IpcChannelInterface {
 
   // TODO: Add queueing for scraping artworks
   private async scrapeArtists() {
+    console.log('scraping')
     this.scraperWorker = await spawn(new Worker('@/utils/main/workers/scraper.ts', { type: 'module' }))
-    const allArtists = await SongDB.getEntityByOptions<artists>({
+    const allArtists = SongDB.getEntityByOptions<artists>({
       artist: true
     })
 
@@ -202,8 +203,8 @@ export class ScannerChannel implements IpcChannelInterface {
     }
     this.setScanning()
 
-    const preferences = await loadPreferences()
-    notifyRenderer({ id: v4(), message: 'Starting scanning files', type: 'info' })
+    const preferences = loadPreferences()
+    notifyRenderer({ id: 'started-scan', message: 'Starting scanning files', type: 'info' })
 
     if (this.scannerWorker) {
       await Thread.terminate(this.scannerWorker)
@@ -220,7 +221,7 @@ export class ScannerChannel implements IpcChannelInterface {
 
     Thread.terminate(this.scannerWorker)
 
-    notifyRenderer({ id: v4(), message: 'Scanning Completed', type: 'info' })
+    notifyRenderer({ id: 'completed-scan', message: 'Scanning Completed', type: 'info' })
 
     if (this.isScanQueued()) {
       await this.scanAll(event, request)

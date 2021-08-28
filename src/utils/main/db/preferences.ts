@@ -51,7 +51,6 @@ export function setWindowSize(windowName: string, windowSize: { width: number, h
 }
 
 export function getWindowSize(windowName: string, defaultValue: { width: number, height: number }) {
-  console.log(store.get(`window.${windowName}`))
   return store.get(`window.${windowName}`, defaultValue)
 }
 

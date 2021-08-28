@@ -18,8 +18,8 @@
                 {{ title }}
               </div>
             </div>
-            <div class="song-subtitle text-truncate">{{ subtitle }}</div>
-            <div class="song-timestamp">
+            <div class="song-subtitle text-truncate" v-if="subtitle">{{ subtitle }}</div>
+            <div class="song-timestamp" v-if="subSubTitle">
               {{ subSubTitle }}
             </div>
           </div>
@@ -77,12 +77,13 @@ export default class SongDetailsCompact extends mixins(ImgLoader) {
   }
 
   private getParsedSubtitle() {
-    return (
-      this.currentSong &&
-      ((this.currentSong?.artists && this.currentSong?.artists?.join(', ')) ?? '') +
+    if (this.currentSong && (this.currentSong.artists?.length || this.currentSong.album?.album_name)) {
+      return (
+        ((this.currentSong?.artists && this.currentSong?.artists?.join(', ')) ?? '') +
         (this.isArtistAlbumNotEmpty() ? ' - ' : '') +
         (this.currentSong?.album && this.currentSong.album.album_name)
-    )
+      )
+    }
   }
 
   private getConcatedSubtitle() {

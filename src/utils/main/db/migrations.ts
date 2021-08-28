@@ -171,7 +171,8 @@ export const migrations = [
   // 26-08-2021
   `
   -- Up
-  ALTER TABLE allsongs ADD date_added TEXT DEFAULT 0 NOT NULL;
+  ALTER TABLE allsongs ADD date_added TEXT DEFAULT "0";
+
   -- Down
   `,
 ]

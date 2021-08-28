@@ -118,6 +118,11 @@ export default class App extends mixins(ThemeHandler, PlayerControls) {
   private registerNotifier() {
     window.NotifierUtils.registerMainProcessNotifier((obj) => {
       vxm.notifier.emit(obj)
+      if (obj.id === 'started-scan' || obj.id === 'completed-scan') {
+        this.$toasted.show(obj.message, {
+          className: obj.id === 'completed-scan' ? 'success-toast' : 'custom-toast'
+        })
+      }
     })
   }
 
@@ -330,4 +335,12 @@ body
 
 .animate__animated.animate__slideInLeft
   --animate-delay: 0.3s
+
+.custom-toast,.success-toast
+  font-weight: 400 !important
+  border-radius: 8px !important
+
+.success-toast
+  background-color: var(--accent) !important
+  color: var(--textInverse) !important
 </style>

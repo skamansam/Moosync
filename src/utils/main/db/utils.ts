@@ -73,7 +73,6 @@ export class DBUtils {
       date: song.date,
       year: song.year,
       lyrics: song.lyrics,
-      // releaseType: newDoc.releaseType,
       bitrate: song.bitrate,
       codec: song.codec,
       container: song.container,
