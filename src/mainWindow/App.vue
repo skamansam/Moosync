@@ -342,6 +342,7 @@ body
 .custom-toast,.success-toast
   font-weight: 400 !important
   border-radius: 8px !important
+  border: 1px solid var(--textPrimary) !important
 
 .success-toast
   background-color: var(--accent) !important
