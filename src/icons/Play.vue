@@ -1,6 +1,10 @@
 <template>
   <svg width="41" height="42" viewBox="0 0 41 42" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <transition name="fade">
+    <transition
+      name="custom-fade"
+      enter-active-class="animate__animated animate__fadeIn"
+      leave-active-class="animate__animated animate__fadeOut animate__faster"
+    >
       <g v-if="play">
         <path d="M16 13L16 28" stroke="var(--accent)" stroke-width="3" />
         <path d="M25 13L25 28" stroke="var(--accent)" stroke-width="3" />
@@ -29,3 +33,8 @@ export default class PLayButton extends Vue {
   private play!: Boolean
 }
 </script>
+
+<style lang="sass" scoped>
+.animate__animated.animate__fadeOut
+  --animate-duration: 0.1s
+</style>

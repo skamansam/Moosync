@@ -5,7 +5,11 @@
         <div class="image-container w-100 h-100">
           <div class="embed-responsive embed-responsive-1by1">
             <div class="embed-responsive-item">
-              <transition name="fade">
+              <transition
+                name="custom-fade"
+                enter-active-class="animate__animated animate__fadeIn"
+                leave-active-class="animate__animated animate__fadeOut animate__faster"
+              >
                 <b-img class="h-100 w-100 albumart" v-if="computedImg" :src="computedImg" :key="computedImg" />
                 <SongDefault class="albumart w-100" v-if="!computedImg" />
               </transition>
@@ -162,4 +166,7 @@ export default class SongDetailsCompact extends mixins(ImgLoader) {
   top: 0
   left: 0
   z-index: -9999
+
+.animate__animated.animate__fadeOut
+  --animate-duration: 0.3s
 </style>

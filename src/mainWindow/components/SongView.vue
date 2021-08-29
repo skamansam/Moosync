@@ -1,27 +1,25 @@
 <template>
   <b-container fluid class="song-container h-100">
-    <transition name="list">
-      <transition
-        name="custom-classes-transition"
-        enter-active-class="animate__animated animate__slideInLeft animate__delay-1s"
-        leave-active-class="animate__animated animate__slideOutRight"
-      >
-        <component
-          v-bind:is="songView"
-          :songList="songList"
-          :currentSong="currentSong"
-          :defaultDetails="defaultDetails"
-          :detailsButtonGroup="detailsButtonGroup"
-          @onRowDoubleClicked="queueSong([arguments[0]])"
-          @onRowContext="getSongContextMenu"
-          @onRowSelected="updateCoverDetails"
-          @onRowSelectionClear="clearSelection"
-          @onRowPlayNowClicked="playTop([arguments[0]])"
-          @playAll="playAll"
-          @addToQueue="addToQueue"
-          @addToLibrary="addToLibrary"
-        ></component>
-      </transition>
+    <transition
+      name="custom-classes-transition"
+      enter-active-class="animate__animated animate__slideInLeft animate__delay-1s"
+      leave-active-class="animate__animated animate__slideOutRight"
+    >
+      <component
+        v-bind:is="songView"
+        :songList="songList"
+        :currentSong="currentSong"
+        :defaultDetails="defaultDetails"
+        :detailsButtonGroup="detailsButtonGroup"
+        @onRowDoubleClicked="queueSong([arguments[0]])"
+        @onRowContext="getSongContextMenu"
+        @onRowSelected="updateCoverDetails"
+        @onRowSelectionClear="clearSelection"
+        @onRowPlayNowClicked="playTop([arguments[0]])"
+        @playAll="playAll"
+        @addToQueue="addToQueue"
+        @addToLibrary="addToLibrary"
+      ></component>
     </transition>
   </b-container>
 </template>
@@ -36,7 +34,6 @@ import ImgLoader from '@/utils/ui/mixins/ImageLoader'
 import { vxm } from '../store'
 import SongViewClassic from '@/mainWindow/components/generic/SongViewClassic.vue'
 import SongViewCompact from '@/mainWindow/components/generic/SongViewCompact.vue'
-import 'animate.css'
 import { sortSongList } from '@/utils/common'
 
 @Component({

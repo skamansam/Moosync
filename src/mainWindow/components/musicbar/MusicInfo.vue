@@ -1,7 +1,11 @@
 <template>
   <div>
     <div v-if="computedImg" class="dark-overlay"></div>
-    <transition name="fade">
+    <transition
+      name="custom-fade"
+      enter-active-class="animate__animated animate__fadeIn"
+      leave-active-class="animate__animated animate__fadeOut animate__faster"
+    >
       <b-img class="bg-img" v-if="computedImg" :src="computedImg" :key="computedImg"></b-img>
     </transition>
     <b-container fluid class="w-100 h-100 main-container">
@@ -252,4 +256,7 @@ export default class MusicInfo extends mixins(ImageLoader, ModelHelper) {
 .empty-message
   margin-left: -30px
   font-size: 36px
+
+.animate__animated.animate__fadeOut
+  --animate-duration: 0.3s
 </style>

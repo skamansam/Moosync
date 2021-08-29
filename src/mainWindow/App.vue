@@ -25,6 +25,7 @@ import { vxm } from './store'
 import { bus } from './main'
 import PlayerControls from '@/utils/ui/mixins/PlayerControls'
 import { v1 } from 'uuid'
+import 'animate.css'
 
 const stun = require('stun')
 
