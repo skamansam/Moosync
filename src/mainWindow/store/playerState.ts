@@ -5,7 +5,7 @@ import { v1 } from 'uuid';
 import { vxm } from '.';
 
 class Queue {
-  data: { [id: string]: Song } = {}
+  data: { [id: string]: Song } = { }
   order: { id: string, songID: string }[] = []
   index: number = -1
 }
@@ -80,14 +80,31 @@ export class PlayerStore extends VuexModule.With({ namespaced: 'player' }) {
   }
 
   @mutation
-  public pop(index: number) {
-    if (index > -1) {
-      const id = this.songQueue.order[index]
-      if (id) {
-        this.songQueue.order.splice(index, 1)
+  private removeFromQueueData(orderData: { id: string, songID: string } | undefined) {
+    if (orderData) {
+      if (this.songQueue.order.findIndex(val => val.songID === orderData.songID) === -1)
+        delete this.songQueue.data[orderData.songID]
+    }
+  }
 
-        if (this.songQueue.order.findIndex(val => val.songID === id.songID) === -1)
-          delete this.songQueue.data[id.songID]
+  @mutation
+  private removeFromQueue(index: number) {
+    if (index > -1) {
+      this.songQueue.order.splice(index, 1)
+      if (this.songQueue.order.length === 0) {
+        this.currentSong = null
+      }
+    }
+  }
+
+  @action
+  public async pop(index: number) {
+    if (index > -1) {
+      this.removeFromQueue(index)
+      this.removeFromQueueData(this.songQueue.order[index])
+
+      if (this.songQueue.index === index) {
+        await this.loadSong(this.queueTop)
       }
     }
   }
