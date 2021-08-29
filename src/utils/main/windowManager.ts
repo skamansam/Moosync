@@ -43,6 +43,7 @@ export class WindowHandler {
 
   private get mainWindowProps(): BrowserWindowConstructorOptions {
     return {
+      title: 'Moosync',
       ...getWindowSize('mainWindow', { width: 1016, height: 653 }),
       minHeight: 653,
       minWidth: 1016,
@@ -52,6 +53,7 @@ export class WindowHandler {
 
   private get prefWindowProps(): BrowserWindowConstructorOptions {
     return {
+      title: 'Preferences',
       ...getWindowSize('prefWindow', { width: 840, height: 653 }),
       minHeight: 653,
       minWidth: 840,
