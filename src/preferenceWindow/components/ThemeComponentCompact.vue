@@ -13,7 +13,7 @@
       />
       <path
         d="M4.61328 22.2376C4.61328 16.1411 9.55546 11.1989 15.652 11.1989H76.3647C86.5255 11.1989 94.7625 19.4359 94.7625 29.5967V223.387H11.9724C7.90807 223.387 4.61328 220.092 4.61328 216.028V22.2376Z"
-        fill="url(#paint0_linear)"
+        :fill="`url(#paint0_linear_${id})`"
       />
       <rect x="108.867" y="17.9448" width="206.055" height="14.7182" rx="7.35912" :fill="colors.secondary" />
       <path
@@ -49,7 +49,7 @@
       />
       <path
         d="M4.61328 202.458H396.486V212.867C396.486 218.616 391.826 223.277 386.077 223.277H11.3591C7.63349 223.277 4.61328 220.256 4.61328 216.531V202.458Z"
-        fill="#212121"
+        :fill="colors.primary"
       />
       <path d="M380.458 213.809L382.502 211.768L384.546 213.809" :stroke="colors.accent" stroke-width="0.408201" />
       <path d="M356.505 212.46L341.992 212.46" :stroke="colors.accent" stroke-width="0.612301" />
@@ -290,15 +290,15 @@
         <feBlend mode="normal" in="SourceGraphic" in2="effect1_dropShadow" result="shape" />
       </filter>
       <linearGradient
-        id="paint0_linear"
+        :id="`paint0_linear_${id}`"
         x1="4.61328"
-        y1="15.0183"
+        y1="15.0184"
         x2="37.7589"
         y2="231.277"
         gradientUnits="userSpaceOnUse"
       >
         <stop :stop-color="colors.secondary" />
-        <stop offset="0.718063" stop-color="#212121" />
+        <stop offset="0.718063" :stop-color="colors.primary" />
       </linearGradient>
       <clipPath id="clip0">
         <rect width="4.23979" height="4.23979" :fill="colors.textPrimary" transform="translate(339.686 23.4641)" />

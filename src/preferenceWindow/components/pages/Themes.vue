@@ -81,7 +81,7 @@ export default class Themes extends Vue {
   }
 
   private get currentTheme() {
-    return this.allThemes[this.activeTheme] ?? this.defaultTheme
+    return this.allThemes[this.activeTheme]?.theme ?? this.defaultTheme
   }
 
   private isThemeActive(themeId: string) {
