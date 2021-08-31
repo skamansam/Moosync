@@ -40,7 +40,19 @@ module.exports = {
       customFileProtocol: 'com.moosync://./',
       builderOptions: {
         productName: 'Moosync',
-        publish: ['github'],
+        mac: {
+          icon: "build/icons//512x512.png",
+        },
+        linux: {
+          target: ['AppImage', 'deb', 'tar.gz']
+        },
+        publish: [{
+          provider: 'github',
+          owner: 'ovenoboyo',
+          repo: 'moosync',
+          vPrefixedTagName: true,
+          releaseType: "draft"
+        }],
         asarUnpack: ['*.worker.js', 'sandbox.js'],
         protocols: [
           {
