@@ -42,8 +42,8 @@
         :forceSeek="forceSeek"
       />
     </div>
-    <div class="slider" :class="{ open: sliderPosition }">
-      <MusicInfo v-show="sliderPosition" :currentSong="currentSong" />
+    <div class="slider" :class="{ open: sliderPosition, close: !sliderPosition }">
+      <MusicInfo :currentSong="currentSong" />
     </div>
   </div>
 </template>
@@ -135,14 +135,16 @@ export default class MusicBar extends mixins(ImgLoader) {
 .slider
   position: fixed
   background: var(--primary)
-  top: 100%
   height: calc(100% - 7.5rem)
   width: 100%
   // animation: 0.2s linear 0s slide
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1)
+  transition: transform 0.3s ease
   z-index: -2
 .open
-  top: 26px !important
+  transform: translateY(-4px)
+
+.close
+  transform: translateY(100vh)
 </style>
 
 <style lang="sass">

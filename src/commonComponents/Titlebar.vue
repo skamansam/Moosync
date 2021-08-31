@@ -13,7 +13,7 @@
           <b-col cols="auto" class="logo-title"> oosync </b-col>
         </b-row>
       </b-col>
-      <b-col cols="auto">
+      <b-col cols="auto" class="buttons-group">
         <b-row no-gutters>
           <b-col cols="auto">
             <div class="titlebar-buttons minimize-button" @click="onMinimize()">
@@ -110,7 +110,6 @@ export default class Sidebar extends Vue {
 
 <style lang="sass" scoped>
 .titlebar
-  z-index: 999 !important
   width: 100%
   height: 31px
   -webkit-app-region: drag
@@ -134,8 +133,6 @@ export default class Sidebar extends Vue {
     &.left
       width: 3px
       height: 18px
-
-
 
 .titlebar-buttons
   padding-left: 17px
@@ -163,4 +160,7 @@ export default class Sidebar extends Vue {
     line-height: 167.19%
     letter-spacing: 0.105em
     color: var(--textSecondary)
+
+.buttons-group
+  z-index: 999
 </style>

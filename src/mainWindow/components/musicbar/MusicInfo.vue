@@ -228,7 +228,7 @@ export default class MusicInfo extends mixins(ImageLoader, ModelHelper) {
   z-index: -9999
 
 .dark-overlay
-  height: 100vh
+  height: calc(100% + 26px)
   width: 100vw
   z-index: -9998
   position: absolute
