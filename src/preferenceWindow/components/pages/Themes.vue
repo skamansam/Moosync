@@ -6,21 +6,27 @@
       </b-row>
       <b-row no-gutters class="w-100"> </b-row>
       <b-row no-gutters class="w-100">
-        <b-col cols="auto" class="mr-3 mb-3">
-          <ThemeComponentClassic
-            @click.native="setSongView('classic')"
-            :selected="isSongView('classic')"
-            :id="getRandomID()"
-            :colors="currentTheme"
-          />
+        <b-col cols="4" class="mr-3 mb-3">
+          <div class="theme-component-container">
+            <ThemeComponentClassic
+              @click.native="setSongView('classic')"
+              :selected="isSongView('classic')"
+              :id="getRandomID()"
+              :colors="currentTheme"
+            />
+            Classic
+          </div>
         </b-col>
-        <b-col cols="auto" class="mr-3 mb-3">
-          <ThemeComponentCompact
-            @click.native="setSongView('compact')"
-            :selected="isSongView('compact')"
-            :id="getRandomID()"
-            :colors="currentTheme"
-          />
+        <b-col cols="4" class="mr-3 mb-3">
+          <div class="theme-component-container">
+            <ThemeComponentCompact
+              @click.native="setSongView('compact')"
+              :selected="isSongView('compact')"
+              :id="getRandomID()"
+              :colors="currentTheme"
+            />
+            Compact
+          </div>
         </b-col>
       </b-row>
       <b-row>
@@ -28,23 +34,29 @@
       </b-row>
       <b-row no-gutters class="w-100"> </b-row>
       <b-row no-gutters class="w-100">
-        <b-col cols="auto" class="mr-3 mb-3">
-          <component
-            :is="themesComponent"
-            @click.native="setTheme('default')"
-            :selected="isThemeActive('default')"
-            :id="getRandomID()"
-            :colors="defaultTheme"
-          />
+        <b-col cols="4" class="mr-3 mb-3">
+          <div class="theme-component-container">
+            <component
+              :is="themesComponent"
+              @click.native="setTheme('default')"
+              :selected="isThemeActive('default')"
+              :id="getRandomID()"
+              :colors="defaultTheme"
+            />
+            Default
+          </div>
         </b-col>
-        <b-col cols="auto" class="mr-3 mb-3" v-for="(value, key) in allThemes" :key="key">
-          <component
-            :is="themesComponent"
-            @click.native="setTheme(value.id)"
-            :selected="isThemeActive(value.id)"
-            :id="value.id"
-            :colors="value.theme"
-          />
+        <b-col cols="4" class="mr-3 mb-3" v-for="(value, key) in allThemes" :key="key">
+          <div class="theme-component-container">
+            <component
+              :is="themesComponent"
+              @click.native="setTheme(value.id)"
+              :selected="isThemeActive(value.id)"
+              :id="value.id"
+              :colors="value.theme"
+            />
+            {{ value.name }}
+          </div>
         </b-col>
       </b-row>
     </b-container>
@@ -132,6 +144,6 @@ export default class Themes extends Vue {
 .path-selector
   max-width: 750px
 
-.title
+.title, .theme-component-container
   text-align: left
 </style>
