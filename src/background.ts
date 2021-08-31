@@ -8,6 +8,7 @@ import path, { resolve } from 'path';
 
 import EventEmitter from 'events';
 import { OAuthHandler } from '@/utils/main/oauth/handler';
+import { autoUpdater } from 'electron-updater';
 import { createProtocol } from 'vue-cli-plugin-electron-builder/lib';
 import { extensionHost } from '@/utils/extensions';
 import log from 'loglevel'
@@ -24,7 +25,6 @@ export const oauthEventEmitter = new EventEmitter()
 export const _windowHandler = new WindowHandler()
 
 nativeTheme.themeSource = 'dark'
-
 
 // Since in development mode, it is valid to have multiple processes open,
 // Quit the app if it is supposed to be launched for oauth
@@ -109,6 +109,13 @@ app.on('before-quit', () => {
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
 app.on('ready', async () => {
+
+  const res = await autoUpdater.checkForUpdatesAndNotify()
+  if (res) {
+    autoUpdater.quitAndInstall()
+  }
+
+
   registerIpcChannels()
   setInitialInterfaceSettings()
 

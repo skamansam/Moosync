@@ -1,6 +1,6 @@
 {
   "name": "moosync",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "private": true,
   "author": "Ovenoboyo <ovenoboyo@gmail.com>",
   "scripts": {
@@ -25,6 +25,7 @@
     "@types/webpack-env": "^1.16.0",
     "@types/webrtc": "0.0.27",
     "@types/yt-player": "^3.5.0",
+    "add": "^2.0.6",
     "animate.css": "^4.1.1",
     "axios": "^0.21.1",
     "axios-cache-adapter": "^2.7.3",
@@ -39,6 +40,7 @@
     "dotenv": "^10.0.0",
     "electron": "^13.1.1",
     "electron-store": "^8.0.0",
+    "electron-updater": "^4.3.9",
     "eslint-plugin-vue": "^7.10.0",
     "events": "^3.3.0",
     "jimp": "^0.16.1",
@@ -77,6 +79,7 @@
     "vuex": "^3.0.1",
     "vuex-class-component": "^2.3.5",
     "winston-daily-rotate-file": "^4.5.5",
+    "yarn": "^1.22.11",
     "youtube-music-api": "^1.0.6",
     "yt-player": "^3.5.0"
   },

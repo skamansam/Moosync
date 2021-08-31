@@ -153,8 +153,6 @@ export class WindowHandler {
         app.exit()
       }
     }
-
-
   }
 
   private handleWindowShow(window: BrowserWindow) {
