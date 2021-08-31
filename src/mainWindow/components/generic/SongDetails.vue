@@ -183,6 +183,8 @@ export default class SongDetails extends mixins(ImageLoader, ErrorHandler) {
   font-size: 14px
 
 .button-group
+  @media (max-height: 700px)
+    display: none !important
   svg
     margin-right: 16px
 
@@ -191,5 +193,6 @@ export default class SongDetails extends mixins(ImageLoader, ErrorHandler) {
   width: 20px
 
 .main-container
-  padding: 15px
+  padding-top: 15px
+  padding-bottom: 15px
 </style>

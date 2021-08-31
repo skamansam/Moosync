@@ -1,6 +1,6 @@
 <template>
-  <div class="w-100 details-background">
-    <b-row align-v="center" class="h-100">
+  <div class="w-100 h-100">
+    <b-row align-v="center" class="details-background">
       <SongDetails
         class="details-container h-100"
         :currentTitle="currentSong ? currentSong.title : ''"
@@ -73,3 +73,19 @@ export default class SongViewClassic extends mixins(ImgLoader, ModelHelper) {
   private detailsButtonGroup!: SongDetailButtons
 }
 </script>
+
+<style lang="sass" scoped>
+.details-background
+  height: 25%
+  max-height: 200px
+  margin-top: 15px
+  width: calc(100% - 30px)
+  border-radius: 28px
+  background: var(--secondary)
+
+.details-container
+  width: 100%
+
+.list-container
+  height: 75%
+</style>

@@ -143,22 +143,6 @@ export default class AllSongs extends mixins(PlayerControls, ModelHelper, Remote
   padding-top: 10px
   overflow: hidden
 
-.details-container
-  width: 100%
-  padding-top: 15px
-  padding-bottom: 15px
-
-.list-container
-  height: 75%
-
-.details-background
-  height: 25%
-  max-height: 200px
-  margin-top: 15px
-  width: calc(100% - 30px)
-  border-radius: 28px
-  background: var(--secondary)
-
 .compact-container
   padding-top: 25px
 
