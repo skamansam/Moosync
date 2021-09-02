@@ -46,13 +46,40 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           CI: true
       - uses: actions/upload-artifact@v2
+        if: ${{ runner.os == 'Windows' }}
         with:
-          name: Artifacts
+          name: Windows Exe
           path: |
             dist_electron/*.exe
-            dist_electron/*.snap
+            dist_electron/latest*.yml
+
+      - uses: actions/upload-artifact@v2
+        if: ${{ runner.os == 'Linux' }}
+        with:
+          name: Linux Snap
+          path: dist_electron/*.snap
+      - uses: actions/upload-artifact@v2
+        if: ${{ runner.os == 'Linux' }}
+        with:
+          name: Linux AppImage
+          path: |
             dist_electron/*.AppImage
-            dist_electron/*.tar.gz
-            dist_electron/*.deb
+            dist_electron/latest*.yml
+      - uses: actions/upload-artifact@v2
+        if: ${{ runner.os == 'Linux' }}
+        with:
+          name: Linux tar.gz
+          path: dist_electron/*.tar.gz
+      - uses: actions/upload-artifact@v2
+        if: ${{ runner.os == 'Linux' }}
+        with:
+          name: Linux Deb
+          path: dist_electron/*.deb
+
+      - uses: actions/upload-artifact@v2
+        if: ${{ runner.os == 'macOS' }}
+        with:
+          name: MacOS Dmg
+          path: |
             dist_electron/*.dmg
             dist_electron/latest*.yml
