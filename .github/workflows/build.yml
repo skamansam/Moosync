@@ -53,4 +53,6 @@ jobs:
             dist_electron/*.snap
             dist_electron/*.AppImage
             dist_electron/*.tar.gz
+            dist_electron/*.deb
+            dist_electron/*.dmg
             dist_electron/latest*.yml
