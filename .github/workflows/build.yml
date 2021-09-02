@@ -45,3 +45,12 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           CI: true
+      - uses: actions/upload-artifact@v2
+        with:
+          name: Artifacts
+          path: |
+            dist_electron/*.exe
+            dist_electron/*.snap
+            dist_electron/*.AppImage
+            dist_electron/*.tar.gz
+            dist_electron/latest*.yml
