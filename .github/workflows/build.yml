@@ -40,8 +40,8 @@ jobs:
             sudo apt update && sudo apt install -y snapd && sudo snap install snapcraft --classic
           fi
         shell: bash
-      - name: yarn electron:publish
-        run: yarn electron:publish
+      - name: yarn electron:build
+        run: yarn electron:build
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           CI: true
