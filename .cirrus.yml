@@ -7,15 +7,11 @@ win_linux_task:
         fingerprint_script: cat yarn.lock
         populate_script: yarn install
       build_script:
-        - apt update && apt install -y snapd
-        - snap install snapcraft --classic
         - chmod +x setup_env.sh && . setup_env.sh && yarn postinstall && yarn electron:build
       deb_artifacts:
         path: dist_electron/*.deb
       appimg_artifacts:
         path: dist_electron/*.AppImage
-      snap_artifacts:
-        path: dist_electron/*.snap
 
     - macos_instance:
         image: big-sur-base

@@ -32,6 +32,12 @@ jobs:
       - name: yarn install
         run: yarn install
       - name: setup env
+        env:
+          YOUTUBECLIENTID: '${{ secrets.YOUTUBECLIENTID }}'
+          LASTFMAPIKEY: '${{ secrets.LASTFMAPIKEY }}'
+          LASTFMSECRET: '${{ secrets.LASTFMSECRET }}'
+          SPOTIFYCLIENTID: '${{ secrets.SPOTIFYCLIENTID }}'
+          SPOTIFYCLIENTSECRET: '${{ secrets.SPOTIFYCLIENTSECRET }}'
         run: chmod +x setup_env.sh && . setup_env.sh
         shell: bash
       - name: install snapcraft
