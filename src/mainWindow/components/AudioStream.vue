@@ -69,6 +69,8 @@ export default class AudioStream extends mixins(SyncMixin, PlayerControls, Error
           this.activePlayer = this.ytPlayer
           break
       }
+
+      this.activePlayer.volume = vxm.player.volume
       this.registerPlayerListeners()
     }
   }
