@@ -37,6 +37,8 @@ export default class PlayerControls extends Vue {
     }
 
     if (!this.isSyncing) this.play()
+
+    this.$toasted.show(`Queued ${songs.length} song${songs.length !== 1 ? 's' : ''}`)
   }
 
   public play() {
