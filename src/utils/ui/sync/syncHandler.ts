@@ -16,11 +16,11 @@ export class SyncHolder {
       coverChannel?: RTCDataChannel
       streamChannel?: RTCDataChannel
     }
-  } = { }
+  } = {}
   private socketConnection?: Socket
   private mode: PeerMode = PeerMode.UNDEFINED
   private BroadcasterID: string = ''
-  private isNegotiating: { [id: string]: boolean } = { }
+  private isNegotiating: { [id: string]: boolean } = {}
   public socketID: string = ''
   private connectionOptions: Partial<ManagerOptions> = {
     forceNew: true,
@@ -101,7 +101,7 @@ export class SyncHolder {
   public isInitialized(methodName: keyof SyncHolder) {
     if (methodName !== 'isInitialized' && methodName !== 'initialize') {
       if (!this.socketConnection) {
-        throw new Error("Handler not initialized, call initialize()")
+        // throw new Error("Handler not initialized, call initialize()")
       }
 
       return this.initialized
