@@ -138,7 +138,6 @@ export default class AudioStream extends mixins(SyncMixin, PlayerControls, Error
       this.handlerFileError(err)
     }
     this.activePlayer.onStateChange = (state) => {
-      console.trace(state)
       if (state === 'STOPPED') {
         if (!this.ignoreStateChange) {
           this.onSongEnded()
