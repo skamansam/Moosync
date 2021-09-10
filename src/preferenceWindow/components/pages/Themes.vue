@@ -1,12 +1,13 @@
 <template>
   <div>
+    <ContextMenu ref="contextMenu" v-click-outside="hideContextMenu" :menu-items="menu" />
     <b-container fluid>
       <b-row>
         <PreferenceHeader title="Songs View" tooltip="Customize the colors" class="mb-3" />
       </b-row>
       <b-row no-gutters class="w-100"> </b-row>
       <b-row no-gutters class="w-100">
-        <b-col cols="4" class="mr-3 mb-3">
+        <b-col cols="3" class="p-2">
           <div class="theme-component-container">
             <ThemeComponentClassic
               @click.native="setSongView('classic')"
@@ -17,7 +18,7 @@
             Classic
           </div>
         </b-col>
-        <b-col cols="4" class="mr-3 mb-3">
+        <b-col cols="3" class="p-2">
           <div class="theme-component-container">
             <ThemeComponentCompact
               @click.native="setSongView('compact')"
@@ -34,7 +35,7 @@
       </b-row>
       <b-row no-gutters class="w-100"> </b-row>
       <b-row no-gutters class="w-100">
-        <b-col cols="4" class="mr-3 mb-3">
+        <b-col cols="3" class="p-2">
           <div class="theme-component-container">
             <component
               :is="themesComponent"
@@ -46,20 +47,28 @@
             Default
           </div>
         </b-col>
-        <b-col cols="4" class="mr-3 mb-3" v-for="(value, key) in allThemes" :key="key">
+        <b-col cols="3" class="p-2" v-for="(value, key) in allThemes" :key="key">
           <div class="theme-component-container">
             <component
               :is="themesComponent"
               @click.native="setTheme(value.id)"
               :selected="isThemeActive(value.id)"
               :id="value.id"
+              @contextmenu.native="themeMenu(arguments[0], value)"
               :colors="value.theme"
             />
             {{ value.name }}
           </div>
         </b-col>
+        <b-col cols="3" class="p-2">
+          <div class="theme-component-container">
+            <Add @click.native="createTheme" />
+            Create new theme
+          </div>
+        </b-col>
       </b-row>
     </b-container>
+    <DeleteModal v-if="themeToRemove" id="themeDeleteModal" :itemName="themeToRemove.name" @confirm="removeTheme" />
   </div>
 </template>
 
@@ -70,12 +79,20 @@ import ThemeComponentClassic from '../ThemeComponentClassic.vue'
 import { v1 } from 'uuid'
 import PreferenceHeader from '../PreferenceHeader.vue'
 import ThemeComponentCompact from '../ThemeComponentCompact.vue'
+import Add from '@/icons/Add.vue'
+import { ContextMenuComponent, MenuItem } from 'vue-context-menu-popup'
+import DeleteModal from '@/commonComponents/DeleteModal.vue'
+import ContextMenu from 'vue-context-menu-popup'
+import 'vue-context-menu-popup/dist/vue-context-menu-popup.css'
 
 @Component({
   components: {
     ThemeComponentClassic,
     ThemeComponentCompact,
-    PreferenceHeader
+    PreferenceHeader,
+    DeleteModal,
+    ContextMenu,
+    Add
   }
 })
 export default class Themes extends Vue {
@@ -102,6 +119,36 @@ export default class Themes extends Vue {
 
   private isSongView(id: songMenu) {
     return id === this.activeView
+  }
+
+  private themeToRemove: ThemeDetails | null = null
+  private menu: MenuItem[] = [
+    {
+      label: 'Delete',
+      handler: () => {
+        this.$bvModal.show('themeDeleteModal')
+      }
+    }
+  ]
+
+  private themeMenu(event: Event, theme: ThemeDetails) {
+    this.themeToRemove = theme
+    this.menu[1] = {
+      label: 'Copy to clipboard',
+      handler: () => {
+        navigator.clipboard.writeText(JSON.stringify(theme))
+      }
+    }
+    ;(this.$refs['contextMenu'] as ContextMenuComponent).open(event)
+  }
+
+  private hideContextMenu() {
+    ;(this.$refs['contextMenu'] as ContextMenuComponent).close()
+  }
+
+  private removeTheme() {
+    this.themeToRemove && window.ThemeUtils.removeTheme(this.themeToRemove?.id)
+    this.getAllThemes()
   }
 
   get defaultTheme() {
@@ -132,6 +179,12 @@ export default class Themes extends Vue {
     this.activeView = id
   }
 
+  private createTheme() {
+    this.$router.push({
+      name: 'new_theme'
+    })
+  }
+
   async created() {
     this.activeTheme = (await window.ThemeUtils.getActiveTheme())?.id ?? 'default'
     this.activeView = (await window.ThemeUtils.getSongView()) ?? 'compact'
@@ -139,6 +192,15 @@ export default class Themes extends Vue {
   }
 }
 </script>
+
+<style lang="sass">
+.context-menu
+  position: fixed !important
+  background: var(--secondary)
+  ul li
+    &:hover
+      background: var(--accent)
+</style>
 
 <style lang="sass" scoped>
 .path-selector

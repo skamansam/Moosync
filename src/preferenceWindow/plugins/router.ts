@@ -1,4 +1,5 @@
 import Extensions from '@/preferenceWindow/components/pages/Extensions.vue';
+import NewTheme from '../components/pages/NewTheme.vue'
 import Paths from '@/preferenceWindow/components/pages/Paths.vue';
 import Router from 'vue-router';
 import System from '../components/pages/System.vue'
@@ -32,6 +33,11 @@ const routes = [
     path: '/themes',
     component: Themes,
   },
+  {
+    name: 'new_theme',
+    path: '/themes/new',
+    component: NewTheme
+  }
 ]
 
 export default new Router({ routes })

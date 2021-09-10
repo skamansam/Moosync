@@ -11,6 +11,7 @@ interface Preferences {
     key: String,
     title: String,
     enabled: boolean
-  }[]
+  }[],
+  themes: { [key: String]: ThemeDetails }
 }
 

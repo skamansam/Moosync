@@ -183,7 +183,5 @@ export default class ThemeComponentClassic extends Vue {
 
   @Prop({ default: false })
   private selected!: boolean
-
-  mounted() {}
 }
 </script>

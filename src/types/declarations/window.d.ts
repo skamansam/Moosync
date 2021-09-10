@@ -87,6 +87,7 @@ interface extensionUtils {
 
 interface themeUtils {
   saveTheme: (theme: ThemeDetails) => Promise<void>
+  removeTheme: (id: string) => Promise<void>
   getTheme: (id?: string) => Promise<ThemeDetails>
   getAllThemes: (id?: string) => Promise<{ [key: string]: ThemeDetails } | undefined>
   setActiveTheme: (id: string) => Promise<void>

@@ -37,6 +37,7 @@ export enum PreferenceEvents {
   PREFERENCE_REFRESH = 'preferenceRefresh',
   SET_THEME = 'setTheme',
   GET_THEME = 'getTheme',
+  REMOVE_THEME = 'removeTheme',
   SET_ACTIVE_THEME = 'setActiveTheme',
   GET_ACTIVE_THEME = 'getActiveTheme',
   GET_ALL_THEMES = 'getAllThemes',

@@ -131,15 +131,8 @@ interface ThemeDetails {
   theme: ThemeItem
 }
 
-interface ThemeItem {
-  primary: string
-  secondary: string
-  tertiary: string
-  textPrimary: string
-  textSecondary: string
-  textInverse: string
-  accent: string
-  divider: string
-}
+type ThemeKey = 'primary' | 'secondary' | 'tertiary' | 'textPrimary' | 'textSecondary' | 'textInverse' | 'accent' | 'divider'
+
+type ThemeItem = { [key in ThemeKey]: string }
 
 

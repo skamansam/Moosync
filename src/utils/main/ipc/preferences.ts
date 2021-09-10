@@ -1,5 +1,5 @@
 import { IpcEvents, PreferenceEvents } from './constants';
-import { getActiveTheme, getSongView, loadAllThemes, loadSelectivePreference, loadTheme, onPreferenceChanged, savePreferences, saveSelectivePreference, saveTheme, setActiveTheme, setSongView } from '../db/preferences';
+import { getActiveTheme, getSongView, loadAllThemes, loadSelectivePreference, loadTheme, onPreferenceChanged, removeTheme, savePreferences, saveSelectivePreference, saveTheme, setActiveTheme, setSongView } from '../db/preferences';
 
 import { WindowHandler } from '../windowManager';
 
@@ -21,6 +21,9 @@ export class PreferenceChannel implements IpcChannelInterface {
         break
       case PreferenceEvents.GET_THEME:
         this.getTheme(event, request)
+        break
+      case PreferenceEvents.REMOVE_THEME:
+        this.removeTheme(event, request)
         break
       case PreferenceEvents.SET_ACTIVE_THEME:
         this.setActiveTheme(event, request)
@@ -72,9 +75,14 @@ export class PreferenceChannel implements IpcChannelInterface {
     event.reply(request.responseChannel, loadTheme(request.params.id))
   }
 
+  private removeTheme(event: Electron.IpcMainEvent, request: IpcRequest) {
+    event.reply(request.responseChannel, removeTheme(request.params.id))
+  }
+
   private getAllThemes(event: Electron.IpcMainEvent, request: IpcRequest) {
     event.reply(request.responseChannel, loadAllThemes())
   }
+
 
   private setActiveTheme(event: Electron.IpcMainEvent, request: IpcRequest) {
     if (request.params.id) {

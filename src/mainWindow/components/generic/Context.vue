@@ -8,9 +8,8 @@ import Vue from 'vue'
 import { bus } from '@/mainWindow/main'
 import { EventBus } from '@/utils/main/ipc/constants'
 import 'vue-context-menu-popup/dist/vue-context-menu-popup.css'
-import { MenuItem } from 'electron'
 import ContextMenu from 'vue-context-menu-popup'
-import { ContextMenuComponent } from 'vue-context-menu-popup'
+import { ContextMenuComponent, MenuItem } from 'vue-context-menu-popup'
 
 Vue.directive('click-outside', {
   bind: function (el: any, binding) {

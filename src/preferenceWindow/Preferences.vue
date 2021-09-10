@@ -16,6 +16,27 @@ import Titlebar from '@/commonComponents/Titlebar.vue'
 import { mixins } from 'vue-class-component'
 import ThemeHandler from '@/utils/ui/mixins/ThemeHandler'
 import Sidebar from '@/preferenceWindow/components/Sidebar.vue'
+import Vue from 'vue'
+
+Vue.directive('click-outside', {
+  bind: function (el: any, binding) {
+    // Define Handler and cache it on the element
+    const bubble = binding.modifiers.bubble
+    const handler = (e: Event) => {
+      if (bubble || (!el.contains(e.target) && el !== e.target)) {
+        binding.value(e)
+      }
+    }
+    el.__vueClickOutside__ = handler
+    // add Event Listeners
+    document.addEventListener('mousedown', handler)
+  },
+  unbind: function (el: any) {
+    // Remove Event Listeners
+    document.removeEventListener('mousedown', el.__vueClickOutside__)
+    el.__vueClickOutside__ = null
+  }
+})
 
 @Component({
   components: {
@@ -99,10 +120,10 @@ body {
 .main-content
   position: absolute
   left: calc(261px + 30px)
-  height: calc(100% - (6rem + 30px) - 70px + 16px)
-  top: calc(70px + 18px + 4px)
+  height: calc(100% - 30px - 70px)
+  top: calc(70px)
   right: 0
-  bottom: calc(6rem + 30px)
+  bottom: calc(30px)
   overflow-y: scroll
   overflow-x: hidden
   z-index: -4

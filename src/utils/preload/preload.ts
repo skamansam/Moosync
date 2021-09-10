@@ -76,6 +76,7 @@ contextBridge.exposeInMainWorld('SearchUtils', {
 
 contextBridge.exposeInMainWorld('ThemeUtils', {
   saveTheme: (theme: ThemeDetails) => ipcRendererHolder.send(IpcEvents.PREFERENCES, { type: PreferenceEvents.SET_THEME, params: { theme } }),
+  removeTheme: (id: string) => ipcRendererHolder.send(IpcEvents.PREFERENCES, { type: PreferenceEvents.REMOVE_THEME, params: { id } }),
   getTheme: (id?: string) => ipcRendererHolder.send(IpcEvents.PREFERENCES, { type: PreferenceEvents.GET_THEME, params: { id } }),
   getAllThemes: () => ipcRendererHolder.send(IpcEvents.PREFERENCES, { type: PreferenceEvents.GET_ALL_THEMES }),
   setActiveTheme: (id: string) => ipcRendererHolder.send(IpcEvents.PREFERENCES, { type: PreferenceEvents.SET_ACTIVE_THEME, params: { id } }),

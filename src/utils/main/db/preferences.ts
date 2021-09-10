@@ -1,4 +1,3 @@
-import { Size } from 'electron/main';
 import Store from 'electron-store';
 import { app } from 'electron';
 import { enableStartup } from '../autoLaunch';
@@ -10,7 +9,8 @@ const defaultPreferences: Preferences = {
   musicPaths: [],
   thumbnailPath: path.join(app.getPath('appData'), app.getName(), '.thumbnails'),
   artworkPath: path.join(app.getPath('appData'), app.getName(), '.thumbnails'),
-  systemSettings: []
+  systemSettings: [],
+  themes: {}
 }
 
 const store = new Store({
@@ -24,6 +24,10 @@ export function savePreferences(prefs: Preferences) {
 
 export function saveTheme(theme: ThemeDetails) {
   store.set(`themes.${theme.id}`, theme)
+}
+
+export function removeTheme(id: string) {
+  store.delete(`themes.${id}` as any)
 }
 
 export function loadTheme(id: string): ThemeDetails | undefined {

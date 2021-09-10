@@ -14,6 +14,7 @@
   },
   "main": "background.js",
   "dependencies": {
+    "@caohenghu/vue-colorpicker": "^1.2.4",
     "@googleapis/oauth2": "^0.2.0",
     "@material/ripple": "^11.0.0",
     "@moosync/moosync-types": "^1.1.8",
