@@ -138,15 +138,15 @@ export default class AudioStream extends mixins(SyncMixin, PlayerControls, Error
       this.handlerFileError(err)
     }
     this.activePlayer.onStateChange = (state) => {
-      if (!this.ignoreStateChange) {
-        if (state === 'STOPPED') {
+      console.trace(state)
+      if (state === 'STOPPED') {
+        if (!this.ignoreStateChange) {
           this.onSongEnded()
-        } else {
-          vxm.player.playerState = state
         }
       } else {
-        this.ignoreStateChange = false
+        vxm.player.playerState = state
       }
+      this.ignoreStateChange = false
     }
 
     vxm.player.$watch('volume', this.onVolumeChanged)
