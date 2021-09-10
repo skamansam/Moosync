@@ -35,7 +35,7 @@ export class YoutubeProvider extends GenericProvider {
         await this.auth.performWithFreshTokens()
         return
       }
-      this.auth.makeAuthorizationRequest()
+      await this.auth.makeAuthorizationRequest()
       return once(this.auth.authStateEmitter!, AuthStateEmitter.ON_TOKEN_RESPONSE)
     }
   }

@@ -23,9 +23,9 @@ export class OAuthHandler {
   }
 
   public registerHandler(path: string) {
-    if (this.callbackRegistry.findIndex(value => value.path === path) !== -1) {
-      console.error('Path already registered')
-      return
+    const index = this.callbackRegistry.findIndex(value => value.path === path)
+    if (index !== -1) {
+      this.callbackRegistry.splice(index, 1)
     }
 
     const channelID = v1()
