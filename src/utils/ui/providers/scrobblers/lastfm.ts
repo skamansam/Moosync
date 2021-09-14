@@ -180,7 +180,7 @@ export class LastFMProvider {
         await this.populateRequest('POST', 'track.scrobble', {
           ...parsedSong, artist: song.artists && song.artists, timestamp: (Date.now() / 1000).toFixed(0)
         })
-      }, 30 * 1e3)
+      }, 20 * 1e3)
     }
   }
 
