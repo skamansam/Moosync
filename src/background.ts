@@ -17,9 +17,11 @@ import { registerIpcChannels } from '@/utils/main/ipc'; // Import for side effec
 import { setInitialInterfaceSettings } from './utils/main/db/preferences';
 import { setupScanTask } from '@/utils/main/scheduler/index';
 
+// Override console.info and console.error with custom logging
 overrideConsole()
 
 const isDevelopment = process.env.NODE_ENV !== 'production'
+
 export const oauthHandler = new OAuthHandler()
 export const oauthEventEmitter = new EventEmitter()
 export const _windowHandler = new WindowHandler()
@@ -107,6 +109,7 @@ app.on('before-quit', () => {
 autoUpdater.autoInstallOnAppQuit = true
 autoUpdater.autoDownload = true
 
+// TODO: Figure out a better way to notify the user about update and wait for confirmation
 autoUpdater.on('update-downloaded', () => {
   autoUpdater.quitAndInstall()
 });
@@ -116,7 +119,6 @@ autoUpdater.on('update-downloaded', () => {
 // Some APIs can only be used after this event occurs.
 app.on('ready', async () => {
   ((await autoUpdater.checkForUpdatesAndNotify())?.downloadPromise)
-
 
   registerIpcChannels()
   setInitialInterfaceSettings()
@@ -128,9 +130,13 @@ app.on('ready', async () => {
   interceptHttp()
 
   await _windowHandler.createWindow(true)
+
+  // Notify extension host of main window creation
   extensionHost.mainWindowCreated()
 
   _windowHandler.handleFileOpen()
+
+  // Setup scan scheduler
   setupScanTask()
 })
 
@@ -151,6 +157,8 @@ if (isDevelopment) {
 
 app.on('open-url', function (event, data) {
   event.preventDefault()
+
+  // TODO: Test this properly
   oauthHandler.handleEvents(data)
 })
 
@@ -167,8 +175,12 @@ if (isDevelopment && process.platform === 'win32') {
 
 app.on('second-instance', handleSecondInstance)
 
+/**
+ * Parses process.argv to find if app was started by protocol
+ * @param argv array of all arguments passed to process
+ * @returns array of string which start with app protocol
+ */
 function findOAuthArg(argv: string[]) {
-  console.log(argv)
   return argv.find((arg) => arg.startsWith('com.moosync'))
 }
 
@@ -191,6 +203,9 @@ function handleSecondInstance(_: Event, argv: string[]) {
   }
 }
 
+/**
+ * Overrides console with logger
+ */
 function overrideConsole() {
   const child = log.getLogger('Main')
   prefixLogger(app.getPath('logs'), child)
