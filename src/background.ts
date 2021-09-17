@@ -12,6 +12,7 @@ import { autoUpdater } from 'electron-updater';
 import { createProtocol } from 'vue-cli-plugin-electron-builder/lib';
 import { extensionHost } from '@/utils/extensions';
 import log from 'loglevel'
+import pie from 'puppeteer-in-electron';
 import { prefixLogger } from './utils/main/logger';
 import { registerIpcChannels } from '@/utils/main/ipc'; // Import for side effects
 import { setInitialInterfaceSettings } from './utils/main/db/preferences';
@@ -25,6 +26,9 @@ const isDevelopment = process.env.NODE_ENV !== 'production'
 export const oauthHandler = new OAuthHandler()
 export const oauthEventEmitter = new EventEmitter()
 export const _windowHandler = new WindowHandler()
+
+pie.initialize(app);
+
 
 nativeTheme.themeSource = 'dark'
 

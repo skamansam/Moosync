@@ -2,6 +2,7 @@ import { IpcEvents, SearchEvents } from './constants'
 import { getDisabledPaths, loadPreferences } from '@/utils/main/db/preferences'
 
 import { SongDB } from '@/utils/main/db'
+import { webScraper } from '../fetchers/lastfm';
 import { ytScraper } from '@/utils/main/fetchers/searchYT'
 
 export class SearchChannel implements IpcChannelInterface {
@@ -19,6 +20,9 @@ export class SearchChannel implements IpcChannelInterface {
         break
       case SearchEvents.SEARCH_ENTITY_BY_OPTIONS:
         this.searchEntityByOptions(event, request)
+        break
+      case SearchEvents.SCRAPE_LASTFM:
+        this.scrapeLastFM(event, request)
         break
     }
   }
@@ -58,6 +62,13 @@ export class SearchChannel implements IpcChannelInterface {
   private async searchEntityByOptions(event: Electron.IpcMainEvent, request: IpcRequest) {
     if (request.params && request.params.options) {
       event.reply(request.responseChannel, SongDB.getEntityByOptions(request.params.options))
+    }
+  }
+
+  private async scrapeLastFM(event: Electron.IpcMainEvent, request: IpcRequest) {
+    if (request.params && request.params.url) {
+      const resp = await webScraper.scrapeURL(request.params.url)
+      event.reply(request.responseChannel, resp)
     }
   }
 }

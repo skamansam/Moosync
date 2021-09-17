@@ -15,7 +15,7 @@ enum ApiResources {
   VIDEO_DETAILS = 'videos'
 }
 
-export class YoutubeProvider extends GenericProvider {
+export class YoutubeProvider implements GenericProvider {
   private auth = new AuthFlow('youtube')
 
   private api = axios.create({
@@ -198,7 +198,7 @@ export class YoutubeProvider extends GenericProvider {
       return { url: song.url!, duration: song.duration }
   }
 
-  public async getUserPlaylist(str: string, isUrl = false) {
+  public async getPlaylistDetails(str: string, isUrl = false) {
     let id: string | undefined = str
     if (isUrl) {
       id = this.getIDFromURL(str)

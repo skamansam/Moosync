@@ -6,6 +6,9 @@ import { forageStore } from './genericProvider';
 import { once } from 'events';
 import qs from 'qs';
 
+/**
+ * Spotify API base URL
+ */
 const BASE_URL = 'https://api.spotify.com/v1/'
 
 enum ApiResources {
@@ -16,7 +19,10 @@ enum ApiResources {
   SONG_DETAILS = 'tracks/{song_id}'
 }
 
-export class SpotifyProvider extends GenericProvider {
+/**
+ * API Handler for Spotify.
+ */
+export class SpotifyProvider implements GenericProvider {
   private auth = new AuthFlow('spotify')
 
   private api = axios.create({
@@ -208,7 +214,7 @@ export class SpotifyProvider extends GenericProvider {
     }
   }
 
-  public async getUserPlaylist(str: string, isUrl = false) {
+  public async getPlaylistDetails(str: string, isUrl = false) {
     let id: string | undefined = str
     if (isUrl) {
       id = this.getIDFromURL(str)

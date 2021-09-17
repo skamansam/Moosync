@@ -1,4 +1,4 @@
-import { LastFMProvider } from './../../utils/ui/providers/scrobblers/lastfm';
+import { LastFMProvider } from '../../utils/ui/providers/lastfm';
 import { SpotifyProvider } from '@/utils/ui/providers/spotify';
 import { VuexModule } from './module';
 import { YoutubeProvider } from '@/utils/ui/providers/youtube';

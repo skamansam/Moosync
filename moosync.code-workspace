@@ -39,10 +39,13 @@
       "musicmetadata",
       "Notif",
       "obeserver",
+      "playlinks",
       "Prefs",
       "preloads",
       "Queryable",
       "scrobble",
+      "Scrobbler",
+      "scrobblers",
       "Serializable",
       "shvl",
       "Spotify",
@@ -67,6 +70,20 @@
         "name": "Moosync",
         "group": "Sqlite",
         "database": "/home/ovenoboyo/.config/moosync/databases/songs.db"
+      },
+      {
+        "mysqlOptions": {
+          "authProtocol": "default"
+        },
+        "previewLimit": 50,
+        "server": "192.168.0.18",
+        "port": 3306,
+        "driver": "MariaDB",
+        "name": "Raspberry pi",
+        "group": "Symbiosis",
+        "database": "sahil",
+        "username": "sahil",
+        "password": "9797"
       }
     ],
     "sqltools.useNodeRuntime": true,

@@ -1,0 +1,3 @@
+interface Recommendations {
+  songs: Song[]
+}

@@ -155,6 +155,12 @@ export class WindowHandler {
     }
   }
 
+  public createScrapeWindow() {
+    return new BrowserWindow({
+      show: false
+    })
+  }
+
   private handleWindowShow(window: BrowserWindow) {
     window.focus()
   }

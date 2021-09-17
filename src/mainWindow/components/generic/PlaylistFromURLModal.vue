@@ -107,12 +107,12 @@ export default class PlaylistFromUrlModal extends mixins(PlayerControls, ImgLoad
     this.playlist = null
 
     if (vxm.providers.youtubeProvider.matchPlaylist(url)) {
-      this.playlist = (await vxm.providers.youtubeProvider.getUserPlaylist(url, true)) ?? null
+      this.playlist = (await vxm.providers.youtubeProvider.getPlaylistDetails(url, true)) ?? null
       generator = vxm.providers.youtubeProvider.getPlaylistContent(url, true)
     }
 
     if (vxm.providers.spotifyProvider.matchPlaylist(url)) {
-      this.playlist = (await vxm.providers.spotifyProvider.getUserPlaylist(url, true)) ?? null
+      this.playlist = (await vxm.providers.spotifyProvider.getPlaylistDetails(url, true)) ?? null
       generator = vxm.providers.spotifyProvider.getPlaylistContent(url, true)
     }
 
@@ -246,7 +246,6 @@ export default class PlaylistFromUrlModal extends mixins(PlayerControls, ImgLoad
 
 .close-button
   background-color: var(--textPrimary)
-
 
 .input-group
   margin-top: 15px

@@ -25,6 +25,7 @@ interface searchUtils {
   searchEntityByOptions: (options: EntityApiOptions) => Promise<T[]>
   searchAll: (term: string) => Promise<SearchResult>
   searchYT: (term: string) => Promise<YoutubeItem[]>
+  scrapeLastFM: (url: string) => Promise<any>
 }
 
 interface fileUtils {

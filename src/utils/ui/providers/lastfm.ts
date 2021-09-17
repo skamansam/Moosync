@@ -1,6 +1,9 @@
+import { GenericRecommendation } from './recommendations/genericRecommendations';
+import { GenericScrobbler } from './scrobblers/genericScrobbler';
 import axios from 'axios';
 import { cache } from '@/utils/ui/providers/genericProvider';
 import md5 from 'md5'
+import moment from 'moment';
 
 const AUTH_BASE_URL = 'http://www.last.fm/api/'
 const API_BASE_URL = 'http://ws.audioscrobbler.com/2.0'
@@ -15,7 +18,7 @@ type authenticatedBody = {
 
 type sessionKey = string
 
-export class LastFMProvider {
+export class LastFMProvider implements GenericScrobbler, GenericRecommendation {
   private _session: sessionKey | undefined
   private api = axios.create({
     adapter: cache.adapter,
@@ -26,6 +29,12 @@ export class LastFMProvider {
   private oAuthChannel: string | undefined
 
   private uninitializedQueue: (() => Promise<any>)[] = []
+
+  private username: String = ''
+
+  public get loggedIn(): boolean {
+    return !!(this.initialized && this._session)
+  }
 
   constructor() {
     this.fetchStoredToken().then((data) => {
@@ -140,6 +149,7 @@ export class LastFMProvider {
   public async signOut() {
     window.Store.removeSecure(KeytarService)
     this._session = undefined
+    this.username = ''
   }
 
   private serializeBody(body: any) {
@@ -186,6 +196,48 @@ export class LastFMProvider {
 
   public async getUserDetails() {
     const resp = await this.populateRequest('GET', 'user.getInfo')
-    return resp?.user?.name
+    return this.username = resp?.user?.name
+  }
+
+  public async getRecommendations(): Promise<Recommendations> {
+    const songList: Song[] = []
+    if (this.username) {
+
+      // const resp = await this.populateRequest('GET', 'tag.getTopTracks', { tag: 'recommended', taggingtype: 'track' })
+      // console.log(resp)
+
+      const resp = await window.SearchUtils.scrapeLastFM(`https://www.last.fm/player/station/user/${this.username}/recommended`)
+      for (const song of JSON.parse(resp).playlist) {
+        if (song.playlinks.length > 0) {
+          let typeOfLink: 'YOUTUBE' | 'SPOTIFY' | undefined;
+          let url;
+          for (const link of song.playlinks) {
+            if (link.affiliate === 'youtube') {
+              typeOfLink = 'YOUTUBE'
+              url = link.id
+              break
+            } else if (link.affiliate === 'spotify') {
+              typeOfLink = 'SPOTIFY'
+              url = link.id
+              break
+            }
+          }
+
+          if (typeOfLink && url) {
+            songList.push({
+              _id: song.playlinks[0].id,
+              title: song.name,
+              duration: song.duration,
+              date_added: Date.now().toString(),
+              url,
+              type: typeOfLink
+            })
+          }
+        }
+      }
+    }
+    return {
+      songs: songList
+    }
   }
 }
