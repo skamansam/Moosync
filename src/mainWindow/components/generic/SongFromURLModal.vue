@@ -77,7 +77,7 @@ export default class SongFromUrlModal extends Vue {
   }
 
   private addToLibrary() {
-    window.DBUtils.storeSongs([this.parsedSong])
+    window.DBUtils.storeSongs([this.parsedSong as Song])
 
     this.refreshCallback && this.refreshCallback()
     this.close()
@@ -186,7 +186,6 @@ export default class SongFromUrlModal extends Vue {
 
 .close-button
   background-color: var(--textPrimary)
-
 
 .input-group
   margin-top: 15px

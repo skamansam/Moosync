@@ -5,7 +5,20 @@ declare namespace YoutubeResponses {
     CHANNELS = 'channels',
     PLAYLISTS = 'playlists',
     PLAYLIST_ITEMS = 'playlistItems',
-    VIDEO_DETAILS = 'videos'
+    VIDEO_DETAILS = 'videos',
+    SEARCH = 'search'
+  }
+
+  type SearchRequest = {
+    params: {
+      relatedToVideoId?: string,
+      videoCategoryId: 10,
+      type: 'video',
+      videoDuration: 'short',
+      maxResults?: number,
+      videoEmbeddable: true,
+      order: 'date'
+    }
   }
 
   type ChannelRequest = {
@@ -50,6 +63,8 @@ declare namespace YoutubeResponses {
     ? PlaylistItemsRequest
     : T extends ApiResources.VIDEO_DETAILS
     ? VideoDetailsRequest
+    : T extends ApiResources.SEARCH
+    ? SearchRequest
     : undefined
 
   namespace Thumbnails {
@@ -256,6 +271,20 @@ declare namespace YoutubeResponses {
     }
   }
 
+  namespace SearchDetails {
+    interface Item {
+      id: {
+        kind: string,
+        videoId: string
+      }
+      kind: string
+      etag: string
+    }
+    interface SearchDetails {
+      items: Item[],
+    }
+  }
+
   type ResponseType<T extends ApiResources> = T extends ApiResources.CHANNELS
     ? ChannelInfo.ChannelInfo
     : T extends ApiResources.PLAYLISTS
@@ -264,5 +293,7 @@ declare namespace YoutubeResponses {
     ? PlaylistItems.PlaylistItems
     : T extends ApiResources.VIDEO_DETAILS
     ? VideoDetails.VideoDetails
+    : T extends ApiResources.SEARCH
+    ? SearchDetails.SearchDetails
     : undefined
 }

@@ -212,7 +212,7 @@ export default class SearchPage extends mixins(RouterPushes, ContextMenuMixin) {
       }
     })
     songs.forEach((value) => {
-      this.queueSong(value)
+      this.queueSong([value])
     })
   }
 
@@ -223,7 +223,7 @@ export default class SearchPage extends mixins(RouterPushes, ContextMenuMixin) {
       }
     })
     songs.forEach((value) => {
-      this.queueSong(value)
+      this.queueSong([value])
     })
   }
 
@@ -234,7 +234,7 @@ export default class SearchPage extends mixins(RouterPushes, ContextMenuMixin) {
       }
     })
     songs.forEach((value) => {
-      this.queueSong(value)
+      this.queueSong([value])
     })
   }
 
@@ -245,7 +245,7 @@ export default class SearchPage extends mixins(RouterPushes, ContextMenuMixin) {
       }
     })
     songs.forEach((value) => {
-      this.queueSong(value)
+      this.queueSong([value])
     })
   }
 
@@ -262,7 +262,6 @@ export default class SearchPage extends mixins(RouterPushes, ContextMenuMixin) {
 </script>
 
 <style lang="sass">
-
 .nav-tabs .nav-link.active, .nav-tabs .nav-item.show .nav-link
   background-color: var(--accent)
   color: var(--textPrimary)

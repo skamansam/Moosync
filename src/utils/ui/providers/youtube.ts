@@ -1,6 +1,7 @@
 import { AuthFlow, AuthStateEmitter } from '@/utils/ui/oauth/flow';
 import { GenericProvider, cache } from '@/utils/ui/providers/genericProvider';
 
+import { GenericRecommendation } from './recommendations/genericRecommendations';
 import axios from 'axios';
 import moment from 'moment';
 import { once } from 'events';
@@ -12,10 +13,11 @@ enum ApiResources {
   CHANNELS = 'channels',
   PLAYLISTS = 'playlists',
   PLAYLIST_ITEMS = 'playlistItems',
-  VIDEO_DETAILS = 'videos'
+  VIDEO_DETAILS = 'videos',
+  SEARCH = 'search'
 }
 
-export class YoutubeProvider implements GenericProvider {
+export class YoutubeProvider implements GenericProvider, GenericRecommendation {
   private auth = new AuthFlow('youtube')
 
   private api = axios.create({
@@ -228,6 +230,53 @@ export class YoutubeProvider implements GenericProvider {
         }
       }
       return
+    }
+  }
+
+  public async getRecommendations(): Promise<Recommendations> {
+    const youtubeSongs = await window.SearchUtils.searchSongsByOptions({
+      song: {
+        type: 'YOUTUBE'
+      }
+    })
+
+    const resp: string[] = [];
+
+    const maxResults: number = Math.max(10 / youtubeSongs.length, 1)
+
+    const baseParams: YoutubeResponses.SearchRequest = {
+      params: {
+        type: 'video',
+        videoCategoryId: 10,
+        videoDuration: 'short',
+        videoEmbeddable: true,
+        order: 'date'
+      }
+    }
+
+    for (const song of youtubeSongs) {
+      (await this.populateRequest(ApiResources.SEARCH, {
+        params: {
+          ...baseParams.params,
+          maxResults,
+          relatedToVideoId: song.url
+        }
+      })).items.forEach((val) => resp.push(val.id.videoId))
+    }
+
+    if (resp.length < 10) {
+      (await this.populateRequest(ApiResources.SEARCH, {
+        params: {
+          ...baseParams.params,
+          maxResults: 10 - resp.length
+        }
+      })).items.forEach((val) => resp.push(val.id.videoId))
+    }
+
+    const songs = await this.getSongDetailsFromID(...resp)
+    console.log(songs)
+    return {
+      songs
     }
   }
 }
