@@ -1,6 +1,7 @@
 import { AuthFlow, AuthStateEmitter } from '@/utils/ui/oauth/flow';
 import { GenericProvider, cache } from '@/utils/ui/providers/genericProvider';
 
+import { GenericRecommendation } from './recommendations/genericRecommendations';
 import axios from 'axios';
 import { forageStore } from './genericProvider';
 import { once } from 'events';
@@ -16,13 +17,15 @@ enum ApiResources {
   PLAYLISTS = 'me/playlists',
   PLAYLIST = 'playlists/{playlist_id}',
   PLAYLIST_ITEMS = 'playlists/{playlist_id}/tracks',
-  SONG_DETAILS = 'tracks/{song_id}'
+  SONG_DETAILS = 'tracks/{song_id}',
+  TOP = 'me/top/{type}',
+  RECOMMENDATIONS = 'recommendations'
 }
 
 /**
  * API Handler for Spotify.
  */
-export class SpotifyProvider implements GenericProvider {
+export class SpotifyProvider implements GenericProvider, GenericRecommendation {
   private auth = new AuthFlow('spotify')
 
   private api = axios.create({
@@ -62,6 +65,11 @@ export class SpotifyProvider implements GenericProvider {
 
     if (resource === ApiResources.SONG_DETAILS) {
       url = resource.replace('{song_id}', (search as SpotifyResponses.TrackItemRequest).params.song_id)
+    }
+
+    if (resource === ApiResources.TOP) {
+      url = resource.replace('{type}', (search as SpotifyResponses.TopRequest).params.type)
+      search.params = undefined
     }
 
     const resp = await this.api(url, {
@@ -260,6 +268,83 @@ export class SpotifyProvider implements GenericProvider {
         }
         return
       }
+    }
+  }
+
+  private parseRecommendations(recommendations: SpotifyResponses.RecommendationDetails.Recommendations) {
+    const songList: Song[] = []
+    for (const track of recommendations.tracks) {
+      const song: Song = {
+        _id: track.id,
+        title: track.name,
+        album: {
+          album_name: track.album.name,
+          album_artist: (track.album.artists && track.album.artists.length > 0) ? track.album.artists[0].name : undefined,
+        },
+        duration: track.duration_ms / 1000,
+        date_added: Date.now().toString(),
+        type: 'SPOTIFY'
+      }
+
+      if (track.artists?.length > 0) {
+        song.artists = []
+        for (const artist of track.artists) {
+          song.artists.push(artist.name)
+        }
+      }
+
+      if (track.album.images?.length > 0) {
+        const high = track.album.images[0].url
+        let low = high
+        if (track.album.images[1])
+          low = track.album.images[1].url
+
+        song.song_coverPath_high = high
+        song.album!.album_coverPath_high = high
+        song.song_coverPath_low = low
+        song.album!.album_coverPath_low = low
+      }
+
+      songList.push(song)
+    }
+    return songList
+  }
+
+  public async getRecommendations(): Promise<Recommendations> {
+    const userTracks: any = await this.populateRequest(ApiResources.TOP, {
+      params: {
+        type: 'tracks',
+        time_range: 'long_term'
+      }
+    })
+
+    const userArtists: any = await this.populateRequest(ApiResources.TOP, {
+      params: {
+        type: 'artists',
+        time_range: 'long_term'
+      }
+    })
+
+    const seedTracks = []
+    const seedArtists = []
+
+    for (const item of userTracks.items) {
+      seedTracks.push(item.id)
+    }
+
+    for (const item of userArtists.items) {
+      seedArtists.push(item.id)
+    }
+
+    const recommendationsResp = await this.populateRequest(ApiResources.RECOMMENDATIONS, {
+      params: {
+        seed_artists: seedArtists,
+        seed_tracks: seedTracks
+      }
+    })
+
+    return {
+      songs: this.parseRecommendations(recommendationsResp)
     }
   }
 }

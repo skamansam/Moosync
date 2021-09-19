@@ -125,7 +125,7 @@ export class AuthFlow {
           openIdConnectUrl: 'https://accounts.spotify.com/authorize',
           clientId: process.env.SpotifyClientID!,
           redirectUri: "com.moosync://spotifyoauthcallback",
-          scope: "playlist-read-private",
+          scope: "playlist-read-private user-top-read",
           keytarService: 'MoosyncSpotifyRefreshToken',
           oAuthChannel: await window.WindowUtils.registerOAuthCallback('spotifyoauthcallback'),
           type: 'spotify'

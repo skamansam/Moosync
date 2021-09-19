@@ -5,9 +5,25 @@ declare module SpotifyResponses {
     PLAYLISTS = 'me/playlists',
     PLAYLIST = 'playlists/{playlist_id}',
     PLAYLIST_ITEMS = 'playlists/{playlist_id}/tracks',
-    SONG_DETAILS = 'tracks/{song_id}'
+    SONG_DETAILS = 'tracks/{song_id}',
+    TOP = 'me/top/{type}',
+    RECOMMENDATIONS = 'recommendations'
   }
 
+  type RecommendationRequest = {
+    params: {
+      seed_artists?: string[]
+      seed_genres?: string[]
+      seed_tracks?: string[]
+    }
+  }
+
+  type TopRequest = {
+    params: {
+      type: 'artists' | 'tracks',
+      time_range: 'long_term' | 'medium_term' | 'short_term'
+    }
+  }
 
   type ChannelRequest = {
     params: undefined
@@ -51,6 +67,10 @@ declare module SpotifyResponses {
     ? TrackItemRequest
     : T extends ApiResources.PLAYLIST
     ? PlaylistItemRequest
+    : T extends ApiResources.TOP
+    ? TopRequest
+    : T extends ApiResources.RECOMMENDATIONS
+    ? RecommendationRequest
     : undefined
 
   interface Image {
@@ -236,6 +256,92 @@ declare module SpotifyResponses {
     }
   }
 
+  declare module RecommendationDetails {
+
+    export interface ExternalUrls {
+      spotify: string;
+    }
+
+    export interface Artist {
+      external_urls: ExternalUrls;
+      href: string;
+      id: string;
+      name: string;
+      type: string;
+      uri: string;
+    }
+
+    export interface Image {
+      height: number;
+      url: string;
+      width: number;
+    }
+
+    export interface Album {
+      album_type: string;
+      artists: Artist[];
+      available_markets: string[];
+      external_urls: ExternalUrls;
+      href: string;
+      id: string;
+      images: Image[];
+      name: string;
+      release_date: string;
+      release_date_precision: string;
+      total_tracks: number;
+      type: string;
+      uri: string;
+    }
+
+    export interface Artist2 {
+      external_urls: ExternalUrls;
+      href: string;
+      id: string;
+      name: string;
+      type: string;
+      uri: string;
+    }
+
+    export interface ExternalIds {
+      isrc: string;
+    }
+
+    export interface Track {
+      album: Album;
+      artists: Artist2[];
+      available_markets: string[];
+      disc_number: number;
+      duration_ms: number;
+      explicit: boolean;
+      external_ids: ExternalIds;
+      external_urls: ExternalUrls;
+      href: string;
+      id: string;
+      is_local: boolean;
+      name: string;
+      popularity: number;
+      preview_url: string;
+      track_number: number;
+      type: string;
+      uri: string;
+    }
+
+    export interface Seed {
+      initialPoolSize: number;
+      afterFilteringSize: number;
+      afterRelinkingSize: number;
+      id: string;
+      type: string;
+      href: string;
+    }
+
+    export interface Recommendations {
+      tracks: Track[];
+      seeds: Seed[];
+    }
+
+  }
+
 
 
   type ResponseType<T extends ApiResources> = T extends ApiResources.USER_DETAILS
@@ -248,5 +354,7 @@ declare module SpotifyResponses {
     ? UserPlaylists.Item
     : T extends ApiResources.SONG_DETAILS
     ? PlaylistItems.Track
+    : T extends ApiResources.RECOMMENDATIONS
+    ? RecommendationDetails.Recommendations
     : undefined
 }
