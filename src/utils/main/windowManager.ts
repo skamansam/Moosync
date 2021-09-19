@@ -133,6 +133,8 @@ export class WindowHandler {
         WindowHandler.preferenceWindow = win.id
 
       this.attachWindowEvents(win, isMainWindow)
+    } else {
+      WindowHandler.getWindow(isMainWindow)?.focus()
     }
   }
 
